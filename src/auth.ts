@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
+import Google from 'next-auth/providers/google' // <-- IMPORTANTE
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
@@ -8,6 +9,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     Credentials({
       name: 'Credenciales',
       credentials: {
@@ -57,9 +62,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async signIn({ user, account, profile }) {
+      // RESTRICCIÓN PARA GOOGLE
+      if (account?.provider === 'google') {
+        const email = profile?.email || ''
+        // CAMBIA ESTO por el dominio real del hospital. 
+        // Para probar ahora, déjalo en @gmail.com
+        if (!email.endsWith('@gmail.com')) {
+          return false 
+        }
+      }
+      return true
+    },
     async jwt({ token, user }) {
       if (user) {
-        // Al poner el "!", le decimos a TypeScript que estamos seguros de que user.id existe
         token.id = user.id!
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.role = (user as any).role
