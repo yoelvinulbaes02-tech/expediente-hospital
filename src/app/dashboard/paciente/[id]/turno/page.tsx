@@ -22,6 +22,15 @@ export default async function EntregaTurnoPage({ params }: { params: Promise<{ i
     },
   })
 
+  // Consultar los médicos activos para el desplegable de entrega
+  const doctores = await prisma.user.findMany({
+    where: { 
+      role: { in: ['DOCTOR', 'RESIDENT'] },
+      isActive: true 
+    },
+    select: { id: true, fullName: true, email: true }
+  })
+
   if (!episode) return <div className="p-8 text-center text-slate-800">Expediente no encontrado.</div>
 
   const ultimosVitales = episode.vitals[0]
@@ -115,8 +124,19 @@ export default async function EntregaTurnoPage({ params }: { params: Promise<{ i
               <input disabled value={session.user?.name || ''} className="w-full px-3 py-2 border rounded-lg bg-slate-200 text-slate-600" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Recibido por (Nombre del médico que recibe):</label>
-              <input name="recibidoPor" required className="w-full px-3 py-2 border rounded-lg text-slate-900" placeholder="Ej. Dra. Ana Gómez" />
+              <label className="block text-sm font-medium text-slate-700 mb-1">Recibido por (Médico que recibe):</label>
+              <select 
+                name="recibidoPor" 
+                required 
+                className="w-full px-3 py-2 border rounded-lg text-slate-900 bg-white"
+              >
+                <option value="">Seleccione un médico...</option>
+                {doctores.map((doc) => (
+                  <option key={doc.id} value={doc.email}>
+                    {doc.fullName} ({doc.email})
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Observaciones adicionales (Opcional):</label>

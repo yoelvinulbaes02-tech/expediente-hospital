@@ -27,12 +27,18 @@ export async function guardarEntregaTurno(formData: FormData): Promise<void> {
     volverConError(episodeId, 'No puedes entregarte el turno a ti mismo')
   }
 
-  // El receptor debe ser un médico real y activo (recibe la responsabilidad del paciente)
+  // El receptor debe ser un médico real y activo (buscamos por CORREO)
   const receptor = await prisma.user.findFirst({
     where: { email: { equals: recibidoPor, mode: 'insensitive' } },
     select: { email: true, fullName: true, role: true, isActive: true },
   })
-  if (!receptor || !receptor.isActive) volverConError(episodeId, 'Receptor no válido')
+  
+  if (!receptor) {
+    volverConError(episodeId, 'El correo del receptor no existe en el sistema')
+  }
+  if (!receptor.isActive) {
+    volverConError(episodeId, 'El receptor está inactivo')
+  }
   if (!ROLES_MEDICOS.includes(receptor.role)) {
     volverConError(episodeId, 'El receptor debe ser médico o residente')
   }

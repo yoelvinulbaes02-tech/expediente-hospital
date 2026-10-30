@@ -8,14 +8,13 @@ export default async function TurnosPendientesPage() {
   const session = await auth()
   if (!session) redirect('/login')
 
-  // Obtenemos el nombre del médico logueado
-  const nombreMedico = session.user?.name || ''
+  const correoMedico = session.user?.email || ''
 
-  // Buscamos todos los handoffs que estén en estado PENDIENTE y que sean para este médico
+  // Buscamos por correo en el campo 'recibidoPor' (que ahora guardaremos como correo)
   const handoffs = await prisma.handoff.findMany({
     where: { 
       status: 'PENDIENTE',
-      recibidoPor: { contains: nombreMedico, mode: 'insensitive' }
+      recibidoPor: { contains: correoMedico, mode: 'insensitive' }
     },
     include: {
       episode: {
@@ -32,7 +31,7 @@ export default async function TurnosPendientesPage() {
           <div>
             <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block">← Volver al Dashboard</Link>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Mis Turnos Pendientes</h1>
-            <p className="text-sm text-slate-500">Pacientes entregados a: {nombreMedico}</p>
+            <p className="text-sm text-slate-500">Pacientes entregados a: {session.user?.name}</p>
           </div>
         </div>
 
@@ -59,12 +58,12 @@ export default async function TurnosPendientesPage() {
                     PENDIENTE
                   </span>
                   
-                  {/* BOTÓN DE ACEPTAR */}
                   <form action={async () => {
                     'use server'
                     const formData = new FormData()
                     formData.append('handoffId', handoff.id)
                     formData.append('episodeId', handoff.episodeId)
+                    formData.append('correoReceptor', correoMedico)
                     await aceptarEntregaTurno(formData)
                   }}>
                     <button type="submit" className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors shadow-sm mt-2">
