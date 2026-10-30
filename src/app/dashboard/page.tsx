@@ -90,6 +90,15 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{session.user?.name}</p>
             <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">{userRole}</p>
           </div>
+
+          {/* BOTÓN MI PERFIL */}
+          <Link 
+            href="/dashboard/perfil" 
+            className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+          >
+            ⚙️ Mi Perfil
+          </Link>
+
           <form action={async () => {
             'use server'
             await signOut({ redirectTo: '/login' })
