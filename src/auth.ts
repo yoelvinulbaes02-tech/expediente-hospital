@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import Google from 'next-auth/providers/google' // <-- IMPORTANTE
+import Google from 'next-auth/providers/google'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
@@ -62,14 +62,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async signIn({ user, account, profile }) {
       // RESTRICCIÓN PARA GOOGLE
       if (account?.provider === 'google') {
         const email = profile?.email || ''
-        // CAMBIA ESTO por el dominio real del hospital. 
-        // Para probar ahora, déjalo en @gmail.com
-        if (!email.endsWith('@gmail.com')) {
+        // SOLO PERMITIR TU CORREO EXACTO
+        if (email !== 'yoelvinulbaes02@gmail.com') {
           return false 
         }
       }
