@@ -42,6 +42,13 @@ export default async function PerfilPage() {
               Guardar Cambios
             </button>
           </form>
+
+          {/* AVISO DE CONTRASEÑA OLVIDADA */}
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-xs text-blue-800 dark:text-blue-300 text-center">
+              ¿Olvidaste tu contraseña? Contacta al administrador del sistema para que te asigne una temporal.
+            </p>
+          </div>
         </div>
       </div>
     </div>

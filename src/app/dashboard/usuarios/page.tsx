@@ -2,8 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { crearUsuario, toggleUsuario } from './actions'
-import { SearchInput } from '@/components/SearchInput' // <-- Reutilizamos tu buscador
+import { crearUsuario, toggleUsuario, resetearPassword } from './actions'
+import { SearchInput } from '@/components/SearchInput'
 
 export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const session = await auth()
@@ -17,7 +17,6 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
   const { q } = await searchParams
   const busqueda = q || ''
 
-  // Buscamos usuarios filtrando por nombre o correo
   const usuarios = await prisma.user.findMany({
     where: busqueda ? {
       OR: [
@@ -88,18 +87,32 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    {u.id !== session.user?.id && (
-                      <form action={toggleUsuario}>
-                        <input type="hidden" name="userId" value={u.id} />
-                        <input type="hidden" name="isActive" value={String(!u.isActive)} />
-                        <button 
-                          type="submit" 
-                          className={`text-xs font-medium px-3 py-1 rounded border transition-colors ${u.isActive ? 'text-red-600 border-red-200 hover:bg-red-50' : 'text-green-600 border-green-200 hover:bg-green-50'}`}
-                        >
-                          {u.isActive ? 'Desactivar' : 'Activar'}
-                        </button>
-                      </form>
-                    )}
+                    <div className="flex items-center justify-end gap-2">
+                      {u.id !== session.user?.id && (
+                        <>
+                          <form action={toggleUsuario}>
+                            <input type="hidden" name="userId" value={u.id} />
+                            <input type="hidden" name="isActive" value={String(!u.isActive)} />
+                            <button 
+                              type="submit" 
+                              className={`text-xs font-medium px-2 py-1 rounded border transition-colors ${u.isActive ? 'text-red-600 border-red-200 hover:bg-red-50' : 'text-green-600 border-green-200 hover:bg-green-50'}`}
+                            >
+                              {u.isActive ? 'Desactivar' : 'Activar'}
+                            </button>
+                          </form>
+                          
+                          <form action={resetearPassword}>
+                            <input type="hidden" name="userId" value={u.id} />
+                            <button 
+                              type="submit" 
+                              className="text-xs font-medium px-2 py-1 rounded border text-amber-600 border-amber-200 hover:bg-amber-50"
+                            >
+                              Resetear Clave
+                            </button>
+                          </form>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
