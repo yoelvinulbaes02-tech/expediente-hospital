@@ -62,14 +62,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async signIn({ user, account, profile }) {
-      // RESTRICCIÓN PARA GOOGLE
       if (account?.provider === 'google') {
         const email = profile?.email || ''
-        // SOLO PERMITIR TU CORREO EXACTO
-        if (email !== 'yoelvinulbaes02@gmail.com') {
-          return false 
+        
+        // RESTRICCIÓN: Solo permitir correos del dominio @pacientes.com
+        if (!email.endsWith('@pacientes.com')) {
+          return false // Rechaza cualquier otro dominio (Gmail, Hotmail, etc.)
         }
       }
       return true
