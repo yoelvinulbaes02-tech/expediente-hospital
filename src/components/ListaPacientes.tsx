@@ -11,6 +11,8 @@ type Episodio = {
   bed: string | null
   chiefComplaint: string | null
   attendingDoctor: string | null
+  responsible: { fullName: string } | null
+  _count: { tasks: number }
   patient: {
     firstName: string
     lastName: string
@@ -35,7 +37,7 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
   const [seleccionados, setSeleccionados] = useState<string[]>([])
   const [medicoRecibe, setMedicoRecibe] = useState('')
 
-  // Lógica de búsqueda que ya tenías
+  // Lógica de búsqueda
   const filtrados = useMemo(() => {
     const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean)
     if (terminos.length === 0) return episodes
@@ -180,6 +182,14 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
               <div className="mb-4 mt-3">
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Motivo: <span className="font-normal">{episode.chiefComplaint}</span></p>
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Médico: <span className="font-normal">{episode.attendingDoctor}</span></p>
+                
+                {/* NUEVOS CAMPOS: A cargo y contador de tareas */}
+                <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">A cargo: <span className="font-normal">{episode.responsible?.fullName ?? 'Sin asignar'}</span></p>
+                {episode._count.tasks > 0 && (
+                  <p className="mt-2 inline-block bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-bold px-2 py-0.5 rounded">
+                    ☑ {episode._count.tasks} pendiente{episode._count.tasks === 1 ? '' : 's'}
+                  </p>
+                )}
               </div>
 
               <BannerAlergias alergias={episode.allergies} />

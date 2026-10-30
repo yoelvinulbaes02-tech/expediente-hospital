@@ -175,7 +175,9 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   bed: 'bed',
   attendingDoctor: 'attendingDoctor',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  responsibleId: 'responsibleId',
+  responsibleSince: 'responsibleSince'
 };
 
 exports.Prisma.AllergyScalarFieldEnum = {
@@ -229,6 +231,20 @@ exports.Prisma.HandoffScalarFieldEnum = {
   aceptadoAt: 'aceptadoAt'
 };
 
+exports.Prisma.TaskScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  title: 'title',
+  category: 'category',
+  dueAt: 'dueAt',
+  status: 'status',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  doneBy: 'doneBy',
+  doneAt: 'doneAt',
+  cancelReason: 'cancelReason'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -276,7 +292,8 @@ exports.Prisma.ModelName = {
   Allergy: 'Allergy',
   Note: 'Note',
   VitalSign: 'VitalSign',
-  Handoff: 'Handoff'
+  Handoff: 'Handoff',
+  Task: 'Task'
 };
 
 /**

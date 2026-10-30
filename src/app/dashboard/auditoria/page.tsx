@@ -2,85 +2,75 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { SearchInput } from '@/components/SearchInput'
+import { TablaAuditoria, type FilaAuditoria } from '@/components/TablaAuditoria'
+import { describirRegistro } from '@/lib/auditoria-texto'
 
-export default async function AuditoriaPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+export default async function AuditoriaPage() {
   const session = await auth()
-  
+
   // Solo el ADMIN puede ver la auditoría
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!session || (session.user as any)?.role !== 'ADMIN') {
+  if (!session || String(session.user?.role) !== 'ADMIN') {
     redirect('/dashboard')
   }
 
-  const { q } = await searchParams
-  const busqueda = q || ''
-
   const registros = await prisma.auditLog.findMany({
-    where: busqueda ? {
-      OR: [
-        { action: { contains: busqueda, mode: 'insensitive' } },
-        { entity: { contains: busqueda, mode: 'insensitive' } },
-        { actorRole: { contains: busqueda, mode: 'insensitive' } },
-      ]
-    } : {},
     orderBy: { serverTs: 'desc' },
-    take: 100,
+    take: 300,
+    include: { actor: { select: { fullName: true, email: true } } },
+  })
+
+  // Nombres de pacientes (por expediente o, si no hay, por paciente)
+  const episodeIds = Array.from(new Set(registros.map((r) => r.episodeId).filter((x): x is string => !!x)))
+  const patientIds = Array.from(
+    new Set(registros.filter((r) => !r.episodeId && r.patientId).map((r) => r.patientId as string))
+  )
+
+  const [episodios, pacientes] = await Promise.all([
+    prisma.episode.findMany({
+      where: { id: { in: episodeIds } },
+      select: { id: true, patient: { select: { firstName: true, lastName: true, expedienteNumber: true } } },
+    }),
+    prisma.patient.findMany({
+      where: { id: { in: patientIds } },
+      select: { id: true, firstName: true, lastName: true, expedienteNumber: true },
+    }),
+  ])
+
+  const porEpisodio = new Map(
+    episodios.map((e) => [e.id, `${e.patient.firstName} ${e.patient.lastName} (${e.patient.expedienteNumber})`])
+  )
+  const porPaciente = new Map(
+    pacientes.map((p) => [p.id, `${p.firstName} ${p.lastName} (${p.expedienteNumber})`])
+  )
+
+  const filas: FilaAuditoria[] = registros.map((r) => {
+    const { que, detalle } = describirRegistro(r)
+    const paciente =
+      (r.episodeId ? porEpisodio.get(r.episodeId) : undefined) ??
+      (r.patientId ? porPaciente.get(r.patientId) : undefined) ??
+      '—'
+    return {
+      id: r.id.toString(),
+      fecha: r.serverTs.toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' }),
+      usuario: r.actor.fullName,
+      correo: r.actor.email,
+      rol: r.actorRole,
+      que,
+      paciente,
+      detalle,
+    }
   })
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <div>
-            <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block">← Volver al Dashboard</Link>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Registro de Auditoría</h1>
-            <p className="text-sm text-slate-500">Historial inmutable de acciones (Últimos 100 movimientos)</p>
-          </div>
-          
-          {/* LUPA DINÁMICA */}
-          <div className="w-full md:w-auto">
-            <SearchInput defaultValue={busqueda} placeholder="🔍 Buscar por acción, rol o entidad..." />
-          </div>
+        <div className="mb-6">
+          <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block">← Volver al Dashboard</Link>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Registro de Auditoría</h1>
+          <p className="text-sm text-slate-500">Historial inmutable de acciones (últimos 300 movimientos)</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-              <tr>
-                <th className="px-4 py-3">Fecha / Hora</th>
-                <th className="px-4 py-3">Usuario</th>
-                <th className="px-4 py-3">Rol</th>
-                <th className="px-4 py-3">Acción</th>
-                <th className="px-4 py-3">Entidad</th>
-                <th className="px-4 py-3">Detalles</th>
-              </tr>
-            </thead>
-            <tbody>
-              {registros.map((log) => (
-                <tr key={log.id.toString()} className="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                  <td className="px-4 py-3 text-xs text-slate-500">
-                    {log.serverTs.toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}
-                  </td>
-                  <td className="px-4 py-3 text-slate-800 dark:text-slate-200">{log.actorId}</td>
-                  <td className="px-4 py-3">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">
-                      {log.actorRole}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-slate-700 dark:text-slate-300">{log.action}</td>
-                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{log.entity}</td>
-                  <td className="px-4 py-3 text-xs text-slate-500 min-w-[16rem] whitespace-normal wrap-break-word">
-                    {log.reason || JSON.stringify(log.newValue)}
-                  </td>
-                </tr>
-              ))}
-              {registros.length === 0 && (
-                <tr><td colSpan={6} className="text-center py-8 text-slate-500">No hay registros que coincidan con la búsqueda.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <TablaAuditoria filas={filas} />
       </div>
     </div>
   )

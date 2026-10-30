@@ -3,10 +3,9 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
+import { exigirPermiso, ROLES_MEDICOS } from '@/lib/permisos'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-
-const ROLES_CLINICOS: string[] = ['DOCTOR', 'RESIDENT', 'NURSE']
 
 // Regresa a la pantalla del turno mostrando un mensaje de error
 function volverConError(episodeId: string, mensaje: string): never {
@@ -14,57 +13,40 @@ function volverConError(episodeId: string, mensaje: string): never {
 }
 
 export async function guardarEntregaTurno(formData: FormData): Promise<void> {
-  const session = await auth()
-  const emailEntrega = session?.user?.email
-  if (!session || !emailEntrega) redirect('/login')
-
   const episodeId = String(formData.get('episodeId') ?? '')
+  if (!episodeId) redirect('/dashboard')
+
+  // Solo el médico a cargo del paciente puede entregarlo
+  const { userId, role, email, nombre, episode } = await exigirPermiso(episodeId, 'editar')
+
   const recibidoPor = String(formData.get('recibidoPor') ?? '').trim()
   const observaciones = String(formData.get('observaciones') ?? '').trim() || null
 
-  if (!episodeId) redirect('/dashboard')
   if (!recibidoPor) volverConError(episodeId, 'Debes seleccionar quién recibe el turno')
-
-  // Solo personal clínico puede entregar turno
-  if (!ROLES_CLINICOS.includes(session.user.role)) {
-    volverConError(episodeId, 'Tu rol no tiene permiso para entregar turnos')
-  }
-
-  if (recibidoPor.toLowerCase() === emailEntrega.toLowerCase()) {
+  if (recibidoPor.toLowerCase() === email.toLowerCase()) {
     volverConError(episodeId, 'No puedes entregarte el turno a ti mismo')
   }
 
-  // El episodio debe existir y estar activo
-  const episode = await prisma.episode.findUnique({
-    where: { id: episodeId },
-    select: { id: true, status: true, patientId: true },
-  })
-  if (!episode || episode.status !== 'active') {
-    volverConError(episodeId, 'El expediente no está activo')
-  }
-
-  // El receptor debe ser un usuario real, activo y clínico
+  // El receptor debe ser un médico real y activo (recibe la responsabilidad del paciente)
   const receptor = await prisma.user.findFirst({
     where: { email: { equals: recibidoPor, mode: 'insensitive' } },
-    select: { email: true, role: true, isActive: true },
+    select: { email: true, fullName: true, role: true, isActive: true },
   })
   if (!receptor || !receptor.isActive) volverConError(episodeId, 'Receptor no válido')
-  if (!ROLES_CLINICOS.includes(receptor.role)) {
-    volverConError(episodeId, 'El receptor no es personal clínico')
+  if (!ROLES_MEDICOS.includes(receptor.role)) {
+    volverConError(episodeId, 'El receptor debe ser médico o residente')
   }
 
   // Evitar dos entregas pendientes para el mismo paciente
-  const pendiente = await prisma.handoff.findFirst({
-    where: { episodeId, status: 'PENDIENTE' },
-  })
-  if (pendiente) {
-    volverConError(episodeId, 'Ya existe una entrega pendiente para este paciente')
-  }
+  const pendiente = await prisma.handoff.findFirst({ where: { episodeId, status: 'PENDIENTE' } })
+  if (pendiente) volverConError(episodeId, 'Ya existe una entrega pendiente para este paciente')
+
+  const tareasPendientes = await prisma.task.count({ where: { episodeId, status: 'pendiente' } })
 
   const handoff = await prisma.handoff.create({
     data: {
       episodeId,
-      entregadoPor: emailEntrega,
+      entregadoPor: email,
       recibidoPor: receptor.email,
       observaciones,
       status: 'PENDIENTE',
@@ -72,17 +54,18 @@ export async function guardarEntregaTurno(formData: FormData): Promise<void> {
   })
 
   await logAudit({
-    actorId: session.user.id,
-    actorRole: session.user.role,
+    actorId: userId,
+    actorRole: role,
     action: 'create',
     entity: 'handoff',
     entityId: handoff.id,
     patientId: episode.patientId,
     episodeId,
     newValue: {
-      entregadoPor: emailEntrega,
-      recibidoPor: receptor.email,
+      entregadoPor: nombre,
+      recibidoPor: receptor.fullName,
       observaciones,
+      tareasPendientes,
       status: 'PENDIENTE',
     },
     reason: 'Entrega de turno solicitada',
@@ -95,46 +78,66 @@ export async function guardarEntregaTurno(formData: FormData): Promise<void> {
 
 export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
   const session = await auth()
-  const email = session?.user?.email
-  if (!session || !email) redirect('/login')
+  const user = session?.user
+  if (!user?.id || !user.email) redirect('/login')
 
   const handoffId = String(formData.get('handoffId') ?? '')
-  const handoff = await prisma.handoff.findUnique({ where: { id: handoffId } })
+  const handoff = await prisma.handoff.findUnique({
+    where: { id: handoffId },
+    include: { episode: { select: { patientId: true, status: true } } },
+  })
   if (!handoff) redirect('/dashboard')
 
   const episodeId = handoff.episodeId
+  const role = String(user.role)
 
   // Solo el receptor designado puede aceptar
-  if (handoff.recibidoPor.toLowerCase() !== email.toLowerCase()) {
+  if (handoff.recibidoPor.toLowerCase() !== user.email.toLowerCase()) {
     volverConError(episodeId, 'Solo la persona designada puede aceptar este turno')
   }
-  if (handoff.status !== 'PENDIENTE') {
-    volverConError(episodeId, 'Esta entrega ya fue procesada')
+  if (!ROLES_MEDICOS.includes(role)) {
+    volverConError(episodeId, 'Solo un médico puede recibir la responsabilidad del paciente')
   }
+  if (handoff.status !== 'PENDIENTE') volverConError(episodeId, 'Esta entrega ya fue procesada')
+  if (handoff.episode.status !== 'active') volverConError(episodeId, 'El expediente ya está cerrado')
 
-  const episode = await prisma.episode.findUnique({
-    where: { id: episodeId },
-    select: { patientId: true },
+  const entregador = await prisma.user.findFirst({
+    where: { email: { equals: handoff.entregadoPor, mode: 'insensitive' } },
+    select: { fullName: true },
   })
+  const nombre = user.name ?? user.email
 
-  await prisma.handoff.update({
-    where: { id: handoffId },
-    data: { status: 'ACEPTADO', aceptadoAt: new Date() },
-  })
+  // Acepta la entrega Y traspasa la responsabilidad en una sola operación
+  const [aceptada] = await prisma.$transaction([
+    prisma.handoff.updateMany({
+      where: { id: handoffId, status: 'PENDIENTE' },
+      data: { status: 'ACEPTADO', aceptadoAt: new Date() },
+    }),
+    prisma.episode.update({
+      where: { id: episodeId },
+      data: { responsibleId: user.id, responsibleSince: new Date() },
+    }),
+  ])
+  if (aceptada.count === 0) volverConError(episodeId, 'Esta entrega ya fue procesada')
 
   await logAudit({
-    actorId: session.user.id,
-    actorRole: session.user.role,
+    actorId: user.id,
+    actorRole: role,
     action: 'update',
     entity: 'handoff',
     entityId: handoffId,
-    patientId: episode?.patientId,
+    patientId: handoff.episode.patientId,
     episodeId,
     oldValue: { status: 'PENDIENTE' },
-    newValue: { status: 'ACEPTADO' },
-    reason: 'Entrega de turno aceptada',
+    newValue: {
+      status: 'ACEPTADO',
+      nuevoResponsable: nombre,
+      entregadoPor: entregador?.fullName ?? handoff.entregadoPor,
+    },
+    reason: 'Entrega de turno aceptada: asumió la responsabilidad del paciente',
   })
 
+  revalidatePath('/dashboard')
   revalidatePath(`/dashboard/paciente/${episodeId}`)
   revalidatePath(`/dashboard/paciente/${episodeId}/turno`)
   redirect(`/dashboard/paciente/${episodeId}/turno`)

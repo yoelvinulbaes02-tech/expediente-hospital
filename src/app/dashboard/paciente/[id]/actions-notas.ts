@@ -1,39 +1,34 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
+import { exigirPermiso, volverAlExpediente } from '@/lib/permisos'
 import { revalidatePath } from 'next/cache'
 
-export async function guardarNota(formData: FormData) {
-  const session = await auth()
-  if (!session) throw new Error('No autorizado')
+export async function guardarNota(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'editar')
 
-  const episodeId = formData.get('episodeId') as string
-  const subjective = formData.get('subjective') as string
-  const objective = formData.get('objective') as string
-  const assessment = formData.get('assessment') as string
-  const plan = formData.get('plan') as string
+  const subjective = String(formData.get('subjective') ?? '').trim()
+  const objective = String(formData.get('objective') ?? '').trim()
+  const assessment = String(formData.get('assessment') ?? '').trim()
+  const plan = String(formData.get('plan') ?? '').trim()
+
+  if (!subjective || !objective || !assessment || !plan) {
+    volverAlExpediente(episodeId, 'Completa los cuatro campos de la nota (S, O, A, P)')
+  }
 
   const nuevaNota = await prisma.note.create({
-    data: {
-      episodeId,
-      subjective,
-      objective,
-      assessment,
-      plan,
-      status: 'firmada',
-      createdBy: session.user?.email || 'desconocido',
-    }
+    data: { episodeId, subjective, objective, assessment, plan, status: 'firmada', createdBy: email },
   })
 
   await logAudit({
-    actorId: session.user?.id as string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actorRole: (session.user as any)?.role,
+    actorId: userId,
+    actorRole: role,
     action: 'create',
     entity: 'note',
     entityId: nuevaNota.id,
+    patientId: episode.patientId,
     episodeId,
     newValue: { subjective, objective, assessment, plan },
     reason: 'Nota de evolución firmada',

@@ -39,6 +39,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     include: {
       patient: true,
       allergies: true,
+      responsible: { select: { fullName: true } },
+      _count: { select: { tasks: { where: { status: 'pendiente' } } } },
     },
     orderBy: { admissionDate: 'desc' },
   })

@@ -1,52 +1,53 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
+import { exigirPermiso, volverAlExpediente } from '@/lib/permisos'
 import { revalidatePath } from 'next/cache'
 
-export async function agregarAlergia(formData: FormData) {
-  const session = await auth()
-  if (!session) throw new Error('No autorizado')
+export async function agregarAlergia(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'editar')
 
-  const episodeId = formData.get('episodeId') as string
-  const patientId = formData.get('patientId') as string
-  const allergen = formData.get('allergen') as string
-  const type = formData.get('type') as string
-  const severity = formData.get('severity') as string
-  const reaction = formData.get('reaction') as string
+  const allergen = String(formData.get('allergen') ?? '').trim()
+  const type = String(formData.get('type') ?? 'otro')
+  const severity = String(formData.get('severity') ?? '')
+  const reaction = String(formData.get('reaction') ?? '').trim()
 
-  await prisma.allergy.deleteMany({
-    where: { 
-      episodeId,
-      status: { in: ['sin_alergias', 'no_evaluada'] }
-    }
-  })
+  if (!allergen) volverAlExpediente(episodeId, 'Escribe el alérgeno')
+  if (!['leve', 'moderada', 'grave'].includes(severity)) {
+    volverAlExpediente(episodeId, 'Selecciona la gravedad de la alergia')
+  }
 
-  await prisma.allergy.create({
-    data: {
-      patientId,
-      episodeId,
-      allergen,
-      type,
-      severity,
-      reaction,
-      status: 'evaluada',
-      createdBy: session.user?.email || 'desconocido'
-    }
-  })
+  await prisma.$transaction([
+    prisma.allergy.deleteMany({
+      where: { episodeId, status: { in: ['sin_alergias', 'no_evaluada'] } },
+    }),
+    prisma.allergy.create({
+      data: {
+        patientId: episode.patientId,
+        episodeId,
+        allergen,
+        type,
+        severity,
+        reaction,
+        status: 'evaluada',
+        createdBy: email,
+      },
+    }),
+  ])
 
   await logAudit({
-    actorId: session.user?.id as string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actorRole: (session.user as any)?.role,
+    actorId: userId,
+    actorRole: role,
     action: 'create',
     entity: 'allergy',
-    patientId,
+    patientId: episode.patientId,
     episodeId,
     newValue: { allergen, type, severity, reaction },
-    reason: 'Registro de nueva alergia en expediente'
+    reason: 'Registro de nueva alergia en expediente',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
 }
