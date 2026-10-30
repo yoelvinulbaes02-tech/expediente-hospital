@@ -2,9 +2,10 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { crearUsuario, toggleUsuario } from './actions' // <-- Importamos la nueva acción
+import { crearUsuario, toggleUsuario } from './actions'
+import { SearchInput } from '@/components/SearchInput' // <-- Reutilizamos tu buscador
 
-export default async function UsuariosPage() {
+export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const session = await auth()
   
   // Solo el ADMIN puede entrar aquí
@@ -13,7 +14,17 @@ export default async function UsuariosPage() {
     redirect('/dashboard')
   }
 
+  const { q } = await searchParams
+  const busqueda = q || ''
+
+  // Buscamos usuarios filtrando por nombre o correo
   const usuarios = await prisma.user.findMany({
+    where: busqueda ? {
+      OR: [
+        { fullName: { contains: busqueda, mode: 'insensitive' } },
+        { email: { contains: busqueda, mode: 'insensitive' } },
+      ]
+    } : {},
     orderBy: { createdAt: 'desc' },
   })
 
@@ -46,6 +57,11 @@ export default async function UsuariosPage() {
               Crear Usuario
             </button>
           </form>
+        </div>
+
+        {/* Lupa de Búsqueda */}
+        <div className="mb-4">
+          <SearchInput defaultValue={busqueda} placeholder="🔍 Buscar doctor por nombre o correo..." />
         </div>
 
         {/* Lista de usuarios */}
@@ -87,6 +103,13 @@ export default async function UsuariosPage() {
                   </td>
                 </tr>
               ))}
+              {usuarios.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="text-center py-8 text-slate-500">
+                    No se encontraron usuarios con esa búsqueda.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
