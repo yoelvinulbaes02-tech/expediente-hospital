@@ -83,7 +83,7 @@ export async function resetearPassword(formData: FormData) {
     where: { id: userId },
     data: { 
       passwordHash,
-      mustChangePassword: true // Obliga al usuario a cambiarla
+      mustChangePassword: true
     }
   })
 
@@ -98,5 +98,4 @@ export async function resetearPassword(formData: FormData) {
   })
 
   revalidatePath('/dashboard/usuarios')
-  return { password: nuevaPasswordTemporal }
 }

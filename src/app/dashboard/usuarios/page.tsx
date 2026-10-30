@@ -98,15 +98,13 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                             </button>
                           </form>
                           
-                          {/* BOTÓN RESET CON ALERTA DE CONTRASEÑA REAL */}
-                          <form action={async (formData) => {
-                            'use server'
-                            const res = await resetearPassword(formData)
-                            alert(`Contraseña reseteada. La nueva clave temporal es: ${res.password}`)
-                          }}>
+                          <form action={resetearPassword}>
                             <input type="hidden" name="userId" value={u.id} />
                             <button 
                               type="submit" 
+                              onClick={() => {
+                                alert('Contraseña reseteada. Revisa la pantalla de Auditoría para ver la nueva clave temporal.');
+                              }}
                               className="text-xs font-medium px-2 py-1 rounded border text-amber-600 border-amber-200 hover:bg-amber-50"
                             >
                               Resetear Clave
