@@ -36,7 +36,6 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
           </div>
         </div>
 
-        {/* Formulario para crear usuario */}
         <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Crear Nuevo Usuario</h2>
           <form action={crearUsuario} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -102,9 +101,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                             <input type="hidden" name="userId" value={u.id} />
                             <button 
                               type="submit" 
-                              onClick={() => {
-                                alert('Contraseña reseteada. Revisa la pantalla de Auditoría para ver la nueva clave temporal.');
-                              }}
+                              onClick={() => alert('Contraseña reseteada. Revisa la pantalla de Auditoría para ver la nueva clave temporal.')}
                               className="text-xs font-medium px-2 py-1 rounded border text-amber-600 border-amber-200 hover:bg-amber-50"
                             >
                               Resetear Clave

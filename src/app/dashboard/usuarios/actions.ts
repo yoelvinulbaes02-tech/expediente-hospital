@@ -75,7 +75,7 @@ export async function resetearPassword(formData: FormData) {
 
   const userId = formData.get('userId') as string
   
-  // Generar contraseña aleatoria segura de 8 caracteres
+  // Generar contraseña aleatoria de 8 caracteres
   const nuevaPasswordTemporal = Math.random().toString(36).slice(-8)
   const passwordHash = await bcrypt.hash(nuevaPasswordTemporal, 12)
 
