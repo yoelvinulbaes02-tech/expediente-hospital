@@ -23,7 +23,6 @@ type Episodio = {
   allergies: React.ComponentProps<typeof BannerAlergias>['alergias']
 }
 
-// Quita acentos y pasa a minúsculas: "María" -> "maria"
 function normalizar(texto?: string | null) {
   return (texto ?? '')
     .normalize('NFD')
@@ -37,7 +36,6 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
   const [seleccionados, setSeleccionados] = useState<string[]>([])
   const [medicoRecibe, setMedicoRecibe] = useState('')
 
-  // Lógica de búsqueda
   const filtrados = useMemo(() => {
     const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean)
     if (terminos.length === 0) return episodes
@@ -54,7 +52,6 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
     })
   }, [busqueda, episodes])
 
-  // Lógica de selección para entrega en lote
   const toggleSeleccion = (id: string) => {
     if (seleccionados.includes(id)) {
       setSeleccionados(seleccionados.filter(item => item !== id))
@@ -111,7 +108,6 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
         </p>
       )}
 
-      {/* BARRA DE ENTREGA EN LOTE */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
         <div className="flex items-center gap-2">
           <input 
@@ -154,7 +150,6 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
         {filtrados.map((episode) => (
           <div key={episode.id} className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300 relative">
             
-            {/* CHECKBOX POR PACIENTE */}
             <div className="absolute top-5 left-5">
               <input 
                 type="checkbox" 
@@ -183,7 +178,7 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Motivo: <span className="font-normal">{episode.chiefComplaint}</span></p>
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Médico: <span className="font-normal">{episode.attendingDoctor}</span></p>
                 
-                {/* NUEVOS CAMPOS: A cargo y contador de tareas */}
+                {/* NUEVOS CAMPOS */}
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">A cargo: <span className="font-normal">{episode.responsible?.fullName ?? 'Sin asignar'}</span></p>
                 {episode._count.tasks > 0 && (
                   <p className="mt-2 inline-block bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-bold px-2 py-0.5 rounded">

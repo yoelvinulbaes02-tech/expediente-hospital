@@ -10,7 +10,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const session = await auth()
   if (!session) redirect('/login')
 
-  // VERIFICACIÓN DE CONTRASEÑA OBLIGATORIA
+  // Verificación de contraseña obligatoria
   const userDb = await prisma.user.findUnique({ where: { id: session.user?.id } })
   if (userDb?.mustChangePassword) {
     redirect('/dashboard/perfil?force=true')
@@ -24,28 +24,22 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const nombreMedico = session.user?.name || ''
   const esAdmin = userRole === 'ADMIN'
 
-  // 1. Buscar pacientes
-  const palabrasNombre = nombreMedico.split(' ').filter(p => p.length > 2)
+  // Mostramos TODOS los pacientes activos (sin filtrar por médico)
   const episodes = await prisma.episode.findMany({
     where: {
       status: 'active',
-      ...(filtroDoc 
-        ? { attendingDoctor: { contains: filtroDoc, mode: 'insensitive' } } 
-        : (!esAdmin && palabrasNombre.length > 0 
-            ? { OR: palabrasNombre.map(palabra => ({ attendingDoctor: { contains: palabra, mode: 'insensitive' } })) } 
-            : {})
-      ),
+      ...(filtroDoc ? { attendingDoctor: { contains: filtroDoc, mode: 'insensitive' } } : {}),
     },
     include: {
       patient: true,
       allergies: true,
-      responsible: { select: { fullName: true } },
-      _count: { select: { tasks: { where: { status: 'pendiente' } } } },
+      responsible: true,
+      _count: { select: { tasks: true } }
     },
     orderBy: { admissionDate: 'desc' },
   })
 
-  // 2. Contar turnos pendientes para este médico
+  // Contar turnos pendientes para este médico
   const turnosPendientes = await prisma.handoff.count({
     where: {
       status: 'PENDIENTE',
@@ -63,7 +57,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <div>
             <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">Hospital General</h1>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {esAdmin ? 'Vista de Administrador (Todos)' : `Mis Pacientes (${nombreMedico})`}
+              {esAdmin ? 'Vista de Administrador (Todos)' : `Panel de ${nombreMedico}`}
             </p>
           </div>
         </div>
