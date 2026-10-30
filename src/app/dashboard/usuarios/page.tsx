@@ -2,12 +2,13 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { crearUsuario } from './actions'
+import { crearUsuario, toggleUsuario } from './actions' // <-- Importamos la nueva acción
 
 export default async function UsuariosPage() {
   const session = await auth()
   
   // Solo el ADMIN puede entrar aquí
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!session || (session.user as any)?.role !== 'ADMIN') {
     redirect('/dashboard')
   }
@@ -56,6 +57,7 @@ export default async function UsuariosPage() {
                 <th className="px-4 py-3">Correo</th>
                 <th className="px-4 py-3">Rol</th>
                 <th className="px-4 py-3">Estado</th>
+                <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -68,6 +70,20 @@ export default async function UsuariosPage() {
                     <span className={`px-2 py-1 rounded-full text-xs font-bold ${u.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {u.isActive ? 'Activo' : 'Inactivo'}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {u.id !== session.user?.id && (
+                      <form action={toggleUsuario}>
+                        <input type="hidden" name="userId" value={u.id} />
+                        <input type="hidden" name="isActive" value={String(!u.isActive)} />
+                        <button 
+                          type="submit" 
+                          className={`text-xs font-medium px-3 py-1 rounded border transition-colors ${u.isActive ? 'text-red-600 border-red-200 hover:bg-red-50' : 'text-green-600 border-green-200 hover:bg-green-50'}`}
+                        >
+                          {u.isActive ? 'Desactivar' : 'Activar'}
+                        </button>
+                      </form>
+                    )}
                   </td>
                 </tr>
               ))}

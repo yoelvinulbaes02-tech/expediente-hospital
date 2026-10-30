@@ -36,3 +36,34 @@ export async function crearUsuario(formData: FormData) {
 
   revalidatePath('/dashboard/usuarios')
 }
+
+export async function toggleUsuario(formData: FormData) {
+  const session = await auth()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (!session || (session.user as any)?.role !== 'ADMIN') throw new Error('No autorizado')
+
+  const userId = formData.get('userId') as string
+  const nuevoEstado = formData.get('isActive') === 'true'
+
+  // No permitir que el admin se desactive a sí mismo
+  if (userId === session.user?.id) return
+
+  const usuario = await prisma.user.update({
+    where: { id: userId },
+    data: { isActive: nuevoEstado }
+  })
+
+  await logAudit({
+    actorId: session.user?.id as string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    actorRole: (session.user as any)?.role,
+    action: 'update',
+    entity: 'user',
+    entityId: userId,
+    oldValue: { isActive: !nuevoEstado },
+    newValue: { isActive: nuevoEstado },
+    reason: `Usuario ${nuevoEstado ? 'activado' : 'desactivado'}`,
+  })
+
+  revalidatePath('/dashboard/usuarios')
+}
