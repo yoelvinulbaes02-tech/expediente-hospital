@@ -1,0 +1,241 @@
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/auth'
+import { redirect } from 'next/navigation'
+import { BannerAlergias } from '@/components/BannerAlergias'
+import Link from 'next/link'
+import { agregarAlergia } from './actions'
+import { guardarNota } from './actions-notas'
+import { guardarSignosVitales } from './actions-vitales'
+import { GraficaTemperatura } from '@/components/GraficaTemperatura'
+
+export default async function ExpedientePage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await auth()
+  if (!session) redirect('/login')
+
+  const { id } = await params;
+
+  const episode = await prisma.episode.findUnique({
+    where: { id: id },
+    include: {
+      patient: true,
+      allergies: true,
+      notes: { orderBy: { createdAt: 'desc' } },
+      vitals: { orderBy: { createdAt: 'desc' }, take: 10 }
+    },
+  })
+
+  if (!episode) return <div className="p-8 text-center text-slate-800">Expediente no encontrado.</div>
+
+  const esSoloLectura = episode.status === 'closed'
+
+  // Lógica para resaltar valores fuera de rango
+  const esAnormal = (tipo: string, valor: number | null) => {
+    if (!valor) return false
+    if (tipo === 'temp') return valor < 36.0 || valor > 37.5
+    if (tipo === 'fc') return valor < 60 || valor > 100
+    if (tipo === 'sys') return valor < 90 || valor > 140
+    if (tipo === 'dia') return valor < 60 || valor > 90
+    if (tipo === 'spo2') return valor < 95
+    return false
+  }
+
+  // Formatear datos para la gráfica
+  const datosGrafica = episode.vitals
+    .filter(v => v.temperature !== null)
+    .map(v => ({ valor: v.temperature!, fecha: v.createdAt.toISOString() }))
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Banner de Solo Lectura */}
+        {esSoloLectura && (
+          <div className="bg-amber-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🔒</span>
+              <strong>Expediente Cerrado:</strong> Este paciente ha sido dado de alta. Estás viendo el historial en modo de solo lectura.
+            </div>
+            <Link href="/dashboard/archivo" className="text-sm font-bold underline hover:text-amber-900">Volver al Archivo</Link>
+          </div>
+        )}
+
+        {/* Cabecera */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <Link href={esSoloLectura ? "/dashboard/archivo" : "/dashboard"} className="text-sm text-blue-600 hover:underline mb-2 inline-block">
+              ← Volver a la lista
+            </Link>
+            <h1 className="text-3xl font-bold text-slate-800">{episode.patient.firstName} {episode.patient.lastName}</h1>
+            <p className="text-slate-500">Exp: {episode.patient.expedienteNumber} • {episode.patient.age} años • {episode.patient.sex}</p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-2">
+            {!esSoloLectura && (
+              <>
+                <Link href={`/dashboard/paciente/${episode.id}/turno`} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                  📋 Entrega de Turno
+                </Link>
+                <Link href={`/dashboard/paciente/${episode.id}/alta`} className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-sm">
+                  🚪 Dar de Alta
+                </Link>
+              </>
+            )}
+            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-bold border border-blue-200 text-lg">
+              Hab. {episode.room} - Cama {episode.bed}
+            </div>
+          </div>
+        </div>
+
+        <BannerAlergias alergias={episode.allergies} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          {/* Columna Izquierda */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Datos del Ingreso</h2>
+              <p className="text-sm text-slate-600 mb-2"><strong>Motivo:</strong> {episode.chiefComplaint}</p>
+              <p className="text-sm text-slate-600 mb-2"><strong>Médico:</strong> {episode.attendingDoctor}</p>
+            </div>
+
+            {/* Formulario de Signos Vitales (Oculto si es solo lectura) */}
+            {!esSoloLectura && (
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Registrar Signos Vitales</h2>
+                <form action={guardarSignosVitales} className="space-y-3">
+                  <input type="hidden" name="episodeId" value={episode.id} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Presión (Sist/Diast)</label>
+                      <div className="flex gap-1">
+                        <input name="systolic" type="number" placeholder="120" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                        <input name="diastolic" type="number" placeholder="80" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">F. Cardíaca</label>
+                      <input name="heartRate" type="number" placeholder="75" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">F. Resp.</label>
+                      <input name="respiratoryRate" type="number" placeholder="16" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Temp (°C)</label>
+                      <input name="temperature" type="number" step="0.1" placeholder="36.5" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">SpO2 (%)</label>
+                      <input name="oxygenSat" type="number" placeholder="98" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Glucosa</label>
+                      <input name="glucose" type="number" placeholder="100" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                    </div>
+                  </div>
+                  <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
+                </form>
+              </div>
+            )}
+
+            {/* Formulario de Alergias (Oculto si es solo lectura) */}
+            {!esSoloLectura && (
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Agregar Alergia</h2>
+                <form action={agregarAlergia} className="space-y-3">
+                  <input type="hidden" name="episodeId" value={episode.id} />
+                  <input type="hidden" name="patientId" value={episode.patient.id} />
+                  <input name="allergen" required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="Alérgeno (Ej. Mariscos)" />
+                  <select name="severity" required className="w-full px-3 py-2 border rounded-lg text-sm bg-white text-slate-900">
+                    <option value="leve">Leve</option>
+                    <option value="moderada">Moderada</option>
+                    <option value="grave">Grave</option>
+                  </select>
+                  <input type="hidden" name="type" value="otro" />
+                  <input type="hidden" name="reaction" value="" />
+                  <button type="submit" className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-900">Guardar Alergia</button>
+                </form>
+              </div>
+            )}
+          </div>
+
+          {/* Columna Derecha */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Gráfica de Temperatura */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Temperatura</h2>
+              <GraficaTemperatura datos={datosGrafica} />
+            </div>
+
+            {/* Historial de Signos Vitales */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Últimos Signos Vitales</h2>
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-100 text-slate-600">
+                  <tr>
+                    <th className="px-3 py-2">Hora</th>
+                    <th className="px-3 py-2">TA</th>
+                    <th className="px-3 py-2">FC</th>
+                    <th className="px-3 py-2">Temp</th>
+                    <th className="px-3 py-2">SpO2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {episode.vitals.map((v) => (
+                    <tr key={v.id} className="border-b">
+                      <td className="px-3 py-2 text-xs text-slate-500">{v.createdAt.toLocaleTimeString('es-DO', { timeZone: 'America/Santo_Domingo' })}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('sys', v.systolic) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>
+                        {v.systolic}/{v.diastolic}
+                      </td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('fc', v.heartRate) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.heartRate}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('temp', v.temperature) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.temperature}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('spo2', v.oxygenSat) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.oxygenSat}</td>
+                    </tr>
+                  ))}
+                  {episode.vitals.length === 0 && (
+                    <tr><td colSpan={5} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Formulario Notas SOAP (Oculto si es solo lectura) */}
+            {!esSoloLectura && (
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Nueva Nota de Evolución (SOAP)</h2>
+                <form action={guardarNota} className="space-y-4">
+                  <input type="hidden" name="episodeId" value={episode.id} />
+                  <textarea name="subjective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="S (Subjetivo): Lo que refiere el paciente..."></textarea>
+                  <textarea name="objective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="O (Objetivo): Signos vitales, hallazgos..."></textarea>
+                  <textarea name="assessment" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="A (Análisis): Impresión diagnóstica..."></textarea>
+                  <textarea name="plan" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="P (Plan): Tratamiento, indicaciones..."></textarea>
+                  <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">Firmar y Guardar Nota</button>
+                </form>
+              </div>
+            )}
+
+            {/* Historial de Notas */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold text-slate-800">Historial de Notas</h2>
+              {episode.notes.length === 0 && <p className="text-slate-500 text-sm">No hay notas registradas.</p>}
+              {episode.notes.map((nota) => (
+                <div key={nota.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                  <div className="flex justify-between items-center border-b pb-2 mb-3">
+                    <p className="text-sm font-bold text-blue-700">Firmado por: {nota.createdBy}</p>
+                    <p className="text-xs text-slate-500">{nota.createdAt.toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
+                    <div><span className="font-bold text-slate-900">S:</span> {nota.subjective}</div>
+                    <div><span className="font-bold text-slate-900">O:</span> {nota.objective}</div>
+                    <div><span className="font-bold text-slate-900">A:</span> {nota.assessment}</div>
+                    <div><span className="font-bold text-slate-900">P:</span> {nota.plan}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

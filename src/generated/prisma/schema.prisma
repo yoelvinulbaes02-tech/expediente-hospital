@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── USUARIOS Y ROLES ───
+enum Role {
+  ADMIN
+  DOCTOR
+  RESIDENT
+  NURSE
+  LAB
+  READONLY
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         Role     @default(READONLY)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  auditEntries AuditLog[]
+}
+
+// ─── AUDITORÍA APPEND-ONLY ───
+model AuditLog {
+  id        BigInt   @id @default(autoincrement())
+  seq       BigInt   @unique
+  prevHash  String   @db.Char(64)
+  entryHash String   @db.Char(64)
+  actorId   String
+  actorRole String
+  patientId String?
+  episodeId String?
+  action    String
+  entity    String
+  entityId  String?
+  oldValue  Json?
+  newValue  Json?
+  reason    String?
+  ipAddress String?
+  userAgent String?
+  serverTs  DateTime @default(now()) @db.Timestamptz
+
+  actor User @relation(fields: [actorId], references: [id])
+}
+
+// ─── PACIENTES Y EPISODIOS ───
+model Patient {
+  id               String    @id @default(cuid())
+  expedienteNumber String    @unique
+  firstName        String
+  lastName         String
+  birthDate        DateTime?
+  age              Int?
+  sex              String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  episodes  Episode[]
+  allergies Allergy[]
+}
+
+model Episode {
+  id              String   @id @default(cuid())
+  patientId       String
+  admissionDate   DateTime @default(now())
+  admissionType   String
+  chiefComplaint  String?
+  status          String   @default("active") // "active" | "closed"
+  room            String?
+  bed             String?
+  attendingDoctor String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  patient   Patient     @relation(fields: [patientId], references: [id])
+  allergies Allergy[]
+  notes     Note[]
+  vitals    VitalSign[]
+  handoffs  Handoff[]
+}
+
+// ─── ALERGIAS Y ALERTAS ───
+model Allergy {
+  id        String   @id @default(cuid())
+  patientId String
+  episodeId String
+  allergen  String
+  type      String // "medicamento" | "alimento" | "latex" | "otro"
+  reaction  String?
+  severity  String // "leve" | "moderada" | "grave"
+  status    String   @default("evaluada") // "evaluada" | "no_evaluada" | "sin_alergias"
+  createdAt DateTime @default(now())
+  createdBy String
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  episode Episode @relation(fields: [episodeId], references: [id])
+}
+
+// ─── NOTAS MÉDICAS (SOAP) ───
+model Note {
+  id         String   @id @default(cuid())
+  episodeId  String
+  subjective String?
+  objective  String?
+  assessment String?
+  plan       String?
+  status     String   @default("firmada") // "borrador" | "firmada"
+  createdBy  String // Email del médico
+  createdAt  DateTime @default(now()) @db.Timestamptz
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+}
+
+// ─── SIGNOS VITALES ───
+model VitalSign {
+  id              String   @id @default(cuid())
+  episodeId       String
+  systolic        Int? // Presión sistólica (Ej. 120)
+  diastolic       Int? // Presión diastólica (Ej. 80)
+  heartRate       Int? // Frecuencia cardíaca
+  respiratoryRate Int? // Frecuencia respiratoria
+  temperature     Float? // Temperatura
+  oxygenSat       Int? // Saturación de oxígeno (SpO2)
+  glucose         Int? // Glucosa
+  painScale       Int? // Escala de dolor (0-10)
+  recordedBy      String // Email del que registra
+  createdAt       DateTime @default(now()) @db.Timestamptz
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+}
+
+// ─── ENTREGA DE TURNO ───
+enum HandoffStatus {
+  PENDIENTE
+  ACEPTADO
+}
+
+// ─── ENTREGA DE TURNO ───
+model Handoff {
+  id            String        @id @default(cuid())
+  episodeId     String
+  entregadoPor  String // Email de quien entrega
+  recibidoPor   String // Email de quien recibe (usuario real)
+  observaciones String?
+  status        HandoffStatus @default(PENDIENTE)
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+  aceptadoAt    DateTime?     @db.Timestamptz
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId])
+  @@index([recibidoPor, status])
+}
