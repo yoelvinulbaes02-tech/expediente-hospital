@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { crearUsuario, toggleUsuario, resetearPassword } from './actions'
 import { SearchInput } from '@/components/SearchInput'
+import { BotonResetClave } from '@/components/BotonResetClave'
 
 export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const session = await auth()
@@ -99,13 +100,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                           
                           <form action={resetearPassword}>
                             <input type="hidden" name="userId" value={u.id} />
-                            <button 
-                              type="submit" 
-                              onClick={() => alert('Contraseña reseteada. Revisa la pantalla de Auditoría para ver la nueva clave temporal.')}
-                              className="text-xs font-medium px-2 py-1 rounded border text-amber-600 border-amber-200 hover:bg-amber-50"
-                            >
-                              Resetear Clave
-                            </button>
+                            <BotonResetClave />
                           </form>
                         </>
                       )}
