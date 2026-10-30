@@ -1,6 +1,7 @@
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { auth, signOut } from '@/auth'
 import { redirect } from 'next/navigation'
+import { SessionTimeout } from '@/components/SessionTimeout'
 import { prisma } from '@/lib/prisma'
 import { ListaPacientes } from '@/components/ListaPacientes'
 import Link from 'next/link'
@@ -46,12 +47,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      {/* COMPONENTE DE INACTIVIDAD AQUÍ */}
+      <SessionTimeout />
+
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-10 transition-colors duration-300">
-        {userRole === 'ADMIN' && (
-  <Link href="/dashboard/usuarios" className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm">
-    👥 Usuarios
-  </Link>
-)}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">H</div>
           <div>
@@ -64,7 +63,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <div className="flex items-center gap-4">
           <ThemeToggle />
           
-          {/* BOTÓN CON CONTADOR */}
+          {userRole === 'ADMIN' && (
+            <Link href="/dashboard/usuarios" className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm">
+              👥 Usuarios
+            </Link>
+          )}
+
           <Link 
             href="/dashboard/turnos-pendientes" 
             className="relative bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors shadow-sm"
