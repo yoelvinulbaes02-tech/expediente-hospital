@@ -70,7 +70,7 @@ export default async function AuditoriaPage({ searchParams }: { searchParams: Pr
                   </td>
                   <td className="px-4 py-3 font-medium text-slate-700 dark:text-slate-300">{log.action}</td>
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{log.entity}</td>
-                  <td className="px-4 py-3 text-xs text-slate-500 min-w-[16rem] whitespace-normal break-words">
+                  <td className="px-4 py-3 text-xs text-slate-500 min-w-[16rem] whitespace-normal wrap-break-word">
                     {log.reason || JSON.stringify(log.newValue)}
                   </td>
                 </tr>

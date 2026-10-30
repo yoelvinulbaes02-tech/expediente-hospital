@@ -1,7 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { cambiarPassword } from './actions'
+import { FormularioCambiarPassword } from '@/components/FormularioCambiarPassword'
 
 export default async function PerfilPage() {
   const session = await auth()
@@ -24,24 +24,8 @@ export default async function PerfilPage() {
           </div>
 
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Cambiar Contraseña</h2>
-          
-          <form action={cambiarPassword} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña Actual</label>
-              <input name="currentPassword" type="password" required className="w-full px-3 py-2 border rounded-lg text-slate-900" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Contraseña</label>
-              <input name="newPassword" type="password" required minLength={6} className="w-full px-3 py-2 border rounded-lg text-slate-900" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Confirmar Nueva Contraseña</label>
-              <input name="confirmPassword" type="password" required minLength={6} className="w-full px-3 py-2 border rounded-lg text-slate-900" />
-            </div>
-            <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-              Guardar Cambios
-            </button>
-          </form>
+
+          <FormularioCambiarPassword />
 
           {/* AVISO DE CONTRASEÑA OLVIDADA */}
           <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
