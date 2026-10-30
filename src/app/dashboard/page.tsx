@@ -64,9 +64,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <ThemeToggle />
           
           {userRole === 'ADMIN' && (
-            <Link href="/dashboard/usuarios" className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm">
-              👥 Usuarios
-            </Link>
+            <>
+              <Link href="/dashboard/usuarios" className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm">
+                👥 Usuarios
+              </Link>
+              <Link href="/dashboard/auditoria" className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-900 transition-colors shadow-sm">
+                📜 Auditoría
+              </Link>
+            </>
           )}
 
           <Link 
