@@ -1709,6 +1709,7 @@ export namespace Prisma {
     fullName: string | null
     role: $Enums.Role | null
     isActive: boolean | null
+    mustChangePassword: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1720,6 +1721,7 @@ export namespace Prisma {
     fullName: string | null
     role: $Enums.Role | null
     isActive: boolean | null
+    mustChangePassword: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1731,6 +1733,7 @@ export namespace Prisma {
     fullName: number
     role: number
     isActive: number
+    mustChangePassword: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1744,6 +1747,7 @@ export namespace Prisma {
     fullName?: true
     role?: true
     isActive?: true
+    mustChangePassword?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1755,6 +1759,7 @@ export namespace Prisma {
     fullName?: true
     role?: true
     isActive?: true
+    mustChangePassword?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1766,6 +1771,7 @@ export namespace Prisma {
     fullName?: true
     role?: true
     isActive?: true
+    mustChangePassword?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1850,6 +1856,7 @@ export namespace Prisma {
     fullName: string
     role: $Enums.Role
     isActive: boolean
+    mustChangePassword: boolean
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -1878,6 +1885,7 @@ export namespace Prisma {
     fullName?: boolean
     role?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     auditEntries?: boolean | User$auditEntriesArgs<ExtArgs>
@@ -1891,6 +1899,7 @@ export namespace Prisma {
     fullName?: boolean
     role?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1902,6 +1911,7 @@ export namespace Prisma {
     fullName?: boolean
     role?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1913,11 +1923,12 @@ export namespace Prisma {
     fullName?: boolean
     role?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "fullName" | "role" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "fullName" | "role" | "isActive" | "mustChangePassword" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     auditEntries?: boolean | User$auditEntriesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1937,6 +1948,7 @@ export namespace Prisma {
       fullName: string
       role: $Enums.Role
       isActive: boolean
+      mustChangePassword: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -2369,6 +2381,7 @@ export namespace Prisma {
     readonly fullName: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'Role'>
     readonly isActive: FieldRef<"User", 'Boolean'>
+    readonly mustChangePassword: FieldRef<"User", 'Boolean'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -11089,6 +11102,7 @@ export namespace Prisma {
     fullName: 'fullName',
     role: 'role',
     isActive: 'isActive',
+    mustChangePassword: 'mustChangePassword',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -11392,6 +11406,7 @@ export namespace Prisma {
     fullName?: StringFilter<"User"> | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
     isActive?: BoolFilter<"User"> | boolean
+    mustChangePassword?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     auditEntries?: AuditLogListRelationFilter
@@ -11404,6 +11419,7 @@ export namespace Prisma {
     fullName?: SortOrder
     role?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     auditEntries?: AuditLogOrderByRelationAggregateInput
@@ -11419,6 +11435,7 @@ export namespace Prisma {
     fullName?: StringFilter<"User"> | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
     isActive?: BoolFilter<"User"> | boolean
+    mustChangePassword?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     auditEntries?: AuditLogListRelationFilter
@@ -11431,6 +11448,7 @@ export namespace Prisma {
     fullName?: SortOrder
     role?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -11448,6 +11466,7 @@ export namespace Prisma {
     fullName?: StringWithAggregatesFilter<"User"> | string
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
+    mustChangePassword?: BoolWithAggregatesFilter<"User"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -12073,6 +12092,7 @@ export namespace Prisma {
     fullName: string
     role?: $Enums.Role
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     auditEntries?: AuditLogCreateNestedManyWithoutActorInput
@@ -12085,6 +12105,7 @@ export namespace Prisma {
     fullName: string
     role?: $Enums.Role
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     auditEntries?: AuditLogUncheckedCreateNestedManyWithoutActorInput
@@ -12097,6 +12118,7 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEntries?: AuditLogUpdateManyWithoutActorNestedInput
@@ -12109,6 +12131,7 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEntries?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
@@ -12121,6 +12144,7 @@ export namespace Prisma {
     fullName: string
     role?: $Enums.Role
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12132,6 +12156,7 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12143,6 +12168,7 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12898,6 +12924,7 @@ export namespace Prisma {
     fullName?: SortOrder
     role?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -12909,6 +12936,7 @@ export namespace Prisma {
     fullName?: SortOrder
     role?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -12920,6 +12948,7 @@ export namespace Prisma {
     fullName?: SortOrder
     role?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -14399,6 +14428,7 @@ export namespace Prisma {
     fullName: string
     role?: $Enums.Role
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14410,6 +14440,7 @@ export namespace Prisma {
     fullName: string
     role?: $Enums.Role
     isActive?: boolean
+    mustChangePassword?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14437,6 +14468,7 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14448,6 +14480,7 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

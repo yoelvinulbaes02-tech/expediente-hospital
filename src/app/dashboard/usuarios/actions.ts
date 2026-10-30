@@ -74,13 +74,17 @@ export async function resetearPassword(formData: FormData) {
   if (!session || (session.user as any)?.role !== 'ADMIN') throw new Error('No autorizado')
 
   const userId = formData.get('userId') as string
-  const nuevaPasswordTemporal = 'Demo1234!'
-
-  const passwordHash = await bcrypt.hash(nuevaPasswordTemporal, 12)
   
+  // Generar contraseña aleatoria segura de 8 caracteres
+  const nuevaPasswordTemporal = Math.random().toString(36).slice(-8)
+  const passwordHash = await bcrypt.hash(nuevaPasswordTemporal, 12)
+
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash }
+    data: { 
+      passwordHash,
+      mustChangePassword: true // Obliga al usuario a cambiarla
+    }
   })
 
   await logAudit({
@@ -90,8 +94,9 @@ export async function resetearPassword(formData: FormData) {
     action: 'update',
     entity: 'user',
     entityId: userId,
-    reason: `Contraseña reseteada por el administrador a: ${nuevaPasswordTemporal}`,
+    reason: `Contraseña reseteada. Nueva clave temporal: ${nuevaPasswordTemporal}`,
   })
 
   revalidatePath('/dashboard/usuarios')
+  return { password: nuevaPasswordTemporal }
 }

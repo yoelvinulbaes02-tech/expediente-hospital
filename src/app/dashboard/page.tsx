@@ -10,6 +10,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const session = await auth()
   if (!session) redirect('/login')
 
+  // VERIFICACIÓN DE CONTRASEÑA OBLIGATORIA
+  const userDb = await prisma.user.findUnique({ where: { id: session.user?.id } })
+  if (userDb?.mustChangePassword) {
+    redirect('/dashboard/perfil?force=true')
+  }
+
   const { doc } = await searchParams
   const filtroDoc = doc || ''
 
@@ -47,7 +53,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      {/* COMPONENTE DE INACTIVIDAD AQUÍ */}
       <SessionTimeout />
 
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-10 transition-colors duration-300">
@@ -91,7 +96,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">{userRole}</p>
           </div>
 
-          {/* BOTÓN MI PERFIL */}
           <Link 
             href="/dashboard/perfil" 
             className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"

@@ -8,7 +8,6 @@ import { SearchInput } from '@/components/SearchInput'
 export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const session = await auth()
   
-  // Solo el ADMIN puede entrar aquí
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!session || (session.user as any)?.role !== 'ADMIN') {
     redirect('/dashboard')
@@ -58,12 +57,10 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
           </form>
         </div>
 
-        {/* Lupa de Búsqueda */}
         <div className="mb-4">
           <SearchInput defaultValue={busqueda} placeholder="🔍 Buscar doctor por nombre o correo..." />
         </div>
 
-        {/* Lista de usuarios */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
@@ -101,7 +98,12 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                             </button>
                           </form>
                           
-                          <form action={resetearPassword}>
+                          {/* BOTÓN RESET CON ALERTA DE CONTRASEÑA REAL */}
+                          <form action={async (formData) => {
+                            'use server'
+                            const res = await resetearPassword(formData)
+                            alert(`Contraseña reseteada. La nueva clave temporal es: ${res.password}`)
+                          }}>
                             <input type="hidden" name="userId" value={u.id} />
                             <button 
                               type="submit" 
