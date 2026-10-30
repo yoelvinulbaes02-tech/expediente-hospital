@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { SearchInput } from '@/components/SearchInput'
 
 export default async function AuditoriaPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const session = await auth()
@@ -24,7 +25,7 @@ export default async function AuditoriaPage({ searchParams }: { searchParams: Pr
       ]
     } : {},
     orderBy: { serverTs: 'desc' },
-    take: 100, // Mostramos los últimos 100 registros
+    take: 100,
   })
 
   return (
@@ -37,17 +38,10 @@ export default async function AuditoriaPage({ searchParams }: { searchParams: Pr
             <p className="text-sm text-slate-500">Historial inmutable de acciones (Últimos 100 movimientos)</p>
           </div>
           
-          <form className="flex w-full md:w-auto gap-2">
-            <input 
-              name="q" 
-              defaultValue={busqueda}
-              placeholder="Buscar por acción o rol..." 
-              className="w-full md:w-64 px-3 py-2 border rounded-lg text-sm text-slate-900"
-            />
-            <button type="submit" className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-900">
-              Buscar
-            </button>
-          </form>
+          {/* LUPA DINÁMICA */}
+          <div className="w-full md:w-auto">
+            <SearchInput defaultValue={busqueda} placeholder="🔍 Buscar por acción, rol o entidad..." />
+          </div>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-x-auto">
@@ -82,7 +76,7 @@ export default async function AuditoriaPage({ searchParams }: { searchParams: Pr
                 </tr>
               ))}
               {registros.length === 0 && (
-                <tr><td colSpan={6} className="text-center py-8 text-slate-500">No hay registros de auditoría.</td></tr>
+                <tr><td colSpan={6} className="text-center py-8 text-slate-500">No hay registros que coincidan con la búsqueda.</td></tr>
               )}
             </tbody>
           </table>
