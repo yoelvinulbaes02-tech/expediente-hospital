@@ -81,7 +81,6 @@ export async function guardarEntregaTurno(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}/turno`)
   redirect(`/dashboard/paciente/${episodeId}/turno`)
 }
-
 export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
   const session = await auth()
   const user = session?.user
@@ -121,27 +120,29 @@ export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
     select: { fullName: true },
   })
 
-  // Acepta la entrega Y traspasa la responsabilidad. Si la entrega ya fue
-  // procesada por otra petición, NO se cambia el responsable.
-  const aceptada = await prisma.$transaction(async (tx) => {
-    const r = await tx.handoff.updateMany({
-      where: { id: handoffId, status: 'PENDIENTE' },
-      data: { status: 'ACEPTADO', aceptadoAt: new Date() },
-    })
-    if (r.count === 0) return false
-
-    await tx.episode.update({
-      where: { id: episodeId },
+  // Las dos escrituras van juntas: el responsable solo cambia si la entrega sigue pendiente
+  const [episodioActualizado, entregaActualizada] = await prisma.$transaction([
+    prisma.episode.updateMany({
+      where: {
+        id: episodeId,
+        status: 'active',
+        handoffs: { some: { id: handoffId, status: 'PENDIENTE' } },
+      },
       data: {
         responsibleId: userId,
         responsibleSince: new Date(),
         attendingDoctor: nombre,
       },
-    })
-    return true
-  })
+    }),
+    prisma.handoff.updateMany({
+      where: { id: handoffId, status: 'PENDIENTE' },
+      data: { status: 'ACEPTADO', aceptadoAt: new Date() },
+    }),
+  ])
 
-  if (!aceptada) volverConError(episodeId, 'Esta entrega ya fue procesada')
+  if (episodioActualizado.count === 0 || entregaActualizada.count === 0) {
+    volverConError(episodeId, 'Esta entrega ya fue procesada')
+  }
 
   await logAudit({
     actorId: userId,
