@@ -32,7 +32,7 @@ export async function guardarEntregaTurno(formData: FormData): Promise<void> {
     where: { email: { equals: recibidoPor, mode: 'insensitive' } },
     select: { email: true, fullName: true, role: true, isActive: true },
   })
-  
+
   if (!receptor) {
     volverConError(episodeId, 'El correo del receptor no existe en el sistema')
   }
@@ -87,24 +87,27 @@ export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
   const user = session?.user
   if (!user?.id || !user.email) redirect('/login')
 
+  const userId = user.id
+  const userEmail = user.email
+  const nombre = user.name ?? userEmail
+  const role = String(user.role)
+
   const handoffId = String(formData.get('handoffId') ?? '')
-  
-  // PASO 5: Agregamos attendingDoctor al include para guardar el valor anterior
+
   const handoff = await prisma.handoff.findUnique({
     where: { id: handoffId },
-    include: { 
-      episode: { 
-        select: { patientId: true, status: true, attendingDoctor: true } 
-      } 
+    include: {
+      episode: {
+        select: { patientId: true, status: true, attendingDoctor: true },
+      },
     },
   })
   if (!handoff) redirect('/dashboard')
 
   const episodeId = handoff.episodeId
-  const role = String(user.role)
 
   // Solo el receptor designado puede aceptar
-  if (handoff.recibidoPor.toLowerCase() !== user.email.toLowerCase()) {
+  if (handoff.recibidoPor.toLowerCase() !== userEmail.toLowerCase()) {
     volverConError(episodeId, 'Solo la persona designada puede aceptar este turno')
   }
   if (!ROLES_MEDICOS.includes(role)) {
@@ -117,37 +120,40 @@ export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
     where: { email: { equals: handoff.entregadoPor, mode: 'insensitive' } },
     select: { fullName: true },
   })
-  const nombre = user.name ?? user.email
 
-  // Acepta la entrega Y traspasa la responsabilidad en una sola operación
-  const [aceptada] = await prisma.$transaction([
-    prisma.handoff.updateMany({
+  // Acepta la entrega Y traspasa la responsabilidad. Si la entrega ya fue
+  // procesada por otra petición, NO se cambia el responsable.
+  const aceptada = await prisma.$transaction(async (tx) => {
+    const r = await tx.handoff.updateMany({
       where: { id: handoffId, status: 'PENDIENTE' },
       data: { status: 'ACEPTADO', aceptadoAt: new Date() },
-    }),
-    prisma.episode.update({
+    })
+    if (r.count === 0) return false
+
+    await tx.episode.update({
       where: { id: episodeId },
-      data: { 
-        responsibleId: user.id, 
+      data: {
+        responsibleId: userId,
         responsibleSince: new Date(),
-        attendingDoctor: nombre // <-- ACTUALIZA EL MÉDICO TRATANTE AL NUEVO
+        attendingDoctor: nombre,
       },
-    }),
-  ])
-  if (aceptada.count === 0) volverConError(episodeId, 'Esta entrega ya fue procesada')
+    })
+    return true
+  })
+
+  if (!aceptada) volverConError(episodeId, 'Esta entrega ya fue procesada')
 
   await logAudit({
-    actorId: user.id,
+    actorId: userId,
     actorRole: role,
     action: 'update',
     entity: 'handoff',
     entityId: handoffId,
     patientId: handoff.episode.patientId,
     episodeId,
-    // PASO 5: Guardamos el médico anterior en oldValue
-    oldValue: { 
-      status: 'PENDIENTE', 
-      medicoTratante: handoff.episode.attendingDoctor 
+    oldValue: {
+      status: 'PENDIENTE',
+      medicoTratante: handoff.episode.attendingDoctor,
     },
     newValue: {
       status: 'ACEPTADO',

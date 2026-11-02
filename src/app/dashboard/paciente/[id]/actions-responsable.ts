@@ -14,7 +14,7 @@ export async function tomarACargo(formData: FormData): Promise<void> {
   // Solo se asigna si sigue sin responsable (evita que dos médicos lo tomen a la vez)
   const r = await prisma.episode.updateMany({
     where: { id: episodeId, responsibleId: null, status: 'active' },
-    data: { responsibleId: userId, responsibleSince: new Date() },
+    data: { responsibleId: userId, responsibleSince: new Date(), attendingDoctor: nombre },
   })
   if (r.count === 0) volverAlExpediente(episodeId, 'Otro médico ya tomó a cargo este paciente')
 
@@ -64,7 +64,11 @@ export async function reasignarResponsable(formData: FormData): Promise<void> {
 
   await prisma.episode.update({
     where: { id: episodeId },
-    data: { responsibleId: nuevo.id, responsibleSince: new Date() },
+    data: {
+      responsibleId: nuevo.id,
+      responsibleSince: new Date(),
+      attendingDoctor: nuevo.fullName,
+    },
   })
 
   await logAudit({
