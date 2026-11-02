@@ -11,8 +11,10 @@ type Episodio = {
   bed: string | null
   chiefComplaint: string | null
   attendingDoctor: string | null
+  responsibleId: string | null
   responsible: { fullName: string } | null
   _count: { tasks: number }
+  handoffs: { recibidoPor: string }[]
   patient: {
     firstName: string
     lastName: string
@@ -23,6 +25,10 @@ type Episodio = {
   allergies: React.ComponentProps<typeof BannerAlergias>['alergias']
 }
 
+type Doctor = { id: string; fullName: string; email: string }
+type Mensaje = { tipo: 'ok' | 'error'; texto: string; detalles: string[] }
+
+// Quita acentos y pasa a minúsculas: "María" -> "maria"
 function normalizar(texto?: string | null) {
   return (texto ?? '')
     .normalize('NFD')
@@ -31,10 +37,22 @@ function normalizar(texto?: string | null) {
     .trim()
 }
 
-export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
+export function ListaPacientes({
+  episodes,
+  userId,
+  miEmail,
+  doctores,
+}: {
+  episodes: Episodio[]
+  userId: string
+  miEmail: string
+  doctores: Doctor[]
+}) {
   const [busqueda, setBusqueda] = useState('')
   const [seleccionados, setSeleccionados] = useState<string[]>([])
   const [medicoRecibe, setMedicoRecibe] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [mensaje, setMensaje] = useState<Mensaje | null>(null)
 
   const filtrados = useMemo(() => {
     const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean)
@@ -52,20 +70,22 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
     })
   }, [busqueda, episodes])
 
+  // Solo se pueden entregar pacientes que tengo a cargo y sin entrega pendiente
+  const seleccionable = (e: Episodio) => e.responsibleId === userId && e.handoffs.length === 0
+  const seleccionables = filtrados.filter(seleccionable)
+  const todosMarcados =
+    seleccionables.length > 0 && seleccionables.every((e) => seleccionados.includes(String(e.id)))
+  const hayEntregables = episodes.some(seleccionable)
+
   const toggleSeleccion = (id: string) => {
-    if (seleccionados.includes(id)) {
-      setSeleccionados(seleccionados.filter(item => item !== id))
-    } else {
-      setSeleccionados([...seleccionados, id])
-    }
+    setSeleccionados((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }
 
   const toggleTodos = () => {
-    if (seleccionados.length === filtrados.length) {
-      setSeleccionados([])
-    } else {
-      setSeleccionados(filtrados.map(e => String(e.id)))
-    }
+    const ids = seleccionables.map((e) => String(e.id))
+    setSeleccionados((prev) =>
+      todosMarcados ? prev.filter((x) => !ids.includes(x)) : Array.from(new Set([...prev, ...ids]))
+    )
   }
 
   return (
@@ -108,96 +128,165 @@ export function ListaPacientes({ episodes }: { episodes: Episodio[] }) {
         </p>
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-        <div className="flex items-center gap-2">
-          <input 
-            type="checkbox" 
-            checked={seleccionados.length === filtrados.length && filtrados.length > 0} 
-            onChange={toggleTodos}
-            className="w-5 h-5 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-          />
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer" onClick={toggleTodos}>
-            Seleccionar Todos ({seleccionados.length})
-          </label>
+      {/* Resultado de la última entrega en lote */}
+      {mensaje && (
+        <div
+          className={`mb-4 px-4 py-3 rounded-lg border text-sm ${
+            mensaje.tipo === 'ok'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-red-50 border-red-200 text-red-800'
+          }`}
+        >
+          <div className="flex justify-between gap-3">
+            <p className="font-medium">{mensaje.texto}</p>
+            <button type="button" onClick={() => setMensaje(null)} aria-label="Cerrar" className="text-xs opacity-60 hover:opacity-100">✕</button>
+          </div>
+          {mensaje.detalles.length > 0 && (
+            <ul className="mt-1 list-disc pl-5 text-xs space-y-0.5">
+              {mensaje.detalles.map((d, i) => <li key={i}>{d}</li>)}
+            </ul>
+          )}
         </div>
+      )}
 
-        {seleccionados.length > 0 && (
-          <form 
-            action={async (formData) => {
-              formData.append('episodeIds', JSON.stringify(seleccionados))
-              await entregarLote(formData)
-              setSeleccionados([])
-              setMedicoRecibe('')
-            }}
-            className="flex items-center gap-2 w-full md:w-auto"
-          >
-            <input 
-              name="recibidoPor" 
-              value={medicoRecibe} 
-              onChange={(e) => setMedicoRecibe(e.target.value)}
-              placeholder="Médico que recibe" 
-              required
-              className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      {/* BARRA DE ENTREGA EN LOTE (solo si tengo pacientes a cargo) */}
+      {hayEntregables && (
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <div className="flex items-center gap-2">
+            <input
+              id="seleccionar-todos"
+              type="checkbox"
+              checked={todosMarcados}
+              onChange={toggleTodos}
+              className="w-5 h-5 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
             />
-            <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-indigo-700 transition-colors shadow-sm whitespace-nowrap">
-              Entregar Seleccionados
-            </button>
-          </form>
-        )}
-      </div>
+            <label htmlFor="seleccionar-todos" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+              Seleccionar mis pacientes ({seleccionados.length})
+            </label>
+          </div>
+
+          {seleccionados.length > 0 && (
+            <form
+              action={async (formData) => {
+                formData.set('episodeIds', JSON.stringify(seleccionados))
+                setEnviando(true)
+                try {
+                  const r = await entregarLote(formData)
+                  if (r.error) {
+                    setMensaje({ tipo: 'error', texto: r.error, detalles: [] })
+                  } else {
+                    setMensaje({
+                      tipo: r.entregados > 0 ? 'ok' : 'error',
+                      texto:
+                        r.entregados > 0
+                          ? `${r.entregados} paciente(s) entregado(s). Siguen a tu cargo hasta que el médico que recibe acepte.`
+                          : 'No se entregó ningún paciente.',
+                      detalles: r.omitidos,
+                    })
+                    setSeleccionados([])
+                    setMedicoRecibe('')
+                  }
+                } finally {
+                  setEnviando(false)
+                }
+              }}
+              className="flex items-center gap-2 w-full md:w-auto"
+            >
+              <select
+                name="recibidoPor"
+                value={medicoRecibe}
+                onChange={(e) => setMedicoRecibe(e.target.value)}
+                required
+                className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Médico que recibe…</option>
+                {doctores.map((d) => (
+                  <option key={d.id} value={d.email}>{d.fullName}</option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                disabled={enviando}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-indigo-700 transition-colors shadow-sm whitespace-nowrap disabled:opacity-60"
+              >
+                {enviando ? 'Entregando…' : 'Entregar Seleccionados'}
+              </button>
+            </form>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtrados.map((episode) => (
-          <div key={episode.id} className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300 relative">
-            
-            <div className="absolute top-5 left-5">
-              <input 
-                type="checkbox" 
-                checked={seleccionados.includes(String(episode.id))}
-                onChange={() => toggleSeleccion(String(episode.id))}
-                className="w-5 h-5 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-              />
-            </div>
+        {filtrados.map((episode) => {
+          const entregable = seleccionable(episode)
+          const entregaPendiente = episode.handoffs[0]
+          const meLoEntregaron = !!entregaPendiente && entregaPendiente.recibidoPor.toLowerCase() === miEmail.toLowerCase()
 
-            <div className="pl-8">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-                    {episode.patient.firstName} {episode.patient.lastName}
-                  </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    {episode.patient.age} años • {episode.patient.sex} • Exp: {episode.patient.expedienteNumber}
-                  </p>
+          return (
+            <div key={episode.id} className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300 relative">
+              {entregable && (
+                <div className="absolute top-5 left-5">
+                  <input
+                    type="checkbox"
+                    checked={seleccionados.includes(String(episode.id))}
+                    onChange={() => toggleSeleccion(String(episode.id))}
+                    className="w-5 h-5 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
                 </div>
-                <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-lg text-sm font-bold border border-blue-100 dark:border-blue-800">
-                  Hab. {episode.room} - Cama {episode.bed}
+              )}
+
+              <div className={entregable ? 'pl-8' : ''}>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                      {episode.patient.firstName} {episode.patient.lastName}
+                    </h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      {episode.patient.age} años • {episode.patient.sex} • Exp: {episode.patient.expedienteNumber}
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-lg text-sm font-bold border border-blue-100 dark:border-blue-800">
+                    Hab. {episode.room} - Cama {episode.bed}
+                  </div>
+                </div>
+
+                <div className="mb-4 mt-3">
+                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Motivo: <span className="font-normal">{episode.chiefComplaint}</span></p>
+                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Médico: <span className="font-normal">{episode.attendingDoctor}</span></p>
+                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">A cargo: <span className="font-normal">{episode.responsible?.fullName ?? 'Sin asignar'}</span></p>
+
+                  {episode._count.tasks > 0 && (
+                    <p className="mt-2 inline-block bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-bold px-2 py-0.5 rounded">
+                      ☑ {episode._count.tasks} pendiente{episode._count.tasks === 1 ? '' : 's'}
+                    </p>
+                  )}
+
+                  {entregaPendiente &&
+                    (meLoEntregaron ? (
+                      <Link
+                        href={`/dashboard/paciente/${episode.id}/turno`}
+                        className="mt-2 block bg-indigo-600 text-white text-sm font-semibold px-3 py-2 rounded-lg hover:bg-indigo-700"
+                      >
+                        📥 Te entregaron este paciente · Revisar y aceptar
+                      </Link>
+                    ) : (
+                      <p className="mt-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+                        ⏳ Entrega pendiente de aceptación
+                      </p>
+                    ))}
+                </div>
+
+                <BannerAlergias alergias={episode.allergies} />
+
+                <div className="text-right mt-2">
+                  <Link href={`/dashboard/paciente/${episode.id}`} className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                    Ver Expediente →
+                  </Link>
                 </div>
               </div>
-
-              <div className="mb-4 mt-3">
-                <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Motivo: <span className="font-normal">{episode.chiefComplaint}</span></p>
-                <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Médico: <span className="font-normal">{episode.attendingDoctor}</span></p>
-                
-                {/* NUEVOS CAMPOS */}
-                <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">A cargo: <span className="font-normal">{episode.responsible?.fullName ?? 'Sin asignar'}</span></p>
-                {episode._count.tasks > 0 && (
-                  <p className="mt-2 inline-block bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-bold px-2 py-0.5 rounded">
-                    ☑ {episode._count.tasks} pendiente{episode._count.tasks === 1 ? '' : 's'}
-                  </p>
-                )}
-              </div>
-
-              <BannerAlergias alergias={episode.allergies} />
-
-              <div className="text-right mt-2">
-                <Link href={`/dashboard/paciente/${episode.id}`} className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-                  Ver Expediente →
-                </Link>
-              </div>
             </div>
-
-          </div>
-        ))}
+          )
+        })}
 
         {filtrados.length === 0 && (
           <div className="col-span-full text-center py-12 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">

@@ -24,7 +24,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const nombreMedico = session.user?.name || ''
   const esAdmin = userRole === 'ADMIN'
 
-  // Mostramos TODOS los pacientes activos (sin filtrar por médico)
+  // a) Mostramos TODOS los pacientes con los nuevos includes
   const episodes = await prisma.episode.findMany({
     where: {
       status: 'active',
@@ -33,10 +33,19 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     include: {
       patient: true,
       allergies: true,
-      responsible: true,
-      _count: { select: { tasks: true } }
+      responsible: { select: { fullName: true } },
+      handoffs: { where: { status: 'PENDIENTE' }, select: { recibidoPor: true }, take: 1 },
+      _count: { select: { tasks: { where: { status: 'pendiente' } } } },
     },
     orderBy: { admissionDate: 'desc' },
+  })
+
+  // b) Consulta de doctores para el selector
+  const userId = session.user?.id ?? ''
+  const doctores = await prisma.user.findMany({
+    where: { isActive: true, role: { in: ['DOCTOR', 'RESIDENT'] }, id: { not: userId } },
+    select: { id: true, fullName: true, email: true },
+    orderBy: { fullName: 'asc' },
   })
 
   // Contar turnos pendientes para este médico
@@ -109,7 +118,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       </header>
 
       <main className="p-4 md:p-8 max-w-5xl mx-auto">
-        <ListaPacientes episodes={episodes} />
+        {/* c) Pasamos los parámetros al componente */}
+        <ListaPacientes
+          episodes={episodes}
+          userId={userId}
+          miEmail={session.user?.email ?? ''}
+          doctores={doctores}
+        />
       </main>
     </div>
   )

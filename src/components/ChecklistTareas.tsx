@@ -39,7 +39,7 @@ const fmt = (d: Date) =>
   })
 
 export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puedeEditar }: Props) {
-  const ahora = new Date().getTime()
+ const ahora = new Date().getTime()
   const pendientes = tareas.filter((t) => t.status === 'pendiente').length
   const hechas = tareas.filter((t) => t.status === 'hecha').length
 

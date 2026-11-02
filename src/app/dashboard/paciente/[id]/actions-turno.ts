@@ -88,9 +88,15 @@ export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
   if (!user?.id || !user.email) redirect('/login')
 
   const handoffId = String(formData.get('handoffId') ?? '')
+  
+  // PASO 5: Agregamos attendingDoctor al include para guardar el valor anterior
   const handoff = await prisma.handoff.findUnique({
     where: { id: handoffId },
-    include: { episode: { select: { patientId: true, status: true } } },
+    include: { 
+      episode: { 
+        select: { patientId: true, status: true, attendingDoctor: true } 
+      } 
+    },
   })
   if (!handoff) redirect('/dashboard')
 
@@ -138,9 +144,14 @@ export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
     entityId: handoffId,
     patientId: handoff.episode.patientId,
     episodeId,
-    oldValue: { status: 'PENDIENTE' },
+    // PASO 5: Guardamos el médico anterior en oldValue
+    oldValue: { 
+      status: 'PENDIENTE', 
+      medicoTratante: handoff.episode.attendingDoctor 
+    },
     newValue: {
       status: 'ACEPTADO',
+      medicoTratante: nombre,
       nuevoResponsable: nombre,
       entregadoPor: entregador?.fullName ?? handoff.entregadoPor,
     },
