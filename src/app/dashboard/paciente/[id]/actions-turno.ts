@@ -121,7 +121,11 @@ export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
     }),
     prisma.episode.update({
       where: { id: episodeId },
-      data: { responsibleId: user.id, responsibleSince: new Date() },
+      data: { 
+        responsibleId: user.id, 
+        responsibleSince: new Date(),
+        attendingDoctor: nombre // <-- ACTUALIZA EL MÉDICO TRATANTE AL NUEVO
+      },
     }),
   ])
   if (aceptada.count === 0) volverConError(episodeId, 'Esta entrega ya fue procesada')
