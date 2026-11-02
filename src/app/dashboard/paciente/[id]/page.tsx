@@ -27,9 +27,18 @@ export default async function ExpedientePage({
   const role = String(session.user.role)
   const miEmail = (session.user.email ?? '').toLowerCase()
 
+  // ¡AQUÍ ESTÁ EL CAMBIO! Agregamos responsibleId: true para que calcularPermisos funcione
   const episode = await prisma.episode.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      status: true,
+      responsibleId: true, // <-- CRUCIAL PARA LOS PERMISOS
+      attendingDoctor: true,
+      chiefComplaint: true,
+      room: true,
+      bed: true,
+      admissionDate: true,
       patient: true,
       allergies: true,
       responsible: { select: { fullName: true } },
@@ -130,7 +139,7 @@ export default async function ExpedientePage({
             </div>
           ) : (
             <div className="bg-slate-100 border border-slate-300 text-slate-700 px-4 py-3 rounded-lg mb-4">
-              👁️ <strong>Solo lectura.</strong> Paciente a cargo de <strong>{episode.responsible?.fullName}</strong>.
+              👁️ <strong>Solo lectura.</strong> Paciente a cargo de <strong>{episode.responsible?.fullName ?? 'Sin asignar'}</strong>.
               {permisos.puedeRegistrarVitales && ' Puedes registrar signos vitales.'}
               {permisos.puedeMarcarTareas && ' Puedes marcar tareas del checklist.'}
             </div>
@@ -167,7 +176,7 @@ export default async function ExpedientePage({
                   <option key={m.id} value={m.id}>{m.fullName}</option>
                 ))}
               </select>
-              <input name="motivo" required placeholder="Motivo (obligatorio)" className="flex-1 min-w-[12rem] px-3 py-2 border rounded-lg text-sm text-slate-900" />
+              <input name="motivo" required placeholder="Motivo (obligatorio)" className="flex-1 min-w-48 px-3 py-2 border rounded-lg text-sm text-slate-900" />
               <button className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-900">Reasignar</button>
             </form>
           </details>
