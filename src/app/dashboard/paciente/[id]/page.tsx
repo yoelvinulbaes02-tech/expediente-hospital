@@ -8,7 +8,7 @@ import { agregarAlergia } from './actions'
 import { guardarNota } from './actions-notas'
 import { guardarSignosVitales } from './actions-vitales'
 import { tomarACargo, reasignarResponsable } from './actions-responsable'
-import { GraficaTemperatura } from '@/components/GraficaTemperatura'
+import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
 
 export default async function ExpedientePage({
@@ -93,10 +93,19 @@ export default async function ExpedientePage({
     return false
   }
 
-  // Formatear datos para la gráfica
-  const datosGrafica = episode.vitals
-    .filter((v) => v.temperature !== null)
-    .map((v) => ({ valor: v.temperature!, fecha: v.createdAt.toISOString() }))
+  // Formatear datos para las gráficas (todo a número simple para pasarlo al navegador)
+  const num = (x: unknown): number | null => (x === null || x === undefined ? null : Number(x))
+  const registrosGrafica: RegistroVital[] = episode.vitals.map((v) => ({
+    fecha: v.createdAt.toISOString(),
+    systolic: num(v.systolic),
+    diastolic: num(v.diastolic),
+    heartRate: num(v.heartRate),
+    respiratoryRate: num(v.respiratoryRate),
+    temperature: num(v.temperature),
+    oxygenSat: num(v.oxygenSat),
+    glucose: num(v.glucose),
+    painScale: num('painScale' in v ? v.painScale : null),
+  }))
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -292,10 +301,10 @@ export default async function ExpedientePage({
               puedeEditar={permisos.puedeEditar}
             />
 
-            {/* Gráfica de Temperatura */}
+            {/* Tendencia de signos vitales */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Temperatura</h2>
-              <GraficaTemperatura datos={datosGrafica} />
+              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Signos Vitales</h2>
+              <GraficasSignos registros={registrosGrafica} />
             </div>
 
             {/* Historial de Signos Vitales */}
