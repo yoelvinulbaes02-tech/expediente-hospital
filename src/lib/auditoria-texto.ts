@@ -6,7 +6,7 @@ const lleno = (v: unknown) => v !== null && v !== undefined && v !== ''
 const cortar = (s: string, max = 160) => (s.length > max ? `${s.slice(0, max)}…` : s)
 const unir = (...p: (string | false | null | undefined)[]) => p.filter(Boolean).join(' · ')
 
-// Nunca mostrar claves temporales en pantalla
+// Nunca mostrar claves temporales en pantalla (protege también los registros antiguos)
 export function ocultarSecretos(texto: string): string {
   return texto.replace(/(clave temporal[^:]*:\s*)\S+/gi, '$1••••••')
 }
@@ -125,12 +125,18 @@ export function describirRegistro(log: {
     }
 
     case 'user:create':
-    case 'user:update':
-      // Usuarios: solo el motivo, sin datos sensibles
+    case 'user:update': {
+      // Usuarios: motivo + a quién afectó (sin datos sensibles)
+      const quien = lleno(n.usuario) ? String(n.usuario) : lleno(n.fullName) ? String(n.fullName) : ''
+      const correo = lleno(n.correo) ? String(n.correo) : lleno(n.email) ? String(n.email) : ''
       return {
         que: `${ACCIONES[log.action] ?? log.action} un usuario`,
-        detalle: log.reason ? ocultarSecretos(log.reason) : '',
+        detalle: unir(
+          log.reason ? ocultarSecretos(log.reason) : '',
+          quien && `Usuario: ${quien}${correo ? ` (${correo})` : ''}`
+        ),
       }
+    }
 
     default: {
       const que = `${ACCIONES[log.action] ?? log.action} ${ENTIDADES[log.entity] ?? log.entity}`

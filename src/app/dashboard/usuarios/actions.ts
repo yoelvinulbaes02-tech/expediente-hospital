@@ -1,101 +1,167 @@
 'use server'
 
+import { randomInt } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import bcrypt from 'bcryptjs'
 
-export async function crearUsuario(formData: FormData) {
-  const session = await auth()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!session || (session.user as any)?.role !== 'ADMIN') throw new Error('No autorizado')
+const ROLES_VALIDOS = ['ADMIN', 'DOCTOR', 'RESIDENT', 'NURSE', 'LAB', 'READONLY'] as const
+type RolValido = (typeof ROLES_VALIDOS)[number]
 
-  const fullName = formData.get('fullName') as string
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const role = formData.get('role') as any
+type EstadoCrear = {
+  ok?: boolean
+  error?: string
+  campo?: 'fullName' | 'email' | 'password' | 'role'
+  creado?: string
+  valores?: { fullName?: string; email?: string; role?: string }
+}
+
+type ResultadoReset = {
+  ok: boolean
+  error?: string
+  password?: string
+  nombre?: string
+  correo?: string
+}
+
+async function exigirAdmin() {
+  const session = await auth()
+  const user = session?.user
+  if (!user?.id || String(user.role) !== 'ADMIN') throw new Error('No autorizado')
+  return { id: user.id, role: String(user.role) }
+}
+
+// Sin caracteres que se confunden (0/O, 1/l/I)
+function generarClaveTemporal(largo = 10): string {
+  const alfabeto = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
+  let clave = ''
+  for (let i = 0; i < largo; i++) clave += alfabeto[randomInt(alfabeto.length)]
+  return clave
+}
+
+export async function crearUsuario(
+  _anterior: EstadoCrear,
+  formData: FormData
+): Promise<EstadoCrear> {
+  const admin = await exigirAdmin()
+
+  const fullName = String(formData.get('fullName') ?? '').trim()
+  const email = String(formData.get('email') ?? '').trim().toLowerCase()
+  const password = String(formData.get('password') ?? '')
+  const role = String(formData.get('role') ?? '')
+
+  // Se devuelven para que el formulario no se borre si hay un error
+  const valores = { fullName, email, role }
+
+  if (fullName.length < 3) {
+    return { error: 'Escribe el nombre completo', campo: 'fullName', valores }
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: 'Escribe un correo válido', campo: 'email', valores }
+  }
+  if (password.length < 6) {
+    return { error: 'La contraseña temporal debe tener al menos 6 caracteres', campo: 'password', valores }
+  }
+  if (!ROLES_VALIDOS.includes(role as RolValido)) {
+    return { error: 'Selecciona un rol válido', campo: 'role', valores }
+  }
+
+  const existente = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: 'insensitive' } },
+    select: { id: true },
+  })
+  if (existente) {
+    return { error: 'Ya existe un usuario con ese correo', campo: 'email', valores }
+  }
 
   const passwordHash = await bcrypt.hash(password, 12)
 
-  const nuevo = await prisma.user.create({
-    data: { fullName, email, passwordHash, role }
-  })
+  // Por si dos administradores crean el mismo correo al mismo tiempo
+  const nuevo = await prisma.user
+    .create({ data: { fullName, email, passwordHash, role: role as RolValido } })
+    .catch((e: unknown) => {
+      if ((e as { code?: string })?.code === 'P2002') return null
+      throw e
+    })
+  if (!nuevo) {
+    return { error: 'Ya existe un usuario con ese correo', campo: 'email', valores }
+  }
 
   await logAudit({
-    actorId: session.user?.id as string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actorRole: (session.user as any)?.role,
+    actorId: admin.id,
+    actorRole: admin.role,
     action: 'create',
     entity: 'user',
     entityId: nuevo.id,
-    newValue: { fullName, email, role },
+    newValue: { usuario: fullName, correo: email, rol: role },
     reason: 'Creación de nuevo usuario',
   })
 
   revalidatePath('/dashboard/usuarios')
+  return { ok: true, creado: `${fullName} (${email})`, valores: {} }
 }
 
-export async function toggleUsuario(formData: FormData) {
-  const session = await auth()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!session || (session.user as any)?.role !== 'ADMIN') throw new Error('No autorizado')
+export async function toggleUsuario(formData: FormData): Promise<void> {
+  const admin = await exigirAdmin()
 
-  const userId = formData.get('userId') as string
+  const userId = String(formData.get('userId') ?? '')
   const nuevoEstado = formData.get('isActive') === 'true'
 
-  if (userId === session.user?.id) return
+  if (!userId || userId === admin.id) return
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const usuario = await prisma.user.update({
     where: { id: userId },
-    data: { isActive: nuevoEstado }
+    data: { isActive: nuevoEstado },
+    select: { fullName: true, email: true },
   })
 
   await logAudit({
-    actorId: session.user?.id as string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actorRole: (session.user as any)?.role,
+    actorId: admin.id,
+    actorRole: admin.role,
     action: 'update',
     entity: 'user',
     entityId: userId,
     oldValue: { isActive: !nuevoEstado },
-    newValue: { isActive: nuevoEstado },
+    newValue: { isActive: nuevoEstado, usuario: usuario.fullName, correo: usuario.email },
     reason: `Usuario ${nuevoEstado ? 'activado' : 'desactivado'}`,
   })
 
   revalidatePath('/dashboard/usuarios')
 }
 
-export async function resetearPassword(formData: FormData) {
-  const session = await auth()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!session || (session.user as any)?.role !== 'ADMIN') throw new Error('No autorizado')
+export async function resetearPassword(userId: string): Promise<ResultadoReset> {
+  const admin = await exigirAdmin()
 
-  const userId = formData.get('userId') as string
-  
-  // Generar contraseña aleatoria de 8 caracteres
-  const nuevaPasswordTemporal = Math.random().toString(36).slice(-8)
-  const passwordHash = await bcrypt.hash(nuevaPasswordTemporal, 12)
+  const objetivo = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, fullName: true, email: true },
+  })
+  if (!objetivo) return { ok: false, error: 'Usuario no encontrado' }
+  if (objetivo.id === admin.id) {
+    return { ok: false, error: 'Para cambiar tu propia contraseña usa "Mi Perfil"' }
+  }
+
+  const temporal = generarClaveTemporal()
+  const passwordHash = await bcrypt.hash(temporal, 12)
 
   await prisma.user.update({
-    where: { id: userId },
-    data: { 
-      passwordHash,
-      mustChangePassword: true
-    }
+    where: { id: objetivo.id },
+    data: { passwordHash, mustChangePassword: true },
   })
 
+  // La clave NO se guarda en la auditoría
   await logAudit({
-    actorId: session.user?.id as string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actorRole: (session.user as any)?.role,
+    actorId: admin.id,
+    actorRole: admin.role,
     action: 'update',
     entity: 'user',
-    entityId: userId,
-    reason: `Contraseña reseteada. Nueva clave temporal: ${nuevaPasswordTemporal}`,
+    entityId: objetivo.id,
+    newValue: { usuario: objetivo.fullName, correo: objetivo.email, debeCambiarla: true },
+    reason: 'Contraseña temporal reseteada por el administrador',
   })
 
   revalidatePath('/dashboard/usuarios')
+  return { ok: true, password: temporal, nombre: objetivo.fullName, correo: objetivo.email }
 }

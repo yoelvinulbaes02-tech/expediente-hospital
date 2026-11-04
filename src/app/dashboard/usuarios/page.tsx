@@ -2,9 +2,10 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { crearUsuario, toggleUsuario, resetearPassword } from './actions'
+import { toggleUsuario } from './actions'
 import { SearchInput } from '@/components/SearchInput'
 import { BotonResetClave } from '@/components/BotonResetClave'
+import { FormularioCrearUsuario } from '@/components/FormularioCrearUsuario'
 
 export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const session = await auth()
@@ -39,29 +40,14 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
 
         <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Crear Nuevo Usuario</h2>
-          <form action={crearUsuario} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input name="fullName" placeholder="Nombre completo (Ej. Dr. Pedro López)" required className="px-3 py-2 border rounded-lg text-slate-900" />
-            <input name="email" type="email" placeholder="Correo electrónico" required className="px-3 py-2 border rounded-lg text-slate-900" />
-            <input name="password" type="password" placeholder="Contraseña temporal" required className="px-3 py-2 border rounded-lg text-slate-900" />
-            <select name="role" required className="px-3 py-2 border rounded-lg text-slate-900 bg-white">
-              <option value="DOCTOR">Médico Tratante</option>
-              <option value="RESIDENT">Residente</option>
-              <option value="NURSE">Enfermería</option>
-              <option value="LAB">Laboratorio/Imágenes</option>
-              <option value="READONLY">Solo Lectura</option>
-              <option value="ADMIN">Administrador</option>
-            </select>
-            <button type="submit" className="md:col-span-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-              Crear Usuario
-            </button>
-          </form>
+          <FormularioCrearUsuario />
         </div>
 
         <div className="mb-4">
           <SearchInput defaultValue={busqueda} placeholder="🔍 Buscar doctor por nombre o correo..." />
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
               <tr>
@@ -97,11 +83,8 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                               {u.isActive ? 'Desactivar' : 'Activar'}
                             </button>
                           </form>
-                          
-                          <form action={resetearPassword}>
-                            <input type="hidden" name="userId" value={u.id} />
-                            <BotonResetClave />
-                          </form>
+
+                          <BotonResetClave userId={u.id} nombre={u.fullName} />
                         </>
                       )}
                     </div>
