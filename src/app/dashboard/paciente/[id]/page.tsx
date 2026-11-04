@@ -8,7 +8,7 @@ import { agregarAlergia } from './actions'
 import { guardarNota } from './actions-notas'
 import { guardarSignosVitales } from './actions-vitales'
 import { tomarACargo, reasignarResponsable } from './actions-responsable'
-import { GraficaTemperatura } from '@/components/GraficaTemperatura'
+import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
 
 export default async function ExpedientePage({
@@ -27,12 +27,13 @@ export default async function ExpedientePage({
   const role = String(session.user.role)
   const miEmail = (session.user.email ?? '').toLowerCase()
 
+  // ¡AQUÍ ESTÁ EL CAMBIO! Agregamos responsibleId: true para que calcularPermisos funcione
   const episode = await prisma.episode.findUnique({
     where: { id },
     select: {
       id: true,
       status: true,
-      responsibleId: true,
+      responsibleId: true, // <-- CRUCIAL PARA LOS PERMISOS
       attendingDoctor: true,
       chiefComplaint: true,
       room: true,
@@ -89,14 +90,22 @@ export default async function ExpedientePage({
     if (tipo === 'sys') return valor < 90 || valor > 140
     if (tipo === 'dia') return valor < 60 || valor > 90
     if (tipo === 'spo2') return valor < 95
-    if (tipo === 'dolor') return valor > 3 // Alerta si el dolor es mayor a 3
     return false
   }
 
-  // Formatear datos para la gráfica
-  const datosGrafica = episode.vitals
-    .filter((v) => v.temperature !== null)
-    .map((v) => ({ valor: v.temperature!, fecha: v.createdAt.toISOString() }))
+  // Formatear datos para las gráficas (todo a número simple para pasarlo al navegador)
+  const num = (x: unknown): number | null => (x === null || x === undefined ? null : Number(x))
+  const registrosGrafica: RegistroVital[] = episode.vitals.map((v) => ({
+    fecha: v.createdAt.toISOString(),
+    systolic: num(v.systolic),
+    diastolic: num(v.diastolic),
+    heartRate: num(v.heartRate),
+    respiratoryRate: num(v.respiratoryRate),
+    temperature: num(v.temperature),
+    oxygenSat: num(v.oxygenSat),
+    glucose: num(v.glucose),
+    painScale: num('painScale' in v ? v.painScale : null),
+  }))
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -193,7 +202,7 @@ export default async function ExpedientePage({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {permisos.puedeEditar && (
+            {!esSoloLectura && (
               <Link href={`/dashboard/paciente/${episode.id}/turno`} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
                 📋 Entrega de Turno
               </Link>
@@ -225,43 +234,38 @@ export default async function ExpedientePage({
             {permisos.puedeRegistrarVitales && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Registrar Signos Vitales</h2>
-                <form action={guardarSignosVitales} className="space-y-4">
+                <form action={guardarSignosVitales} className="space-y-3">
                   <input type="hidden" name="episodeId" value={episode.id} />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Presión Arterial (Sist/Diast)</label>
-                      <div className="flex gap-2">
-                        <input name="systolic" type="number" placeholder="120" className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" />
-                        <input name="diastolic" type="number" placeholder="80" className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Presión (Sist/Diast)</label>
+                      <div className="flex gap-1">
+                        <input name="systolic" type="number" placeholder="120" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                        <input name="diastolic" type="number" placeholder="80" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">F. Cardíaca</label>
-                      <input name="heartRate" type="number" placeholder="75" className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" />
+                      <label className="block text-xs font-medium text-slate-700 mb-1">F. Cardíaca</label>
+                      <input name="heartRate" type="number" placeholder="75" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">F. Resp.</label>
-                      <input name="respiratoryRate" type="number" placeholder="16" className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" />
+                      <label className="block text-xs font-medium text-slate-700 mb-1">F. Resp.</label>
+                      <input name="respiratoryRate" type="number" placeholder="16" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Temp (°C)</label>
-                      <input name="temperature" type="number" step="0.1" placeholder="36.5" className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" />
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Temp (°C)</label>
+                      <input name="temperature" type="number" step="0.1" placeholder="36.5" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">SpO2 (%)</label>
-                      <input name="oxygenSat" type="number" placeholder="98" className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" />
+                      <label className="block text-xs font-medium text-slate-700 mb-1">SpO2 (%)</label>
+                      <input name="oxygenSat" type="number" placeholder="98" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Glucosa</label>
-                      <input name="glucose" type="number" placeholder="100" className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" />
-                    </div>
-                    {/* NUEVO CAMPO: DOLOR */}
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Dolor (Escala 0-10)</label>
-                      <input name="painScale" type="number" min="0" max="10" placeholder="0 = Sin dolor, 10 = Dolor insoportable" className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" />
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Glucosa</label>
+                      <input name="glucose" type="number" placeholder="100" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
                     </div>
                   </div>
-                  <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
+                  <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
                 </form>
               </div>
             )}
@@ -272,15 +276,15 @@ export default async function ExpedientePage({
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Agregar Alergia</h2>
                 <form action={agregarAlergia} className="space-y-3">
                   <input type="hidden" name="episodeId" value={episode.id} />
-                  <input name="allergen" required className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="Alérgeno (Ej. Mariscos)" />
-                  <select name="severity" required className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm bg-white text-slate-900">
+                  <input name="allergen" required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="Alérgeno (Ej. Mariscos)" />
+                  <select name="severity" required className="w-full px-3 py-2 border rounded-lg text-sm bg-white text-slate-900">
                     <option value="leve">Leve</option>
                     <option value="moderada">Moderada</option>
                     <option value="grave">Grave</option>
                   </select>
                   <input type="hidden" name="type" value="otro" />
                   <input type="hidden" name="reaction" value="" />
-                  <button type="submit" className="w-full bg-slate-800 text-white px-4 py-3 md:py-2 rounded-lg text-sm hover:bg-slate-900">Guardar Alergia</button>
+                  <button type="submit" className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-900">Guardar Alergia</button>
                 </form>
               </div>
             )}
@@ -297,50 +301,42 @@ export default async function ExpedientePage({
               puedeEditar={permisos.puedeEditar}
             />
 
-            {/* Gráfica de Temperatura */}
+            {/* Tendencia de signos vitales */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Temperatura</h2>
-              <GraficaTemperatura datos={datosGrafica} />
+              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Signos Vitales</h2>
+              <GraficasSignos registros={registrosGrafica} />
             </div>
 
-            {/* Historial de Signos Vitales: con scroll lateral en el teléfono */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            {/* Historial de Signos Vitales */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Últimos Signos Vitales</h2>
-              <div className="overflow-x-auto -mx-6 px-6">
-                <table className="w-full text-sm text-left min-w-[600px]">
-                  <thead className="bg-slate-100 text-slate-600">
-                    <tr>
-                      <th className="px-3 py-2">Hora</th>
-                      <th className="px-3 py-2">TA</th>
-                      <th className="px-3 py-2">FC</th>
-                      <th className="px-3 py-2">FR</th>
-                      <th className="px-3 py-2">Temp</th>
-                      <th className="px-3 py-2">SpO2</th>
-                      <th className="px-3 py-2">Glucosa</th>
-                      <th className="px-3 py-2">Dolor</th>
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-100 text-slate-600">
+                  <tr>
+                    <th className="px-3 py-2">Hora</th>
+                    <th className="px-3 py-2">TA</th>
+                    <th className="px-3 py-2">FC</th>
+                    <th className="px-3 py-2">Temp</th>
+                    <th className="px-3 py-2">SpO2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {episode.vitals.map((v) => (
+                    <tr key={v.id} className="border-b">
+                      <td className="px-3 py-2 text-xs text-slate-500">{v.createdAt.toLocaleTimeString('es-DO', { timeZone: 'America/Santo_Domingo' })}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('sys', v.systolic) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>
+                        {v.systolic}/{v.diastolic}
+                      </td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('fc', v.heartRate) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.heartRate}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('temp', v.temperature) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.temperature}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('spo2', v.oxygenSat) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.oxygenSat}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {episode.vitals.map((v) => (
-                      <tr key={v.id} className="border-b">
-                        <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">{v.createdAt.toLocaleTimeString('es-DO', { timeZone: 'America/Santo_Domingo' })}</td>
-                        <td className={`px-3 py-2 font-medium whitespace-nowrap ${esAnormal('sys', v.systolic) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>
-                          {v.systolic}/{v.diastolic}
-                        </td>
-                        <td className={`px-3 py-2 font-medium ${esAnormal('fc', v.heartRate) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.heartRate}</td>
-                        <td className="px-3 py-2 font-medium text-slate-800">{v.respiratoryRate}</td>
-                        <td className={`px-3 py-2 font-medium ${esAnormal('temp', v.temperature) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.temperature}</td>
-                        <td className={`px-3 py-2 font-medium ${esAnormal('spo2', v.oxygenSat) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.oxygenSat}</td>
-                        <td className="px-3 py-2 font-medium text-slate-800">{v.glucose}</td>
-                        <td className={`px-3 py-2 font-medium ${esAnormal('dolor', v.painScale) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.painScale}</td>
-                      </tr>
-                    ))}
-                    {episode.vitals.length === 0 && (
-                      <tr><td colSpan={8} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                  {episode.vitals.length === 0 && (
+                    <tr><td colSpan={5} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
+                  )}
+                </tbody>
+              </table>
             </div>
 
             {/* Notas SOAP: solo el médico a cargo */}
@@ -349,11 +345,11 @@ export default async function ExpedientePage({
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Nueva Nota de Evolución (SOAP)</h2>
                 <form action={guardarNota} className="space-y-4">
                   <input type="hidden" name="episodeId" value={episode.id} />
-                  <textarea name="subjective" rows={3} required className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="S (Subjetivo): Lo que refiere el paciente..."></textarea>
-                  <textarea name="objective" rows={3} required className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="O (Objetivo): Signos vitales, hallazgos..."></textarea>
-                  <textarea name="assessment" rows={3} required className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="A (Análisis): Impresión diagnóstica..."></textarea>
-                  <textarea name="plan" rows={3} required className="w-full px-3 py-3 md:py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="P (Plan): Tratamiento, indicaciones..."></textarea>
-                  <button type="submit" className="w-full bg-blue-600 text-white px-4 py-3 md:py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">Firmar y Guardar Nota</button>
+                  <textarea name="subjective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="S (Subjetivo): Lo que refiere el paciente..."></textarea>
+                  <textarea name="objective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="O (Objetivo): Signos vitales, hallazgos..."></textarea>
+                  <textarea name="assessment" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="A (Análisis): Impresión diagnóstica..."></textarea>
+                  <textarea name="plan" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="P (Plan): Tratamiento, indicaciones..."></textarea>
+                  <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">Firmar y Guardar Nota</button>
                 </form>
               </div>
             )}
