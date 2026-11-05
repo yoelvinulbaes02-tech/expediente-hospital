@@ -1,4 +1,5 @@
 import { guardarAntecedentes } from '@/app/dashboard/paciente/[id]/actions-clinicas'
+import { TextareaConDeshacer } from '@/components/TextareaConDeshacer'
 
 type Antecedentes = {
   pathological: string | null
@@ -24,6 +25,8 @@ export function SeccionAntecedentes({
       antecedentes.family ||
       antecedentes.habits ||
       antecedentes.medications)
+
+  const textareaClass = 'w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900 focus:ring-1 focus:ring-blue-500'
 
   return (
     <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
@@ -70,56 +73,62 @@ export function SeccionAntecedentes({
           </summary>
           <form action={guardarAntecedentes} className="space-y-3 mt-3">
             <input type="hidden" name="episodeId" value={episodeId} />
+            
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Patológicos</label>
-              <textarea
+              <TextareaConDeshacer
                 name="pathological"
                 rows={2}
                 defaultValue={antecedentes?.pathological ?? ''}
                 placeholder="Ej. DM2 de 10 años de evolución, HTA..."
-                className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                className={textareaClass}
               />
             </div>
+            
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Quirúrgicos</label>
-              <textarea
+              <TextareaConDeshacer
                 name="surgical"
                 rows={1}
                 defaultValue={antecedentes?.surgical ?? ''}
                 placeholder="Ej. Apendicectomía en 2012"
-                className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                className={textareaClass}
               />
             </div>
+
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Medicamentos habituales</label>
-              <textarea
+              <TextareaConDeshacer
                 name="medications"
                 rows={2}
                 defaultValue={antecedentes?.medications ?? ''}
                 placeholder="Ej. Losartán 50mg c/12h, Amlodipina 5mg..."
-                className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                className={textareaClass}
               />
             </div>
+
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Familiares</label>
-              <textarea
+              <TextareaConDeshacer
                 name="family"
                 rows={1}
                 defaultValue={antecedentes?.family ?? ''}
                 placeholder="Ej. Madre con ERC, Padre fallecido por IAM"
-                className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                className={textareaClass}
               />
             </div>
+
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Hábitos</label>
-              <textarea
+              <TextareaConDeshacer
                 name="habits"
                 rows={1}
                 defaultValue={antecedentes?.habits ?? ''}
                 placeholder="Ej. Tabaquismo negado, Alcohol ocasional"
-                className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                className={textareaClass}
               />
             </div>
+
             <button
               type="submit"
               className="w-full bg-slate-800 text-white py-2 rounded-lg text-xs font-bold hover:bg-slate-900 transition-colors"

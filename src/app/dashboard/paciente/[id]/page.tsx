@@ -11,11 +11,12 @@ import { tomarACargo, reasignarResponsable } from './actions-responsable'
 import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
 
-// Componentes clínicos de la Tanda B
+// Componentes clínicos
 import { NotasImportantes } from '@/components/NotasImportantes'
 import { BloqueNefrologico } from '@/components/BloqueNefrologico'
 import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
+import { FormularioNotaSOAP } from '@/components/FormularioNotaSOAP'
 
 const ETIQUETA_ROL: Record<string, string> = {
   ADMIN: 'Administrador',
@@ -91,7 +92,6 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo
   const entregaPendiente = episode.handoffs[0]
 
-  // Recolectar emails de autores
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => emails.add(v.recordedBy))
@@ -452,19 +452,9 @@ export default async function ExpedientePage({
               </table>
             </div>
 
-            {/* SOAP */}
+            {/* 5. NOTA SOAP CON PROTECCIÓN ANTI-BORRADO Y BOTONES DESHACER */}
             {permisos.puedeRegistrar && (
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Nueva Nota de Evolución (SOAP)</h2>
-                <form action={guardarNota} className="space-y-4">
-                  <input type="hidden" name="episodeId" value={episode.id} />
-                  <textarea name="subjective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="S (Subjetivo): Lo que refiere el paciente..."></textarea>
-                  <textarea name="objective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="O (Objetivo): Signos vitales, hallazgos..."></textarea>
-                  <textarea name="assessment" rows={2} required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="A (Análisis): Impresión diagnóstica..."></textarea>
-                  <textarea name="plan" rows={2} required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="P (Plan): Tratamiento, indicaciones..."></textarea>
-                  <button type="submit" className="w-full bg-blue-600 text-white px-4 py-3 md:py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">Firmar y Guardar Nota</button>
-                </form>
-              </div>
+              <FormularioNotaSOAP episodeId={episode.id} action={guardarNota} />
             )}
 
             {/* Historial de Notas */}

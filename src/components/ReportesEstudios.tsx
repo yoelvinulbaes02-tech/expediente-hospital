@@ -1,4 +1,5 @@
 import { guardarReporteEstudio } from '@/app/dashboard/paciente/[id]/actions-clinicas'
+import { TextareaConDeshacer } from '@/components/TextareaConDeshacer'
 
 type Estudio = {
   id: string
@@ -95,18 +96,18 @@ export function ReportesEstudios({
               <input
                 name="title"
                 required
-                placeholder="Ej. Sonografía renal y vías urinarias, Ecocardiograma transtorácico..."
+                placeholder="Ej. Sonografía renal y vías urinarias..."
                 className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Conclusión / Hallazgos</label>
-              <textarea
+              <TextareaConDeshacer
                 name="result"
                 rows={3}
                 required
                 placeholder="Escribe los hallazgos principales y la conclusión..."
-                className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900"
+                className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900 focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <button
