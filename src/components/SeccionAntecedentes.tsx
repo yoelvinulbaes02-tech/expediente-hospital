@@ -7,15 +7,30 @@ type Antecedentes = {
   family: string | null
   habits: string | null
   medications: string | null
+  updatedBy: string | null
+  updatedAt: Date
+}
+
+const ETIQUETA_ROL: Record<string, string> = {
+  ADMIN: 'Administrador',
+  DOCTOR: 'Médico',
+  RESIDENT: 'Residente',
+  NURSE: 'Enfermería',
+  LAB: 'Laboratorio',
+  READONLY: 'Solo lectura',
 }
 
 export function SeccionAntecedentes({
   episodeId,
   antecedentes,
+  nombres,
+  roles,
   puedeRegistrar,
 }: {
   episodeId: string
   antecedentes: Antecedentes | null
+  nombres: Record<string, string>
+  roles: Record<string, string>
   puedeRegistrar: boolean
 }) {
   const tieneDatos =
@@ -30,8 +45,8 @@ export function SeccionAntecedentes({
 
   return (
     <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-      <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-3 flex items-center justify-between">
-        <span>📋 Antecedentes del Paciente</span>
+      <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-3">
+        📋 Antecedentes del Paciente
       </h2>
 
       {!tieneDatos ? (
@@ -62,6 +77,30 @@ export function SeccionAntecedentes({
             <p>
               <strong className="text-slate-900">Hábitos:</strong> {antecedentes.habits}
             </p>
+          )}
+
+          {/* FIRMA Y TRAZABILIDAD CLÍNICA */}
+          {antecedentes.updatedBy && (
+            <div className="mt-3 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between text-[11px] text-slate-500">
+              <div>
+                <span>Actualizado por: </span>
+                <strong className="text-slate-700">{nombres[antecedentes.updatedBy] ?? antecedentes.updatedBy}</strong>
+                {roles[antecedentes.updatedBy] && (
+                  <span className="ml-1 bg-slate-100 text-slate-700 text-[10px] font-bold px-1.5 py-0.2 rounded border">
+                    {ETIQUETA_ROL[roles[antecedentes.updatedBy]] ?? roles[antecedentes.updatedBy]}
+                  </span>
+                )}
+              </div>
+              <span className="text-slate-400 text-[10px]">
+                {antecedentes.updatedAt.toLocaleString('es-DO', {
+                  timeZone: 'America/Santo_Domingo',
+                  day: '2-digit',
+                  month: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
+            </div>
           )}
         </div>
       )}

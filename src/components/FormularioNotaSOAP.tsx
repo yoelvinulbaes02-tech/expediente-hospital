@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { TextareaConDeshacer } from '@/components/TextareaConDeshacer'
 
 export function FormularioNotaSOAP({
@@ -9,15 +10,32 @@ export function FormularioNotaSOAP({
   episodeId: string
   action: (formData: FormData) => Promise<void>
 }) {
+  const [formKey, setFormKey] = useState(0)
+  const [enviando, setEnviando] = useState(false)
+
   const inputClass =
     'w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500'
 
   const limpiarBorradores = () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem(`draft_${episodeId}_s`)
-      localStorage.removeItem(`draft_${episodeId}_o`)
-      localStorage.removeItem(`draft_${episodeId}_a`)
-      localStorage.removeItem(`draft_${episodeId}_p`)
+      try {
+        localStorage.removeItem(`draft_${episodeId}_s`)
+        localStorage.removeItem(`draft_${episodeId}_o`)
+        localStorage.removeItem(`draft_${episodeId}_a`)
+        localStorage.removeItem(`draft_${episodeId}_p`)
+      } catch {}
+    }
+  }
+
+  const handleSubmit = async (formData: FormData) => {
+    setEnviando(true)
+    try {
+      limpiarBorradores()
+      await action(formData)
+      // Al cambiar la key, React desmonta y limpia los 4 textareas inmediatamente
+      setFormKey((prev) => prev + 1)
+    } finally {
+      setEnviando(false)
     }
   }
 
@@ -28,13 +46,7 @@ export function FormularioNotaSOAP({
         <span className="text-xs text-slate-400 font-medium">Con protección anti-borrado</span>
       </div>
 
-      <form
-        action={async (formData) => {
-          await action(formData)
-          limpiarBorradores()
-        }}
-        className="space-y-4"
-      >
+      <form key={formKey} action={handleSubmit} className="space-y-4">
         <input type="hidden" name="episodeId" value={episodeId} />
 
         <div>
@@ -95,9 +107,10 @@ export function FormularioNotaSOAP({
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white px-4 py-3 md:py-2.5 rounded-lg font-bold text-sm hover:bg-blue-700 active:scale-98 transition-all shadow-sm"
+          disabled={enviando}
+          className="w-full bg-blue-600 text-white px-4 py-3 md:py-2.5 rounded-lg font-bold text-sm hover:bg-blue-700 active:scale-98 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Firmar y Guardar Nota
+          {enviando ? 'Guardando y firmando nota…' : 'Firmar y Guardar Nota'}
         </button>
       </form>
     </div>

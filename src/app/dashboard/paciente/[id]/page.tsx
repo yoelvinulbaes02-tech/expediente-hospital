@@ -92,6 +92,7 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo
   const entregaPendiente = episode.handoffs[0]
 
+  // Recolectar emails de todas las firmas del expediente
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => emails.add(v.recordedBy))
@@ -101,6 +102,13 @@ export default async function ExpedientePage({
     emails.add(t.createdBy)
     if (t.doneBy) emails.add(t.doneBy)
   })
+  if (episode.patient.medicalHistory?.updatedBy) {
+    emails.add(episode.patient.medicalHistory.updatedBy)
+  }
+  episode.vascularAccesses.forEach((va) => emails.add(va.createdBy))
+  episode.viralSerologies.forEach((vs) => emails.add(vs.recordedBy))
+  episode.gfrRecords.forEach((gfr) => emails.add(gfr.recordedBy))
+
   if (entregaPendiente) {
     emails.add(entregaPendiente.entregadoPor)
     emails.add(entregaPendiente.recibidoPor)
@@ -282,7 +290,7 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* 1. NOTAS IMPORTANTES (AVISOS DESTACADOS) */}
+        {/* 1. NOTAS IMPORTANTES */}
         <NotasImportantes
           episodeId={episode.id}
           alertas={episode.importantAlerts}
@@ -290,12 +298,14 @@ export default async function ExpedientePage({
           puedeRegistrar={permisos.puedeRegistrar}
         />
 
-        {/* 2. ACCESO VASCULAR, VIRALES Y TFG ACTUAL */}
+        {/* 2. ACCESO VASCULAR, VIRALES Y TFG (CON FIRMAS) */}
         <BloqueNefrologico
           episodeId={episode.id}
           acceso={episode.vascularAccesses[0] ?? null}
           virales={episode.viralSerologies[0] ?? null}
           tfgActual={episode.gfrRecords[0] ?? null}
+          nombres={nombres}
+          roles={roles}
           puedeRegistrar={permisos.puedeRegistrar}
         />
 
@@ -313,10 +323,12 @@ export default async function ExpedientePage({
               <p className="text-sm text-slate-600 mb-2"><strong>A cargo ahora:</strong> {episode.responsible?.fullName ?? 'Sin asignar'}</p>
             </div>
 
-            {/* 3. ANTECEDENTES MÉDICOS DEL PACIENTE */}
+            {/* 3. ANTECEDENTES (CON FIRMA) */}
             <SeccionAntecedentes
               episodeId={episode.id}
               antecedentes={episode.patient.medicalHistory}
+              nombres={nombres}
+              roles={roles}
               puedeRegistrar={permisos.puedeRegistrar}
             />
 
@@ -368,7 +380,7 @@ export default async function ExpedientePage({
               </div>
             )}
 
-            {/* Alergias Simplificadas */}
+            {/* Alergias */}
             {permisos.puedeRegistrar && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2">Gestión de Alergias</h2>
@@ -452,7 +464,7 @@ export default async function ExpedientePage({
               </table>
             </div>
 
-            {/* 5. NOTA SOAP CON PROTECCIÓN ANTI-BORRADO Y BOTONES DESHACER */}
+            {/* 5. FORMULARIO SOAP CON LIMPIEZA AUTOMÁTICA */}
             {permisos.puedeRegistrar && (
               <FormularioNotaSOAP episodeId={episode.id} action={guardarNota} />
             )}
