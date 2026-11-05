@@ -24,12 +24,12 @@ model User {
   fullName           String
   role               Role     @default(READONLY)
   isActive           Boolean  @default(true)
-  mustChangePassword Boolean  @default(false) // <-- NUEVO CAMPO
+  mustChangePassword Boolean  @default(false)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
  
-  auditEntries AuditLog[]
-  episodesAtCharge Episode[] @relation("EpisodeResponsible")
+  auditEntries       AuditLog[]
+  episodesAtCharge   Episode[] @relation("EpisodeResponsible")
 }
 
 // ─── AUDITORÍA APPEND-ONLY ───
@@ -72,27 +72,30 @@ model Patient {
 }
 
 model Episode {
-  id               String    @id @default(cuid())
-  patientId        String
-  admissionDate    DateTime  @default(now())
-  admissionType    String
-  chiefComplaint   String?
-  status           String    @default("active") // "active" | "closed"
-  room             String?
-  bed              String?
-  attendingDoctor  String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                 String    @id @default(cuid())
+  patientId          String
+  admissionDate      DateTime  @default(now())
+  admissionType      String
+  chiefComplaint     String?
+  status             String    @default("active") // "active" | "closed"
+  room               String?
+  bed                String?
+  attendingDoctor    String?
+  admittingDoctor    String?   // MA que lo ingresó
+  primaryDiagnosis   String?   // Diagnóstico principal de ingreso
+  secondaryDiagnoses String?   // Otros diagnósticos secundarios
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  patient          Patient   @relation(fields: [patientId], references: [id])
-  allergies        Allergy[]
-  notes            Note[]
-  vitals           VitalSign[]
-  handoffs         Handoff[]
-    responsibleId    String?
-  responsibleSince DateTime? @db.Timestamptz
-  responsible      User?     @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
-  tasks            Task[]
+  patient            Patient   @relation(fields: [patientId], references: [id])
+  allergies          Allergy[]
+  notes              Note[]
+  vitals             VitalSign[]
+  handoffs           Handoff[]
+  responsibleId      String?
+  responsibleSince   DateTime? @db.Timestamptz
+  responsible        User?     @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
+  tasks              Task[]
 
   @@index([responsibleId])
 }
@@ -103,9 +106,9 @@ model Allergy {
   patientId   String
   episodeId   String
   allergen    String
-  type        String    // "medicamento" | "alimento" | "latex" | "otro"
+  type        String    @default("otro") // "medicamento" | "alimento" | "latex" | "otro"
   reaction    String?
-  severity    String    // "leve" | "moderada" | "grave"
+  severity    String?   @default("no_especificada") // Simplificado (sin leve/moderada/grave)
   status      String    @default("evaluada") // "evaluada" | "no_evaluada" | "sin_alergias"
   createdAt   DateTime  @default(now())
   createdBy   String
@@ -133,14 +136,15 @@ model Note {
 model VitalSign {
   id               String   @id @default(cuid())
   episodeId        String
-  systolic         Int?     // Presión sistólica (Ej. 120)
-  diastolic        Int?     // Presión diastólica (Ej. 80)
+  systolic         Int?     // Presión sistólica
+  diastolic        Int?     // Presión diastólica
   heartRate        Int?     // Frecuencia cardíaca
   respiratoryRate  Int?     // Frecuencia respiratoria
   temperature      Float?   // Temperatura
   oxygenSat        Int?     // Saturación de oxígeno (SpO2)
   glucose          Int?     // Glucosa
   painScale        Int?     // Escala de dolor (0-10)
+  diuresis         Int?     // Diuresis en mL
   recordedBy       String   // Email del que registra
   createdAt        DateTime @default(now()) @db.Timestamptz
 
@@ -174,12 +178,12 @@ model Task {
   id           String    @id @default(cuid())
   episodeId    String
   title        String
-  category     String    @default("otro") // "analisis" | "estudio" | "indicacion" | "otro"
+  category     String    @default("otro")
   dueAt        DateTime? @db.Timestamptz
-  status       String    @default("pendiente") // "pendiente" | "hecha" | "cancelada"
-  createdBy    String    // Email de quien la creó
+  status       String    @default("pendiente")
+  createdBy    String
   createdAt    DateTime  @default(now()) @db.Timestamptz
-  doneBy       String?   // Email de quien la marcó hecha
+  doneBy       String?
   doneAt       DateTime? @db.Timestamptz
   cancelReason String?
 

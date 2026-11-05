@@ -174,6 +174,9 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   room: 'room',
   bed: 'bed',
   attendingDoctor: 'attendingDoctor',
+  admittingDoctor: 'admittingDoctor',
+  primaryDiagnosis: 'primaryDiagnosis',
+  secondaryDiagnoses: 'secondaryDiagnoses',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   responsibleId: 'responsibleId',
@@ -216,6 +219,7 @@ exports.Prisma.VitalSignScalarFieldEnum = {
   oxygenSat: 'oxygenSat',
   glucose: 'glucose',
   painScale: 'painScale',
+  diuresis: 'diuresis',
   recordedBy: 'recordedBy',
   createdAt: 'createdAt'
 };

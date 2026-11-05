@@ -12,6 +12,7 @@ export type RegistroVital = {
   oxygenSat: number | null
   glucose: number | null
   painScale: number | null
+  diuresis: number | null
 }
 
 type Campo = Exclude<keyof RegistroVital, 'fecha'>
@@ -19,7 +20,7 @@ type Serie = {
   nombre: string
   campo: Campo
   color: string
-  rango: [number | null, number | null] // [mínimo normal, máximo normal]
+  rango: [number | null, number | null]
 }
 type Grafica = {
   id: string
@@ -31,7 +32,6 @@ type Grafica = {
   techo?: number
 }
 
-// Rangos: los de la tabla (TA, FC, Temp, SpO2) + FR, glucosa y dolor (ajústalos aquí si hace falta)
 const GRAFICAS: Grafica[] = [
   {
     id: 'presion',
@@ -88,6 +88,14 @@ const GRAFICAS: Grafica[] = [
     techo: 10,
     series: [{ nombre: 'Dolor', campo: 'painScale', color: '#2563eb', rango: [0, 3] }],
   },
+  {
+    id: 'diuresis',
+    titulo: 'Diuresis',
+    corto: 'Diuresis',
+    unidad: 'mL',
+    piso: 0,
+    series: [{ nombre: 'Diuresis', campo: 'diuresis', color: '#0284c7', rango: [400, null] }],
+  },
 ]
 
 const ROJO = '#dc2626'
@@ -107,7 +115,6 @@ const fmtFecha = (iso: string) =>
 
 const redondear = (n: number) => Math.round(n * 10) / 10
 
-// `registros` debe venir en orden cronológico (el más antiguo primero)
 function ultimoValor(registros: RegistroVital[], campo: Campo): number | null {
   for (let i = registros.length - 1; i >= 0; i--) {
     const v = registros[i][campo]
@@ -137,7 +144,7 @@ function Linea({
 
   const W = grande ? 640 : 420
   const H = grande ? 280 : 190
-  const izq = 40
+  const izq = 44
   const der = 14
   const arr = 16
   const aba = 24
@@ -170,7 +177,6 @@ function Linea({
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img" aria-label={`Tendencia de ${g.titulo}`}>
-      {/* Franjas de rango normal */}
       {g.series.map((s) => {
         const lo = Math.max(s.rango[0] ?? min, min)
         const hi = Math.min(s.rango[1] ?? max, max)
@@ -188,7 +194,6 @@ function Linea({
         )
       })}
 
-      {/* Líneas guía y escala vertical */}
       {ticks.map((t, i) => (
         <g key={`tick-${i}`}>
           <line x1={izq} y1={y(t)} x2={W - der} y2={y(t)} stroke="#e2e8f0" strokeWidth="1" />
@@ -198,7 +203,6 @@ function Linea({
         </g>
       ))}
 
-      {/* Fechas de los extremos */}
       <text x={izq} y={H - 6} fontSize="12" textAnchor="start" fill="#64748b">
         {fmtFecha(filas[0].fecha)}
       </text>
@@ -206,7 +210,6 @@ function Linea({
         {fmtFecha(filas[filas.length - 1].fecha)}
       </text>
 
-      {/* Series */}
       {g.series.map((s) => {
         const pts = filas
           .map((r, i) => ({ v: r[s.campo], px: x(i) }))
@@ -292,10 +295,8 @@ function Tarjeta({
 export function GraficasSignos({ registros }: { registros: RegistroVital[] }) {
   const [vista, setVista] = useState<string>('todas')
 
-  // La página los entrega del más reciente al más antiguo; aquí se ordenan cronológicamente
   const orden = [...registros].reverse()
 
-  // Solo se muestran los signos que tienen al menos un dato
   const visibles = GRAFICAS.filter((g) =>
     orden.some((r) => g.series.some((s) => r[s.campo] !== null))
   )

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { BannerAlergias } from '@/components/BannerAlergias'
 import { ChecklistTareas } from '@/components/ChecklistTareas'
 import Link from 'next/link'
-import { agregarAlergia } from './actions'
+import { agregarAlergia, marcarSinAlergias } from './actions'
 import { guardarNota } from './actions-notas'
 import { guardarSignosVitales } from './actions-vitales'
 import { tomarACargo, reasignarResponsable } from './actions-responsable'
@@ -50,8 +50,12 @@ export default async function ExpedientePage({
     select: {
       id: true,
       status: true,
-      responsibleId: true, // necesario para calcular los permisos
+      responsibleId: true,
+      admissionType: true,
       attendingDoctor: true,
+      admittingDoctor: true,
+      primaryDiagnosis: true,
+      secondaryDiagnoses: true,
       chiefComplaint: true,
       room: true,
       bed: true,
@@ -60,7 +64,7 @@ export default async function ExpedientePage({
       allergies: true,
       responsible: { select: { fullName: true } },
       notes: { orderBy: { createdAt: 'desc' } },
-      vitals: { orderBy: { createdAt: 'desc' }, take: 10 },
+      vitals: { orderBy: { createdAt: 'desc' }, take: 15 },
       tasks: { orderBy: { createdAt: 'asc' } },
       handoffs: { where: { status: 'PENDIENTE' }, take: 1 },
     },
@@ -72,7 +76,6 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo
   const entregaPendiente = episode.handoffs[0]
 
-  // Nombres completos y roles en lugar de correos
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => emails.add(v.recordedBy))
@@ -91,7 +94,6 @@ export default async function ExpedientePage({
   const nombres: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.fullName]))
   const roles: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.role]))
 
-  // Lista de médicos para reasignar (solo la ve el administrador)
   const medicos =
     role === 'ADMIN' && permisos.activo
       ? await prisma.user.findMany({
@@ -101,7 +103,6 @@ export default async function ExpedientePage({
         })
       : []
 
-  // Lógica para resaltar valores fuera de rango
   const esAnormal = (tipo: string, valor: number | null) => {
     if (!valor) return false
     if (tipo === 'temp') return valor < 36.0 || valor > 37.5
@@ -112,7 +113,6 @@ export default async function ExpedientePage({
     return false
   }
 
-  // Formatear datos para las gráficas (todo a número simple para pasarlo al navegador)
   const num = (x: unknown): number | null => (x === null || x === undefined ? null : Number(x))
   const registrosGrafica: RegistroVital[] = episode.vitals.map((v) => ({
     fecha: v.createdAt.toISOString(),
@@ -124,6 +124,7 @@ export default async function ExpedientePage({
     oxygenSat: num(v.oxygenSat),
     glucose: num(v.glucose),
     painScale: num('painScale' in v ? v.painScale : null),
+    diuresis: num('diuresis' in v ? v.diuresis : null),
   }))
 
   const entradaVital =
@@ -132,35 +133,31 @@ export default async function ExpedientePage({
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Mensaje de error (permisos, validaciones) */}
         {error && (
           <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4">
             ⚠️ {error}
           </div>
         )}
 
-        {/* Banner de Solo Lectura (expediente cerrado) */}
         {esSoloLectura && (
           <div className="bg-amber-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xl">🔒</span>
-              <strong>Expediente Cerrado:</strong> Este paciente ha sido dado de alta. Estás viendo el historial en modo de solo lectura.
+              <strong>Expediente Cerrado:</strong> Este paciente ha sido dado de alta.
             </div>
             <Link href="/dashboard/archivo" className="text-sm font-bold underline hover:text-amber-900">Volver al Archivo</Link>
           </div>
         )}
 
-        {/* Quién está a cargo */}
         {!esSoloLectura &&
           (permisos.esResponsable ? (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg mb-4">
-              ✅ <strong>Tú estás a cargo</strong> de este paciente. Puedes editar su información, entregar el turno y dar de alta.
+              ✅ <strong>Tú estás a cargo</strong> de este paciente.
             </div>
           ) : permisos.sinResponsable ? (
             <div className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-lg mb-4 flex flex-wrap items-center justify-between gap-3">
               <span>
                 ⚠️ <strong>Este paciente no tiene médico a cargo.</strong>
-                {permisos.puedeRegistrar && ' Puedes agregar notas, signos vitales, alergias y tareas.'}
               </span>
               {permisos.puedeTomarACargo && (
                 <form action={tomarACargo}>
@@ -173,24 +170,19 @@ export default async function ExpedientePage({
             </div>
           ) : permisos.puedeRegistrar ? (
             <div className="bg-sky-50 border border-sky-200 text-sky-900 px-4 py-3 rounded-lg mb-4">
-              👥 Paciente a cargo de <strong>{episode.responsible?.fullName ?? 'Sin asignar'}</strong>. Puedes agregar
-              notas, signos vitales, alergias y tareas; quedan firmados con tu nombre.
+              👥 Paciente a cargo de <strong>{episode.responsible?.fullName ?? 'Sin asignar'}</strong>. Puedes registrar notas, signos, alergias y tareas.
             </div>
           ) : (
             <div className="bg-slate-100 border border-slate-300 text-slate-700 px-4 py-3 rounded-lg mb-4">
               👁️ <strong>Solo lectura.</strong> Paciente a cargo de <strong>{episode.responsible?.fullName ?? 'Sin asignar'}</strong>.
-              {permisos.puedeMarcarTareas && ' Puedes marcar tareas del checklist.'}
             </div>
           ))}
 
-        {/* Entrega de turno pendiente */}
         {entregaPendiente && !esSoloLectura && (
           <div className="bg-indigo-50 border border-indigo-200 text-indigo-900 px-4 py-3 rounded-lg mb-4 flex flex-wrap items-center justify-between gap-3">
             <span>
-              📋 <strong>Entrega de turno pendiente:</strong>{' '}
-              {nombres[entregaPendiente.entregadoPor] ?? entregaPendiente.entregadoPor} entregó este paciente a{' '}
-              <strong>{nombres[entregaPendiente.recibidoPor] ?? entregaPendiente.recibidoPor}</strong>. Hasta que acepte,
-              sigue a cargo {episode.responsible?.fullName ?? 'nadie'}.
+              📋 <strong>Entrega de turno pendiente:</strong> Para{' '}
+              <strong>{nombres[entregaPendiente.recibidoPor] ?? entregaPendiente.recibidoPor}</strong>.
             </span>
             {entregaPendiente.recibidoPor.toLowerCase() === miEmail && (
               <Link href={`/dashboard/paciente/${episode.id}/turno`} className="font-bold underline">
@@ -200,7 +192,6 @@ export default async function ExpedientePage({
           </div>
         )}
 
-        {/* Reasignar (solo administrador) */}
         {role === 'ADMIN' && permisos.activo && (
           <details className="bg-white border border-slate-200 rounded-lg mb-4 px-4 py-3">
             <summary className="text-sm font-medium text-slate-700 cursor-pointer">
@@ -220,8 +211,8 @@ export default async function ExpedientePage({
           </details>
         )}
 
-        {/* Cabecera */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        {/* Cabecera Principal */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
             <Link href={esSoloLectura ? '/dashboard/archivo' : '/dashboard'} className="text-sm text-blue-600 hover:underline mb-2 inline-block">
               ← Volver a la lista
@@ -247,6 +238,31 @@ export default async function ExpedientePage({
           </div>
         </div>
 
+        {/* RECUADRO FIJO DE DIAGNÓSTICOS DE INGRESO Y MA */}
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Diagnóstico de Ingreso</span>
+            {episode.admittingDoctor && (
+              <span className="text-xs text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                <strong>MA que lo ingresó:</strong> {episode.admittingDoctor}
+              </span>
+            )}
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bg-blue-600 text-white text-xs uppercase px-2 py-0.5 rounded font-bold">Principal</span>
+              <p className="text-base font-bold text-slate-800">
+                {episode.primaryDiagnosis || episode.chiefComplaint || 'Sin diagnóstico registrado'}
+              </p>
+            </div>
+            {episode.secondaryDiagnoses && (
+              <p className="text-sm text-slate-600 pl-1">
+                <strong>Secundarios / Otros:</strong> {episode.secondaryDiagnoses}
+              </p>
+            )}
+          </div>
+        </div>
+
         <BannerAlergias alergias={episode.allergies} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
@@ -254,12 +270,14 @@ export default async function ExpedientePage({
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Datos del Ingreso</h2>
+              <p className="text-sm text-slate-600 mb-2"><strong>Forma:</strong> {episode.admissionType}</p>
               <p className="text-sm text-slate-600 mb-2"><strong>Motivo:</strong> {episode.chiefComplaint}</p>
-              <p className="text-sm text-slate-600 mb-2"><strong>Médico:</strong> {episode.attendingDoctor}</p>
+              <p className="text-sm text-slate-600 mb-2"><strong>MA que ingresó:</strong> {episode.admittingDoctor ?? 'No especificado'}</p>
+              <p className="text-sm text-slate-600 mb-2"><strong>Médico Tratante:</strong> {episode.attendingDoctor}</p>
               <p className="text-sm text-slate-600 mb-2"><strong>A cargo ahora:</strong> {episode.responsible?.fullName ?? 'Sin asignar'}</p>
             </div>
 
-            {/* Signos Vitales: personal clínico (Médico, Residente, Enfermería) */}
+            {/* Formulario de Signos Vitales (con Diuresis) */}
             {permisos.puedeRegistrar && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Registrar Signos Vitales</h2>
@@ -290,12 +308,16 @@ export default async function ExpedientePage({
                       <input name="oxygenSat" type="number" inputMode="numeric" placeholder="98" className={entradaVital} />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">Glucosa</label>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Glucosa (mg/dL)</label>
                       <input name="glucose" type="number" inputMode="numeric" placeholder="100" className={entradaVital} />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">Dolor (0-10)</label>
                       <input name="painScale" type="number" inputMode="numeric" min={0} max={10} placeholder="0" className={entradaVital} />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-slate-700 mb-1 font-bold text-sky-800">Diuresis (mL)</label>
+                      <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
                     </div>
                   </div>
                   <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
@@ -303,21 +325,26 @@ export default async function ExpedientePage({
               </div>
             )}
 
-            {/* Alergias: personal clínico */}
+            {/* Alergias Simplificadas */}
             {permisos.puedeRegistrar && (
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Agregar Alergia</h2>
-                <form action={agregarAlergia} className="space-y-3">
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                <h2 className="text-lg font-bold text-slate-800 border-b pb-2">Gestión de Alergias</h2>
+                
+                {/* Botón rápido Niega Alergias */}
+                <form action={marcarSinAlergias}>
                   <input type="hidden" name="episodeId" value={episode.id} />
-                  <input name="allergen" required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="Alérgeno (Ej. Mariscos)" />
-                  <select name="severity" required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm bg-white text-slate-900">
-                    <option value="leve">Leve</option>
-                    <option value="moderada">Moderada</option>
-                    <option value="grave">Grave</option>
-                  </select>
-                  <input type="hidden" name="type" value="otro" />
-                  <input type="hidden" name="reaction" value="" />
-                  <button type="submit" className="w-full bg-slate-800 text-white px-4 py-3 md:py-2 rounded-lg text-sm hover:bg-slate-900">Guardar Alergia</button>
+                  <button type="submit" className="w-full bg-emerald-50 text-emerald-800 border border-emerald-300 px-3 py-2 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors">
+                    ✅ Marcar: Paciente Niega Alergias
+                  </button>
+                </form>
+
+                {/* Formulario para registrar alergia conocida */}
+                <form action={agregarAlergia} className="space-y-3 pt-2 border-t">
+                  <p className="text-xs font-bold text-slate-700">O registrar alergia conocida:</p>
+                  <input type="hidden" name="episodeId" value={episode.id} />
+                  <input name="allergen" required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="Alérgeno (Ej. Penicilina, AINEs...)" />
+                  <input name="reaction" className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="Reacción (opcional, ej. Edema, rash)" />
+                  <button type="submit" className="w-full bg-red-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-red-700">Guardar Alergia</button>
                 </form>
               </div>
             )}
@@ -325,7 +352,6 @@ export default async function ExpedientePage({
 
           {/* Columna Derecha */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Checklist: lo primero que ve quien recibe el turno */}
             <ChecklistTareas
               episodeId={episode.id}
               tareas={episode.tasks}
@@ -335,13 +361,13 @@ export default async function ExpedientePage({
               puedeAgregar={permisos.puedeRegistrar}
             />
 
-            {/* Tendencia de signos vitales */}
+            {/* Tendencia de Signos Vitales y Diuresis */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Signos Vitales</h2>
+              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Signos Vitales y Diuresis</h2>
               <GraficasSignos registros={registrosGrafica} />
             </div>
 
-            {/* Historial de Signos Vitales */}
+            {/* Tabla de Signos Vitales */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Últimos Signos Vitales</h2>
               <table className="w-full text-sm text-left">
@@ -352,6 +378,7 @@ export default async function ExpedientePage({
                     <th className="px-3 py-2">FC</th>
                     <th className="px-3 py-2">Temp</th>
                     <th className="px-3 py-2">SpO2</th>
+                    <th className="px-3 py-2">Diuresis</th>
                     <th className="px-3 py-2">Registró</th>
                   </tr>
                 </thead>
@@ -360,22 +387,23 @@ export default async function ExpedientePage({
                     <tr key={v.id} className="border-b">
                       <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">{fechaCorta(v.createdAt)}</td>
                       <td className={`px-3 py-2 font-medium ${esAnormal('sys', v.systolic) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>
-                        {v.systolic}/{v.diastolic}
+                        {v.systolic ? `${v.systolic}/${v.diastolic}` : '—'}
                       </td>
-                      <td className={`px-3 py-2 font-medium ${esAnormal('fc', v.heartRate) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.heartRate}</td>
-                      <td className={`px-3 py-2 font-medium ${esAnormal('temp', v.temperature) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.temperature}</td>
-                      <td className={`px-3 py-2 font-medium ${esAnormal('spo2', v.oxygenSat) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.oxygenSat}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('fc', v.heartRate) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.heartRate ?? '—'}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('temp', v.temperature) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.temperature ?? '—'}</td>
+                      <td className={`px-3 py-2 font-medium ${esAnormal('spo2', v.oxygenSat) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.oxygenSat ?? '—'}</td>
+                      <td className="px-3 py-2 font-medium text-sky-800">{v.diuresis ? `${v.diuresis} mL` : '—'}</td>
                       <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">{nombres[v.recordedBy] ?? v.recordedBy}</td>
                     </tr>
                   ))}
                   {episode.vitals.length === 0 && (
-                    <tr><td colSpan={6} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
+                    <tr><td colSpan={7} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
 
-            {/* Notas SOAP: personal clínico */}
+            {/* SOAP */}
             {permisos.puedeRegistrar && (
               <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Nueva Nota de Evolución (SOAP)</h2>

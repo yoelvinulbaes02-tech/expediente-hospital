@@ -11,6 +11,9 @@ type Episodio = {
   bed: string | null
   chiefComplaint: string | null
   attendingDoctor: string | null
+  admittingDoctor?: string | null
+  primaryDiagnosis?: string | null
+  secondaryDiagnoses?: string | null
   responsibleId: string | null
   responsible: { fullName: string } | null
   _count: { tasks: number }
@@ -28,13 +31,26 @@ type Episodio = {
 type Doctor = { id: string; fullName: string; email: string }
 type Mensaje = { tipo: 'ok' | 'error'; texto: string; detalles: string[] }
 
-// Quita acentos y pasa a minúsculas: "María" -> "maria"
 function normalizar(texto?: string | null) {
   return (texto ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
+}
+
+// Comparador para orden natural ascendente por Habitación y Cama (ej. 103 antes de 630)
+function compararUbicacion(a: Episodio, b: Episodio): number {
+  const roomA = a.room?.trim() || ''
+  const roomB = b.room?.trim() || ''
+  if (!roomA && roomB) return 1
+  if (roomA && !roomB) return -1
+  const compRoom = roomA.localeCompare(roomB, undefined, { numeric: true, sensitivity: 'base' })
+  if (compRoom !== 0) return compRoom
+
+  const bedA = a.bed?.trim() || ''
+  const bedB = b.bed?.trim() || ''
+  return bedA.localeCompare(bedB, undefined, { numeric: true, sensitivity: 'base' })
 }
 
 export function ListaPacientes({
@@ -54,23 +70,29 @@ export function ListaPacientes({
   const [enviando, setEnviando] = useState(false)
   const [mensaje, setMensaje] = useState<Mensaje | null>(null)
 
+  // 1. Ordenamos de forma natural ascendente por habitación y cama
+  const ordenados = useMemo(() => {
+    return [...episodes].sort(compararUbicacion)
+  }, [episodes])
+
+  // 2. Filtramos la lista ordenada
   const filtrados = useMemo(() => {
     const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean)
-    if (terminos.length === 0) return episodes
+    if (terminos.length === 0) return ordenados
 
-    return episodes.filter((e) => {
+    return ordenados.filter((e) => {
       const palabras = [
         ...normalizar(e.patient.firstName).split(/\s+/),
         ...normalizar(e.patient.lastName).split(/\s+/),
         normalizar(e.patient.expedienteNumber),
         normalizar(e.room),
         normalizar(e.bed),
+        normalizar(e.primaryDiagnosis),
       ]
       return terminos.every((t) => palabras.some((p) => p.startsWith(t)))
     })
-  }, [busqueda, episodes])
+  }, [busqueda, ordenados])
 
-  // Solo se pueden entregar pacientes que tengo a cargo y sin entrega pendiente
   const seleccionable = (e: Episodio) => e.responsibleId === userId && e.handoffs.length === 0
   const seleccionables = filtrados.filter(seleccionable)
   const todosMarcados =
@@ -94,12 +116,11 @@ export function ListaPacientes({
         <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Lista de Pacientes</h2>
 
         <div className="flex flex-col md:flex-row md:items-center gap-3 w-full md:w-auto">
-          {/* Buscador: a todo el ancho en el teléfono */}
           <div className="relative w-full md:w-72">
             <input
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="🔍 Buscar nombre, cama o exp..."
+              placeholder="🔍 Buscar nombre, cama, exp o diag..."
               autoComplete="off"
               className="w-full px-3 py-3 md:py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg text-base md:text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -138,7 +159,6 @@ export function ListaPacientes({
         </p>
       )}
 
-      {/* Resultado de la última entrega en lote */}
       {mensaje && (
         <div
           className={`mb-4 px-4 py-3 rounded-lg border text-sm ${
@@ -159,7 +179,6 @@ export function ListaPacientes({
         </div>
       )}
 
-      {/* Seleccionar todos (solo si tengo pacientes a cargo) */}
       {hayEntregables && (
         <div className="flex items-center gap-3 mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
           <input
@@ -210,10 +229,22 @@ export function ListaPacientes({
                   </div>
                 </div>
 
-                <div className="mb-4 mt-3">
-                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Motivo: <span className="font-normal">{episode.chiefComplaint}</span></p>
-                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Médico: <span className="font-normal">{episode.attendingDoctor}</span></p>
-                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">A cargo: <span className="font-normal">{episode.responsible?.fullName ?? 'Sin asignar'}</span></p>
+                <div className="mb-4 mt-3 space-y-1">
+                  {/* Diagnóstico principal en la portada en vez de médico tratante */}
+                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                    Diagnóstico:{' '}
+                    <span className="font-bold text-blue-700 dark:text-blue-300">
+                      {episode.primaryDiagnosis || episode.chiefComplaint || 'Sin diagnóstico especificado'}
+                    </span>
+                  </p>
+                  {episode.secondaryDiagnoses && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+                      Secundarios: {episode.secondaryDiagnoses}
+                    </p>
+                  )}
+                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                    A cargo: <span className="font-normal">{episode.responsible?.fullName ?? 'Sin asignar'}</span>
+                  </p>
 
                   {episode._count.tasks > 0 && (
                     <p className="mt-2 inline-block bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-bold px-2 py-0.5 rounded">
@@ -225,7 +256,7 @@ export function ListaPacientes({
                     (meLoEntregaron ? (
                       <Link
                         href={`/dashboard/paciente/${episode.id}/turno`}
-                        className="mt-2 block bg-indigo-600 text-white text-sm font-semibold px-3 py-3 md:py-2 rounded-lg hover:bg-indigo-700"
+                        className="mt-2 block bg-indigo-600 text-white text-sm font-semibold px-3 py-3 md:py-2 rounded-lg hover:bg-indigo-700 text-center"
                       >
                         📥 Te entregaron este paciente · Revisar y aceptar
                       </Link>
@@ -255,10 +286,8 @@ export function ListaPacientes({
         )}
       </div>
 
-      {/* Espacio para que la barra fija no tape el último paciente */}
       {seleccionados.length > 0 && <div className="h-40 md:h-28" aria-hidden />}
 
-      {/* BARRA FIJA DE ENTREGA EN LOTE: aparece al marcar pacientes */}
       {seleccionados.length > 0 && (
         <div className="fixed bottom-0 inset-x-0 z-20 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-[0_-4px_12px_rgba(0,0,0,0.12)] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <form

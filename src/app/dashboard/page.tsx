@@ -10,7 +10,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const session = await auth()
   if (!session) redirect('/login')
 
-  // Verificación de contraseña obligatoria
   const userDb = await prisma.user.findUnique({ where: { id: session.user?.id } })
   if (userDb?.mustChangePassword) {
     redirect('/dashboard/perfil?force=true')
@@ -24,7 +23,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const nombreMedico = session.user?.name || ''
   const esAdmin = userRole === 'ADMIN'
 
-  // a) Mostramos TODOS los pacientes con los nuevos includes
+  // Consulta de episodios activos incluyendo los diagnósticos
   const episodes = await prisma.episode.findMany({
     where: {
       status: 'active',
@@ -37,10 +36,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       handoffs: { where: { status: 'PENDIENTE' }, select: { recibidoPor: true }, take: 1 },
       _count: { select: { tasks: { where: { status: 'pendiente' } } } },
     },
-    orderBy: { admissionDate: 'desc' },
   })
 
-  // b) Consulta de doctores para el selector
   const userId = session.user?.id ?? ''
   const doctores = await prisma.user.findMany({
     where: { isActive: true, role: { in: ['DOCTOR', 'RESIDENT'] }, id: { not: userId } },
@@ -48,12 +45,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     orderBy: { fullName: 'asc' },
   })
 
-  // Contar turnos pendientes para este médico
   const turnosPendientes = await prisma.handoff.count({
     where: {
       status: 'PENDIENTE',
-      recibidoPor: { contains: nombreMedico, mode: 'insensitive' }
-    }
+      recibidoPor: { contains: nombreMedico, mode: 'insensitive' },
+    },
   })
 
   const textoBadge = turnosPendientes > 9 ? '+9' : String(turnosPendientes)
@@ -86,7 +82,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </div>
 
         <div className="flex items-center gap-2 md:gap-4 shrink-0">
-          {/* Teléfono: campana de turnos pendientes siempre visible */}
           <Link
             href="/dashboard/turnos-pendientes"
             aria-label="Turnos pendientes"
@@ -102,7 +97,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
           <ThemeToggle />
 
-          {/* Escritorio: todos los botones como antes */}
           <div className="hidden md:flex items-center gap-4">
             {userRole === 'ADMIN' && (
               <>
@@ -144,7 +138,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             </form>
           </div>
 
-          {/* Teléfono: menú desplegable */}
           <details className="relative md:hidden">
             <summary
               aria-label="Abrir menú"
@@ -184,7 +177,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       </header>
 
       <main className="p-4 md:p-8 max-w-5xl mx-auto">
-        {/* c) Pasamos los parámetros al componente */}
         <ListaPacientes
           episodes={episodes}
           userId={userId}

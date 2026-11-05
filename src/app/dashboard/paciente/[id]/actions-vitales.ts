@@ -5,7 +5,6 @@ import { logAudit } from '@/lib/audit'
 import { exigirPermiso, volverAlExpediente } from '@/lib/permisos'
 import { revalidatePath } from 'next/cache'
 
-// Límites amplios: solo atrapan errores de digitación, no valores clínicos raros
 const CAMPOS = [
   { campo: 'systolic', etiqueta: 'Presión sistólica', min: 40, max: 300, entero: true },
   { campo: 'diastolic', etiqueta: 'Presión diastólica', min: 20, max: 200, entero: true },
@@ -15,6 +14,7 @@ const CAMPOS = [
   { campo: 'oxygenSat', etiqueta: 'SpO2', min: 30, max: 100, entero: true },
   { campo: 'glucose', etiqueta: 'Glucosa', min: 10, max: 1500, entero: true },
   { campo: 'painScale', etiqueta: 'Dolor', min: 0, max: 10, entero: true },
+  { campo: 'diuresis', etiqueta: 'Diuresis', min: 0, max: 15000, entero: true },
 ] as const
 
 export async function guardarSignosVitales(formData: FormData): Promise<void> {
@@ -42,10 +42,10 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
     valores[c.campo] = n
   }
 
-  const { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, painScale } = valores
+  const { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, painScale, diuresis } = valores
 
   if (Object.values(valores).every((v) => v === null)) {
-    volverAlExpediente(episodeId, 'Escribe al menos un signo vital')
+    volverAlExpediente(episodeId, 'Escribe al menos un signo vital o diuresis')
   }
   if ((systolic === null) !== (diastolic === null)) {
     volverAlExpediente(episodeId, 'Escribe la presión sistólica y la diastólica juntas')
@@ -65,6 +65,7 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
       oxygenSat,
       glucose,
       painScale,
+      diuresis,
       recordedBy: email,
     },
   })
@@ -77,8 +78,8 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
     entityId: nuevoRegistro.id,
     patientId: episode.patientId,
     episodeId,
-    newValue: { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, painScale },
-    reason: 'Registro de signos vitales',
+    newValue: { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, painScale, diuresis },
+    reason: 'Registro de signos vitales y diuresis',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
