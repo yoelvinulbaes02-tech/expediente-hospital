@@ -183,6 +183,68 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   responsibleSince: 'responsibleSince'
 };
 
+exports.Prisma.MedicalHistoryScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  pathological: 'pathological',
+  surgical: 'surgical',
+  family: 'family',
+  habits: 'habits',
+  medications: 'medications',
+  updatedAt: 'updatedAt',
+  updatedBy: 'updatedBy'
+};
+
+exports.Prisma.ImportantAlertScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  content: 'content',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  isActive: 'isActive'
+};
+
+exports.Prisma.GfrRecordScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  value: 'value',
+  recordedBy: 'recordedBy',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.StudyReportScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  studyType: 'studyType',
+  title: 'title',
+  studyDate: 'studyDate',
+  result: 'result',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ViralSerologyScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  episodeId: 'episodeId',
+  status: 'status',
+  details: 'details',
+  recordedBy: 'recordedBy',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.VascularAccessScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  type: 'type',
+  site: 'site',
+  placementDate: 'placementDate',
+  notes: 'notes',
+  isActive: 'isActive',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.AllergyScalarFieldEnum = {
   id: 'id',
   patientId: 'patientId',
@@ -293,6 +355,12 @@ exports.Prisma.ModelName = {
   AuditLog: 'AuditLog',
   Patient: 'Patient',
   Episode: 'Episode',
+  MedicalHistory: 'MedicalHistory',
+  ImportantAlert: 'ImportantAlert',
+  GfrRecord: 'GfrRecord',
+  StudyReport: 'StudyReport',
+  ViralSerology: 'ViralSerology',
+  VascularAccess: 'VascularAccess',
   Allergy: 'Allergy',
   Note: 'Note',
   VitalSign: 'VitalSign',

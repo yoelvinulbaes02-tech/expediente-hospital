@@ -11,6 +11,12 @@ import { tomarACargo, reasignarResponsable } from './actions-responsable'
 import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
 
+// Componentes clínicos de la Tanda B
+import { NotasImportantes } from '@/components/NotasImportantes'
+import { BloqueNefrologico } from '@/components/BloqueNefrologico'
+import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
+import { ReportesEstudios } from '@/components/ReportesEstudios'
+
 const ETIQUETA_ROL: Record<string, string> = {
   ADMIN: 'Administrador',
   DOCTOR: 'Médico',
@@ -60,13 +66,22 @@ export default async function ExpedientePage({
       room: true,
       bed: true,
       admissionDate: true,
-      patient: true,
+      patient: {
+        include: {
+          medicalHistory: true,
+        },
+      },
       allergies: true,
       responsible: { select: { fullName: true } },
       notes: { orderBy: { createdAt: 'desc' } },
       vitals: { orderBy: { createdAt: 'desc' }, take: 15 },
       tasks: { orderBy: { createdAt: 'asc' } },
       handoffs: { where: { status: 'PENDIENTE' }, take: 1 },
+      importantAlerts: { where: { isActive: true }, orderBy: { createdAt: 'desc' } },
+      gfrRecords: { orderBy: { createdAt: 'desc' } },
+      studyReports: { orderBy: { createdAt: 'desc' } },
+      viralSerologies: { orderBy: { updatedAt: 'desc' }, take: 1 },
+      vascularAccesses: { where: { isActive: true }, take: 1 },
     },
   })
 
@@ -76,9 +91,12 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo
   const entregaPendiente = episode.handoffs[0]
 
+  // Recolectar emails de autores
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => emails.add(v.recordedBy))
+  episode.importantAlerts.forEach((a) => emails.add(a.createdBy))
+  episode.studyReports.forEach((s) => emails.add(s.createdBy))
   episode.tasks.forEach((t) => {
     emails.add(t.createdBy)
     if (t.doneBy) emails.add(t.doneBy)
@@ -87,6 +105,7 @@ export default async function ExpedientePage({
     emails.add(entregaPendiente.entregadoPor)
     emails.add(entregaPendiente.recibidoPor)
   }
+
   const usuarios = await prisma.user.findMany({
     where: { email: { in: Array.from(emails) } },
     select: { email: true, fullName: true, role: true },
@@ -238,7 +257,7 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* RECUADRO FIJO DE DIAGNÓSTICOS DE INGRESO Y MA */}
+        {/* Recuadro Fijo de Diagnósticos de Ingreso y MA */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Diagnóstico de Ingreso</span>
@@ -263,6 +282,23 @@ export default async function ExpedientePage({
           </div>
         </div>
 
+        {/* 1. NOTAS IMPORTANTES (AVISOS DESTACADOS) */}
+        <NotasImportantes
+          episodeId={episode.id}
+          alertas={episode.importantAlerts}
+          nombres={nombres}
+          puedeRegistrar={permisos.puedeRegistrar}
+        />
+
+        {/* 2. ACCESO VASCULAR, VIRALES Y TFG ACTUAL */}
+        <BloqueNefrologico
+          episodeId={episode.id}
+          acceso={episode.vascularAccesses[0] ?? null}
+          virales={episode.viralSerologies[0] ?? null}
+          tfgActual={episode.gfrRecords[0] ?? null}
+          puedeRegistrar={permisos.puedeRegistrar}
+        />
+
         <BannerAlergias alergias={episode.allergies} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
@@ -276,6 +312,13 @@ export default async function ExpedientePage({
               <p className="text-sm text-slate-600 mb-2"><strong>Médico Tratante:</strong> {episode.attendingDoctor}</p>
               <p className="text-sm text-slate-600 mb-2"><strong>A cargo ahora:</strong> {episode.responsible?.fullName ?? 'Sin asignar'}</p>
             </div>
+
+            {/* 3. ANTECEDENTES MÉDICOS DEL PACIENTE */}
+            <SeccionAntecedentes
+              episodeId={episode.id}
+              antecedentes={episode.patient.medicalHistory}
+              puedeRegistrar={permisos.puedeRegistrar}
+            />
 
             {/* Formulario de Signos Vitales (con Diuresis) */}
             {permisos.puedeRegistrar && (
@@ -316,7 +359,7 @@ export default async function ExpedientePage({
                       <input name="painScale" type="number" inputMode="numeric" min={0} max={10} placeholder="0" className={entradaVital} />
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-xs font-medium text-slate-700 mb-1 font-bold text-sky-800">Diuresis (mL)</label>
+                      <label className="block text-xs font-bold text-sky-800 mb-1">Diuresis (mL)</label>
                       <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
                     </div>
                   </div>
@@ -330,7 +373,6 @@ export default async function ExpedientePage({
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2">Gestión de Alergias</h2>
                 
-                {/* Botón rápido Niega Alergias */}
                 <form action={marcarSinAlergias}>
                   <input type="hidden" name="episodeId" value={episode.id} />
                   <button type="submit" className="w-full bg-emerald-50 text-emerald-800 border border-emerald-300 px-3 py-2 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors">
@@ -338,7 +380,6 @@ export default async function ExpedientePage({
                   </button>
                 </form>
 
-                {/* Formulario para registrar alergia conocida */}
                 <form action={agregarAlergia} className="space-y-3 pt-2 border-t">
                   <p className="text-xs font-bold text-slate-700">O registrar alergia conocida:</p>
                   <input type="hidden" name="episodeId" value={episode.id} />
@@ -359,6 +400,14 @@ export default async function ExpedientePage({
               puedeMarcar={permisos.puedeMarcarTareas}
               puedeEditar={permisos.puedeEditar}
               puedeAgregar={permisos.puedeRegistrar}
+            />
+
+            {/* 4. REPORTES DE ESTUDIOS */}
+            <ReportesEstudios
+              episodeId={episode.id}
+              estudios={episode.studyReports}
+              nombres={nombres}
+              puedeRegistrar={permisos.puedeRegistrar}
             />
 
             {/* Tendencia de Signos Vitales y Diuresis */}

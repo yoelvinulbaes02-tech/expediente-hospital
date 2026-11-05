@@ -69,6 +69,8 @@ model Patient {
 
   episodes         Episode[]
   allergies        Allergy[]
+  medicalHistory   MedicalHistory?
+  viralSerologies  ViralSerology[]
 }
 
 model Episode {
@@ -82,8 +84,8 @@ model Episode {
   bed                String?
   attendingDoctor    String?
   admittingDoctor    String?   // MA que lo ingresó
-  primaryDiagnosis   String?   // Diagnóstico principal de ingreso
-  secondaryDiagnoses String?   // Otros diagnósticos secundarios
+  primaryDiagnosis   String?   // Diagnóstico principal
+  secondaryDiagnoses String?   // Diagnósticos secundarios
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -97,7 +99,104 @@ model Episode {
   responsible        User?     @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
   tasks              Task[]
 
+  importantAlerts    ImportantAlert[]
+  gfrRecords         GfrRecord[]
+  studyReports       StudyReport[]
+  viralSerologies    ViralSerology[]
+  vascularAccesses   VascularAccess[]
+
   @@index([responsibleId])
+}
+
+// ─── ANTECEDENTES DEL PACIENTE ───
+model MedicalHistory {
+  id           String   @id @default(cuid())
+  patientId    String   @unique
+  pathological String?  // Patológicos (DM, HTA, ERC, etc.)
+  surgical     String?  // Quirúrgicos
+  family       String?  // Familiares
+  habits       String?  // Hábitos tóxicos / no tóxicos
+  medications  String?  // Medicamentos habituales
+  updatedAt    DateTime @updatedAt
+  updatedBy    String?
+
+  patient      Patient  @relation(fields: [patientId], references: [id])
+}
+
+// ─── NOTAS IMPORTANTES / AVISOS ───
+model ImportantAlert {
+  id         String   @id @default(cuid())
+  episodeId  String
+  content    String
+  createdBy  String
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  isActive   Boolean  @default(true)
+
+  episode    Episode  @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId, isActive])
+}
+
+// ─── TASA DE FILTRACIÓN GLOMERULAR (TFG) ───
+model GfrRecord {
+  id         String   @id @default(cuid())
+  episodeId  String
+  value      Float    // mL/min/1.73m²
+  recordedBy String
+  createdAt  DateTime @default(now()) @db.Timestamptz
+
+  episode    Episode  @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId])
+}
+
+// ─── REPORTES DE ESTUDIOS ───
+model StudyReport {
+  id          String    @id @default(cuid())
+  episodeId   String
+  studyType   String    // Sonografía, TAC, RX, Ecocardiograma, Doppler, Biopsia, Laboratorio, Otro
+  title       String    // Nombre específico del estudio
+  studyDate   DateTime? @db.Timestamptz
+  result      String    // Conclusión o reporte
+  createdBy   String
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+
+  episode     Episode   @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId])
+}
+
+// ─── MARCADORES VIRALES ───
+model ViralSerology {
+  id          String    @id @default(cuid())
+  patientId   String
+  episodeId   String
+  status      String    @default("negativo") // "negativo" | "positivo" | "pendiente"
+  details     String?   // Detalle (ej. "VIH Negativo, VHB (-), VHC (+)")
+  recordedBy  String
+  updatedAt   DateTime  @updatedAt
+
+  patient     Patient   @relation(fields: [patientId], references: [id])
+  episode     Episode   @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId])
+}
+
+// ─── ACCESOS VASCULARES ───
+model VascularAccess {
+  id             String    @id @default(cuid())
+  episodeId      String
+  type           String    // Catéter Tunelizado, Catéter Temporal, FAV, Injerto, Otro
+  site           String?   // Yugular interna der, Femoral izq, etc.
+  placementDate  DateTime? @db.Timestamptz
+  notes          String?
+  isActive       Boolean   @default(true)
+  createdBy      String
+  createdAt      DateTime  @default(now()) @db.Timestamptz
+
+  episode        Episode   @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId, isActive])
 }
 
 // ─── ALERGIAS Y ALERTAS ───
@@ -106,10 +205,10 @@ model Allergy {
   patientId   String
   episodeId   String
   allergen    String
-  type        String    @default("otro") // "medicamento" | "alimento" | "latex" | "otro"
+  type        String    @default("otro")
   reaction    String?
-  severity    String?   @default("no_especificada") // Simplificado (sin leve/moderada/grave)
-  status      String    @default("evaluada") // "evaluada" | "no_evaluada" | "sin_alergias"
+  severity    String?   @default("no_especificada")
+  status      String    @default("evaluada")
   createdAt   DateTime  @default(now())
   createdBy   String
 
@@ -125,8 +224,8 @@ model Note {
   objective   String?
   assessment  String?
   plan        String?
-  status      String   @default("firmada") // "borrador" | "firmada"
-  createdBy   String   // Email del médico
+  status      String   @default("firmada")
+  createdBy   String
   createdAt   DateTime @default(now()) @db.Timestamptz
 
   episode     Episode  @relation(fields: [episodeId], references: [id])
@@ -136,16 +235,16 @@ model Note {
 model VitalSign {
   id               String   @id @default(cuid())
   episodeId        String
-  systolic         Int?     // Presión sistólica
-  diastolic        Int?     // Presión diastólica
-  heartRate        Int?     // Frecuencia cardíaca
-  respiratoryRate  Int?     // Frecuencia respiratoria
-  temperature      Float?   // Temperatura
-  oxygenSat        Int?     // Saturación de oxígeno (SpO2)
-  glucose          Int?     // Glucosa
-  painScale        Int?     // Escala de dolor (0-10)
-  diuresis         Int?     // Diuresis en mL
-  recordedBy       String   // Email del que registra
+  systolic         Int?
+  diastolic        Int?
+  heartRate        Int?
+  respiratoryRate  Int?
+  temperature      Float?
+  oxygenSat        Int?
+  glucose          Int?
+  painScale        Int?
+  diuresis         Int?
+  recordedBy       String
   createdAt        DateTime @default(now()) @db.Timestamptz
 
   episode          Episode  @relation(fields: [episodeId], references: [id])
@@ -160,8 +259,8 @@ enum HandoffStatus {
 model Handoff {
   id            String        @id @default(cuid())
   episodeId     String
-  entregadoPor  String        // Email de quien entrega
-  recibidoPor   String        // Email de quien recibe (usuario real)
+  entregadoPor  String
+  recibidoPor   String
   observaciones String?
   status        HandoffStatus @default(PENDIENTE)
   createdAt     DateTime      @default(now()) @db.Timestamptz
