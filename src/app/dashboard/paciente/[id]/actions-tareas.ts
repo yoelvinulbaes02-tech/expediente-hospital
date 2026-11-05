@@ -20,7 +20,7 @@ const textoFecha = (f: Date) => f.toLocaleString('es-DO', { timeZone: 'America/S
 
 export async function crearTarea(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'editar')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
 
   const titulo = String(formData.get('titulo') ?? '').trim()
   const categoriaForm = String(formData.get('categoria') ?? 'otro')
@@ -63,7 +63,7 @@ export async function marcarTarea(formData: FormData): Promise<void> {
   if (!tarea) redirect('/dashboard')
   const episodeId = tarea.episodeId
 
-  // Cancelar: solo el médico a cargo. Marcar/reabrir: médico a cargo, enfermería o laboratorio.
+  // Cancelar: solo el médico a cargo. Marcar/reabrir: personal clínico y laboratorio.
   const { userId, role, email, episode } = await exigirPermiso(
     episodeId,
     accion === 'cancelar' ? 'editar' : 'tareas'

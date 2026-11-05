@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache'
 
 export async function agregarAlergia(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'editar')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
 
   const allergen = String(formData.get('allergen') ?? '').trim()
   const type = String(formData.get('type') ?? 'otro')

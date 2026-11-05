@@ -11,6 +11,24 @@ import { tomarACargo, reasignarResponsable } from './actions-responsable'
 import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
 
+const ETIQUETA_ROL: Record<string, string> = {
+  ADMIN: 'Administrador',
+  DOCTOR: 'Médico',
+  RESIDENT: 'Residente',
+  NURSE: 'Enfermería',
+  LAB: 'Laboratorio',
+  READONLY: 'Solo lectura',
+}
+
+const fechaCorta = (d: Date) =>
+  d.toLocaleString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
 export default async function ExpedientePage({
   params,
   searchParams,
@@ -27,13 +45,12 @@ export default async function ExpedientePage({
   const role = String(session.user.role)
   const miEmail = (session.user.email ?? '').toLowerCase()
 
-  // ¡AQUÍ ESTÁ EL CAMBIO! Agregamos responsibleId: true para que calcularPermisos funcione
   const episode = await prisma.episode.findUnique({
     where: { id },
     select: {
       id: true,
       status: true,
-      responsibleId: true, // <-- CRUCIAL PARA LOS PERMISOS
+      responsibleId: true, // necesario para calcular los permisos
       attendingDoctor: true,
       chiefComplaint: true,
       room: true,
@@ -55,9 +72,10 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo
   const entregaPendiente = episode.handoffs[0]
 
-  // Nombres completos en lugar de correos
+  // Nombres completos y roles en lugar de correos
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
+  episode.vitals.forEach((v) => emails.add(v.recordedBy))
   episode.tasks.forEach((t) => {
     emails.add(t.createdBy)
     if (t.doneBy) emails.add(t.doneBy)
@@ -68,9 +86,10 @@ export default async function ExpedientePage({
   }
   const usuarios = await prisma.user.findMany({
     where: { email: { in: Array.from(emails) } },
-    select: { email: true, fullName: true },
+    select: { email: true, fullName: true, role: true },
   })
   const nombres: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.fullName]))
+  const roles: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.role]))
 
   // Lista de médicos para reasignar (solo la ve el administrador)
   const medicos =
@@ -107,6 +126,9 @@ export default async function ExpedientePage({
     painScale: num('painScale' in v ? v.painScale : null),
   }))
 
+  const entradaVital =
+    'w-full px-2 py-2 md:py-1 border rounded text-base md:text-sm text-slate-900'
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -132,11 +154,14 @@ export default async function ExpedientePage({
         {!esSoloLectura &&
           (permisos.esResponsable ? (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg mb-4">
-              ✅ <strong>Tú estás a cargo</strong> de este paciente. Puedes editar su información.
+              ✅ <strong>Tú estás a cargo</strong> de este paciente. Puedes editar su información, entregar el turno y dar de alta.
             </div>
           ) : permisos.sinResponsable ? (
             <div className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-lg mb-4 flex flex-wrap items-center justify-between gap-3">
-              <span>⚠️ <strong>Este paciente no tiene médico a cargo.</strong></span>
+              <span>
+                ⚠️ <strong>Este paciente no tiene médico a cargo.</strong>
+                {permisos.puedeRegistrar && ' Puedes agregar notas, signos vitales, alergias y tareas.'}
+              </span>
               {permisos.puedeTomarACargo && (
                 <form action={tomarACargo}>
                   <input type="hidden" name="episodeId" value={episode.id} />
@@ -146,10 +171,14 @@ export default async function ExpedientePage({
                 </form>
               )}
             </div>
+          ) : permisos.puedeRegistrar ? (
+            <div className="bg-sky-50 border border-sky-200 text-sky-900 px-4 py-3 rounded-lg mb-4">
+              👥 Paciente a cargo de <strong>{episode.responsible?.fullName ?? 'Sin asignar'}</strong>. Puedes agregar
+              notas, signos vitales, alergias y tareas; quedan firmados con tu nombre.
+            </div>
           ) : (
             <div className="bg-slate-100 border border-slate-300 text-slate-700 px-4 py-3 rounded-lg mb-4">
               👁️ <strong>Solo lectura.</strong> Paciente a cargo de <strong>{episode.responsible?.fullName ?? 'Sin asignar'}</strong>.
-              {permisos.puedeRegistrarVitales && ' Puedes registrar signos vitales.'}
               {permisos.puedeMarcarTareas && ' Puedes marcar tareas del checklist.'}
             </div>
           ))}
@@ -230,61 +259,65 @@ export default async function ExpedientePage({
               <p className="text-sm text-slate-600 mb-2"><strong>A cargo ahora:</strong> {episode.responsible?.fullName ?? 'Sin asignar'}</p>
             </div>
 
-            {/* Signos Vitales: médico a cargo o enfermería */}
-            {permisos.puedeRegistrarVitales && (
+            {/* Signos Vitales: personal clínico (Médico, Residente, Enfermería) */}
+            {permisos.puedeRegistrar && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Registrar Signos Vitales</h2>
                 <form action={guardarSignosVitales} className="space-y-3">
                   <input type="hidden" name="episodeId" value={episode.id} />
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
+                  <div className="grid grid-cols-2 gap-3 md:gap-2">
+                    <div className="col-span-2">
                       <label className="block text-xs font-medium text-slate-700 mb-1">Presión (Sist/Diast)</label>
-                      <div className="flex gap-1">
-                        <input name="systolic" type="number" placeholder="120" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
-                        <input name="diastolic" type="number" placeholder="80" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                      <div className="flex gap-2 md:gap-1">
+                        <input name="systolic" type="number" inputMode="numeric" placeholder="120" className={entradaVital} />
+                        <input name="diastolic" type="number" inputMode="numeric" placeholder="80" className={entradaVital} />
                       </div>
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">F. Cardíaca</label>
-                      <input name="heartRate" type="number" placeholder="75" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                      <input name="heartRate" type="number" inputMode="numeric" placeholder="75" className={entradaVital} />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">F. Resp.</label>
-                      <input name="respiratoryRate" type="number" placeholder="16" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                      <input name="respiratoryRate" type="number" inputMode="numeric" placeholder="16" className={entradaVital} />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">Temp (°C)</label>
-                      <input name="temperature" type="number" step="0.1" placeholder="36.5" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                      <input name="temperature" type="number" inputMode="decimal" step="0.1" placeholder="36.5" className={entradaVital} />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">SpO2 (%)</label>
-                      <input name="oxygenSat" type="number" placeholder="98" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                      <input name="oxygenSat" type="number" inputMode="numeric" placeholder="98" className={entradaVital} />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">Glucosa</label>
-                      <input name="glucose" type="number" placeholder="100" className="w-full px-2 py-1 border rounded text-sm text-slate-900" />
+                      <input name="glucose" type="number" inputMode="numeric" placeholder="100" className={entradaVital} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Dolor (0-10)</label>
+                      <input name="painScale" type="number" inputMode="numeric" min={0} max={10} placeholder="0" className={entradaVital} />
                     </div>
                   </div>
-                  <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
+                  <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
                 </form>
               </div>
             )}
 
-            {/* Alergias: solo el médico a cargo */}
-            {permisos.puedeEditar && (
+            {/* Alergias: personal clínico */}
+            {permisos.puedeRegistrar && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Agregar Alergia</h2>
                 <form action={agregarAlergia} className="space-y-3">
                   <input type="hidden" name="episodeId" value={episode.id} />
-                  <input name="allergen" required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="Alérgeno (Ej. Mariscos)" />
-                  <select name="severity" required className="w-full px-3 py-2 border rounded-lg text-sm bg-white text-slate-900">
+                  <input name="allergen" required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="Alérgeno (Ej. Mariscos)" />
+                  <select name="severity" required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm bg-white text-slate-900">
                     <option value="leve">Leve</option>
                     <option value="moderada">Moderada</option>
                     <option value="grave">Grave</option>
                   </select>
                   <input type="hidden" name="type" value="otro" />
                   <input type="hidden" name="reaction" value="" />
-                  <button type="submit" className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-900">Guardar Alergia</button>
+                  <button type="submit" className="w-full bg-slate-800 text-white px-4 py-3 md:py-2 rounded-lg text-sm hover:bg-slate-900">Guardar Alergia</button>
                 </form>
               </div>
             )}
@@ -299,6 +332,7 @@ export default async function ExpedientePage({
               nombres={nombres}
               puedeMarcar={permisos.puedeMarcarTareas}
               puedeEditar={permisos.puedeEditar}
+              puedeAgregar={permisos.puedeRegistrar}
             />
 
             {/* Tendencia de signos vitales */}
@@ -313,43 +347,45 @@ export default async function ExpedientePage({
               <table className="w-full text-sm text-left">
                 <thead className="bg-slate-100 text-slate-600">
                   <tr>
-                    <th className="px-3 py-2">Hora</th>
+                    <th className="px-3 py-2 whitespace-nowrap">Fecha / Hora</th>
                     <th className="px-3 py-2">TA</th>
                     <th className="px-3 py-2">FC</th>
                     <th className="px-3 py-2">Temp</th>
                     <th className="px-3 py-2">SpO2</th>
+                    <th className="px-3 py-2">Registró</th>
                   </tr>
                 </thead>
                 <tbody>
                   {episode.vitals.map((v) => (
                     <tr key={v.id} className="border-b">
-                      <td className="px-3 py-2 text-xs text-slate-500">{v.createdAt.toLocaleTimeString('es-DO', { timeZone: 'America/Santo_Domingo' })}</td>
+                      <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">{fechaCorta(v.createdAt)}</td>
                       <td className={`px-3 py-2 font-medium ${esAnormal('sys', v.systolic) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>
                         {v.systolic}/{v.diastolic}
                       </td>
                       <td className={`px-3 py-2 font-medium ${esAnormal('fc', v.heartRate) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.heartRate}</td>
                       <td className={`px-3 py-2 font-medium ${esAnormal('temp', v.temperature) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.temperature}</td>
                       <td className={`px-3 py-2 font-medium ${esAnormal('spo2', v.oxygenSat) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.oxygenSat}</td>
+                      <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">{nombres[v.recordedBy] ?? v.recordedBy}</td>
                     </tr>
                   ))}
                   {episode.vitals.length === 0 && (
-                    <tr><td colSpan={5} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
+                    <tr><td colSpan={6} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
 
-            {/* Notas SOAP: solo el médico a cargo */}
-            {permisos.puedeEditar && (
+            {/* Notas SOAP: personal clínico */}
+            {permisos.puedeRegistrar && (
               <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Nueva Nota de Evolución (SOAP)</h2>
                 <form action={guardarNota} className="space-y-4">
                   <input type="hidden" name="episodeId" value={episode.id} />
-                  <textarea name="subjective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="S (Subjetivo): Lo que refiere el paciente..."></textarea>
-                  <textarea name="objective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="O (Objetivo): Signos vitales, hallazgos..."></textarea>
-                  <textarea name="assessment" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="A (Análisis): Impresión diagnóstica..."></textarea>
-                  <textarea name="plan" rows={2} required className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900" placeholder="P (Plan): Tratamiento, indicaciones..."></textarea>
-                  <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">Firmar y Guardar Nota</button>
+                  <textarea name="subjective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="S (Subjetivo): Lo que refiere el paciente..."></textarea>
+                  <textarea name="objective" rows={2} required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="O (Objetivo): Signos vitales, hallazgos..."></textarea>
+                  <textarea name="assessment" rows={2} required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="A (Análisis): Impresión diagnóstica..."></textarea>
+                  <textarea name="plan" rows={2} required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="P (Plan): Tratamiento, indicaciones..."></textarea>
+                  <button type="submit" className="w-full bg-blue-600 text-white px-4 py-3 md:py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">Firmar y Guardar Nota</button>
                 </form>
               </div>
             )}
@@ -360,8 +396,15 @@ export default async function ExpedientePage({
               {episode.notes.length === 0 && <p className="text-slate-500 text-sm">No hay notas registradas.</p>}
               {episode.notes.map((nota) => (
                 <div key={nota.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                  <div className="flex justify-between items-center border-b pb-2 mb-3">
-                    <p className="text-sm font-bold text-blue-700">Firmado por: {nombres[nota.createdBy] ?? nota.createdBy}</p>
+                  <div className="flex flex-wrap justify-between items-center gap-2 border-b pb-2 mb-3">
+                    <p className="text-sm font-bold text-blue-700">
+                      Firmado por: {nombres[nota.createdBy] ?? nota.createdBy}
+                      {roles[nota.createdBy] && (
+                        <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">
+                          {ETIQUETA_ROL[roles[nota.createdBy]] ?? roles[nota.createdBy]}
+                        </span>
+                      )}
+                    </p>
                     <p className="text-xs text-slate-500">{nota.createdAt.toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}</p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">

@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache'
 
 export async function guardarNota(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'editar')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
 
   const subjective = String(formData.get('subjective') ?? '').trim()
   const objective = String(formData.get('objective') ?? '').trim()

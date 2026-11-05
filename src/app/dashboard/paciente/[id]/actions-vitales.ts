@@ -1,26 +1,58 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
+import { exigirPermiso, volverAlExpediente } from '@/lib/permisos'
 import { revalidatePath } from 'next/cache'
 
-export async function guardarSignosVitales(formData: FormData) {
-  const session = await auth()
-  if (!session) throw new Error('No autorizado')
+// Límites amplios: solo atrapan errores de digitación, no valores clínicos raros
+const CAMPOS = [
+  { campo: 'systolic', etiqueta: 'Presión sistólica', min: 40, max: 300, entero: true },
+  { campo: 'diastolic', etiqueta: 'Presión diastólica', min: 20, max: 200, entero: true },
+  { campo: 'heartRate', etiqueta: 'Frecuencia cardíaca', min: 20, max: 300, entero: true },
+  { campo: 'respiratoryRate', etiqueta: 'Frecuencia respiratoria', min: 4, max: 80, entero: true },
+  { campo: 'temperature', etiqueta: 'Temperatura', min: 30, max: 45, entero: false },
+  { campo: 'oxygenSat', etiqueta: 'SpO2', min: 30, max: 100, entero: true },
+  { campo: 'glucose', etiqueta: 'Glucosa', min: 10, max: 1500, entero: true },
+  { campo: 'painScale', etiqueta: 'Dolor', min: 0, max: 10, entero: true },
+] as const
 
-  const episodeId = formData.get('episodeId') as string
-  
-  const parseNum = (val: FormDataEntryValue | null) => val ? Number(val) : null
+export async function guardarSignosVitales(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
 
-  const systolic = parseNum(formData.get('systolic'))
-  const diastolic = parseNum(formData.get('diastolic'))
-  const heartRate = parseNum(formData.get('heartRate'))
-  const respiratoryRate = parseNum(formData.get('respiratoryRate'))
-  const temperature = parseNum(formData.get('temperature'))
-  const oxygenSat = parseNum(formData.get('oxygenSat'))
-  const glucose = parseNum(formData.get('glucose'))
-  const painScale = parseNum(formData.get('painScale')) // <-- NUEVO
+  const valores: Record<string, number | null> = {}
+
+  for (const c of CAMPOS) {
+    const texto = String(formData.get(c.campo) ?? '').trim()
+    if (texto === '') {
+      valores[c.campo] = null
+      continue
+    }
+    const n = Number(texto)
+    if (!Number.isFinite(n)) {
+      volverAlExpediente(episodeId, `${c.etiqueta}: escribe un número válido`)
+    }
+    if (c.entero && !Number.isInteger(n)) {
+      volverAlExpediente(episodeId, `${c.etiqueta}: escribe un número entero`)
+    }
+    if (n < c.min || n > c.max) {
+      volverAlExpediente(episodeId, `${c.etiqueta} fuera del rango válido (${c.min} a ${c.max})`)
+    }
+    valores[c.campo] = n
+  }
+
+  const { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, painScale } = valores
+
+  if (Object.values(valores).every((v) => v === null)) {
+    volverAlExpediente(episodeId, 'Escribe al menos un signo vital')
+  }
+  if ((systolic === null) !== (diastolic === null)) {
+    volverAlExpediente(episodeId, 'Escribe la presión sistólica y la diastólica juntas')
+  }
+  if (systolic !== null && diastolic !== null && diastolic >= systolic) {
+    volverAlExpediente(episodeId, 'La presión diastólica debe ser menor que la sistólica')
+  }
 
   const nuevoRegistro = await prisma.vitalSign.create({
     data: {
@@ -33,19 +65,20 @@ export async function guardarSignosVitales(formData: FormData) {
       oxygenSat,
       glucose,
       painScale,
-      recordedBy: session.user?.email || 'desconocido'
-    }
+      recordedBy: email,
+    },
   })
 
   await logAudit({
-    actorId: session.user?.id as string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actorRole: (session.user as any)?.role,
+    actorId: userId,
+    actorRole: role,
     action: 'create',
     entity: 'vital_sign',
     entityId: nuevoRegistro.id,
+    patientId: episode.patientId,
     episodeId,
-    newValue: { systolic, diastolic, heartRate, temperature, oxygenSat, glucose, painScale },
+    newValue: { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, painScale },
+    reason: 'Registro de signos vitales',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

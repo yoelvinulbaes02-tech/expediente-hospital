@@ -17,7 +17,8 @@ type Props = {
   tareas: Tarea[]
   nombres: Record<string, string>
   puedeMarcar: boolean
-  puedeEditar: boolean
+  puedeEditar: boolean // cancelar tareas (solo el médico a cargo)
+  puedeAgregar: boolean // agregar tareas (personal clínico)
 }
 
 const CATEGORIAS: Record<string, string> = {
@@ -38,8 +39,8 @@ const fmt = (d: Date) =>
     minute: '2-digit',
   })
 
-export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puedeEditar }: Props) {
- const ahora = new Date().getTime()
+export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puedeEditar, puedeAgregar }: Props) {
+  const ahora = new Date().getTime()
   const pendientes = tareas.filter((t) => t.status === 'pendiente').length
   const hechas = tareas.filter((t) => t.status === 'hecha').length
 
@@ -74,7 +75,7 @@ export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puede
                     value="hecha"
                     disabled={!puedeMarcar}
                     title={puedeMarcar ? 'Marcar como realizada' : 'No tienes permiso para marcar tareas'}
-                    className="w-6 h-6 rounded border-2 border-slate-400 hover:border-emerald-600 hover:bg-emerald-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-7 h-7 md:w-6 md:h-6 rounded border-2 border-slate-400 hover:border-emerald-600 hover:bg-emerald-50 disabled:opacity-40 disabled:cursor-not-allowed"
                   />
                 )}
                 {t.status === 'hecha' && (
@@ -83,13 +84,13 @@ export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puede
                     value="reabrir"
                     disabled={!puedeMarcar}
                     title={puedeMarcar ? 'Desmarcar (reabrir)' : 'No tienes permiso'}
-                    className="w-6 h-6 rounded border-2 border-emerald-600 bg-emerald-600 text-white text-sm leading-none disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-7 h-7 md:w-6 md:h-6 rounded border-2 border-emerald-600 bg-emerald-600 text-white text-sm leading-none disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     ✓
                   </button>
                 )}
                 {t.status === 'cancelada' && (
-                  <span className="w-6 h-6 rounded border-2 border-slate-300 bg-slate-100 text-slate-400 text-sm flex items-center justify-center">
+                  <span className="w-7 h-7 md:w-6 md:h-6 rounded border-2 border-slate-300 bg-slate-100 text-slate-400 text-sm flex items-center justify-center">
                     ✕
                   </span>
                 )}
@@ -117,6 +118,9 @@ export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puede
                     <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">VENCIDA</span>
                   )}
                 </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  Agregada por {nombres[t.createdBy] ?? t.createdBy}
+                </p>
                 {t.status === 'hecha' && t.doneAt && (
                   <p className="text-xs text-emerald-700 mt-1">
                     Hecho por {nombres[t.doneBy ?? ''] ?? t.doneBy} · {fmt(t.doneAt)}
@@ -128,7 +132,7 @@ export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puede
 
                 {puedeEditar && t.status === 'pendiente' && (
                   <details className="mt-1">
-                    <summary className="text-xs text-slate-400 hover:text-red-600 cursor-pointer">
+                    <summary className="text-xs text-slate-400 hover:text-red-600 cursor-pointer py-1">
                       Cancelar tarea
                     </summary>
                     <form action={marcarTarea} className="flex gap-2 mt-1">
@@ -138,7 +142,7 @@ export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puede
                         name="motivo"
                         required
                         placeholder="Motivo de la cancelación"
-                        className="flex-1 px-2 py-1 border rounded text-xs text-slate-900"
+                        className="flex-1 px-2 py-2 md:py-1 border rounded text-base md:text-xs text-slate-900"
                       />
                       <button className="bg-red-600 text-white px-3 py-1 rounded text-xs">Confirmar</button>
                     </form>
@@ -150,7 +154,7 @@ export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puede
         })}
       </ul>
 
-      {puedeEditar && (
+      {puedeAgregar && (
         <form action={crearTarea} className="mt-4 pt-4 border-t space-y-2">
           <input type="hidden" name="episodeId" value={episodeId} />
           <p className="text-xs font-bold text-slate-600">Agregar tarea o análisis</p>
@@ -158,10 +162,10 @@ export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puede
             name="titulo"
             required
             placeholder="Ej. Hemograma completo, Ecocardiograma..."
-            className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900"
+            className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900"
           />
           <div className="flex flex-wrap gap-2">
-            <select name="categoria" className="px-3 py-2 border rounded-lg text-sm bg-white text-slate-900">
+            <select name="categoria" className="px-3 py-2 border rounded-lg text-base md:text-sm bg-white text-slate-900">
               <option value="analisis">Análisis</option>
               <option value="estudio">Estudio (sonografía, eco, doppler…)</option>
               <option value="indicacion">Indicación</option>
@@ -170,7 +174,7 @@ export function ChecklistTareas({ episodeId, tareas, nombres, puedeMarcar, puede
             <input
               name="programada"
               type="datetime-local"
-              className="px-3 py-2 border rounded-lg text-sm text-slate-900"
+              className="px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900"
             />
             <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
               Agregar
