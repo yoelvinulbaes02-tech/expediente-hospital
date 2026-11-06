@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { toggleUsuario } from './actions'
 import { SearchInput } from '@/components/SearchInput'
 import { BotonResetClave } from '@/components/BotonResetClave'
+import { BotonEditarUsuario } from '@/components/BotonEditarUsuario'
 import { FormularioCrearUsuario } from '@/components/FormularioCrearUsuario'
 
 export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
@@ -71,6 +72,14 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      {/* BOTÓN EDITAR NOMBRE Y ROL */}
+                      <BotonEditarUsuario
+                        userId={u.id}
+                        nombreActual={u.fullName}
+                        rolActual={u.role}
+                        email={u.email}
+                      />
+
                       {u.id !== session.user?.id && (
                         <>
                           <form action={toggleUsuario}>

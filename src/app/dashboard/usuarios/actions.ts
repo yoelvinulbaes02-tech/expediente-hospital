@@ -33,7 +33,6 @@ async function exigirAdmin() {
   return { id: user.id, role: String(user.role) }
 }
 
-// Sin caracteres que se confunden (0/O, 1/l/I)
 function generarClaveTemporal(largo = 10): string {
   const alfabeto = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
   let clave = ''
@@ -52,7 +51,6 @@ export async function crearUsuario(
   const password = String(formData.get('password') ?? '')
   const role = String(formData.get('role') ?? '')
 
-  // Se devuelven para que el formulario no se borre si hay un error
   const valores = { fullName, email, role }
 
   if (fullName.length < 3) {
@@ -78,7 +76,6 @@ export async function crearUsuario(
 
   const passwordHash = await bcrypt.hash(password, 12)
 
-  // Por si dos administradores crean el mismo correo al mismo tiempo
   const nuevo = await prisma.user
     .create({ data: { fullName, email, passwordHash, role: role as RolValido } })
     .catch((e: unknown) => {
@@ -151,7 +148,6 @@ export async function resetearPassword(userId: string): Promise<ResultadoReset> 
     data: { passwordHash, mustChangePassword: true },
   })
 
-  // La clave NO se guarda en la auditoría
   await logAudit({
     actorId: admin.id,
     actorRole: admin.role,
@@ -164,4 +160,51 @@ export async function resetearPassword(userId: string): Promise<ResultadoReset> 
 
   revalidatePath('/dashboard/usuarios')
   return { ok: true, password: temporal, nombre: objetivo.fullName, correo: objetivo.email }
+}
+
+// ─── NUEVA ACCIÓN: EDITAR NOMBRE Y ROL DEL USUARIO ───
+export async function editarUsuario(
+  userId: string,
+  fullName: string,
+  role: string
+): Promise<{ ok: boolean; error?: string }> {
+  const admin = await exigirAdmin()
+
+  const nombreLimpio = fullName.trim()
+  if (nombreLimpio.length < 3) {
+    return { ok: false, error: 'El nombre debe tener al menos 3 caracteres' }
+  }
+  if (!ROLES_VALIDOS.includes(role as RolValido)) {
+    return { ok: false, error: 'Selecciona un rol válido' }
+  }
+
+  const previo = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, fullName: true, email: true, role: true },
+  })
+
+  if (!previo) return { ok: false, error: 'Usuario no encontrado' }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      fullName: nombreLimpio,
+      role: role as RolValido,
+    },
+  })
+
+  await logAudit({
+    actorId: admin.id,
+    actorRole: admin.role,
+    action: 'update',
+    entity: 'user',
+    entityId: userId,
+    oldValue: { fullName: previo.fullName, role: previo.role },
+    newValue: { fullName: nombreLimpio, role },
+    reason: `Nombre/rol de usuario modificado por administrador: "${previo.fullName}" -> "${nombreLimpio}"`,
+  })
+
+  revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard')
+  return { ok: true }
 }
