@@ -79,7 +79,7 @@ export default async function ExpedientePage({
       vitals: { orderBy: { createdAt: 'desc' }, take: 15 },
       tasks: { orderBy: { createdAt: 'asc' } },
       handoffs: { where: { status: 'PENDIENTE' }, take: 1 },
-      importantAlerts: { where: { isActive: true }, orderBy: { createdAt: 'desc' } },
+      importantAlerts: { orderBy: { createdAt: 'desc' } },
       gfrRecords: { orderBy: { createdAt: 'desc' } },
       studyReports: { orderBy: { createdAt: 'desc' } },
       viralSerologies: { orderBy: { updatedAt: 'desc' }, take: 1 },
@@ -93,7 +93,6 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo
   const entregaPendiente = episode.handoffs[0]
 
-  // Recolectar emails de todas las firmas
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => emails.add(v.recordedBy))
@@ -264,7 +263,7 @@ export default async function ExpedientePage({
               </Link>
             )}
 
-            {/* BADGE DE HABITACIÓN EDITABLE */}
+            {/* Badge de Habitación con Reubicación */}
             <div className="relative">
               <div className="bg-blue-100 text-blue-900 px-4 py-2 rounded-lg font-bold border border-blue-200 text-lg flex items-center gap-2">
                 <span>Hab. {episode.room} - Cama {episode.bed}</span>
@@ -329,7 +328,7 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* 1. NOTAS IMPORTANTES */}
+        {/* 1. NOTAS IMPORTANTES (CON CONFIRMACIÓN Y ARCHIVO) */}
         <NotasImportantes
           episodeId={episode.id}
           alertas={episode.importantAlerts}
@@ -533,13 +532,11 @@ export default async function ExpedientePage({
                     <p className="text-xs text-slate-500">{nota.createdAt.toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}</p>
                   </div>
                   
-                  {/* Si es una nota nueva de un solo recuadro: */}
                   {nota.content ? (
                     <p className="text-sm text-slate-800 whitespace-pre-line leading-relaxed">
                       {nota.content}
                     </p>
                   ) : (
-                    /* Retrocompatibilidad si es una nota antigua SOAP: */
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
                       <div><span className="font-bold text-slate-900">S:</span> {nota.subjective}</div>
                       <div><span className="font-bold text-slate-900">O:</span> {nota.objective}</div>
