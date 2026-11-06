@@ -146,14 +146,23 @@ const GRUPOS_LAB = [
   { id: 'OTRAS ANALÍTICAS', icono: '📋', titulo: 'Otras Analíticas' },
 ]
 
+// Quita acentos, tildes y pasa todo a minúsculas limpias: "QUÍMICA" -> "quimica"
+function normalizar(texto?: string | null): string {
+  return (texto ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
 function normalizarCat(cat: string): string {
-  const c = cat.toUpperCase()
-  if (c.includes('HEMATO')) return 'HEMATOLOGÍA'
-  if (c.includes('QUÍM') || c.includes('QUIM')) return 'QUÍMICA SANGUÍNEA'
-  if (c.includes('URO')) return 'UROANÁLISIS'
-  if (c.includes('CULTIV') || c.includes('BACTER')) return 'CULTIVOS Y BACTERIOLOGÍA'
-  if (c.includes('PARASIT') || c.includes('LÍQUID') || c.includes('LIQUID')) return 'PARASITOLOGÍA Y LÍQUIDOS'
-  if (c.includes('SEROL') || c.includes('INMUNO')) return 'SEROLOGÍA E INMUNOLOGÍA'
+  const c = normalizar(cat)
+  if (c.includes('hemato')) return 'HEMATOLOGÍA'
+  if (c.includes('quim')) return 'QUÍMICA SANGUÍNEA'
+  if (c.includes('uro')) return 'UROANÁLISIS'
+  if (c.includes('cultiv') || c.includes('bacter')) return 'CULTIVOS Y BACTERIOLOGÍA'
+  if (c.includes('parasit') || c.includes('liquid')) return 'PARASITOLOGÍA Y LÍQUIDOS'
+  if (c.includes('serol') || c.includes('inmuno')) return 'SEROLOGÍA E INMUNOLOGÍA'
   return 'OTRAS ANALÍTICAS'
 }
 
@@ -194,16 +203,19 @@ export function ReportesLaboratorio({
     }
   }
 
+  // BÚSQUEDA INSENSIBLE A TILDES, MAYÚSCULAS Y ESPACIOS
   const filtrados = useMemo(() => {
-    if (!busqueda.trim()) return reportes
-    const q = busqueda.toLowerCase().trim()
-    return reportes.filter(
-      (r) =>
-        r.testName.toLowerCase().includes(q) ||
-        r.category.toLowerCase().includes(q) ||
-        r.result.toLowerCase().includes(q)
-    )
-  }, [reportes, busqueda])
+    const q = normalizar(busqueda)
+    if (!q) return reportes
+    const terminos = q.split(/\s+/).filter(Boolean)
+
+    return reportes.filter((r) => {
+      const textoCompleto = normalizar(
+        `${r.testName} ${r.category} ${r.result} ${nombres[r.createdBy] ?? r.createdBy}`
+      )
+      return terminos.every((term) => textoCompleto.includes(term))
+    })
+  }, [reportes, busqueda, nombres])
 
   const gruposConDatos = useMemo(() => {
     const mapa: Record<string, ReporteLab[]> = {}
@@ -228,6 +240,7 @@ export function ReportesLaboratorio({
           </span>
         </div>
 
+        {/* LUPA Y BUSCADOR INSENSIBLE A TILDES Y MAYÚSCULAS */}
         <div className="relative w-full sm:w-64">
           <input
             type="text"
@@ -262,6 +275,7 @@ export function ReportesLaboratorio({
             const items = gruposConDatos[g.id]
             if (!items || items.length === 0) return null
 
+            // Si hay búsqueda activa, se abre automáticamente el grupo correspondiente
             const estaAbierto = hayBusqueda || !!abiertos[g.id]
 
             return (
