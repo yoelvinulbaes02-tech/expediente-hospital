@@ -64,7 +64,7 @@ model Patient {
   birthDate           DateTime?
   age                 Int?
   sex                 String
-  bloodType           String? // Tipificación (ej. O+, A-, B+, etc.)
+  bloodType           String?
   bloodTypeRecordedBy String?
   bloodTypeUpdatedAt  DateTime? @db.Timestamptz
   createdAt           DateTime  @default(now())
@@ -82,13 +82,13 @@ model Episode {
   admissionDate      DateTime @default(now())
   admissionType      String
   chiefComplaint     String?
-  status             String   @default("active") // "active" | "closed"
+  status             String   @default("active")
   room               String?
   bed                String?
-  attendingDoctor    String? // Médico tratante (residente que ingresó)
-  admittingDoctor    String? // MA que lo ingresó
-  primaryDiagnosis   String? // Diagnóstico principal
-  secondaryDiagnoses String? // Diagnósticos secundarios
+  attendingDoctor    String?
+  admittingDoctor    String?
+  primaryDiagnosis   String?
+  secondaryDiagnoses String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -104,6 +104,7 @@ model Episode {
 
   importantAlerts  ImportantAlert[]
   gfrRecords       GfrRecord[]
+  labReports       LabReport[]
   studyReports     StudyReport[]
   viralSerologies  ViralSerology[]
   vascularAccesses VascularAccess[]
@@ -144,9 +145,25 @@ model ImportantAlert {
 model GfrRecord {
   id         String   @id @default(cuid())
   episodeId  String
-  value      Float // mL/min/1.73m²
+  value      Float
   recordedBy String
   createdAt  DateTime @default(now()) @db.Timestamptz
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId])
+}
+
+// ─── REPORTES DE LABORATORIO Y ANALÍTICAS ───
+model LabReport {
+  id         String    @id @default(cuid())
+  episodeId  String
+  category   String // Hematología, Uroanálisis, Cultivos, Parasitología, Química Sanguínea, Serología
+  testName   String // Nombre específico de la analítica
+  sampleDate DateTime? @db.Timestamptz
+  result     String // Valores y hallazgos
+  createdBy  String // Email de quien registra
+  createdAt  DateTime  @default(now()) @db.Timestamptz
 
   episode Episode @relation(fields: [episodeId], references: [id])
 
@@ -223,13 +240,13 @@ model Allergy {
 model Note {
   id         String   @id @default(cuid())
   episodeId  String
-  content    String? // Recuadro único de evolución
-  subjective String? // Mantenido por retrocompatibilidad
-  objective  String? // Mantenido por retrocompatibilidad
-  assessment String? // Mantenido por retrocompatibilidad
-  plan       String? // Mantenido por retrocompatibilidad
+  content    String?
+  subjective String?
+  objective  String?
+  assessment String?
+  plan       String?
   status     String   @default("firmada")
-  createdBy  String // Email de quien firma
+  createdBy  String
   createdAt  DateTime @default(now()) @db.Timestamptz
 
   episode Episode @relation(fields: [episodeId], references: [id])
@@ -246,9 +263,9 @@ model VitalSign {
   temperature     Float?
   oxygenSat       Int?
   glucose         Int?
-  weight          Float? // Peso en kg (ej. 68.5)
-  painScale       Int? // Mantenido por retrocompatibilidad
-  diuresis        Int? // Diuresis en mL
+  weight          Float?
+  painScale       Int?
+  diuresis        Int?
   recordedBy      String
   createdAt       DateTime @default(now()) @db.Timestamptz
 

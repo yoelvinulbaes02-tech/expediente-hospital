@@ -16,6 +16,7 @@ import { calcularPermisos } from '@/lib/permisos'
 import { NotasImportantes } from '@/components/NotasImportantes'
 import { BloqueNefrologico } from '@/components/BloqueNefrologico'
 import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
+import { ReportesLaboratorio } from '@/components/ReportesLaboratorio'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
 import { FormularioNotaEvolucion } from '@/components/FormularioNotaEvolucion'
 
@@ -81,6 +82,7 @@ export default async function ExpedientePage({
       handoffs: { where: { status: 'PENDIENTE' }, take: 1 },
       importantAlerts: { orderBy: { createdAt: 'desc' } },
       gfrRecords: { orderBy: { createdAt: 'desc' } },
+      labReports: { orderBy: { createdAt: 'desc' } },
       studyReports: { orderBy: { createdAt: 'desc' } },
       viralSerologies: { orderBy: { updatedAt: 'desc' }, take: 1 },
       vascularAccesses: { where: { isActive: true }, take: 1 },
@@ -93,10 +95,12 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo
   const entregaPendiente = episode.handoffs[0]
 
+  // Recolectar emails de todas las firmas
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => emails.add(v.recordedBy))
   episode.importantAlerts.forEach((a) => emails.add(a.createdBy))
+  episode.labReports.forEach((l) => emails.add(l.createdBy))
   episode.studyReports.forEach((s) => emails.add(s.createdBy))
   episode.tasks.forEach((t) => {
     emails.add(t.createdBy)
@@ -328,7 +332,7 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* 1. NOTAS IMPORTANTES (CON CONFIRMACIÓN Y ARCHIVO) */}
+        {/* 1. NOTAS IMPORTANTES */}
         <NotasImportantes
           episodeId={episode.id}
           alertas={episode.importantAlerts}
@@ -336,7 +340,7 @@ export default async function ExpedientePage({
           puedeRegistrar={permisos.puedeRegistrar}
         />
 
-        {/* 2. ACCESO VASCULAR, VIRALES, TIPIFICACIÓN Y TFG (CON FIRMAS) */}
+        {/* 2. ACCESO VASCULAR, VIRALES, TIPIFICACIÓN Y TFG */}
         <BloqueNefrologico
           episodeId={episode.id}
           acceso={episode.vascularAccesses[0] ?? null}
@@ -457,7 +461,16 @@ export default async function ExpedientePage({
               puedeAgregar={permisos.puedeRegistrar}
             />
 
-            {/* 4. REPORTES DE ESTUDIOS */}
+            {/* 4. REPORTES DE LABORATORIO (ARRIBA DE REPORTES DE ESTUDIO) */}
+            <ReportesLaboratorio
+              episodeId={episode.id}
+              reportes={episode.labReports}
+              nombres={nombres}
+              roles={roles}
+              puedeRegistrar={permisos.puedeRegistrar}
+            />
+
+            {/* 5. REPORTES DE ESTUDIOS (SONOGRAFÍAS, TAC, RX) */}
             <ReportesEstudios
               episodeId={episode.id}
               estudios={episode.studyReports}
@@ -509,7 +522,7 @@ export default async function ExpedientePage({
               </table>
             </div>
 
-            {/* 5. FORMULARIO DE EVOLUCIÓN (UN SOLO RECUADRO) */}
+            {/* 6. FORMULARIO DE EVOLUCIÓN (UN SOLO RECUADRO) */}
             {permisos.puedeRegistrar && (
               <FormularioNotaEvolucion episodeId={episode.id} action={guardarNota} />
             )}

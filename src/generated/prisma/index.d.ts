@@ -49,6 +49,11 @@ export type ImportantAlert = $Result.DefaultSelection<Prisma.$ImportantAlertPayl
  */
 export type GfrRecord = $Result.DefaultSelection<Prisma.$GfrRecordPayload>
 /**
+ * Model LabReport
+ * 
+ */
+export type LabReport = $Result.DefaultSelection<Prisma.$LabReportPayload>
+/**
  * Model StudyReport
  * 
  */
@@ -312,6 +317,16 @@ export class PrismaClient<
     * ```
     */
   get gfrRecord(): Prisma.GfrRecordDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.labReport`: Exposes CRUD operations for the **LabReport** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more LabReports
+    * const labReports = await prisma.labReport.findMany()
+    * ```
+    */
+  get labReport(): Prisma.LabReportDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.studyReport`: Exposes CRUD operations for the **StudyReport** model.
@@ -846,6 +861,7 @@ export namespace Prisma {
     MedicalHistory: 'MedicalHistory',
     ImportantAlert: 'ImportantAlert',
     GfrRecord: 'GfrRecord',
+    LabReport: 'LabReport',
     StudyReport: 'StudyReport',
     ViralSerology: 'ViralSerology',
     VascularAccess: 'VascularAccess',
@@ -869,7 +885,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "auditLog" | "patient" | "episode" | "medicalHistory" | "importantAlert" | "gfrRecord" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
+      modelProps: "user" | "auditLog" | "patient" | "episode" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1388,6 +1404,80 @@ export namespace Prisma {
           count: {
             args: Prisma.GfrRecordCountArgs<ExtArgs>
             result: $Utils.Optional<GfrRecordCountAggregateOutputType> | number
+          }
+        }
+      }
+      LabReport: {
+        payload: Prisma.$LabReportPayload<ExtArgs>
+        fields: Prisma.LabReportFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.LabReportFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.LabReportFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>
+          }
+          findFirst: {
+            args: Prisma.LabReportFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.LabReportFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>
+          }
+          findMany: {
+            args: Prisma.LabReportFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>[]
+          }
+          create: {
+            args: Prisma.LabReportCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>
+          }
+          createMany: {
+            args: Prisma.LabReportCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.LabReportCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>[]
+          }
+          delete: {
+            args: Prisma.LabReportDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>
+          }
+          update: {
+            args: Prisma.LabReportUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>
+          }
+          deleteMany: {
+            args: Prisma.LabReportDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.LabReportUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.LabReportUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>[]
+          }
+          upsert: {
+            args: Prisma.LabReportUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabReportPayload>
+          }
+          aggregate: {
+            args: Prisma.LabReportAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLabReport>
+          }
+          groupBy: {
+            args: Prisma.LabReportGroupByArgs<ExtArgs>
+            result: $Utils.Optional<LabReportGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.LabReportCountArgs<ExtArgs>
+            result: $Utils.Optional<LabReportCountAggregateOutputType> | number
           }
         }
       }
@@ -2113,6 +2203,7 @@ export namespace Prisma {
     medicalHistory?: MedicalHistoryOmit
     importantAlert?: ImportantAlertOmit
     gfrRecord?: GfrRecordOmit
+    labReport?: LabReportOmit
     studyReport?: StudyReportOmit
     viralSerology?: ViralSerologyOmit
     vascularAccess?: VascularAccessOmit
@@ -2297,6 +2388,7 @@ export namespace Prisma {
     tasks: number
     importantAlerts: number
     gfrRecords: number
+    labReports: number
     studyReports: number
     viralSerologies: number
     vascularAccesses: number
@@ -2310,6 +2402,7 @@ export namespace Prisma {
     tasks?: boolean | EpisodeCountOutputTypeCountTasksArgs
     importantAlerts?: boolean | EpisodeCountOutputTypeCountImportantAlertsArgs
     gfrRecords?: boolean | EpisodeCountOutputTypeCountGfrRecordsArgs
+    labReports?: boolean | EpisodeCountOutputTypeCountLabReportsArgs
     studyReports?: boolean | EpisodeCountOutputTypeCountStudyReportsArgs
     viralSerologies?: boolean | EpisodeCountOutputTypeCountViralSerologiesArgs
     vascularAccesses?: boolean | EpisodeCountOutputTypeCountVascularAccessesArgs
@@ -2373,6 +2466,13 @@ export namespace Prisma {
    */
   export type EpisodeCountOutputTypeCountGfrRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GfrRecordWhereInput
+  }
+
+  /**
+   * EpisodeCountOutputType without action
+   */
+  export type EpisodeCountOutputTypeCountLabReportsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LabReportWhereInput
   }
 
   /**
@@ -6345,6 +6445,7 @@ export namespace Prisma {
     tasks?: boolean | Episode$tasksArgs<ExtArgs>
     importantAlerts?: boolean | Episode$importantAlertsArgs<ExtArgs>
     gfrRecords?: boolean | Episode$gfrRecordsArgs<ExtArgs>
+    labReports?: boolean | Episode$labReportsArgs<ExtArgs>
     studyReports?: boolean | Episode$studyReportsArgs<ExtArgs>
     viralSerologies?: boolean | Episode$viralSerologiesArgs<ExtArgs>
     vascularAccesses?: boolean | Episode$vascularAccessesArgs<ExtArgs>
@@ -6423,6 +6524,7 @@ export namespace Prisma {
     tasks?: boolean | Episode$tasksArgs<ExtArgs>
     importantAlerts?: boolean | Episode$importantAlertsArgs<ExtArgs>
     gfrRecords?: boolean | Episode$gfrRecordsArgs<ExtArgs>
+    labReports?: boolean | Episode$labReportsArgs<ExtArgs>
     studyReports?: boolean | Episode$studyReportsArgs<ExtArgs>
     viralSerologies?: boolean | Episode$viralSerologiesArgs<ExtArgs>
     vascularAccesses?: boolean | Episode$vascularAccessesArgs<ExtArgs>
@@ -6449,6 +6551,7 @@ export namespace Prisma {
       tasks: Prisma.$TaskPayload<ExtArgs>[]
       importantAlerts: Prisma.$ImportantAlertPayload<ExtArgs>[]
       gfrRecords: Prisma.$GfrRecordPayload<ExtArgs>[]
+      labReports: Prisma.$LabReportPayload<ExtArgs>[]
       studyReports: Prisma.$StudyReportPayload<ExtArgs>[]
       viralSerologies: Prisma.$ViralSerologyPayload<ExtArgs>[]
       vascularAccesses: Prisma.$VascularAccessPayload<ExtArgs>[]
@@ -6873,6 +6976,7 @@ export namespace Prisma {
     tasks<T extends Episode$tasksArgs<ExtArgs> = {}>(args?: Subset<T, Episode$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     importantAlerts<T extends Episode$importantAlertsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$importantAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportantAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     gfrRecords<T extends Episode$gfrRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$gfrRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GfrRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    labReports<T extends Episode$labReportsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$labReportsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     studyReports<T extends Episode$studyReportsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$studyReportsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudyReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     viralSerologies<T extends Episode$viralSerologiesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$viralSerologiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ViralSerologyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     vascularAccesses<T extends Episode$vascularAccessesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$vascularAccessesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VascularAccessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7506,6 +7610,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: GfrRecordScalarFieldEnum | GfrRecordScalarFieldEnum[]
+  }
+
+  /**
+   * Episode.labReports
+   */
+  export type Episode$labReportsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    where?: LabReportWhereInput
+    orderBy?: LabReportOrderByWithRelationInput | LabReportOrderByWithRelationInput[]
+    cursor?: LabReportWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LabReportScalarFieldEnum | LabReportScalarFieldEnum[]
   }
 
   /**
@@ -10884,6 +11012,1108 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: GfrRecordInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model LabReport
+   */
+
+  export type AggregateLabReport = {
+    _count: LabReportCountAggregateOutputType | null
+    _min: LabReportMinAggregateOutputType | null
+    _max: LabReportMaxAggregateOutputType | null
+  }
+
+  export type LabReportMinAggregateOutputType = {
+    id: string | null
+    episodeId: string | null
+    category: string | null
+    testName: string | null
+    sampleDate: Date | null
+    result: string | null
+    createdBy: string | null
+    createdAt: Date | null
+  }
+
+  export type LabReportMaxAggregateOutputType = {
+    id: string | null
+    episodeId: string | null
+    category: string | null
+    testName: string | null
+    sampleDate: Date | null
+    result: string | null
+    createdBy: string | null
+    createdAt: Date | null
+  }
+
+  export type LabReportCountAggregateOutputType = {
+    id: number
+    episodeId: number
+    category: number
+    testName: number
+    sampleDate: number
+    result: number
+    createdBy: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type LabReportMinAggregateInputType = {
+    id?: true
+    episodeId?: true
+    category?: true
+    testName?: true
+    sampleDate?: true
+    result?: true
+    createdBy?: true
+    createdAt?: true
+  }
+
+  export type LabReportMaxAggregateInputType = {
+    id?: true
+    episodeId?: true
+    category?: true
+    testName?: true
+    sampleDate?: true
+    result?: true
+    createdBy?: true
+    createdAt?: true
+  }
+
+  export type LabReportCountAggregateInputType = {
+    id?: true
+    episodeId?: true
+    category?: true
+    testName?: true
+    sampleDate?: true
+    result?: true
+    createdBy?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type LabReportAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which LabReport to aggregate.
+     */
+    where?: LabReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LabReports to fetch.
+     */
+    orderBy?: LabReportOrderByWithRelationInput | LabReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: LabReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LabReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LabReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned LabReports
+    **/
+    _count?: true | LabReportCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: LabReportMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: LabReportMaxAggregateInputType
+  }
+
+  export type GetLabReportAggregateType<T extends LabReportAggregateArgs> = {
+        [P in keyof T & keyof AggregateLabReport]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLabReport[P]>
+      : GetScalarType<T[P], AggregateLabReport[P]>
+  }
+
+
+
+
+  export type LabReportGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LabReportWhereInput
+    orderBy?: LabReportOrderByWithAggregationInput | LabReportOrderByWithAggregationInput[]
+    by: LabReportScalarFieldEnum[] | LabReportScalarFieldEnum
+    having?: LabReportScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: LabReportCountAggregateInputType | true
+    _min?: LabReportMinAggregateInputType
+    _max?: LabReportMaxAggregateInputType
+  }
+
+  export type LabReportGroupByOutputType = {
+    id: string
+    episodeId: string
+    category: string
+    testName: string
+    sampleDate: Date | null
+    result: string
+    createdBy: string
+    createdAt: Date
+    _count: LabReportCountAggregateOutputType | null
+    _min: LabReportMinAggregateOutputType | null
+    _max: LabReportMaxAggregateOutputType | null
+  }
+
+  type GetLabReportGroupByPayload<T extends LabReportGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<LabReportGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof LabReportGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], LabReportGroupByOutputType[P]>
+            : GetScalarType<T[P], LabReportGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type LabReportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    category?: boolean
+    testName?: boolean
+    sampleDate?: boolean
+    result?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["labReport"]>
+
+  export type LabReportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    category?: boolean
+    testName?: boolean
+    sampleDate?: boolean
+    result?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["labReport"]>
+
+  export type LabReportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    category?: boolean
+    testName?: boolean
+    sampleDate?: boolean
+    result?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["labReport"]>
+
+  export type LabReportSelectScalar = {
+    id?: boolean
+    episodeId?: boolean
+    category?: boolean
+    testName?: boolean
+    sampleDate?: boolean
+    result?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+  }
+
+  export type LabReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "category" | "testName" | "sampleDate" | "result" | "createdBy" | "createdAt", ExtArgs["result"]["labReport"]>
+  export type LabReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+  export type LabReportIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+  export type LabReportIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+
+  export type $LabReportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "LabReport"
+    objects: {
+      episode: Prisma.$EpisodePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      episodeId: string
+      category: string
+      testName: string
+      sampleDate: Date | null
+      result: string
+      createdBy: string
+      createdAt: Date
+    }, ExtArgs["result"]["labReport"]>
+    composites: {}
+  }
+
+  type LabReportGetPayload<S extends boolean | null | undefined | LabReportDefaultArgs> = $Result.GetResult<Prisma.$LabReportPayload, S>
+
+  type LabReportCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<LabReportFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: LabReportCountAggregateInputType | true
+    }
+
+  export interface LabReportDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['LabReport'], meta: { name: 'LabReport' } }
+    /**
+     * Find zero or one LabReport that matches the filter.
+     * @param {LabReportFindUniqueArgs} args - Arguments to find a LabReport
+     * @example
+     * // Get one LabReport
+     * const labReport = await prisma.labReport.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends LabReportFindUniqueArgs>(args: SelectSubset<T, LabReportFindUniqueArgs<ExtArgs>>): Prisma__LabReportClient<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one LabReport that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {LabReportFindUniqueOrThrowArgs} args - Arguments to find a LabReport
+     * @example
+     * // Get one LabReport
+     * const labReport = await prisma.labReport.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends LabReportFindUniqueOrThrowArgs>(args: SelectSubset<T, LabReportFindUniqueOrThrowArgs<ExtArgs>>): Prisma__LabReportClient<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first LabReport that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabReportFindFirstArgs} args - Arguments to find a LabReport
+     * @example
+     * // Get one LabReport
+     * const labReport = await prisma.labReport.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends LabReportFindFirstArgs>(args?: SelectSubset<T, LabReportFindFirstArgs<ExtArgs>>): Prisma__LabReportClient<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first LabReport that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabReportFindFirstOrThrowArgs} args - Arguments to find a LabReport
+     * @example
+     * // Get one LabReport
+     * const labReport = await prisma.labReport.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends LabReportFindFirstOrThrowArgs>(args?: SelectSubset<T, LabReportFindFirstOrThrowArgs<ExtArgs>>): Prisma__LabReportClient<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more LabReports that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabReportFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all LabReports
+     * const labReports = await prisma.labReport.findMany()
+     * 
+     * // Get first 10 LabReports
+     * const labReports = await prisma.labReport.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const labReportWithIdOnly = await prisma.labReport.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends LabReportFindManyArgs>(args?: SelectSubset<T, LabReportFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a LabReport.
+     * @param {LabReportCreateArgs} args - Arguments to create a LabReport.
+     * @example
+     * // Create one LabReport
+     * const LabReport = await prisma.labReport.create({
+     *   data: {
+     *     // ... data to create a LabReport
+     *   }
+     * })
+     * 
+     */
+    create<T extends LabReportCreateArgs>(args: SelectSubset<T, LabReportCreateArgs<ExtArgs>>): Prisma__LabReportClient<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many LabReports.
+     * @param {LabReportCreateManyArgs} args - Arguments to create many LabReports.
+     * @example
+     * // Create many LabReports
+     * const labReport = await prisma.labReport.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends LabReportCreateManyArgs>(args?: SelectSubset<T, LabReportCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many LabReports and returns the data saved in the database.
+     * @param {LabReportCreateManyAndReturnArgs} args - Arguments to create many LabReports.
+     * @example
+     * // Create many LabReports
+     * const labReport = await prisma.labReport.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many LabReports and only return the `id`
+     * const labReportWithIdOnly = await prisma.labReport.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends LabReportCreateManyAndReturnArgs>(args?: SelectSubset<T, LabReportCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a LabReport.
+     * @param {LabReportDeleteArgs} args - Arguments to delete one LabReport.
+     * @example
+     * // Delete one LabReport
+     * const LabReport = await prisma.labReport.delete({
+     *   where: {
+     *     // ... filter to delete one LabReport
+     *   }
+     * })
+     * 
+     */
+    delete<T extends LabReportDeleteArgs>(args: SelectSubset<T, LabReportDeleteArgs<ExtArgs>>): Prisma__LabReportClient<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one LabReport.
+     * @param {LabReportUpdateArgs} args - Arguments to update one LabReport.
+     * @example
+     * // Update one LabReport
+     * const labReport = await prisma.labReport.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends LabReportUpdateArgs>(args: SelectSubset<T, LabReportUpdateArgs<ExtArgs>>): Prisma__LabReportClient<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more LabReports.
+     * @param {LabReportDeleteManyArgs} args - Arguments to filter LabReports to delete.
+     * @example
+     * // Delete a few LabReports
+     * const { count } = await prisma.labReport.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends LabReportDeleteManyArgs>(args?: SelectSubset<T, LabReportDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more LabReports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabReportUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many LabReports
+     * const labReport = await prisma.labReport.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends LabReportUpdateManyArgs>(args: SelectSubset<T, LabReportUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more LabReports and returns the data updated in the database.
+     * @param {LabReportUpdateManyAndReturnArgs} args - Arguments to update many LabReports.
+     * @example
+     * // Update many LabReports
+     * const labReport = await prisma.labReport.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more LabReports and only return the `id`
+     * const labReportWithIdOnly = await prisma.labReport.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends LabReportUpdateManyAndReturnArgs>(args: SelectSubset<T, LabReportUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one LabReport.
+     * @param {LabReportUpsertArgs} args - Arguments to update or create a LabReport.
+     * @example
+     * // Update or create a LabReport
+     * const labReport = await prisma.labReport.upsert({
+     *   create: {
+     *     // ... data to create a LabReport
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the LabReport we want to update
+     *   }
+     * })
+     */
+    upsert<T extends LabReportUpsertArgs>(args: SelectSubset<T, LabReportUpsertArgs<ExtArgs>>): Prisma__LabReportClient<$Result.GetResult<Prisma.$LabReportPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of LabReports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabReportCountArgs} args - Arguments to filter LabReports to count.
+     * @example
+     * // Count the number of LabReports
+     * const count = await prisma.labReport.count({
+     *   where: {
+     *     // ... the filter for the LabReports we want to count
+     *   }
+     * })
+    **/
+    count<T extends LabReportCountArgs>(
+      args?: Subset<T, LabReportCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], LabReportCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a LabReport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabReportAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends LabReportAggregateArgs>(args: Subset<T, LabReportAggregateArgs>): Prisma.PrismaPromise<GetLabReportAggregateType<T>>
+
+    /**
+     * Group by LabReport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabReportGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends LabReportGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: LabReportGroupByArgs['orderBy'] }
+        : { orderBy?: LabReportGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, LabReportGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLabReportGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the LabReport model
+   */
+  readonly fields: LabReportFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for LabReport.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__LabReportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    episode<T extends EpisodeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDefaultArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the LabReport model
+   */
+  interface LabReportFieldRefs {
+    readonly id: FieldRef<"LabReport", 'String'>
+    readonly episodeId: FieldRef<"LabReport", 'String'>
+    readonly category: FieldRef<"LabReport", 'String'>
+    readonly testName: FieldRef<"LabReport", 'String'>
+    readonly sampleDate: FieldRef<"LabReport", 'DateTime'>
+    readonly result: FieldRef<"LabReport", 'String'>
+    readonly createdBy: FieldRef<"LabReport", 'String'>
+    readonly createdAt: FieldRef<"LabReport", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * LabReport findUnique
+   */
+  export type LabReportFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * Filter, which LabReport to fetch.
+     */
+    where: LabReportWhereUniqueInput
+  }
+
+  /**
+   * LabReport findUniqueOrThrow
+   */
+  export type LabReportFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * Filter, which LabReport to fetch.
+     */
+    where: LabReportWhereUniqueInput
+  }
+
+  /**
+   * LabReport findFirst
+   */
+  export type LabReportFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * Filter, which LabReport to fetch.
+     */
+    where?: LabReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LabReports to fetch.
+     */
+    orderBy?: LabReportOrderByWithRelationInput | LabReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for LabReports.
+     */
+    cursor?: LabReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LabReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LabReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LabReports.
+     */
+    distinct?: LabReportScalarFieldEnum | LabReportScalarFieldEnum[]
+  }
+
+  /**
+   * LabReport findFirstOrThrow
+   */
+  export type LabReportFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * Filter, which LabReport to fetch.
+     */
+    where?: LabReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LabReports to fetch.
+     */
+    orderBy?: LabReportOrderByWithRelationInput | LabReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for LabReports.
+     */
+    cursor?: LabReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LabReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LabReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LabReports.
+     */
+    distinct?: LabReportScalarFieldEnum | LabReportScalarFieldEnum[]
+  }
+
+  /**
+   * LabReport findMany
+   */
+  export type LabReportFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * Filter, which LabReports to fetch.
+     */
+    where?: LabReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LabReports to fetch.
+     */
+    orderBy?: LabReportOrderByWithRelationInput | LabReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing LabReports.
+     */
+    cursor?: LabReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LabReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LabReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LabReports.
+     */
+    distinct?: LabReportScalarFieldEnum | LabReportScalarFieldEnum[]
+  }
+
+  /**
+   * LabReport create
+   */
+  export type LabReportCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * The data needed to create a LabReport.
+     */
+    data: XOR<LabReportCreateInput, LabReportUncheckedCreateInput>
+  }
+
+  /**
+   * LabReport createMany
+   */
+  export type LabReportCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many LabReports.
+     */
+    data: LabReportCreateManyInput | LabReportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * LabReport createManyAndReturn
+   */
+  export type LabReportCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * The data used to create many LabReports.
+     */
+    data: LabReportCreateManyInput | LabReportCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * LabReport update
+   */
+  export type LabReportUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * The data needed to update a LabReport.
+     */
+    data: XOR<LabReportUpdateInput, LabReportUncheckedUpdateInput>
+    /**
+     * Choose, which LabReport to update.
+     */
+    where: LabReportWhereUniqueInput
+  }
+
+  /**
+   * LabReport updateMany
+   */
+  export type LabReportUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update LabReports.
+     */
+    data: XOR<LabReportUpdateManyMutationInput, LabReportUncheckedUpdateManyInput>
+    /**
+     * Filter which LabReports to update
+     */
+    where?: LabReportWhereInput
+    /**
+     * Limit how many LabReports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * LabReport updateManyAndReturn
+   */
+  export type LabReportUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * The data used to update LabReports.
+     */
+    data: XOR<LabReportUpdateManyMutationInput, LabReportUncheckedUpdateManyInput>
+    /**
+     * Filter which LabReports to update
+     */
+    where?: LabReportWhereInput
+    /**
+     * Limit how many LabReports to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * LabReport upsert
+   */
+  export type LabReportUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * The filter to search for the LabReport to update in case it exists.
+     */
+    where: LabReportWhereUniqueInput
+    /**
+     * In case the LabReport found by the `where` argument doesn't exist, create a new LabReport with this data.
+     */
+    create: XOR<LabReportCreateInput, LabReportUncheckedCreateInput>
+    /**
+     * In case the LabReport was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<LabReportUpdateInput, LabReportUncheckedUpdateInput>
+  }
+
+  /**
+   * LabReport delete
+   */
+  export type LabReportDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
+    /**
+     * Filter which LabReport to delete.
+     */
+    where: LabReportWhereUniqueInput
+  }
+
+  /**
+   * LabReport deleteMany
+   */
+  export type LabReportDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which LabReports to delete
+     */
+    where?: LabReportWhereInput
+    /**
+     * Limit how many LabReports to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * LabReport without action
+   */
+  export type LabReportDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabReport
+     */
+    select?: LabReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LabReport
+     */
+    omit?: LabReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabReportInclude<ExtArgs> | null
   }
 
 
@@ -20088,6 +21318,20 @@ export namespace Prisma {
   export type GfrRecordScalarFieldEnum = (typeof GfrRecordScalarFieldEnum)[keyof typeof GfrRecordScalarFieldEnum]
 
 
+  export const LabReportScalarFieldEnum: {
+    id: 'id',
+    episodeId: 'episodeId',
+    category: 'category',
+    testName: 'testName',
+    sampleDate: 'sampleDate',
+    result: 'result',
+    createdBy: 'createdBy',
+    createdAt: 'createdAt'
+  };
+
+  export type LabReportScalarFieldEnum = (typeof LabReportScalarFieldEnum)[keyof typeof LabReportScalarFieldEnum]
+
+
   export const StudyReportScalarFieldEnum: {
     id: 'id',
     episodeId: 'episodeId',
@@ -20706,6 +21950,7 @@ export namespace Prisma {
     tasks?: TaskListRelationFilter
     importantAlerts?: ImportantAlertListRelationFilter
     gfrRecords?: GfrRecordListRelationFilter
+    labReports?: LabReportListRelationFilter
     studyReports?: StudyReportListRelationFilter
     viralSerologies?: ViralSerologyListRelationFilter
     vascularAccesses?: VascularAccessListRelationFilter
@@ -20737,6 +21982,7 @@ export namespace Prisma {
     tasks?: TaskOrderByRelationAggregateInput
     importantAlerts?: ImportantAlertOrderByRelationAggregateInput
     gfrRecords?: GfrRecordOrderByRelationAggregateInput
+    labReports?: LabReportOrderByRelationAggregateInput
     studyReports?: StudyReportOrderByRelationAggregateInput
     viralSerologies?: ViralSerologyOrderByRelationAggregateInput
     vascularAccesses?: VascularAccessOrderByRelationAggregateInput
@@ -20771,6 +22017,7 @@ export namespace Prisma {
     tasks?: TaskListRelationFilter
     importantAlerts?: ImportantAlertListRelationFilter
     gfrRecords?: GfrRecordListRelationFilter
+    labReports?: LabReportListRelationFilter
     studyReports?: StudyReportListRelationFilter
     viralSerologies?: ViralSerologyListRelationFilter
     vascularAccesses?: VascularAccessListRelationFilter
@@ -21010,6 +22257,76 @@ export namespace Prisma {
     value?: FloatWithAggregatesFilter<"GfrRecord"> | number
     recordedBy?: StringWithAggregatesFilter<"GfrRecord"> | string
     createdAt?: DateTimeWithAggregatesFilter<"GfrRecord"> | Date | string
+  }
+
+  export type LabReportWhereInput = {
+    AND?: LabReportWhereInput | LabReportWhereInput[]
+    OR?: LabReportWhereInput[]
+    NOT?: LabReportWhereInput | LabReportWhereInput[]
+    id?: StringFilter<"LabReport"> | string
+    episodeId?: StringFilter<"LabReport"> | string
+    category?: StringFilter<"LabReport"> | string
+    testName?: StringFilter<"LabReport"> | string
+    sampleDate?: DateTimeNullableFilter<"LabReport"> | Date | string | null
+    result?: StringFilter<"LabReport"> | string
+    createdBy?: StringFilter<"LabReport"> | string
+    createdAt?: DateTimeFilter<"LabReport"> | Date | string
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+  }
+
+  export type LabReportOrderByWithRelationInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    category?: SortOrder
+    testName?: SortOrder
+    sampleDate?: SortOrderInput | SortOrder
+    result?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    episode?: EpisodeOrderByWithRelationInput
+  }
+
+  export type LabReportWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: LabReportWhereInput | LabReportWhereInput[]
+    OR?: LabReportWhereInput[]
+    NOT?: LabReportWhereInput | LabReportWhereInput[]
+    episodeId?: StringFilter<"LabReport"> | string
+    category?: StringFilter<"LabReport"> | string
+    testName?: StringFilter<"LabReport"> | string
+    sampleDate?: DateTimeNullableFilter<"LabReport"> | Date | string | null
+    result?: StringFilter<"LabReport"> | string
+    createdBy?: StringFilter<"LabReport"> | string
+    createdAt?: DateTimeFilter<"LabReport"> | Date | string
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+  }, "id">
+
+  export type LabReportOrderByWithAggregationInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    category?: SortOrder
+    testName?: SortOrder
+    sampleDate?: SortOrderInput | SortOrder
+    result?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    _count?: LabReportCountOrderByAggregateInput
+    _max?: LabReportMaxOrderByAggregateInput
+    _min?: LabReportMinOrderByAggregateInput
+  }
+
+  export type LabReportScalarWhereWithAggregatesInput = {
+    AND?: LabReportScalarWhereWithAggregatesInput | LabReportScalarWhereWithAggregatesInput[]
+    OR?: LabReportScalarWhereWithAggregatesInput[]
+    NOT?: LabReportScalarWhereWithAggregatesInput | LabReportScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"LabReport"> | string
+    episodeId?: StringWithAggregatesFilter<"LabReport"> | string
+    category?: StringWithAggregatesFilter<"LabReport"> | string
+    testName?: StringWithAggregatesFilter<"LabReport"> | string
+    sampleDate?: DateTimeNullableWithAggregatesFilter<"LabReport"> | Date | string | null
+    result?: StringWithAggregatesFilter<"LabReport"> | string
+    createdBy?: StringWithAggregatesFilter<"LabReport"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"LabReport"> | Date | string
   }
 
   export type StudyReportWhereInput = {
@@ -22021,6 +23338,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -22050,6 +23368,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -22079,6 +23398,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -22108,6 +23428,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -22365,6 +23686,82 @@ export namespace Prisma {
     episodeId?: StringFieldUpdateOperationsInput | string
     value?: FloatFieldUpdateOperationsInput | number
     recordedBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabReportCreateInput = {
+    id?: string
+    category: string
+    testName: string
+    sampleDate?: Date | string | null
+    result: string
+    createdBy: string
+    createdAt?: Date | string
+    episode: EpisodeCreateNestedOneWithoutLabReportsInput
+  }
+
+  export type LabReportUncheckedCreateInput = {
+    id?: string
+    episodeId: string
+    category: string
+    testName: string
+    sampleDate?: Date | string | null
+    result: string
+    createdBy: string
+    createdAt?: Date | string
+  }
+
+  export type LabReportUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    testName?: StringFieldUpdateOperationsInput | string
+    sampleDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episode?: EpisodeUpdateOneRequiredWithoutLabReportsNestedInput
+  }
+
+  export type LabReportUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    testName?: StringFieldUpdateOperationsInput | string
+    sampleDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabReportCreateManyInput = {
+    id?: string
+    episodeId: string
+    category: string
+    testName: string
+    sampleDate?: Date | string | null
+    result: string
+    createdBy: string
+    createdAt?: Date | string
+  }
+
+  export type LabReportUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    testName?: StringFieldUpdateOperationsInput | string
+    sampleDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabReportUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    testName?: StringFieldUpdateOperationsInput | string
+    sampleDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -23570,6 +24967,12 @@ export namespace Prisma {
     none?: GfrRecordWhereInput
   }
 
+  export type LabReportListRelationFilter = {
+    every?: LabReportWhereInput
+    some?: LabReportWhereInput
+    none?: LabReportWhereInput
+  }
+
   export type StudyReportListRelationFilter = {
     every?: StudyReportWhereInput
     some?: StudyReportWhereInput
@@ -23603,6 +25006,10 @@ export namespace Prisma {
   }
 
   export type GfrRecordOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type LabReportOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -23796,6 +25203,39 @@ export namespace Prisma {
     _sum?: NestedFloatFilter<$PrismaModel>
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type LabReportCountOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    category?: SortOrder
+    testName?: SortOrder
+    sampleDate?: SortOrder
+    result?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type LabReportMaxOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    category?: SortOrder
+    testName?: SortOrder
+    sampleDate?: SortOrder
+    result?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type LabReportMinOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    category?: SortOrder
+    testName?: SortOrder
+    sampleDate?: SortOrder
+    result?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type StudyReportCountOrderByAggregateInput = {
@@ -24528,6 +25968,13 @@ export namespace Prisma {
     connect?: GfrRecordWhereUniqueInput | GfrRecordWhereUniqueInput[]
   }
 
+  export type LabReportCreateNestedManyWithoutEpisodeInput = {
+    create?: XOR<LabReportCreateWithoutEpisodeInput, LabReportUncheckedCreateWithoutEpisodeInput> | LabReportCreateWithoutEpisodeInput[] | LabReportUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: LabReportCreateOrConnectWithoutEpisodeInput | LabReportCreateOrConnectWithoutEpisodeInput[]
+    createMany?: LabReportCreateManyEpisodeInputEnvelope
+    connect?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+  }
+
   export type StudyReportCreateNestedManyWithoutEpisodeInput = {
     create?: XOR<StudyReportCreateWithoutEpisodeInput, StudyReportUncheckedCreateWithoutEpisodeInput> | StudyReportCreateWithoutEpisodeInput[] | StudyReportUncheckedCreateWithoutEpisodeInput[]
     connectOrCreate?: StudyReportCreateOrConnectWithoutEpisodeInput | StudyReportCreateOrConnectWithoutEpisodeInput[]
@@ -24596,6 +26043,13 @@ export namespace Prisma {
     connectOrCreate?: GfrRecordCreateOrConnectWithoutEpisodeInput | GfrRecordCreateOrConnectWithoutEpisodeInput[]
     createMany?: GfrRecordCreateManyEpisodeInputEnvelope
     connect?: GfrRecordWhereUniqueInput | GfrRecordWhereUniqueInput[]
+  }
+
+  export type LabReportUncheckedCreateNestedManyWithoutEpisodeInput = {
+    create?: XOR<LabReportCreateWithoutEpisodeInput, LabReportUncheckedCreateWithoutEpisodeInput> | LabReportCreateWithoutEpisodeInput[] | LabReportUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: LabReportCreateOrConnectWithoutEpisodeInput | LabReportCreateOrConnectWithoutEpisodeInput[]
+    createMany?: LabReportCreateManyEpisodeInputEnvelope
+    connect?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
   }
 
   export type StudyReportUncheckedCreateNestedManyWithoutEpisodeInput = {
@@ -24733,6 +26187,20 @@ export namespace Prisma {
     update?: GfrRecordUpdateWithWhereUniqueWithoutEpisodeInput | GfrRecordUpdateWithWhereUniqueWithoutEpisodeInput[]
     updateMany?: GfrRecordUpdateManyWithWhereWithoutEpisodeInput | GfrRecordUpdateManyWithWhereWithoutEpisodeInput[]
     deleteMany?: GfrRecordScalarWhereInput | GfrRecordScalarWhereInput[]
+  }
+
+  export type LabReportUpdateManyWithoutEpisodeNestedInput = {
+    create?: XOR<LabReportCreateWithoutEpisodeInput, LabReportUncheckedCreateWithoutEpisodeInput> | LabReportCreateWithoutEpisodeInput[] | LabReportUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: LabReportCreateOrConnectWithoutEpisodeInput | LabReportCreateOrConnectWithoutEpisodeInput[]
+    upsert?: LabReportUpsertWithWhereUniqueWithoutEpisodeInput | LabReportUpsertWithWhereUniqueWithoutEpisodeInput[]
+    createMany?: LabReportCreateManyEpisodeInputEnvelope
+    set?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+    disconnect?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+    delete?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+    connect?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+    update?: LabReportUpdateWithWhereUniqueWithoutEpisodeInput | LabReportUpdateWithWhereUniqueWithoutEpisodeInput[]
+    updateMany?: LabReportUpdateManyWithWhereWithoutEpisodeInput | LabReportUpdateManyWithWhereWithoutEpisodeInput[]
+    deleteMany?: LabReportScalarWhereInput | LabReportScalarWhereInput[]
   }
 
   export type StudyReportUpdateManyWithoutEpisodeNestedInput = {
@@ -24875,6 +26343,20 @@ export namespace Prisma {
     deleteMany?: GfrRecordScalarWhereInput | GfrRecordScalarWhereInput[]
   }
 
+  export type LabReportUncheckedUpdateManyWithoutEpisodeNestedInput = {
+    create?: XOR<LabReportCreateWithoutEpisodeInput, LabReportUncheckedCreateWithoutEpisodeInput> | LabReportCreateWithoutEpisodeInput[] | LabReportUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: LabReportCreateOrConnectWithoutEpisodeInput | LabReportCreateOrConnectWithoutEpisodeInput[]
+    upsert?: LabReportUpsertWithWhereUniqueWithoutEpisodeInput | LabReportUpsertWithWhereUniqueWithoutEpisodeInput[]
+    createMany?: LabReportCreateManyEpisodeInputEnvelope
+    set?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+    disconnect?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+    delete?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+    connect?: LabReportWhereUniqueInput | LabReportWhereUniqueInput[]
+    update?: LabReportUpdateWithWhereUniqueWithoutEpisodeInput | LabReportUpdateWithWhereUniqueWithoutEpisodeInput[]
+    updateMany?: LabReportUpdateManyWithWhereWithoutEpisodeInput | LabReportUpdateManyWithWhereWithoutEpisodeInput[]
+    deleteMany?: LabReportScalarWhereInput | LabReportScalarWhereInput[]
+  }
+
   export type StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput = {
     create?: XOR<StudyReportCreateWithoutEpisodeInput, StudyReportUncheckedCreateWithoutEpisodeInput> | StudyReportCreateWithoutEpisodeInput[] | StudyReportUncheckedCreateWithoutEpisodeInput[]
     connectOrCreate?: StudyReportCreateOrConnectWithoutEpisodeInput | StudyReportCreateOrConnectWithoutEpisodeInput[]
@@ -24965,6 +26447,20 @@ export namespace Prisma {
     upsert?: EpisodeUpsertWithoutGfrRecordsInput
     connect?: EpisodeWhereUniqueInput
     update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutGfrRecordsInput, EpisodeUpdateWithoutGfrRecordsInput>, EpisodeUncheckedUpdateWithoutGfrRecordsInput>
+  }
+
+  export type EpisodeCreateNestedOneWithoutLabReportsInput = {
+    create?: XOR<EpisodeCreateWithoutLabReportsInput, EpisodeUncheckedCreateWithoutLabReportsInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutLabReportsInput
+    connect?: EpisodeWhereUniqueInput
+  }
+
+  export type EpisodeUpdateOneRequiredWithoutLabReportsNestedInput = {
+    create?: XOR<EpisodeCreateWithoutLabReportsInput, EpisodeUncheckedCreateWithoutLabReportsInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutLabReportsInput
+    upsert?: EpisodeUpsertWithoutLabReportsInput
+    connect?: EpisodeWhereUniqueInput
+    update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutLabReportsInput, EpisodeUpdateWithoutLabReportsInput>, EpisodeUncheckedUpdateWithoutLabReportsInput>
   }
 
   export type EpisodeCreateNestedOneWithoutStudyReportsInput = {
@@ -25491,6 +26987,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -25519,6 +27016,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -25702,6 +27200,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -25730,6 +27229,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -26242,6 +27742,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type LabReportCreateWithoutEpisodeInput = {
+    id?: string
+    category: string
+    testName: string
+    sampleDate?: Date | string | null
+    result: string
+    createdBy: string
+    createdAt?: Date | string
+  }
+
+  export type LabReportUncheckedCreateWithoutEpisodeInput = {
+    id?: string
+    category: string
+    testName: string
+    sampleDate?: Date | string | null
+    result: string
+    createdBy: string
+    createdAt?: Date | string
+  }
+
+  export type LabReportCreateOrConnectWithoutEpisodeInput = {
+    where: LabReportWhereUniqueInput
+    create: XOR<LabReportCreateWithoutEpisodeInput, LabReportUncheckedCreateWithoutEpisodeInput>
+  }
+
+  export type LabReportCreateManyEpisodeInputEnvelope = {
+    data: LabReportCreateManyEpisodeInput | LabReportCreateManyEpisodeInput[]
+    skipDuplicates?: boolean
+  }
+
   export type StudyReportCreateWithoutEpisodeInput = {
     id?: string
     studyType: string
@@ -26618,6 +28148,36 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"GfrRecord"> | Date | string
   }
 
+  export type LabReportUpsertWithWhereUniqueWithoutEpisodeInput = {
+    where: LabReportWhereUniqueInput
+    update: XOR<LabReportUpdateWithoutEpisodeInput, LabReportUncheckedUpdateWithoutEpisodeInput>
+    create: XOR<LabReportCreateWithoutEpisodeInput, LabReportUncheckedCreateWithoutEpisodeInput>
+  }
+
+  export type LabReportUpdateWithWhereUniqueWithoutEpisodeInput = {
+    where: LabReportWhereUniqueInput
+    data: XOR<LabReportUpdateWithoutEpisodeInput, LabReportUncheckedUpdateWithoutEpisodeInput>
+  }
+
+  export type LabReportUpdateManyWithWhereWithoutEpisodeInput = {
+    where: LabReportScalarWhereInput
+    data: XOR<LabReportUpdateManyMutationInput, LabReportUncheckedUpdateManyWithoutEpisodeInput>
+  }
+
+  export type LabReportScalarWhereInput = {
+    AND?: LabReportScalarWhereInput | LabReportScalarWhereInput[]
+    OR?: LabReportScalarWhereInput[]
+    NOT?: LabReportScalarWhereInput | LabReportScalarWhereInput[]
+    id?: StringFilter<"LabReport"> | string
+    episodeId?: StringFilter<"LabReport"> | string
+    category?: StringFilter<"LabReport"> | string
+    testName?: StringFilter<"LabReport"> | string
+    sampleDate?: DateTimeNullableFilter<"LabReport"> | Date | string | null
+    result?: StringFilter<"LabReport"> | string
+    createdBy?: StringFilter<"LabReport"> | string
+    createdAt?: DateTimeFilter<"LabReport"> | Date | string
+  }
+
   export type StudyReportUpsertWithWhereUniqueWithoutEpisodeInput = {
     where: StudyReportWhereUniqueInput
     update: XOR<StudyReportUpdateWithoutEpisodeInput, StudyReportUncheckedUpdateWithoutEpisodeInput>
@@ -26806,6 +28366,7 @@ export namespace Prisma {
     responsible?: UserCreateNestedOneWithoutEpisodesAtChargeInput
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -26834,6 +28395,7 @@ export namespace Prisma {
     handoffs?: HandoffUncheckedCreateNestedManyWithoutEpisodeInput
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -26878,6 +28440,7 @@ export namespace Prisma {
     responsible?: UserUpdateOneWithoutEpisodesAtChargeNestedInput
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -26906,6 +28469,7 @@ export namespace Prisma {
     handoffs?: HandoffUncheckedUpdateManyWithoutEpisodeNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -26934,6 +28498,7 @@ export namespace Prisma {
     responsible?: UserCreateNestedOneWithoutEpisodesAtChargeInput
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -26962,6 +28527,7 @@ export namespace Prisma {
     handoffs?: HandoffUncheckedCreateNestedManyWithoutEpisodeInput
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -27006,6 +28572,7 @@ export namespace Prisma {
     responsible?: UserUpdateOneWithoutEpisodesAtChargeNestedInput
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -27034,6 +28601,139 @@ export namespace Prisma {
     handoffs?: HandoffUncheckedUpdateManyWithoutEpisodeNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
+    studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
+    viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
+    vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeCreateWithoutLabReportsInput = {
+    id?: string
+    admissionDate?: Date | string
+    admissionType: string
+    chiefComplaint?: string | null
+    status?: string
+    room?: string | null
+    bed?: string | null
+    attendingDoctor?: string | null
+    admittingDoctor?: string | null
+    primaryDiagnosis?: string | null
+    secondaryDiagnoses?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    responsibleSince?: Date | string | null
+    patient: PatientCreateNestedOneWithoutEpisodesInput
+    allergies?: AllergyCreateNestedManyWithoutEpisodeInput
+    notes?: NoteCreateNestedManyWithoutEpisodeInput
+    vitals?: VitalSignCreateNestedManyWithoutEpisodeInput
+    handoffs?: HandoffCreateNestedManyWithoutEpisodeInput
+    responsible?: UserCreateNestedOneWithoutEpisodesAtChargeInput
+    tasks?: TaskCreateNestedManyWithoutEpisodeInput
+    importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
+    gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
+    viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
+    vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeUncheckedCreateWithoutLabReportsInput = {
+    id?: string
+    patientId: string
+    admissionDate?: Date | string
+    admissionType: string
+    chiefComplaint?: string | null
+    status?: string
+    room?: string | null
+    bed?: string | null
+    attendingDoctor?: string | null
+    admittingDoctor?: string | null
+    primaryDiagnosis?: string | null
+    secondaryDiagnoses?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    responsibleId?: string | null
+    responsibleSince?: Date | string | null
+    allergies?: AllergyUncheckedCreateNestedManyWithoutEpisodeInput
+    notes?: NoteUncheckedCreateNestedManyWithoutEpisodeInput
+    vitals?: VitalSignUncheckedCreateNestedManyWithoutEpisodeInput
+    handoffs?: HandoffUncheckedCreateNestedManyWithoutEpisodeInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
+    importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
+    gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
+    viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
+    vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeCreateOrConnectWithoutLabReportsInput = {
+    where: EpisodeWhereUniqueInput
+    create: XOR<EpisodeCreateWithoutLabReportsInput, EpisodeUncheckedCreateWithoutLabReportsInput>
+  }
+
+  export type EpisodeUpsertWithoutLabReportsInput = {
+    update: XOR<EpisodeUpdateWithoutLabReportsInput, EpisodeUncheckedUpdateWithoutLabReportsInput>
+    create: XOR<EpisodeCreateWithoutLabReportsInput, EpisodeUncheckedCreateWithoutLabReportsInput>
+    where?: EpisodeWhereInput
+  }
+
+  export type EpisodeUpdateToOneWithWhereWithoutLabReportsInput = {
+    where?: EpisodeWhereInput
+    data: XOR<EpisodeUpdateWithoutLabReportsInput, EpisodeUncheckedUpdateWithoutLabReportsInput>
+  }
+
+  export type EpisodeUpdateWithoutLabReportsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    admissionType?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    bed?: NullableStringFieldUpdateOperationsInput | string | null
+    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    patient?: PatientUpdateOneRequiredWithoutEpisodesNestedInput
+    allergies?: AllergyUpdateManyWithoutEpisodeNestedInput
+    notes?: NoteUpdateManyWithoutEpisodeNestedInput
+    vitals?: VitalSignUpdateManyWithoutEpisodeNestedInput
+    handoffs?: HandoffUpdateManyWithoutEpisodeNestedInput
+    responsible?: UserUpdateOneWithoutEpisodesAtChargeNestedInput
+    tasks?: TaskUpdateManyWithoutEpisodeNestedInput
+    importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
+    gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
+    viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
+    vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeUncheckedUpdateWithoutLabReportsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    admissionType?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    bed?: NullableStringFieldUpdateOperationsInput | string | null
+    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergies?: AllergyUncheckedUpdateManyWithoutEpisodeNestedInput
+    notes?: NoteUncheckedUpdateManyWithoutEpisodeNestedInput
+    vitals?: VitalSignUncheckedUpdateManyWithoutEpisodeNestedInput
+    handoffs?: HandoffUncheckedUpdateManyWithoutEpisodeNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
+    importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
+    gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -27063,6 +28763,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
   }
@@ -27091,6 +28792,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
   }
@@ -27135,6 +28837,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
   }
@@ -27163,6 +28866,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
   }
@@ -27232,6 +28936,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
   }
@@ -27260,6 +28965,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
   }
@@ -27351,6 +29057,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
   }
@@ -27379,6 +29086,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
   }
@@ -27407,6 +29115,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
   }
@@ -27435,6 +29144,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
   }
@@ -27479,6 +29189,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
   }
@@ -27507,6 +29218,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
   }
@@ -27575,6 +29287,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -27603,6 +29316,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -27694,6 +29408,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -27722,6 +29437,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -27750,6 +29466,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -27778,6 +29495,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -27822,6 +29540,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -27850,6 +29569,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -27878,6 +29598,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -27906,6 +29627,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -27950,6 +29672,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -27978,6 +29701,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -28006,6 +29730,7 @@ export namespace Prisma {
     tasks?: TaskCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -28034,6 +29759,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -28078,6 +29804,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -28106,6 +29833,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -28134,6 +29862,7 @@ export namespace Prisma {
     responsible?: UserCreateNestedOneWithoutEpisodesAtChargeInput
     importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
@@ -28162,6 +29891,7 @@ export namespace Prisma {
     handoffs?: HandoffUncheckedCreateNestedManyWithoutEpisodeInput
     importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
     gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
@@ -28206,6 +29936,7 @@ export namespace Prisma {
     responsible?: UserUpdateOneWithoutEpisodesAtChargeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -28234,6 +29965,7 @@ export namespace Prisma {
     handoffs?: HandoffUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -28356,6 +30088,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -28384,6 +30117,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -28469,6 +30203,7 @@ export namespace Prisma {
     tasks?: TaskUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
@@ -28497,6 +30232,7 @@ export namespace Prisma {
     tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
     importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
     gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -28658,6 +30394,16 @@ export namespace Prisma {
     id?: string
     value: number
     recordedBy: string
+    createdAt?: Date | string
+  }
+
+  export type LabReportCreateManyEpisodeInput = {
+    id?: string
+    category: string
+    testName: string
+    sampleDate?: Date | string | null
+    result: string
+    createdBy: string
     createdAt?: Date | string
   }
 
@@ -28922,6 +30668,36 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     value?: FloatFieldUpdateOperationsInput | number
     recordedBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabReportUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    testName?: StringFieldUpdateOperationsInput | string
+    sampleDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabReportUncheckedUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    testName?: StringFieldUpdateOperationsInput | string
+    sampleDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabReportUncheckedUpdateManyWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    testName?: StringFieldUpdateOperationsInput | string
+    sampleDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

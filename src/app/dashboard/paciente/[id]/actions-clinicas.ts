@@ -142,7 +142,51 @@ export async function registrarTFG(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// ─── 4. REPORTES DE ESTUDIOS ───
+// ─── 4. REPORTES DE LABORATORIO Y ANALÍTICAS (NUEVO) ───
+export async function guardarReporteLaboratorio(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const testName = String(formData.get('testName') ?? '').trim()
+  const customTest = String(formData.get('customTest') ?? '').trim()
+  const category = String(formData.get('category') ?? 'Laboratorio').trim()
+  const fechaStr = String(formData.get('sampleDate') ?? '').trim()
+  const result = String(formData.get('result') ?? '').trim()
+
+  const nombreFinal = testName === 'OTRO' ? customTest : testName
+
+  if (!nombreFinal) volverAlExpediente(episodeId, 'Selecciona o escribe el nombre de la analítica')
+  if (!result) volverAlExpediente(episodeId, 'Escribe el resultado de la analítica')
+
+  const sampleDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
+
+  const reporte = await prisma.labReport.create({
+    data: {
+      episodeId,
+      category,
+      testName: nombreFinal,
+      sampleDate,
+      result,
+      createdBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'create',
+    entity: 'lab_report',
+    entityId: reporte.id,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: { analitica: nombreFinal, categoria: category, resultado: result },
+    reason: 'Reporte de laboratorio registrado',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+// ─── 5. REPORTES DE ESTUDIOS ───
 export async function guardarReporteEstudio(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
@@ -183,7 +227,7 @@ export async function guardarReporteEstudio(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// ─── 5. MARCADORES VIRALES ───
+// ─── 6. MARCADORES VIRALES ───
 export async function guardarVirales(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
@@ -231,7 +275,7 @@ export async function guardarVirales(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// ─── 6. ACCESO VASCULAR ───
+// ─── 7. ACCESO VASCULAR ───
 export async function guardarAccesoVascular(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
@@ -275,7 +319,7 @@ export async function guardarAccesoVascular(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// ─── 7. TIPIFICACIÓN SANGUÍNEA (GRUPO Y RH) ───
+// ─── 8. TIPIFICACIÓN SANGUÍNEA ───
 export async function guardarTipificacion(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
@@ -307,7 +351,7 @@ export async function guardarTipificacion(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// ─── 8. CAMBIAR HABITACIÓN / CAMA (REUBICACIÓN DEL PX) ───
+// ─── 9. CAMBIAR HABITACIÓN / CAMA ───
 export async function cambiarUbicacion(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, episode } = await exigirPermiso(episodeId, 'registrar')
@@ -317,7 +361,6 @@ export async function cambiarUbicacion(formData: FormData): Promise<void> {
 
   if (!room || !bed) volverAlExpediente(episodeId, 'Debe indicar habitación y cama')
 
-  // Consultamos los datos anteriores de forma segura y tipada
   const previo = await prisma.episode.findUnique({
     where: { id: episodeId },
     select: { room: true, bed: true },

@@ -215,6 +215,17 @@ exports.Prisma.GfrRecordScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.LabReportScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  category: 'category',
+  testName: 'testName',
+  sampleDate: 'sampleDate',
+  result: 'result',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.StudyReportScalarFieldEnum = {
   id: 'id',
   episodeId: 'episodeId',
@@ -363,6 +374,7 @@ exports.Prisma.ModelName = {
   MedicalHistory: 'MedicalHistory',
   ImportantAlert: 'ImportantAlert',
   GfrRecord: 'GfrRecord',
+  LabReport: 'LabReport',
   StudyReport: 'StudyReport',
   ViralSerology: 'ViralSerology',
   VascularAccess: 'VascularAccess',
