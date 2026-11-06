@@ -23,6 +23,119 @@ const ETIQUETA_ROL: Record<string, string> = {
   READONLY: 'Lectura',
 }
 
+const CATALOGO_LAB: Record<string, string[]> = {
+  'I- HEMATOLOGÍA': [
+    'Hemograma Completo',
+    'Recuento de Plaquetas',
+    'Tiempo de Protrombina (TP)',
+    'Tiempo Parcial de Tromboplastina (TPT)',
+    'Tiempo de Sangría',
+    'Tiempo de Coagulación',
+    'Tipificación y RH',
+    'Test de Coombs Directo-Indirecto',
+    'Conteo total de Eosinófilos',
+    'Conteo de Reticulocitos',
+    'Eritrosedimentación (VSG)',
+    'Investigación de Hematozoarios (Gota Gruesa)',
+    'Investigación de Filarias',
+    'Fragilidad Globular',
+    'Inv. Células Falciformes (Falcia)',
+    'Inv. de Células L.E.',
+    'Electroforesis de Hemoglobina',
+  ],
+  'II- UROANÁLISIS': [
+    'Examen de Orina Completo',
+    'Proteína en Orina de 24 Horas',
+    'Depuración Endógena de Creatinina (DCE)',
+    'Gravindex (HCG Orina)',
+  ],
+  'III- CULTIVOS Y BACTERIOLOGÍA': [
+    'Urocultivo',
+    'Hemocultivo',
+    'Coprocultivo',
+    'Cultivo de Secreción de Absceso',
+    'Cultivo de Secreción de Úlcera',
+    'Cultivo de Secreción de Fístula',
+    'Cultivo de Secreción de Esputo',
+    'Cultivo de Secreción Faríngea',
+    'Cultivo de Secreción Ótica',
+    'Cultivo de Secreción Ocular',
+    'Cultivo de Secreción Ganglionar',
+    'Cultivo de Secreción Endocervical',
+    'Cultivo de Secreción Intraabdominal',
+    'Cultivo de LCR',
+    'Extendido de Secreción Vaginal',
+    'Extendido de Secreción Uretral',
+    'Conteo de Eosinófilos en Ext. Mucoso',
+    'Baciloscopia (BAAR)',
+    'BK - Orina 24 Horas',
+  ],
+  'IV- PARASITOLOGÍA Y LÍQUIDOS': [
+    'Coprológico',
+    'Investigación Sangre Oculta en Heces',
+    'Investigación de Amebas',
+    'Investigación de Leishmania',
+    'Investigación Disacáridos en Heces',
+    'Prueba de Digestión en Heces',
+    'Citoquímico de Líquido Biológico',
+  ],
+  'VI- QUÍMICA SANGUÍNEA': [
+    'Creatinina',
+    'Nitrógeno Ureico (BUN)',
+    'Glicemia en Ayunas',
+    'Glicemia Post Prandial',
+    'Hb Glicosilada (HbA1c)',
+    'Curva Tolerancia a la Glucosa',
+    'Electrolitos Séricos (Na, K, Cl)',
+    'Calcio',
+    'Fósforo',
+    'Cloro',
+    'Gasometría Arterial',
+    'Ácido Úrico',
+    'Colesterol Total',
+    'Colesterol HDL y LDL',
+    'Triglicéridos',
+    'Transaminasas (AST / SGOT)',
+    'Transaminasas (ALT / SGPT)',
+    'Bilirrubina Total y Fraccionada (D-I-T)',
+    'Fosfatasa Alcalina',
+    'Fosfatasa Ácida',
+    'Amilasa Sérica',
+    'Lipasa Sérica',
+    'Proteínas Totales y Fraccionadas',
+    'L.D.H.',
+    'C.P.K. Total',
+    'CK-MB',
+    'Troponinas Cualí-Cuantitativa',
+    'PSA Libre - Total',
+    'Electroforesis de Proteína',
+  ],
+  'VII- SEROLOGÍA E INMUNOLOGÍA': [
+    'HIV I-II',
+    'HBsAg (Hepatitis B)',
+    'HCV (Hepatitis C)',
+    'V.D.R.L.',
+    'F.T.A. - A.B.S.',
+    'F.T.A. en L.C.R.',
+    'TSH',
+    'T-3',
+    'T-4',
+    'T-4 Libre',
+    'Proteína C Reactiva (PCR)',
+    'Factor Reumatoide',
+    'Antiestreptolisina O (ASO)',
+    'Streptozime',
+    'Detección Anticuerpos Antinucleares (ANA)',
+    'Anti D.N.A.',
+    'Inmunoglobulinas (IgG - IgA - IgM)',
+    'Antígenos Febriles',
+    'Dengue IgG / IgM',
+    'Inv. de Toxoplasmosis (anti IgG / IgM)',
+    'Helicobacter pylori',
+    'Leptospira',
+  ],
+}
+
 const GRUPOS_LAB = [
   { id: 'HEMATOLOGÍA', icono: '🩸', titulo: 'Hematología' },
   { id: 'QUÍMICA SANGUÍNEA', icono: '🧪', titulo: 'Química Sanguínea' },
@@ -59,7 +172,7 @@ export function ReportesLaboratorio({
 }) {
   const [busqueda, setBusqueda] = useState('')
   const [abiertos, setAbiertos] = useState<Record<string, boolean>>({
-    HEMATOLOGÍA: true, // Abierto por defecto para revisión rápida
+    HEMATOLOGÍA: true,
     'QUÍMICA SANGUÍNEA': true,
   })
 
@@ -81,7 +194,6 @@ export function ReportesLaboratorio({
     }
   }
 
-  // Filtrado en tiempo real con la barra de búsqueda
   const filtrados = useMemo(() => {
     if (!busqueda.trim()) return reportes
     const q = busqueda.toLowerCase().trim()
@@ -93,7 +205,6 @@ export function ReportesLaboratorio({
     )
   }, [reportes, busqueda])
 
-  // Agrupación de los análisis filtrados por categoría
   const gruposConDatos = useMemo(() => {
     const mapa: Record<string, ReporteLab[]> = {}
     filtrados.forEach((r) => {
@@ -108,7 +219,6 @@ export function ReportesLaboratorio({
 
   return (
     <div className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-200">
-      {/* CABECERA CON LUPA DE BÚSQUEDA SIEMPRE VISIBLE */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3 mb-3">
         <div className="flex items-center gap-2">
           <span className="text-xl">🧪</span>
@@ -118,7 +228,6 @@ export function ReportesLaboratorio({
           </span>
         </div>
 
-        {/* LUPA Y BUSCADOR COMPACTO */}
         <div className="relative w-full sm:w-64">
           <input
             type="text"
@@ -139,7 +248,6 @@ export function ReportesLaboratorio({
         </div>
       </div>
 
-      {/* LISTA COMPACTA EN DESPLEGABLES AGRUPADOS (ACORDEÓN) */}
       {reportes.length === 0 ? (
         <p className="text-xs text-slate-400 py-3 italic text-center">
           No hay analíticas de laboratorio registradas en este paciente.
@@ -154,12 +262,10 @@ export function ReportesLaboratorio({
             const items = gruposConDatos[g.id]
             if (!items || items.length === 0) return null
 
-            // Si hay búsqueda activa, se mantiene abierto automáticamente
             const estaAbierto = hayBusqueda || !!abiertos[g.id]
 
             return (
               <div key={g.id} className="border border-slate-200 rounded-lg overflow-hidden">
-                {/* RENGLÓN PRINCIPAL DEL GRUPO (BOTÓN DESPLEGABLE) */}
                 <button
                   type="button"
                   onClick={() => toggleGrupo(g.id)}
@@ -170,7 +276,7 @@ export function ReportesLaboratorio({
                     <strong className="text-xs font-bold text-slate-800 uppercase tracking-wider truncate">
                       {g.titulo}
                     </strong>
-                    <span className="text-[11px] font-bold px-2 py-0.2 rounded-full bg-white text-slate-600 border border-slate-200 shadow-2xs">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200">
                       {items.length}
                     </span>
                   </div>
@@ -180,7 +286,6 @@ export function ReportesLaboratorio({
                   </span>
                 </button>
 
-                {/* CONTENIDO DESPLEGADO COMPACTO */}
                 {estaAbierto && (
                   <div className="border-t border-slate-200 divide-y divide-slate-100 bg-white">
                     {items.map((rep) => (
@@ -188,7 +293,6 @@ export function ReportesLaboratorio({
                         key={rep.id}
                         className="p-2.5 sm:px-4 sm:py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 hover:bg-slate-50/80 transition-colors text-xs"
                       >
-                        {/* Nombre del análisis */}
                         <div className="sm:w-2/5 min-w-0">
                           <strong className="text-slate-800 font-semibold">{rep.testName}</strong>
                           {rep.sampleDate && (
@@ -203,16 +307,14 @@ export function ReportesLaboratorio({
                           )}
                         </div>
 
-                        {/* Resultado en fuente monoespaciada */}
-                        <div className="sm:w-2/5 font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200/80 rounded px-2.5 py-1 text-xs whitespace-pre-line">
+                        <div className="sm:w-2/5 font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-xs whitespace-pre-line">
                           {rep.result}
                         </div>
 
-                        {/* Quién registró */}
                         <div className="sm:w-1/5 text-right text-[11px] text-slate-500 whitespace-nowrap shrink-0">
                           <span>{nombres[rep.createdBy] ?? rep.createdBy}</span>
                           {roles[rep.createdBy] && (
-                            <span className="ml-1 text-[10px] bg-slate-100 text-slate-600 px-1 py-0.2 rounded border font-semibold">
+                            <span className="ml-1 text-[10px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded border font-semibold">
                               {ETIQUETA_ROL[roles[rep.createdBy]] ?? roles[rep.createdBy]}
                             </span>
                           )}
@@ -227,7 +329,6 @@ export function ReportesLaboratorio({
         </div>
       )}
 
-      {/* BOTÓN COLAPSADO PARA REGISTRAR NUEVA ANALÍTICA */}
       {puedeRegistrar && (
         <div className="pt-2 border-t">
           {!formAbierto ? (
@@ -279,123 +380,15 @@ export function ReportesLaboratorio({
                       className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                     >
                       <option value="">Seleccione un análisis...</option>
-
-                      <optgroup label="I- HEMATOLOGÍA">
-                        <option value="Hemograma Completo">Hemograma Completo</option>
-                        <option value="Recuento de Plaquetas">Recuento de Plaquetas</option>
-                        <option value="Tiempo de Protrombina (TP)">Tiempo de Protrombina (TP)</option>
-                        <option value="Tiempo Parcial de Tromboplastina (TPT)">Tiempo Parcial de Tromboplastina (TPT)</option>
-                        <option value="Tiempo de Sangría">Tiempo de Sangría</option>
-                        <option value="Tiempo de Coagulación">Tiempo de Coagulación</option>
-                        <option value="Tipificación y RH">Tipificación y RH</option>
-                        <option value="Test de Coombs Directo-Indirecto">Test de Coombs Directo-Indirecto</option>
-                        <option value="Conteo total de Eosinófilos">Conteo total de Eosinófilos</option>
-                        <option value="Conteo de Reticulocitos">Conteo de Reticulocitos</option>
-                        <option value="Eritrosedimentación (VSG)">Eritrosedimentación (VSG)</option>
-                        <option value="Investigación de Hematozoarios (Gota Gruesa)">Investigación de Hematozoarios (Gota Gruesa)</option>
-                        <option value="Investigación de Filarias">Investigación de Filarias</option>
-                        <option value="Fragilidad Globular">Fragilidad Globular</option>
-                        <option value="Inv. Células Falciformes (Falcia)">Inv. Células Falciformes (Falcia)</option>
-                        <option value="Inv. de Células L.E.">Inv. de Células L.E.</option>
-                        <option value="Electroforesis de Hemoglobina">Electroforesis de Hemoglobina</option>
-                      </optgroup>
-
-                      <optgroup label="II- UROANÁLISIS">
-                        <option value="Examen de Orina Completo">Examen de Orina Completo</option>
-                        <option value="Proteína en Orina de 24 Horas">Proteína en Orina de 24 Horas</option>
-                        <option value="Depuración Endógena de Creatinina (DCE)">Depuración Endógena de Creatinina (DCE)</option>
-                        <option value="Gravindex (HCG Orina)">Gravindex (HCG Orina)</option>
-                      </optgroup>
-
-                      <optgroup label="III- CULTIVOS Y BACTERIOLOGÍA">
-                        <option value="Urocultivo">Urocultivo</option>
-                        <option value="Hemocultivo">Hemocultivo</option>
-                        <option value="Coprocultivo">Coprocultivo</option>
-                        <option value="Cultivo de Secreción de Absceso">Cultivo de Secreción de Absceso</option>
-                        <option value="Cultivo de Secreción de Úlcera">Cultivo de Secreción de Úlcera</option>
-                        <option value="Cultivo de Secreción de Fístula">Cultivo de Secreción de Fístula</option>
-                        <option value="Cultivo de Secreción de Esputo">Cultivo de Secreción de Esputo</option>
-                        <option value="Cultivo de Secreción Faríngea">Cultivo de Secreción Faríngea</option>
-                        <option value="Cultivo de Secreción Ótica">Cultivo de Secreción Ótica</option>
-                        <option value="Cultivo de Secreción Ocular">Cultivo de Secreción Ocular</option>
-                        <option value="Cultivo de Secreción Ganglionar">Cultivo de Secreción Ganglionar</option>
-                        <option value="Cultivo de Secreción Endocervical">Cultivo de Secreción Endocervical</option>
-                        <option value="Cultivo de Secreción Intraabdominal">Cultivo de Secreción Intraabdominal</option>
-                        <option value="Cultivo de LCR">Cultivo de LCR</option>
-                        <option value="Extendido de Secreción Vaginal">Extendido de Secreción Vaginal</option>
-                        <option value="Extendido de Secreción Uretral">Extendido de Secreción Uretral</option>
-                        <option value="Conteo de Eosinófilos en Ext. Mucoso">Conteo de Eosinófilos en Ext. Mucoso</option>
-                        <option value="Baciloscopia (BAAR)">Baciloscopia (BAAR)</option>
-                        <option value="BK - Orina 24 Horas">BK - Orina 24 Horas</option>
-                      </optgroup>
-
-                      <optgroup label="IV- PARASITOLOGÍA Y LÍQUIDOS">
-                        <option value="Coprológico">Coprológico</option>
-                        <option value="Investigación Sangre Oculta en Heces">Investigación Sangre Oculta en Heces</option>
-                        <option value="Investigación de Amebas">Investigación de Amebas</option>
-                        <option value="Investigación de Leishmania">Investigación de Leishmania</option>
-                        <option value="Investigación Disacáridos en Heces">Investigación Disacáridos en Heces</option>
-                        <option value="Prueba de Digestión en Heces">Prueba de Digestión en Heces</option>
-                        <option value="Citoquímico de Líquido Biológico">Citoquímico de Líquido Biológico</option>
-                      </optgroup>
-
-                      <optgroup label="VI- QUÍMICA SANGUÍNEA">
-                        <option value="Creatinina">Creatinina</option>
-                        <option value="Nitrógeno Ureico (BUN)">Nitrógeno Ureico (BUN)</option>
-                        <option value="Glicemia en Ayunas">Glicemia en Ayunas</option>
-                        <option value="Glicemia Post Prandial">Glicemia Post Prandial</option>
-                        <option value="Hb Glicosilada (HbA1c)">Hb Glicosilada (HbA1c)</option>
-                        <option value="Curva Tolerancia a la Glucosa">Curva Tolerancia a la Glucosa</option>
-                        <option value="Electrolitos Séricos (Na, K, Cl)">Electrolitos Séricos (Na, K, Cl)</option>
-                        <option value="Calcio">Calcio</option>
-                        <option value="Fósforo">Fósforo</option>
-                        <option value="Cloro">Cloro</option>
-                        <option value="Gasometría Arterial">Gasometría Arterial</option>
-                        <option value="Ácido Úrico">Ácido Úrico</option>
-                        <option value="Colesterol Total">Colesterol Total</option>
-                        <option value="Colesterol HDL y LDL">Colesterol HDL y LDL</option>
-                        <option value="Triglicéridos">Triglicéridos</option>
-                        <option value="Transaminasas (AST / SGOT)">Transaminasas (AST / SGOT)</option>
-                        <option value="Transaminasas (ALT / SGPT)">Transaminasas (ALT / SGPT)</option>
-                        <option value="Bilirrubina Total y Fraccionada (D-I-T)">Bilirrubina Total y Fraccionada (D-I-T)</option>
-                        <option value="Fosfatasa Alcalina">Fosfatasa Alcalina</option>
-                        <option value="Fosfatasa Ácida">Fosfatasa Ácida</option>
-                        <option value="Amilasa Sérica">Amilasa Sérica</option>
-                        <option value="Lipasa Sérica">Lipasa Sérica</option>
-                        <option value="Proteínas Totales y Fraccionadas">Proteínas Totales y Fraccionadas</option>
-                        <option value="L.D.H.">L.D.H.</option>
-                        <option value="C.P.K. Total">C.P.K. Total</option>
-                        <option value="CK-MB">CK-MB</option>
-                        <option value="Troponinas Cualí-Cuantitativa">Troponinas Cualí-Cuantitativa</option>
-                        <option value="PSA Libre - Total">PSA Libre - Total</option>
-                        <option value="Electroforesis de Proteína">Electroforesis de Proteína</option>
-                      </optgroup>
-
-                      <optgroup label="VII- SEROLOGÍA E INMUNOLOGÍA">
-                        <option value="HIV I-II">HIV I-II</option>
-                        <option value="HBsAg (Hepatitis B)">HBsAg (Hepatitis B)</option>
-                        <option value="HCV (Hepatitis C)">HCV (Hepatitis C)</option>
-                        <option value="V.D.R.L.">V.D.R.L.</option>
-                        <option value="F.T.A. - A.B.S.">F.T.A. - A.B.S.</option>
-                        <option value="F.T.A. en L.C.R.">F.T.A. en L.C.R.</option>
-                        <option value="TSH">TSH</option>
-                        <option value="T-3">T-3</option>
-                        <option value="T-4">T-4</option>
-                        <option value="T-4 Libre">T-4 Libre</option>
-                        <option value="Proteína C Reactiva (PCR)">Proteína C Reactiva (PCR)</option>
-                        <option value="Factor Reumatoide">Factor Reumatoide</option>
-                        <option value="Antiestreptolisina O (ASO)">Antiestreptolisina O (ASO)</option>
-                        <option value="Streptozime">Streptozime</option>
-                        <option value="Detección Anticuerpos Antinucleares (ANA)">Detección Anticuerpos Antinucleares (ANA)</option>
-                        <option value="Anti D.N.A.">Anti D.N.A.</option>
-                        <option value="Inmunoglobulinas (IgG - IgA - IgM)">Inmunoglobulinas (IgG - IgA - IgM)</option>
-                        <option value="Antígenos Febriles">Antígenos Febriles</option>
-                        <option value="Dengue IgG / IgM">Dengue IgG / IgM</option>
-                        <option value="Inv. de Toxoplasmosis (anti IgG / IgM)">Inv. de Toxoplasmosis (anti IgG / IgM)</option>
-                        <option value="Helicobacter pylori">Helicobacter pylori</option>
-                        <option value="Leptospira">Leptospira</option>
-                      </optgroup>
-
+                      {Object.entries(CATALOGO_LAB).map(([grupo, items]) => (
+                        <optgroup key={grupo} label={grupo}>
+                          {items.map((item) => (
+                            <option key={item} value={item}>
+                              {item}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
                       <optgroup label="OTRA">
                         <option value="OTRO">Otra analítica no listada...</option>
                       </optgroup>
@@ -409,4 +402,58 @@ export function ReportesLaboratorio({
                     <input
                       name="sampleDate"
                       type="date"
-                      className="w-full px-2.5 py-1.5
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white text-slate-900"
+                    />
+                  </div>
+                </div>
+
+                {analiticaElegida === 'OTRO' && (
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      Escriba el nombre de la analítica *
+                    </label>
+                    <input
+                      name="customTest"
+                      required
+                      placeholder="Ej. Procalcitonina, Dimero D..."
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    Resultado / Valores *
+                  </label>
+                  <TextareaConDeshacer
+                    name="result"
+                    rows={2}
+                    required
+                    placeholder="Escribe los valores obtenidos (ej. 60 mm/h, o WBC: 8.5, Hb: 12.3...)"
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-mono text-slate-900 focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-1">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-teal-700 text-white py-2 rounded-lg text-xs font-bold hover:bg-teal-800 transition-colors shadow-sm"
+                  >
+                    Guardar Resultado
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormAbierto(false)}
+                    className="px-3 py-2 border rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
