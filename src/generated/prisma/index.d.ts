@@ -6197,6 +6197,9 @@ export namespace Prisma {
   export type EpisodeMinAggregateOutputType = {
     id: string | null
     patientId: string | null
+    serviceType: string | null
+    consultingDepartment: string | null
+    consultingResident: string | null
     admissionDate: Date | null
     admissionType: string | null
     chiefComplaint: string | null
@@ -6216,6 +6219,9 @@ export namespace Prisma {
   export type EpisodeMaxAggregateOutputType = {
     id: string | null
     patientId: string | null
+    serviceType: string | null
+    consultingDepartment: string | null
+    consultingResident: string | null
     admissionDate: Date | null
     admissionType: string | null
     chiefComplaint: string | null
@@ -6235,6 +6241,9 @@ export namespace Prisma {
   export type EpisodeCountAggregateOutputType = {
     id: number
     patientId: number
+    serviceType: number
+    consultingDepartment: number
+    consultingResident: number
     admissionDate: number
     admissionType: number
     chiefComplaint: number
@@ -6256,6 +6265,9 @@ export namespace Prisma {
   export type EpisodeMinAggregateInputType = {
     id?: true
     patientId?: true
+    serviceType?: true
+    consultingDepartment?: true
+    consultingResident?: true
     admissionDate?: true
     admissionType?: true
     chiefComplaint?: true
@@ -6275,6 +6287,9 @@ export namespace Prisma {
   export type EpisodeMaxAggregateInputType = {
     id?: true
     patientId?: true
+    serviceType?: true
+    consultingDepartment?: true
+    consultingResident?: true
     admissionDate?: true
     admissionType?: true
     chiefComplaint?: true
@@ -6294,6 +6309,9 @@ export namespace Prisma {
   export type EpisodeCountAggregateInputType = {
     id?: true
     patientId?: true
+    serviceType?: true
+    consultingDepartment?: true
+    consultingResident?: true
     admissionDate?: true
     admissionType?: true
     chiefComplaint?: true
@@ -6386,6 +6404,9 @@ export namespace Prisma {
   export type EpisodeGroupByOutputType = {
     id: string
     patientId: string
+    serviceType: string
+    consultingDepartment: string | null
+    consultingResident: string | null
     admissionDate: Date
     admissionType: string
     chiefComplaint: string | null
@@ -6422,6 +6443,9 @@ export namespace Prisma {
   export type EpisodeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     patientId?: boolean
+    serviceType?: boolean
+    consultingDepartment?: boolean
+    consultingResident?: boolean
     admissionDate?: boolean
     admissionType?: boolean
     chiefComplaint?: boolean
@@ -6455,6 +6479,9 @@ export namespace Prisma {
   export type EpisodeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     patientId?: boolean
+    serviceType?: boolean
+    consultingDepartment?: boolean
+    consultingResident?: boolean
     admissionDate?: boolean
     admissionType?: boolean
     chiefComplaint?: boolean
@@ -6476,6 +6503,9 @@ export namespace Prisma {
   export type EpisodeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     patientId?: boolean
+    serviceType?: boolean
+    consultingDepartment?: boolean
+    consultingResident?: boolean
     admissionDate?: boolean
     admissionType?: boolean
     chiefComplaint?: boolean
@@ -6497,6 +6527,9 @@ export namespace Prisma {
   export type EpisodeSelectScalar = {
     id?: boolean
     patientId?: boolean
+    serviceType?: boolean
+    consultingDepartment?: boolean
+    consultingResident?: boolean
     admissionDate?: boolean
     admissionType?: boolean
     chiefComplaint?: boolean
@@ -6513,7 +6546,7 @@ export namespace Prisma {
     responsibleSince?: boolean
   }
 
-  export type EpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "admissionDate" | "admissionType" | "chiefComplaint" | "status" | "room" | "bed" | "attendingDoctor" | "admittingDoctor" | "primaryDiagnosis" | "secondaryDiagnoses" | "createdAt" | "updatedAt" | "responsibleId" | "responsibleSince", ExtArgs["result"]["episode"]>
+  export type EpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "serviceType" | "consultingDepartment" | "consultingResident" | "admissionDate" | "admissionType" | "chiefComplaint" | "status" | "room" | "bed" | "attendingDoctor" | "admittingDoctor" | "primaryDiagnosis" | "secondaryDiagnoses" | "createdAt" | "updatedAt" | "responsibleId" | "responsibleSince", ExtArgs["result"]["episode"]>
   export type EpisodeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     patient?: boolean | PatientDefaultArgs<ExtArgs>
     allergies?: boolean | Episode$allergiesArgs<ExtArgs>
@@ -6559,6 +6592,9 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       patientId: string
+      serviceType: string
+      consultingDepartment: string | null
+      consultingResident: string | null
       admissionDate: Date
       admissionType: string
       chiefComplaint: string | null
@@ -7011,6 +7047,9 @@ export namespace Prisma {
   interface EpisodeFieldRefs {
     readonly id: FieldRef<"Episode", 'String'>
     readonly patientId: FieldRef<"Episode", 'String'>
+    readonly serviceType: FieldRef<"Episode", 'String'>
+    readonly consultingDepartment: FieldRef<"Episode", 'String'>
+    readonly consultingResident: FieldRef<"Episode", 'String'>
     readonly admissionDate: FieldRef<"Episode", 'DateTime'>
     readonly admissionType: FieldRef<"Episode", 'String'>
     readonly chiefComplaint: FieldRef<"Episode", 'String'>
@@ -21261,6 +21300,9 @@ export namespace Prisma {
   export const EpisodeScalarFieldEnum: {
     id: 'id',
     patientId: 'patientId',
+    serviceType: 'serviceType',
+    consultingDepartment: 'consultingDepartment',
+    consultingResident: 'consultingResident',
     admissionDate: 'admissionDate',
     admissionType: 'admissionType',
     chiefComplaint: 'chiefComplaint',
@@ -21927,6 +21969,9 @@ export namespace Prisma {
     NOT?: EpisodeWhereInput | EpisodeWhereInput[]
     id?: StringFilter<"Episode"> | string
     patientId?: StringFilter<"Episode"> | string
+    serviceType?: StringFilter<"Episode"> | string
+    consultingDepartment?: StringNullableFilter<"Episode"> | string | null
+    consultingResident?: StringNullableFilter<"Episode"> | string | null
     admissionDate?: DateTimeFilter<"Episode"> | Date | string
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
@@ -21959,6 +22004,9 @@ export namespace Prisma {
   export type EpisodeOrderByWithRelationInput = {
     id?: SortOrder
     patientId?: SortOrder
+    serviceType?: SortOrder
+    consultingDepartment?: SortOrderInput | SortOrder
+    consultingResident?: SortOrderInput | SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrderInput | SortOrder
@@ -21994,6 +22042,9 @@ export namespace Prisma {
     OR?: EpisodeWhereInput[]
     NOT?: EpisodeWhereInput | EpisodeWhereInput[]
     patientId?: StringFilter<"Episode"> | string
+    serviceType?: StringFilter<"Episode"> | string
+    consultingDepartment?: StringNullableFilter<"Episode"> | string | null
+    consultingResident?: StringNullableFilter<"Episode"> | string | null
     admissionDate?: DateTimeFilter<"Episode"> | Date | string
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
@@ -22026,6 +22077,9 @@ export namespace Prisma {
   export type EpisodeOrderByWithAggregationInput = {
     id?: SortOrder
     patientId?: SortOrder
+    serviceType?: SortOrder
+    consultingDepartment?: SortOrderInput | SortOrder
+    consultingResident?: SortOrderInput | SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrderInput | SortOrder
@@ -22051,6 +22105,9 @@ export namespace Prisma {
     NOT?: EpisodeScalarWhereWithAggregatesInput | EpisodeScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Episode"> | string
     patientId?: StringWithAggregatesFilter<"Episode"> | string
+    serviceType?: StringWithAggregatesFilter<"Episode"> | string
+    consultingDepartment?: StringNullableWithAggregatesFilter<"Episode"> | string | null
+    consultingResident?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     admissionDate?: DateTimeWithAggregatesFilter<"Episode"> | Date | string
     admissionType?: StringWithAggregatesFilter<"Episode"> | string
     chiefComplaint?: StringNullableWithAggregatesFilter<"Episode"> | string | null
@@ -23316,6 +23373,9 @@ export namespace Prisma {
 
   export type EpisodeCreateInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -23347,6 +23407,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -23376,6 +23439,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23407,6 +23473,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23437,6 +23506,9 @@ export namespace Prisma {
   export type EpisodeCreateManyInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -23455,6 +23527,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23473,6 +23548,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25024,6 +25102,9 @@ export namespace Prisma {
   export type EpisodeCountOrderByAggregateInput = {
     id?: SortOrder
     patientId?: SortOrder
+    serviceType?: SortOrder
+    consultingDepartment?: SortOrder
+    consultingResident?: SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
@@ -25043,6 +25124,9 @@ export namespace Prisma {
   export type EpisodeMaxOrderByAggregateInput = {
     id?: SortOrder
     patientId?: SortOrder
+    serviceType?: SortOrder
+    consultingDepartment?: SortOrder
+    consultingResident?: SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
@@ -25062,6 +25146,9 @@ export namespace Prisma {
   export type EpisodeMinOrderByAggregateInput = {
     id?: SortOrder
     patientId?: SortOrder
+    serviceType?: SortOrder
+    consultingDepartment?: SortOrder
+    consultingResident?: SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
@@ -26966,6 +27053,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutResponsibleInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -26996,6 +27086,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutResponsibleInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -27093,6 +27186,9 @@ export namespace Prisma {
     NOT?: EpisodeScalarWhereInput | EpisodeScalarWhereInput[]
     id?: StringFilter<"Episode"> | string
     patientId?: StringFilter<"Episode"> | string
+    serviceType?: StringFilter<"Episode"> | string
+    consultingDepartment?: StringNullableFilter<"Episode"> | string | null
+    consultingResident?: StringNullableFilter<"Episode"> | string | null
     admissionDate?: DateTimeFilter<"Episode"> | Date | string
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
@@ -27179,6 +27275,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutPatientInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -27208,6 +27307,9 @@ export namespace Prisma {
 
   export type EpisodeUncheckedCreateWithoutPatientInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28345,6 +28447,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutImportantAlertsInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28375,6 +28480,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutImportantAlertsInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28419,6 +28527,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutImportantAlertsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28449,6 +28560,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutImportantAlertsInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28477,6 +28591,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutGfrRecordsInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28507,6 +28624,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutGfrRecordsInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28551,6 +28671,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutGfrRecordsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28581,6 +28704,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutGfrRecordsInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28609,6 +28735,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutLabReportsInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28639,6 +28768,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutLabReportsInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28683,6 +28815,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutLabReportsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28713,6 +28848,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutLabReportsInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28741,6 +28879,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutStudyReportsInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28771,6 +28912,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutStudyReportsInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28815,6 +28959,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutStudyReportsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28845,6 +28992,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutStudyReportsInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28914,6 +29064,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutViralSerologiesInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28944,6 +29097,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutViralSerologiesInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29035,6 +29191,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutViralSerologiesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29065,6 +29224,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutViralSerologiesInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29093,6 +29255,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutVascularAccessesInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29123,6 +29288,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutVascularAccessesInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29167,6 +29335,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutVascularAccessesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29197,6 +29368,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutVascularAccessesInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29266,6 +29440,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutAllergiesInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29296,6 +29473,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutAllergiesInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29387,6 +29567,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutAllergiesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29417,6 +29600,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutAllergiesInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29445,6 +29631,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutNotesInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29475,6 +29664,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutNotesInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29519,6 +29711,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutNotesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29549,6 +29744,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutNotesInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29577,6 +29775,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutVitalsInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29607,6 +29808,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutVitalsInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29651,6 +29855,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutVitalsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29681,6 +29888,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutVitalsInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29709,6 +29919,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutHandoffsInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29739,6 +29952,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutHandoffsInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29783,6 +29999,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutHandoffsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29813,6 +30032,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutHandoffsInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29841,6 +30063,9 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutTasksInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29871,6 +30096,9 @@ export namespace Prisma {
   export type EpisodeUncheckedCreateWithoutTasksInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29915,6 +30143,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutTasksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29945,6 +30176,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutTasksInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29993,6 +30227,9 @@ export namespace Prisma {
   export type EpisodeCreateManyResponsibleInput = {
     id?: string
     patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -30067,6 +30304,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutResponsibleInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30097,6 +30337,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateWithoutResponsibleInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30126,6 +30369,9 @@ export namespace Prisma {
   export type EpisodeUncheckedUpdateManyWithoutResponsibleInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30143,6 +30389,9 @@ export namespace Prisma {
 
   export type EpisodeCreateManyPatientInput = {
     id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -30182,6 +30431,9 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30211,6 +30463,9 @@ export namespace Prisma {
 
   export type EpisodeUncheckedUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30240,6 +30495,9 @@ export namespace Prisma {
 
   export type EpisodeUncheckedUpdateManyWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null

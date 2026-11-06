@@ -10,6 +10,10 @@ export async function crearPaciente(formData: FormData) {
   const session = await auth()
   if (!session) throw new Error('No autorizado')
 
+  const serviceType = String(formData.get('serviceType') ?? 'propio').trim()
+  const consultingDepartment = String(formData.get('consultingDepartment') ?? '').trim()
+  const consultingResident = String(formData.get('consultingResident') ?? '').trim()
+
   const expedienteNumber = String(formData.get('expedienteNumber') ?? '').trim()
   const firstName = String(formData.get('firstName') ?? '').trim()
   const lastName = String(formData.get('lastName') ?? '').trim()
@@ -25,7 +29,6 @@ export async function crearPaciente(formData: FormData) {
   const secondaryDiagnoses = String(formData.get('secondaryDiagnoses') ?? '').trim()
   const alergiasEstado = String(formData.get('alergiasEstado') ?? 'no_evaluada').trim()
 
-  // 1. Verificar expediente único
   const existe = await prisma.patient.findUnique({
     where: { expedienteNumber },
   })
@@ -34,7 +37,6 @@ export async function crearPaciente(formData: FormData) {
     throw new Error('El número de expediente ya está registrado.')
   }
 
-  // 2. Crear paciente y episodio
   const nuevoPaciente = await prisma.patient.create({
     data: {
       expedienteNumber,
@@ -44,12 +46,15 @@ export async function crearPaciente(formData: FormData) {
       sex,
       episodes: {
         create: {
+          serviceType,
+          consultingDepartment: consultingDepartment || null,
+          consultingResident: consultingResident || null,
           admissionType,
           chiefComplaint,
           room,
           bed,
           admittingDoctor: admittingDoctor || null,
-          attendingDoctor: attendingDoctor || admittingDoctor || null,
+          attendingDoctor: attendingDoctor || consultingResident || null,
           primaryDiagnosis: primaryDiagnosis || null,
           secondaryDiagnoses: secondaryDiagnoses || null,
         },
@@ -60,7 +65,6 @@ export async function crearPaciente(formData: FormData) {
 
   const episodeId = nuevoPaciente.episodes[0].id
 
-  // 3. Registrar estado inicial de alergias
   await prisma.allergy.create({
     data: {
       patientId: nuevoPaciente.id,
@@ -74,7 +78,6 @@ export async function crearPaciente(formData: FormData) {
     },
   })
 
-  // 4. Auditoría
   await logAudit({
     actorId: session.user?.id as string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,14 +89,13 @@ export async function crearPaciente(formData: FormData) {
     episodeId,
     newValue: {
       expedienteNumber,
+      tipoGuardia: serviceType,
+      departamento: consultingDepartment,
+      residente: consultingResident,
       nombre: `${firstName} ${lastName}`,
       diagnosticoPrincipal: primaryDiagnosis,
-      maIngreso: admittingDoctor,
-      formaIngreso: admissionType,
-      habitacion: room,
-      cama: bed,
     },
-    reason: 'Apertura de nuevo expediente clínico',
+    reason: `Apertura de expediente (${serviceType === 'interconsulta' ? 'Interconsulta' : 'Paciente Propio'})`,
   })
 
   revalidatePath('/dashboard')

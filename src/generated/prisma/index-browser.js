@@ -170,6 +170,9 @@ exports.Prisma.PatientScalarFieldEnum = {
 exports.Prisma.EpisodeScalarFieldEnum = {
   id: 'id',
   patientId: 'patientId',
+  serviceType: 'serviceType',
+  consultingDepartment: 'consultingDepartment',
+  consultingResident: 'consultingResident',
   admissionDate: 'admissionDate',
   admissionType: 'admissionType',
   chiefComplaint: 'chiefComplaint',

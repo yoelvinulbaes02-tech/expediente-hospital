@@ -77,39 +77,43 @@ model Patient {
 }
 
 model Episode {
-  id                 String    @id @default(cuid())
-  patientId          String
-  admissionDate      DateTime  @default(now())
-  admissionType      String
-  chiefComplaint     String?
-  status             String    @default("active")
-  room               String?
-  bed                String?
-  attendingDoctor    String?
-  admittingDoctor    String?
-  primaryDiagnosis   String?
-  secondaryDiagnoses String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  patientId            String
+  serviceType          String    @default("propio") // "propio" (Sala) | "interconsulta"
+  consultingDepartment String?   // Ej. UCI, Cirugía, Medicina Interna
+  consultingResident   String?   // Residente a cargo de la interconsulta
+  admissionDate        DateTime  @default(now())
+  admissionType        String
+  chiefComplaint       String?
+  status               String    @default("active")
+  room                 String?
+  bed                  String?
+  attendingDoctor      String?   // Médico tratante / residente de ingreso
+  admittingDoctor      String?   // MA que lo ingresó
+  primaryDiagnosis     String?
+  secondaryDiagnoses   String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  patient            Patient   @relation(fields: [patientId], references: [id])
-  allergies          Allergy[]
-  notes              Note[]
-  vitals             VitalSign[]
-  handoffs           Handoff[]
-  responsibleId      String?
-  responsibleSince   DateTime? @db.Timestamptz
-  responsible        User?     @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
-  tasks              Task[]
+  patient              Patient   @relation(fields: [patientId], references: [id])
+  allergies            Allergy[]
+  notes                Note[]
+  vitals               VitalSign[]
+  handoffs             Handoff[]
+  responsibleId        String?
+  responsibleSince     DateTime? @db.Timestamptz
+  responsible          User?     @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
+  tasks                Task[]
 
-  importantAlerts    ImportantAlert[]
-  gfrRecords         GfrRecord[]
-  labReports         LabReport[]
-  studyReports       StudyReport[]
-  viralSerologies    ViralSerology[]
-  vascularAccesses   VascularAccess[]
+  importantAlerts      ImportantAlert[]
+  gfrRecords           GfrRecord[]
+  labReports           LabReport[]
+  studyReports         StudyReport[]
+  viralSerologies      ViralSerology[]
+  vascularAccesses     VascularAccess[]
 
   @@index([responsibleId])
+  @@index([serviceType, status])
 }
 
 // ─── ANTECEDENTES DEL PACIENTE ───
@@ -158,11 +162,11 @@ model GfrRecord {
 model LabReport {
   id         String    @id @default(cuid())
   episodeId  String
-  category   String    // Hematología, Uroanálisis, Cultivos, Parasitología, Química Sanguínea, Serología
-  testName   String    // Nombre específico de la analítica
+  category   String
+  testName   String
   sampleDate DateTime? @db.Timestamptz
-  result     String    // Valores y hallazgos
-  createdBy  String    // Email de quien registra
+  result     String
+  createdBy  String
   createdAt  DateTime  @default(now()) @db.Timestamptz
 
   episode    Episode   @relation(fields: [episodeId], references: [id])
