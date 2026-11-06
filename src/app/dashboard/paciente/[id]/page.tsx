@@ -8,6 +8,7 @@ import { agregarAlergia, marcarSinAlergias } from './actions'
 import { guardarNota } from './actions-notas'
 import { guardarSignosVitales } from './actions-vitales'
 import { tomarACargo, reasignarResponsable } from './actions-responsable'
+import { cambiarUbicacion } from './actions-clinicas'
 import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
 
@@ -16,7 +17,7 @@ import { NotasImportantes } from '@/components/NotasImportantes'
 import { BloqueNefrologico } from '@/components/BloqueNefrologico'
 import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
-import { FormularioNotaSOAP } from '@/components/FormularioNotaSOAP'
+import { FormularioNotaEvolucion } from '@/components/FormularioNotaEvolucion'
 
 const ETIQUETA_ROL: Record<string, string> = {
   ADMIN: 'Administrador',
@@ -92,7 +93,7 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo
   const entregaPendiente = episode.handoffs[0]
 
-  // Recolectar emails de todas las firmas del expediente
+  // Recolectar emails de todas las firmas
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => emails.add(v.recordedBy))
@@ -104,6 +105,9 @@ export default async function ExpedientePage({
   })
   if (episode.patient.medicalHistory?.updatedBy) {
     emails.add(episode.patient.medicalHistory.updatedBy)
+  }
+  if (episode.patient.bloodTypeRecordedBy) {
+    emails.add(episode.patient.bloodTypeRecordedBy)
   }
   episode.vascularAccesses.forEach((va) => emails.add(va.createdBy))
   episode.viralSerologies.forEach((vs) => emails.add(vs.recordedBy))
@@ -150,8 +154,8 @@ export default async function ExpedientePage({
     temperature: num(v.temperature),
     oxygenSat: num(v.oxygenSat),
     glucose: num(v.glucose),
-    painScale: num('painScale' in v ? v.painScale : null),
-    diuresis: num('diuresis' in v ? v.diuresis : null),
+    weight: num(v.weight),
+    diuresis: num(v.diuresis),
   }))
 
   const entradaVital =
@@ -238,7 +242,7 @@ export default async function ExpedientePage({
           </details>
         )}
 
-        {/* Cabecera Principal */}
+        {/* Cabecera Principal con Edición de Habitación/Cama */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
             <Link href={esSoloLectura ? '/dashboard/archivo' : '/dashboard'} className="text-sm text-blue-600 hover:underline mb-2 inline-block">
@@ -259,21 +263,56 @@ export default async function ExpedientePage({
                 🚪 Dar de Alta
               </Link>
             )}
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-bold border border-blue-200 text-lg">
-              Hab. {episode.room} - Cama {episode.bed}
+
+            {/* BADGE DE HABITACIÓN EDITABLE */}
+            <div className="relative">
+              <div className="bg-blue-100 text-blue-900 px-4 py-2 rounded-lg font-bold border border-blue-200 text-lg flex items-center gap-2">
+                <span>Hab. {episode.room} - Cama {episode.bed}</span>
+                {permisos.puedeRegistrar && (
+                  <details className="inline-block relative">
+                    <summary className="list-none cursor-pointer text-xs bg-white text-blue-700 px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 font-normal">
+                      ✏️ Cambiar
+                    </summary>
+                    <div className="absolute right-0 mt-2 w-64 bg-white p-3 rounded-xl border border-slate-300 shadow-xl z-30 text-left">
+                      <p className="text-xs font-bold text-slate-700 mb-2">Reubicar paciente de cama:</p>
+                      <form action={cambiarUbicacion} className="space-y-2">
+                        <input type="hidden" name="episodeId" value={episode.id} />
+                        <div>
+                          <label className="block text-[11px] text-slate-500">Nueva Habitación:</label>
+                          <input name="room" defaultValue={episode.room ?? ''} required className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] text-slate-500">Nueva Cama:</label>
+                          <input name="bed" defaultValue={episode.bed ?? ''} required className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
+                        </div>
+                        <button type="submit" className="w-full bg-blue-600 text-white text-xs py-1.5 rounded font-bold hover:bg-blue-700">
+                          Guardar Reubicación
+                        </button>
+                      </form>
+                    </div>
+                  </details>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Recuadro Fijo de Diagnósticos de Ingreso y MA */}
+        {/* Recuadro Fijo de Diagnósticos de Ingreso y Médicos */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Diagnóstico de Ingreso</span>
-            {episode.admittingDoctor && (
-              <span className="text-xs text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
-                <strong>MA que lo ingresó:</strong> {episode.admittingDoctor}
-              </span>
-            )}
+            <div className="flex flex-wrap gap-2 text-xs">
+              {episode.admittingDoctor && (
+                <span className="text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                  <strong>MA que ingresó:</strong> {episode.admittingDoctor}
+                </span>
+              )}
+              {episode.attendingDoctor && (
+                <span className="text-blue-800 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
+                  <strong>Médico tratante (residente que ingresó):</strong> {episode.attendingDoctor}
+                </span>
+              )}
+            </div>
           </div>
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -298,12 +337,17 @@ export default async function ExpedientePage({
           puedeRegistrar={permisos.puedeRegistrar}
         />
 
-        {/* 2. ACCESO VASCULAR, VIRALES Y TFG (CON FIRMAS) */}
+        {/* 2. ACCESO VASCULAR, VIRALES, TIPIFICACIÓN Y TFG (CON FIRMAS) */}
         <BloqueNefrologico
           episodeId={episode.id}
           acceso={episode.vascularAccesses[0] ?? null}
           virales={episode.viralSerologies[0] ?? null}
           tfgActual={episode.gfrRecords[0] ?? null}
+          tipificacion={{
+            bloodType: episode.patient.bloodType,
+            recordedBy: episode.patient.bloodTypeRecordedBy,
+            updatedAt: episode.patient.bloodTypeUpdatedAt,
+          }}
           nombres={nombres}
           roles={roles}
           puedeRegistrar={permisos.puedeRegistrar}
@@ -319,11 +363,11 @@ export default async function ExpedientePage({
               <p className="text-sm text-slate-600 mb-2"><strong>Forma:</strong> {episode.admissionType}</p>
               <p className="text-sm text-slate-600 mb-2"><strong>Motivo:</strong> {episode.chiefComplaint}</p>
               <p className="text-sm text-slate-600 mb-2"><strong>MA que ingresó:</strong> {episode.admittingDoctor ?? 'No especificado'}</p>
-              <p className="text-sm text-slate-600 mb-2"><strong>Médico Tratante:</strong> {episode.attendingDoctor}</p>
+              <p className="text-sm text-slate-600 mb-2"><strong>Médico tratante (residente que ingresó):</strong> {episode.attendingDoctor}</p>
               <p className="text-sm text-slate-600 mb-2"><strong>A cargo ahora:</strong> {episode.responsible?.fullName ?? 'Sin asignar'}</p>
             </div>
 
-            {/* 3. ANTECEDENTES (CON FIRMA) */}
+            {/* 3. ANTECEDENTES */}
             <SeccionAntecedentes
               episodeId={episode.id}
               antecedentes={episode.patient.medicalHistory}
@@ -332,7 +376,7 @@ export default async function ExpedientePage({
               puedeRegistrar={permisos.puedeRegistrar}
             />
 
-            {/* Formulario de Signos Vitales (con Diuresis) */}
+            {/* Formulario de Signos Vitales (con Peso y Diuresis) */}
             {permisos.puedeRegistrar && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Registrar Signos Vitales</h2>
@@ -367,8 +411,8 @@ export default async function ExpedientePage({
                       <input name="glucose" type="number" inputMode="numeric" placeholder="100" className={entradaVital} />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">Dolor (0-10)</label>
-                      <input name="painScale" type="number" inputMode="numeric" min={0} max={10} placeholder="0" className={entradaVital} />
+                      <label className="block text-xs font-bold text-emerald-800 mb-1">Peso (kg)</label>
+                      <input name="weight" type="number" inputMode="decimal" step="0.1" placeholder="70.5" className={entradaVital} />
                     </div>
                     <div className="col-span-2">
                       <label className="block text-xs font-bold text-sky-800 mb-1">Diuresis (mL)</label>
@@ -422,13 +466,13 @@ export default async function ExpedientePage({
               puedeRegistrar={permisos.puedeRegistrar}
             />
 
-            {/* Tendencia de Signos Vitales y Diuresis */}
+            {/* Tendencia de Signos Vitales, Peso y Diuresis */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Signos Vitales y Diuresis</h2>
+              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Tendencia de Signos Vitales, Peso y Diuresis</h2>
               <GraficasSignos registros={registrosGrafica} />
             </div>
 
-            {/* Tabla de Signos Vitales */}
+            {/* Tabla de Signos Vitales con Peso y Diuresis */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Últimos Signos Vitales</h2>
               <table className="w-full text-sm text-left">
@@ -439,6 +483,7 @@ export default async function ExpedientePage({
                     <th className="px-3 py-2">FC</th>
                     <th className="px-3 py-2">Temp</th>
                     <th className="px-3 py-2">SpO2</th>
+                    <th className="px-3 py-2">Peso</th>
                     <th className="px-3 py-2">Diuresis</th>
                     <th className="px-3 py-2">Registró</th>
                   </tr>
@@ -453,26 +498,27 @@ export default async function ExpedientePage({
                       <td className={`px-3 py-2 font-medium ${esAnormal('fc', v.heartRate) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.heartRate ?? '—'}</td>
                       <td className={`px-3 py-2 font-medium ${esAnormal('temp', v.temperature) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.temperature ?? '—'}</td>
                       <td className={`px-3 py-2 font-medium ${esAnormal('spo2', v.oxygenSat) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>{v.oxygenSat ?? '—'}</td>
+                      <td className="px-3 py-2 font-bold text-emerald-700">{v.weight ? `${v.weight} kg` : '—'}</td>
                       <td className="px-3 py-2 font-medium text-sky-800">{v.diuresis ? `${v.diuresis} mL` : '—'}</td>
                       <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">{nombres[v.recordedBy] ?? v.recordedBy}</td>
                     </tr>
                   ))}
                   {episode.vitals.length === 0 && (
-                    <tr><td colSpan={7} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
+                    <tr><td colSpan={8} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
 
-            {/* 5. FORMULARIO SOAP CON LIMPIEZA AUTOMÁTICA */}
+            {/* 5. FORMULARIO DE EVOLUCIÓN (UN SOLO RECUADRO) */}
             {permisos.puedeRegistrar && (
-              <FormularioNotaSOAP episodeId={episode.id} action={guardarNota} />
+              <FormularioNotaEvolucion episodeId={episode.id} action={guardarNota} />
             )}
 
-            {/* Historial de Notas */}
+            {/* Historial de Notas de Evolución */}
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-slate-800">Historial de Notas</h2>
-              {episode.notes.length === 0 && <p className="text-slate-500 text-sm">No hay notas registradas.</p>}
+              <h2 className="text-lg font-bold text-slate-800">Historial de Evoluciones</h2>
+              {episode.notes.length === 0 && <p className="text-slate-500 text-sm">No hay evoluciones registradas.</p>}
               {episode.notes.map((nota) => (
                 <div key={nota.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                   <div className="flex flex-wrap justify-between items-center gap-2 border-b pb-2 mb-3">
@@ -486,12 +532,21 @@ export default async function ExpedientePage({
                     </p>
                     <p className="text-xs text-slate-500">{nota.createdAt.toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
-                    <div><span className="font-bold text-slate-900">S:</span> {nota.subjective}</div>
-                    <div><span className="font-bold text-slate-900">O:</span> {nota.objective}</div>
-                    <div><span className="font-bold text-slate-900">A:</span> {nota.assessment}</div>
-                    <div><span className="font-bold text-slate-900">P:</span> {nota.plan}</div>
-                  </div>
+                  
+                  {/* Si es una nota nueva de un solo recuadro: */}
+                  {nota.content ? (
+                    <p className="text-sm text-slate-800 whitespace-pre-line leading-relaxed">
+                      {nota.content}
+                    </p>
+                  ) : (
+                    /* Retrocompatibilidad si es una nota antigua SOAP: */
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
+                      <div><span className="font-bold text-slate-900">S:</span> {nota.subjective}</div>
+                      <div><span className="font-bold text-slate-900">O:</span> {nota.objective}</div>
+                      <div><span className="font-bold text-slate-900">A:</span> {nota.assessment}</div>
+                      <div><span className="font-bold text-slate-900">P:</span> {nota.plan}</div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

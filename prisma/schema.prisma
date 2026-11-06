@@ -57,20 +57,23 @@ model AuditLog {
 
 // ─── PACIENTES Y EPISODIOS ───
 model Patient {
-  id               String    @id @default(cuid())
-  expedienteNumber String    @unique
-  firstName        String
-  lastName         String
-  birthDate        DateTime?
-  age              Int?
-  sex              String
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  expedienteNumber    String    @unique
+  firstName           String
+  lastName            String
+  birthDate           DateTime?
+  age                 Int?
+  sex                 String
+  bloodType           String?   // Tipificación (ej. O+, A-, B+, etc.)
+  bloodTypeRecordedBy String?
+  bloodTypeUpdatedAt  DateTime? @db.Timestamptz
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  episodes         Episode[]
-  allergies        Allergy[]
-  medicalHistory   MedicalHistory?
-  viralSerologies  ViralSerology[]
+  episodes            Episode[]
+  allergies           Allergy[]
+  medicalHistory      MedicalHistory?
+  viralSerologies     ViralSerology[]
 }
 
 model Episode {
@@ -82,7 +85,7 @@ model Episode {
   status             String    @default("active") // "active" | "closed"
   room               String?
   bed                String?
-  attendingDoctor    String?
+  attendingDoctor    String?   // Médico tratante (residente que ingresó)
   admittingDoctor    String?   // MA que lo ingresó
   primaryDiagnosis   String?   // Diagnóstico principal
   secondaryDiagnoses String?   // Diagnósticos secundarios
@@ -112,11 +115,11 @@ model Episode {
 model MedicalHistory {
   id           String   @id @default(cuid())
   patientId    String   @unique
-  pathological String?  // Patológicos (DM, HTA, ERC, etc.)
-  surgical     String?  // Quirúrgicos
-  family       String?  // Familiares
-  habits       String?  // Hábitos tóxicos / no tóxicos
-  medications  String?  // Medicamentos habituales
+  pathological String?
+  surgical     String?
+  family       String?
+  habits       String?
+  medications  String?
   updatedAt    DateTime @updatedAt
   updatedBy    String?
 
@@ -154,10 +157,10 @@ model GfrRecord {
 model StudyReport {
   id          String    @id @default(cuid())
   episodeId   String
-  studyType   String    // Sonografía, TAC, RX, Ecocardiograma, Doppler, Biopsia, Laboratorio, Otro
-  title       String    // Nombre específico del estudio
+  studyType   String
+  title       String
   studyDate   DateTime? @db.Timestamptz
-  result      String    // Conclusión o reporte
+  result      String
   createdBy   String
   createdAt   DateTime  @default(now()) @db.Timestamptz
 
@@ -171,8 +174,8 @@ model ViralSerology {
   id          String    @id @default(cuid())
   patientId   String
   episodeId   String
-  status      String    @default("negativo") // "negativo" | "positivo" | "pendiente"
-  details     String?   // Detalle (ej. "VIH Negativo, VHB (-), VHC (+)")
+  status      String    @default("negativo")
+  details     String?
   recordedBy  String
   updatedAt   DateTime  @updatedAt
 
@@ -186,8 +189,8 @@ model ViralSerology {
 model VascularAccess {
   id             String    @id @default(cuid())
   episodeId      String
-  type           String    // Catéter Tunelizado, Catéter Temporal, FAV, Injerto, Otro
-  site           String?   // Yugular interna der, Femoral izq, etc.
+  type           String
+  site           String?
   placementDate  DateTime? @db.Timestamptz
   notes          String?
   isActive       Boolean   @default(true)
@@ -216,16 +219,17 @@ model Allergy {
   episode     Episode   @relation(fields: [episodeId], references: [id])
 }
 
-// ─── NOTAS MÉDICAS (SOAP) ───
+// ─── NOTAS MÉDICAS DE EVOLUCIÓN ───
 model Note {
   id          String   @id @default(cuid())
   episodeId   String
-  subjective  String?
-  objective   String?
-  assessment  String?
-  plan        String?
+  content     String?  // Recuadro único de evolución
+  subjective  String?  // Mantenido por retrocompatibilidad
+  objective   String?  // Mantenido por retrocompatibilidad
+  assessment  String?  // Mantenido por retrocompatibilidad
+  plan        String?  // Mantenido por retrocompatibilidad
   status      String   @default("firmada")
-  createdBy   String
+  createdBy   String   // Email de quien firma
   createdAt   DateTime @default(now()) @db.Timestamptz
 
   episode     Episode  @relation(fields: [episodeId], references: [id])
@@ -242,8 +246,9 @@ model VitalSign {
   temperature      Float?
   oxygenSat        Int?
   glucose          Int?
-  painScale        Int?
-  diuresis         Int?
+  weight           Float?   // Peso en kg (ej. 68.5)
+  painScale        Int?     // Mantenido por retrocompatibilidad
+  diuresis         Int?     // Diuresis en mL
   recordedBy       String
   createdAt        DateTime @default(now()) @db.Timestamptz
 

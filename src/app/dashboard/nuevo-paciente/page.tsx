@@ -65,8 +65,8 @@ export default function NuevoPacientePage() {
                 <input name="admittingDoctor" required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 placeholder:text-slate-400" placeholder="Ej. Dr. Ramírez (MA)" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Médico Tratante / Cabecera</label>
-                <input name="attendingDoctor" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 placeholder:text-slate-400" placeholder="Ej. Dra. Gómez" />
+                <label className="block text-sm font-medium text-slate-700 mb-1">Médico tratante (residente que ingresó) *</label>
+                <input name="attendingDoctor" required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 placeholder:text-slate-400" placeholder="Ej. Dra. Gómez (R3)" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Habitación *</label>
@@ -83,7 +83,7 @@ export default function NuevoPacientePage() {
             </div>
           </div>
 
-          {/* SECCIÓN 3: Diagnósticos de Ingreso */}
+          {/* SECCIÓN 3: Diagnósticos */}
           <div>
             <h2 className="text-lg font-semibold text-slate-700 mb-4 border-b pb-2 mt-6">3. Diagnósticos de Ingreso</h2>
             <div className="space-y-4">
@@ -116,7 +116,6 @@ export default function NuevoPacientePage() {
                 <option value="sin_alergias">✅ Niega alergias (Sin alergias conocidas)</option>
                 <option value="no_evaluada">⚠️ No evaluadas (Pendiente de evaluación)</option>
               </select>
-              <p className="text-xs text-slate-500 mt-1">Si el paciente presenta alguna alergia activa, podrá ingresarla directamente en su expediente.</p>
             </div>
           </div>
 

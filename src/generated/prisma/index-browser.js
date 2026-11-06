@@ -160,6 +160,9 @@ exports.Prisma.PatientScalarFieldEnum = {
   birthDate: 'birthDate',
   age: 'age',
   sex: 'sex',
+  bloodType: 'bloodType',
+  bloodTypeRecordedBy: 'bloodTypeRecordedBy',
+  bloodTypeUpdatedAt: 'bloodTypeUpdatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -261,6 +264,7 @@ exports.Prisma.AllergyScalarFieldEnum = {
 exports.Prisma.NoteScalarFieldEnum = {
   id: 'id',
   episodeId: 'episodeId',
+  content: 'content',
   subjective: 'subjective',
   objective: 'objective',
   assessment: 'assessment',
@@ -280,6 +284,7 @@ exports.Prisma.VitalSignScalarFieldEnum = {
   temperature: 'temperature',
   oxygenSat: 'oxygenSat',
   glucose: 'glucose',
+  weight: 'weight',
   painScale: 'painScale',
   diuresis: 'diuresis',
   recordedBy: 'recordedBy',

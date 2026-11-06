@@ -13,7 +13,7 @@ const CAMPOS = [
   { campo: 'temperature', etiqueta: 'Temperatura', min: 30, max: 45, entero: false },
   { campo: 'oxygenSat', etiqueta: 'SpO2', min: 30, max: 100, entero: true },
   { campo: 'glucose', etiqueta: 'Glucosa', min: 10, max: 1500, entero: true },
-  { campo: 'painScale', etiqueta: 'Dolor', min: 0, max: 10, entero: true },
+  { campo: 'weight', etiqueta: 'Peso', min: 1, max: 500, entero: false },
   { campo: 'diuresis', etiqueta: 'Diuresis', min: 0, max: 15000, entero: true },
 ] as const
 
@@ -42,10 +42,10 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
     valores[c.campo] = n
   }
 
-  const { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, painScale, diuresis } = valores
+  const { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, weight, diuresis } = valores
 
   if (Object.values(valores).every((v) => v === null)) {
-    volverAlExpediente(episodeId, 'Escribe al menos un signo vital o diuresis')
+    volverAlExpediente(episodeId, 'Escribe al menos un signo vital, peso o diuresis')
   }
   if ((systolic === null) !== (diastolic === null)) {
     volverAlExpediente(episodeId, 'Escribe la presión sistólica y la diastólica juntas')
@@ -64,7 +64,7 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
       temperature,
       oxygenSat,
       glucose,
-      painScale,
+      weight,
       diuresis,
       recordedBy: email,
     },
@@ -78,8 +78,8 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
     entityId: nuevoRegistro.id,
     patientId: episode.patientId,
     episodeId,
-    newValue: { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, painScale, diuresis },
-    reason: 'Registro de signos vitales y diuresis',
+    newValue: { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, weight, diuresis },
+    reason: 'Registro de signos vitales, peso y diuresis',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

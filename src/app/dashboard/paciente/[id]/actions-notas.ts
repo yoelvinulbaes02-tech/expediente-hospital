@@ -9,17 +9,19 @@ export async function guardarNota(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
 
-  const subjective = String(formData.get('subjective') ?? '').trim()
-  const objective = String(formData.get('objective') ?? '').trim()
-  const assessment = String(formData.get('assessment') ?? '').trim()
-  const plan = String(formData.get('plan') ?? '').trim()
+  const content = String(formData.get('content') ?? '').trim()
 
-  if (!subjective || !objective || !assessment || !plan) {
-    volverAlExpediente(episodeId, 'Completa los cuatro campos de la nota (S, O, A, P)')
+  if (!content || content.length < 5) {
+    volverAlExpediente(episodeId, 'Por favor redacta la evolución clínica del paciente')
   }
 
   const nuevaNota = await prisma.note.create({
-    data: { episodeId, subjective, objective, assessment, plan, status: 'firmada', createdBy: email },
+    data: {
+      episodeId,
+      content,
+      status: 'firmada',
+      createdBy: email,
+    },
   })
 
   await logAudit({
@@ -30,8 +32,8 @@ export async function guardarNota(formData: FormData): Promise<void> {
     entityId: nuevaNota.id,
     patientId: episode.patientId,
     episodeId,
-    newValue: { subjective, objective, assessment, plan },
-    reason: 'Nota de evolución firmada',
+    newValue: { evolucion: content },
+    reason: 'Nota de evolución clínica firmada',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

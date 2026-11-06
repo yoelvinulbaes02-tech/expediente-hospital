@@ -2,6 +2,7 @@ import {
   registrarTFG,
   guardarVirales,
   guardarAccesoVascular,
+  guardarTipificacion,
 } from '@/app/dashboard/paciente/[id]/actions-clinicas'
 
 type Acceso = {
@@ -27,6 +28,12 @@ type Gfr = {
   createdAt: Date
 }
 
+type Tipificacion = {
+  bloodType: string | null
+  recordedBy: string | null
+  updatedAt: Date | null
+}
+
 const ETIQUETA_ROL: Record<string, string> = {
   ADMIN: 'Administrador',
   DOCTOR: 'Médico',
@@ -41,6 +48,7 @@ export function BloqueNefrologico({
   acceso,
   virales,
   tfgActual,
+  tipificacion,
   nombres,
   roles,
   puedeRegistrar,
@@ -49,6 +57,7 @@ export function BloqueNefrologico({
   acceso: Acceso | null
   virales: Serologia | null
   tfgActual: Gfr | null
+  tipificacion: Tipificacion
   nombres: Record<string, string>
   roles: Record<string, string>
   puedeRegistrar: boolean
@@ -64,10 +73,10 @@ export function BloqueNefrologico({
   return (
     <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6">
       <h2 className="text-base font-bold text-slate-800 border-b pb-2 mb-4">
-        🩺 Acceso Vascular, Virales y TFG
+        🩺 Acceso Vascular, Virales, Tipificación y TFG
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 1. ACCESO VASCULAR */}
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
           <div>
@@ -83,26 +92,25 @@ export function BloqueNefrologico({
                     📅 Colocado hace {diasAcceso} día{diasAcceso === 1 ? '' : 's'}
                   </p>
                 )}
-                {/* FIRMA Y REGISTRO */}
                 <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
-                  <span>Registrado por: </span>
+                  <span>Registró: </span>
                   <strong className="text-slate-700">{nombres[acceso.createdBy] ?? acceso.createdBy}</strong>
                   {roles[acceso.createdBy] && (
-                    <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1.5 py-0.2 rounded">
+                    <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1 rounded">
                       {ETIQUETA_ROL[roles[acceso.createdBy]] ?? roles[acceso.createdBy]}
                     </span>
                   )}
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-slate-400 italic">Sin acceso vascular registrado.</p>
+              <p className="text-xs text-slate-400 italic">Sin acceso registrado.</p>
             )}
           </div>
 
           {puedeRegistrar && (
             <details className="mt-2 pt-2 border-t border-slate-200">
               <summary className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
-                {acceso ? 'Cambiar / Actualizar acceso' : '+ Registrar acceso'}
+                {acceso ? 'Actualizar' : '+ Registrar'}
               </summary>
               <form action={guardarAccesoVascular} className="space-y-2 mt-2">
                 <input type="hidden" name="episodeId" value={episodeId} />
@@ -116,17 +124,16 @@ export function BloqueNefrologico({
                 </select>
                 <input
                   name="site"
-                  placeholder="Sitio (ej. Yugular interna der)"
+                  placeholder="Sitio (ej. Yugular der)"
                   className="w-full px-2 py-1.5 border rounded text-xs text-slate-900"
                 />
-                <label className="block text-[11px] text-slate-500">Fecha de colocación:</label>
                 <input
                   name="placementDate"
                   type="date"
                   className="w-full px-2 py-1.5 border rounded text-xs text-slate-900"
                 />
                 <button className="w-full bg-slate-800 text-white text-xs py-1.5 rounded font-medium hover:bg-slate-900">
-                  Guardar Acceso
+                  Guardar
                 </button>
               </form>
             </details>
@@ -140,20 +147,18 @@ export function BloqueNefrologico({
               Marcadores Virales
             </span>
             {esViralNegativo ? (
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-600 font-bold text-base">🛡️</span>
-                  <div>
-                    <p className="text-sm font-bold text-emerald-800">Negativo / No Reactivo</p>
-                    <p className="text-[11px] text-slate-500">VIH, Hepatitis B y C negativos</p>
-                  </div>
+              <div className="flex items-center gap-2">
+                <span className="text-emerald-600 font-bold text-base">🛡️</span>
+                <div>
+                  <p className="text-sm font-bold text-emerald-800">Negativo / No Reactivo</p>
+                  <p className="text-[11px] text-slate-500">VIH, Hepatitis B y C</p>
                 </div>
               </div>
             ) : (
               <div className="flex items-start gap-2">
                 <span className="text-red-600 font-bold text-base">☣️</span>
                 <div>
-                  <p className="text-sm font-bold text-red-800">Reactivo / Positivo</p>
+                  <p className="text-sm font-bold text-red-800">Reactivo</p>
                   <p className="text-xs text-red-700 font-semibold">{virales.details}</p>
                 </div>
               </div>
@@ -161,20 +166,13 @@ export function BloqueNefrologico({
 
             {virales && (
               <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
-                <span>Registrado por: </span>
+                <span>Registró: </span>
                 <strong className="text-slate-700">{nombres[virales.recordedBy] ?? virales.recordedBy}</strong>
                 {roles[virales.recordedBy] && (
-                  <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1.5 py-0.2 rounded">
+                  <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1 rounded">
                     {ETIQUETA_ROL[roles[virales.recordedBy]] ?? roles[virales.recordedBy]}
                   </span>
                 )}
-                <span className="block text-[10px] text-slate-400">
-                  {virales.updatedAt.toLocaleDateString('es-DO', {
-                    timeZone: 'America/Santo_Domingo',
-                    day: '2-digit',
-                    month: '2-digit',
-                  })}
-                </span>
               </div>
             )}
           </div>
@@ -182,33 +180,88 @@ export function BloqueNefrologico({
           {puedeRegistrar && (
             <details className="mt-2 pt-2 border-t border-slate-200">
               <summary className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
-                Actualizar virales
+                Actualizar
               </summary>
               <form action={guardarVirales} className="space-y-2 mt-2">
                 <input type="hidden" name="episodeId" value={episodeId} />
                 <select name="status" className="w-full px-2 py-1.5 border rounded text-xs bg-white text-slate-900">
                   <option value="negativo">Negativo (No reactivo)</option>
                   <option value="positivo">Positivo / Reactivo</option>
-                  <option value="pendiente">Pendiente de resultados</option>
+                  <option value="pendiente">Pendiente</option>
                 </select>
                 <input
                   name="details"
-                  placeholder="Especifique si es positivo (ej. VHC +)"
+                  placeholder="Detalle (ej. VHC +)"
                   className="w-full px-2 py-1.5 border rounded text-xs text-slate-900"
                 />
                 <button className="w-full bg-slate-800 text-white text-xs py-1.5 rounded font-medium hover:bg-slate-900">
-                  Actualizar Virales
+                  Guardar
                 </button>
               </form>
             </details>
           )}
         </div>
 
-        {/* 3. TFG */}
+        {/* 3. TIPIFICACIÓN SANGUÍNEA */}
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
-              Tasa Filtración Glomerular (TFG)
+              Tipificación (Grupo y Rh)
+            </span>
+            {tipificacion.bloodType ? (
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🩸</span>
+                  <span className="text-2xl font-black text-rose-700">{tipificacion.bloodType}</span>
+                </div>
+                {tipificacion.recordedBy && (
+                  <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
+                    <span>Registró: </span>
+                    <strong className="text-slate-700">{nombres[tipificacion.recordedBy] ?? tipificacion.recordedBy}</strong>
+                    {roles[tipificacion.recordedBy] && (
+                      <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1 rounded">
+                        {ETIQUETA_ROL[roles[tipificacion.recordedBy]] ?? roles[tipificacion.recordedBy]}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 italic">Sin tipificación registrada.</p>
+            )}
+          </div>
+
+          {puedeRegistrar && (
+            <details className="mt-2 pt-2 border-t border-slate-200">
+              <summary className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
+                {tipificacion.bloodType ? 'Actualizar' : '+ Registrar grupo'}
+              </summary>
+              <form action={guardarTipificacion} className="space-y-2 mt-2">
+                <input type="hidden" name="episodeId" value={episodeId} />
+                <select name="bloodType" required className="w-full px-2 py-1.5 border rounded text-xs bg-white text-slate-900">
+                  <option value="">Seleccione grupo...</option>
+                  <option value="O+">O Positivo (O+)</option>
+                  <option value="O-">O Negativo (O-)</option>
+                  <option value="A+">A Positivo (A+)</option>
+                  <option value="A-">A Negativo (A-)</option>
+                  <option value="B+">B Positivo (B+)</option>
+                  <option value="B-">B Negativo (B-)</option>
+                  <option value="AB+">AB Positivo (AB+)</option>
+                  <option value="AB-">AB Negativo (AB-)</option>
+                </select>
+                <button className="w-full bg-rose-700 text-white text-xs py-1.5 rounded font-medium hover:bg-rose-800">
+                  Guardar Tipificación
+                </button>
+              </form>
+            </details>
+          )}
+        </div>
+
+        {/* 4. TFG */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
+          <div>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
+              Tasa Filtración Glomerular
             </span>
             {tfgActual ? (
               <div>
@@ -217,20 +270,13 @@ export function BloqueNefrologico({
                   <span className="text-xs font-medium text-slate-500">mL/min/1.73m²</span>
                 </div>
                 <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
-                  <span>Medición por: </span>
+                  <span>Registró: </span>
                   <strong className="text-slate-700">{nombres[tfgActual.recordedBy] ?? tfgActual.recordedBy}</strong>
                   {roles[tfgActual.recordedBy] && (
-                    <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1.5 py-0.2 rounded">
+                    <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1 rounded">
                       {ETIQUETA_ROL[roles[tfgActual.recordedBy]] ?? roles[tfgActual.recordedBy]}
                     </span>
                   )}
-                  <span className="block text-[10px] text-slate-400">
-                    {tfgActual.createdAt.toLocaleDateString('es-DO', {
-                      timeZone: 'America/Santo_Domingo',
-                      day: '2-digit',
-                      month: '2-digit',
-                    })}
-                  </span>
                 </div>
               </div>
             ) : (
@@ -241,7 +287,7 @@ export function BloqueNefrologico({
           {puedeRegistrar && (
             <details className="mt-2 pt-2 border-t border-slate-200">
               <summary className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
-                + Nueva medición de TFG
+                + Nueva TFG
               </summary>
               <form action={registrarTFG} className="flex gap-2 mt-2">
                 <input type="hidden" name="episodeId" value={episodeId} />
@@ -253,7 +299,7 @@ export function BloqueNefrologico({
                   placeholder="Ej. 14.5"
                   className="flex-1 px-2 py-1.5 border rounded text-xs text-slate-900"
                 />
-                <button className="bg-sky-600 text-white text-xs px-3 py-1.5 rounded font-medium hover:bg-sky-700">
+                <button className="bg-sky-600 text-white text-xs px-2.5 py-1.5 rounded font-medium hover:bg-sky-700">
                   Guardar
                 </button>
               </form>

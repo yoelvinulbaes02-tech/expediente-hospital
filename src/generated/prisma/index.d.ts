@@ -4833,6 +4833,9 @@ export namespace Prisma {
     birthDate: Date | null
     age: number | null
     sex: string | null
+    bloodType: string | null
+    bloodTypeRecordedBy: string | null
+    bloodTypeUpdatedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4845,6 +4848,9 @@ export namespace Prisma {
     birthDate: Date | null
     age: number | null
     sex: string | null
+    bloodType: string | null
+    bloodTypeRecordedBy: string | null
+    bloodTypeUpdatedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4857,6 +4863,9 @@ export namespace Prisma {
     birthDate: number
     age: number
     sex: number
+    bloodType: number
+    bloodTypeRecordedBy: number
+    bloodTypeUpdatedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4879,6 +4888,9 @@ export namespace Prisma {
     birthDate?: true
     age?: true
     sex?: true
+    bloodType?: true
+    bloodTypeRecordedBy?: true
+    bloodTypeUpdatedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4891,6 +4903,9 @@ export namespace Prisma {
     birthDate?: true
     age?: true
     sex?: true
+    bloodType?: true
+    bloodTypeRecordedBy?: true
+    bloodTypeUpdatedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4903,6 +4918,9 @@ export namespace Prisma {
     birthDate?: true
     age?: true
     sex?: true
+    bloodType?: true
+    bloodTypeRecordedBy?: true
+    bloodTypeUpdatedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -5002,6 +5020,9 @@ export namespace Prisma {
     birthDate: Date | null
     age: number | null
     sex: string
+    bloodType: string | null
+    bloodTypeRecordedBy: string | null
+    bloodTypeUpdatedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: PatientCountAggregateOutputType | null
@@ -5033,6 +5054,9 @@ export namespace Prisma {
     birthDate?: boolean
     age?: boolean
     sex?: boolean
+    bloodType?: boolean
+    bloodTypeRecordedBy?: boolean
+    bloodTypeUpdatedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     episodes?: boolean | Patient$episodesArgs<ExtArgs>
@@ -5050,6 +5074,9 @@ export namespace Prisma {
     birthDate?: boolean
     age?: boolean
     sex?: boolean
+    bloodType?: boolean
+    bloodTypeRecordedBy?: boolean
+    bloodTypeUpdatedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["patient"]>
@@ -5062,6 +5089,9 @@ export namespace Prisma {
     birthDate?: boolean
     age?: boolean
     sex?: boolean
+    bloodType?: boolean
+    bloodTypeRecordedBy?: boolean
+    bloodTypeUpdatedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["patient"]>
@@ -5074,11 +5104,14 @@ export namespace Prisma {
     birthDate?: boolean
     age?: boolean
     sex?: boolean
+    bloodType?: boolean
+    bloodTypeRecordedBy?: boolean
+    bloodTypeUpdatedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "expedienteNumber" | "firstName" | "lastName" | "birthDate" | "age" | "sex" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "expedienteNumber" | "firstName" | "lastName" | "birthDate" | "age" | "sex" | "bloodType" | "bloodTypeRecordedBy" | "bloodTypeUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
   export type PatientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episodes?: boolean | Patient$episodesArgs<ExtArgs>
     allergies?: boolean | Patient$allergiesArgs<ExtArgs>
@@ -5105,6 +5138,9 @@ export namespace Prisma {
       birthDate: Date | null
       age: number | null
       sex: string
+      bloodType: string | null
+      bloodTypeRecordedBy: string | null
+      bloodTypeUpdatedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["patient"]>
@@ -5541,6 +5577,9 @@ export namespace Prisma {
     readonly birthDate: FieldRef<"Patient", 'DateTime'>
     readonly age: FieldRef<"Patient", 'Int'>
     readonly sex: FieldRef<"Patient", 'String'>
+    readonly bloodType: FieldRef<"Patient", 'String'>
+    readonly bloodTypeRecordedBy: FieldRef<"Patient", 'String'>
+    readonly bloodTypeUpdatedAt: FieldRef<"Patient", 'DateTime'>
     readonly createdAt: FieldRef<"Patient", 'DateTime'>
     readonly updatedAt: FieldRef<"Patient", 'DateTime'>
   }
@@ -15311,6 +15350,7 @@ export namespace Prisma {
   export type NoteMinAggregateOutputType = {
     id: string | null
     episodeId: string | null
+    content: string | null
     subjective: string | null
     objective: string | null
     assessment: string | null
@@ -15323,6 +15363,7 @@ export namespace Prisma {
   export type NoteMaxAggregateOutputType = {
     id: string | null
     episodeId: string | null
+    content: string | null
     subjective: string | null
     objective: string | null
     assessment: string | null
@@ -15335,6 +15376,7 @@ export namespace Prisma {
   export type NoteCountAggregateOutputType = {
     id: number
     episodeId: number
+    content: number
     subjective: number
     objective: number
     assessment: number
@@ -15349,6 +15391,7 @@ export namespace Prisma {
   export type NoteMinAggregateInputType = {
     id?: true
     episodeId?: true
+    content?: true
     subjective?: true
     objective?: true
     assessment?: true
@@ -15361,6 +15404,7 @@ export namespace Prisma {
   export type NoteMaxAggregateInputType = {
     id?: true
     episodeId?: true
+    content?: true
     subjective?: true
     objective?: true
     assessment?: true
@@ -15373,6 +15417,7 @@ export namespace Prisma {
   export type NoteCountAggregateInputType = {
     id?: true
     episodeId?: true
+    content?: true
     subjective?: true
     objective?: true
     assessment?: true
@@ -15458,6 +15503,7 @@ export namespace Prisma {
   export type NoteGroupByOutputType = {
     id: string
     episodeId: string
+    content: string | null
     subjective: string | null
     objective: string | null
     assessment: string | null
@@ -15487,6 +15533,7 @@ export namespace Prisma {
   export type NoteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     episodeId?: boolean
+    content?: boolean
     subjective?: boolean
     objective?: boolean
     assessment?: boolean
@@ -15500,6 +15547,7 @@ export namespace Prisma {
   export type NoteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     episodeId?: boolean
+    content?: boolean
     subjective?: boolean
     objective?: boolean
     assessment?: boolean
@@ -15513,6 +15561,7 @@ export namespace Prisma {
   export type NoteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     episodeId?: boolean
+    content?: boolean
     subjective?: boolean
     objective?: boolean
     assessment?: boolean
@@ -15526,6 +15575,7 @@ export namespace Prisma {
   export type NoteSelectScalar = {
     id?: boolean
     episodeId?: boolean
+    content?: boolean
     subjective?: boolean
     objective?: boolean
     assessment?: boolean
@@ -15535,7 +15585,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type NoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "subjective" | "objective" | "assessment" | "plan" | "status" | "createdBy" | "createdAt", ExtArgs["result"]["note"]>
+  export type NoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "content" | "subjective" | "objective" | "assessment" | "plan" | "status" | "createdBy" | "createdAt", ExtArgs["result"]["note"]>
   export type NoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -15554,6 +15604,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       episodeId: string
+      content: string | null
       subjective: string | null
       objective: string | null
       assessment: string | null
@@ -15987,6 +16038,7 @@ export namespace Prisma {
   interface NoteFieldRefs {
     readonly id: FieldRef<"Note", 'String'>
     readonly episodeId: FieldRef<"Note", 'String'>
+    readonly content: FieldRef<"Note", 'String'>
     readonly subjective: FieldRef<"Note", 'String'>
     readonly objective: FieldRef<"Note", 'String'>
     readonly assessment: FieldRef<"Note", 'String'>
@@ -16433,6 +16485,7 @@ export namespace Prisma {
     temperature: number | null
     oxygenSat: number | null
     glucose: number | null
+    weight: number | null
     painScale: number | null
     diuresis: number | null
   }
@@ -16445,6 +16498,7 @@ export namespace Prisma {
     temperature: number | null
     oxygenSat: number | null
     glucose: number | null
+    weight: number | null
     painScale: number | null
     diuresis: number | null
   }
@@ -16459,6 +16513,7 @@ export namespace Prisma {
     temperature: number | null
     oxygenSat: number | null
     glucose: number | null
+    weight: number | null
     painScale: number | null
     diuresis: number | null
     recordedBy: string | null
@@ -16475,6 +16530,7 @@ export namespace Prisma {
     temperature: number | null
     oxygenSat: number | null
     glucose: number | null
+    weight: number | null
     painScale: number | null
     diuresis: number | null
     recordedBy: string | null
@@ -16491,6 +16547,7 @@ export namespace Prisma {
     temperature: number
     oxygenSat: number
     glucose: number
+    weight: number
     painScale: number
     diuresis: number
     recordedBy: number
@@ -16507,6 +16564,7 @@ export namespace Prisma {
     temperature?: true
     oxygenSat?: true
     glucose?: true
+    weight?: true
     painScale?: true
     diuresis?: true
   }
@@ -16519,6 +16577,7 @@ export namespace Prisma {
     temperature?: true
     oxygenSat?: true
     glucose?: true
+    weight?: true
     painScale?: true
     diuresis?: true
   }
@@ -16533,6 +16592,7 @@ export namespace Prisma {
     temperature?: true
     oxygenSat?: true
     glucose?: true
+    weight?: true
     painScale?: true
     diuresis?: true
     recordedBy?: true
@@ -16549,6 +16609,7 @@ export namespace Prisma {
     temperature?: true
     oxygenSat?: true
     glucose?: true
+    weight?: true
     painScale?: true
     diuresis?: true
     recordedBy?: true
@@ -16565,6 +16626,7 @@ export namespace Prisma {
     temperature?: true
     oxygenSat?: true
     glucose?: true
+    weight?: true
     painScale?: true
     diuresis?: true
     recordedBy?: true
@@ -16668,6 +16730,7 @@ export namespace Prisma {
     temperature: number | null
     oxygenSat: number | null
     glucose: number | null
+    weight: number | null
     painScale: number | null
     diuresis: number | null
     recordedBy: string
@@ -16703,6 +16766,7 @@ export namespace Prisma {
     temperature?: boolean
     oxygenSat?: boolean
     glucose?: boolean
+    weight?: boolean
     painScale?: boolean
     diuresis?: boolean
     recordedBy?: boolean
@@ -16720,6 +16784,7 @@ export namespace Prisma {
     temperature?: boolean
     oxygenSat?: boolean
     glucose?: boolean
+    weight?: boolean
     painScale?: boolean
     diuresis?: boolean
     recordedBy?: boolean
@@ -16737,6 +16802,7 @@ export namespace Prisma {
     temperature?: boolean
     oxygenSat?: boolean
     glucose?: boolean
+    weight?: boolean
     painScale?: boolean
     diuresis?: boolean
     recordedBy?: boolean
@@ -16754,13 +16820,14 @@ export namespace Prisma {
     temperature?: boolean
     oxygenSat?: boolean
     glucose?: boolean
+    weight?: boolean
     painScale?: boolean
     diuresis?: boolean
     recordedBy?: boolean
     createdAt?: boolean
   }
 
-  export type VitalSignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "systolic" | "diastolic" | "heartRate" | "respiratoryRate" | "temperature" | "oxygenSat" | "glucose" | "painScale" | "diuresis" | "recordedBy" | "createdAt", ExtArgs["result"]["vitalSign"]>
+  export type VitalSignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "systolic" | "diastolic" | "heartRate" | "respiratoryRate" | "temperature" | "oxygenSat" | "glucose" | "weight" | "painScale" | "diuresis" | "recordedBy" | "createdAt", ExtArgs["result"]["vitalSign"]>
   export type VitalSignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -16786,6 +16853,7 @@ export namespace Prisma {
       temperature: number | null
       oxygenSat: number | null
       glucose: number | null
+      weight: number | null
       painScale: number | null
       diuresis: number | null
       recordedBy: string
@@ -17223,6 +17291,7 @@ export namespace Prisma {
     readonly temperature: FieldRef<"VitalSign", 'Float'>
     readonly oxygenSat: FieldRef<"VitalSign", 'Int'>
     readonly glucose: FieldRef<"VitalSign", 'Int'>
+    readonly weight: FieldRef<"VitalSign", 'Float'>
     readonly painScale: FieldRef<"VitalSign", 'Int'>
     readonly diuresis: FieldRef<"VitalSign", 'Int'>
     readonly recordedBy: FieldRef<"VitalSign", 'String'>
@@ -19949,6 +20018,9 @@ export namespace Prisma {
     birthDate: 'birthDate',
     age: 'age',
     sex: 'sex',
+    bloodType: 'bloodType',
+    bloodTypeRecordedBy: 'bloodTypeRecordedBy',
+    bloodTypeUpdatedAt: 'bloodTypeUpdatedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -20077,6 +20149,7 @@ export namespace Prisma {
   export const NoteScalarFieldEnum: {
     id: 'id',
     episodeId: 'episodeId',
+    content: 'content',
     subjective: 'subjective',
     objective: 'objective',
     assessment: 'assessment',
@@ -20099,6 +20172,7 @@ export namespace Prisma {
     temperature: 'temperature',
     oxygenSat: 'oxygenSat',
     glucose: 'glucose',
+    weight: 'weight',
     painScale: 'painScale',
     diuresis: 'diuresis',
     recordedBy: 'recordedBy',
@@ -20513,6 +20587,9 @@ export namespace Prisma {
     birthDate?: DateTimeNullableFilter<"Patient"> | Date | string | null
     age?: IntNullableFilter<"Patient"> | number | null
     sex?: StringFilter<"Patient"> | string
+    bloodType?: StringNullableFilter<"Patient"> | string | null
+    bloodTypeRecordedBy?: StringNullableFilter<"Patient"> | string | null
+    bloodTypeUpdatedAt?: DateTimeNullableFilter<"Patient"> | Date | string | null
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
     episodes?: EpisodeListRelationFilter
@@ -20529,6 +20606,9 @@ export namespace Prisma {
     birthDate?: SortOrderInput | SortOrder
     age?: SortOrderInput | SortOrder
     sex?: SortOrder
+    bloodType?: SortOrderInput | SortOrder
+    bloodTypeRecordedBy?: SortOrderInput | SortOrder
+    bloodTypeUpdatedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     episodes?: EpisodeOrderByRelationAggregateInput
@@ -20548,6 +20628,9 @@ export namespace Prisma {
     birthDate?: DateTimeNullableFilter<"Patient"> | Date | string | null
     age?: IntNullableFilter<"Patient"> | number | null
     sex?: StringFilter<"Patient"> | string
+    bloodType?: StringNullableFilter<"Patient"> | string | null
+    bloodTypeRecordedBy?: StringNullableFilter<"Patient"> | string | null
+    bloodTypeUpdatedAt?: DateTimeNullableFilter<"Patient"> | Date | string | null
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
     episodes?: EpisodeListRelationFilter
@@ -20564,6 +20647,9 @@ export namespace Prisma {
     birthDate?: SortOrderInput | SortOrder
     age?: SortOrderInput | SortOrder
     sex?: SortOrder
+    bloodType?: SortOrderInput | SortOrder
+    bloodTypeRecordedBy?: SortOrderInput | SortOrder
+    bloodTypeUpdatedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PatientCountOrderByAggregateInput
@@ -20584,6 +20670,9 @@ export namespace Prisma {
     birthDate?: DateTimeNullableWithAggregatesFilter<"Patient"> | Date | string | null
     age?: IntNullableWithAggregatesFilter<"Patient"> | number | null
     sex?: StringWithAggregatesFilter<"Patient"> | string
+    bloodType?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    bloodTypeRecordedBy?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    bloodTypeUpdatedAt?: DateTimeNullableWithAggregatesFilter<"Patient"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
   }
@@ -21225,6 +21314,7 @@ export namespace Prisma {
     NOT?: NoteWhereInput | NoteWhereInput[]
     id?: StringFilter<"Note"> | string
     episodeId?: StringFilter<"Note"> | string
+    content?: StringNullableFilter<"Note"> | string | null
     subjective?: StringNullableFilter<"Note"> | string | null
     objective?: StringNullableFilter<"Note"> | string | null
     assessment?: StringNullableFilter<"Note"> | string | null
@@ -21238,6 +21328,7 @@ export namespace Prisma {
   export type NoteOrderByWithRelationInput = {
     id?: SortOrder
     episodeId?: SortOrder
+    content?: SortOrderInput | SortOrder
     subjective?: SortOrderInput | SortOrder
     objective?: SortOrderInput | SortOrder
     assessment?: SortOrderInput | SortOrder
@@ -21254,6 +21345,7 @@ export namespace Prisma {
     OR?: NoteWhereInput[]
     NOT?: NoteWhereInput | NoteWhereInput[]
     episodeId?: StringFilter<"Note"> | string
+    content?: StringNullableFilter<"Note"> | string | null
     subjective?: StringNullableFilter<"Note"> | string | null
     objective?: StringNullableFilter<"Note"> | string | null
     assessment?: StringNullableFilter<"Note"> | string | null
@@ -21267,6 +21359,7 @@ export namespace Prisma {
   export type NoteOrderByWithAggregationInput = {
     id?: SortOrder
     episodeId?: SortOrder
+    content?: SortOrderInput | SortOrder
     subjective?: SortOrderInput | SortOrder
     objective?: SortOrderInput | SortOrder
     assessment?: SortOrderInput | SortOrder
@@ -21285,6 +21378,7 @@ export namespace Prisma {
     NOT?: NoteScalarWhereWithAggregatesInput | NoteScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Note"> | string
     episodeId?: StringWithAggregatesFilter<"Note"> | string
+    content?: StringNullableWithAggregatesFilter<"Note"> | string | null
     subjective?: StringNullableWithAggregatesFilter<"Note"> | string | null
     objective?: StringNullableWithAggregatesFilter<"Note"> | string | null
     assessment?: StringNullableWithAggregatesFilter<"Note"> | string | null
@@ -21307,6 +21401,7 @@ export namespace Prisma {
     temperature?: FloatNullableFilter<"VitalSign"> | number | null
     oxygenSat?: IntNullableFilter<"VitalSign"> | number | null
     glucose?: IntNullableFilter<"VitalSign"> | number | null
+    weight?: FloatNullableFilter<"VitalSign"> | number | null
     painScale?: IntNullableFilter<"VitalSign"> | number | null
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     recordedBy?: StringFilter<"VitalSign"> | string
@@ -21324,6 +21419,7 @@ export namespace Prisma {
     temperature?: SortOrderInput | SortOrder
     oxygenSat?: SortOrderInput | SortOrder
     glucose?: SortOrderInput | SortOrder
+    weight?: SortOrderInput | SortOrder
     painScale?: SortOrderInput | SortOrder
     diuresis?: SortOrderInput | SortOrder
     recordedBy?: SortOrder
@@ -21344,6 +21440,7 @@ export namespace Prisma {
     temperature?: FloatNullableFilter<"VitalSign"> | number | null
     oxygenSat?: IntNullableFilter<"VitalSign"> | number | null
     glucose?: IntNullableFilter<"VitalSign"> | number | null
+    weight?: FloatNullableFilter<"VitalSign"> | number | null
     painScale?: IntNullableFilter<"VitalSign"> | number | null
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     recordedBy?: StringFilter<"VitalSign"> | string
@@ -21361,6 +21458,7 @@ export namespace Prisma {
     temperature?: SortOrderInput | SortOrder
     oxygenSat?: SortOrderInput | SortOrder
     glucose?: SortOrderInput | SortOrder
+    weight?: SortOrderInput | SortOrder
     painScale?: SortOrderInput | SortOrder
     diuresis?: SortOrderInput | SortOrder
     recordedBy?: SortOrder
@@ -21385,6 +21483,7 @@ export namespace Prisma {
     temperature?: FloatNullableWithAggregatesFilter<"VitalSign"> | number | null
     oxygenSat?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     glucose?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
+    weight?: FloatNullableWithAggregatesFilter<"VitalSign"> | number | null
     painScale?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     diuresis?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     recordedBy?: StringWithAggregatesFilter<"VitalSign"> | string
@@ -21785,6 +21884,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodes?: EpisodeCreateNestedManyWithoutPatientInput
@@ -21801,6 +21903,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodes?: EpisodeUncheckedCreateNestedManyWithoutPatientInput
@@ -21817,6 +21922,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodes?: EpisodeUpdateManyWithoutPatientNestedInput
@@ -21833,6 +21941,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodes?: EpisodeUncheckedUpdateManyWithoutPatientNestedInput
@@ -21849,6 +21960,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21861,6 +21975,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21873,6 +21990,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22566,6 +22686,7 @@ export namespace Prisma {
 
   export type NoteCreateInput = {
     id?: string
+    content?: string | null
     subjective?: string | null
     objective?: string | null
     assessment?: string | null
@@ -22579,6 +22700,7 @@ export namespace Prisma {
   export type NoteUncheckedCreateInput = {
     id?: string
     episodeId: string
+    content?: string | null
     subjective?: string | null
     objective?: string | null
     assessment?: string | null
@@ -22590,6 +22712,7 @@ export namespace Prisma {
 
   export type NoteUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     subjective?: NullableStringFieldUpdateOperationsInput | string | null
     objective?: NullableStringFieldUpdateOperationsInput | string | null
     assessment?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22603,6 +22726,7 @@ export namespace Prisma {
   export type NoteUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     episodeId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     subjective?: NullableStringFieldUpdateOperationsInput | string | null
     objective?: NullableStringFieldUpdateOperationsInput | string | null
     assessment?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22615,6 +22739,7 @@ export namespace Prisma {
   export type NoteCreateManyInput = {
     id?: string
     episodeId: string
+    content?: string | null
     subjective?: string | null
     objective?: string | null
     assessment?: string | null
@@ -22626,6 +22751,7 @@ export namespace Prisma {
 
   export type NoteUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     subjective?: NullableStringFieldUpdateOperationsInput | string | null
     objective?: NullableStringFieldUpdateOperationsInput | string | null
     assessment?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22638,6 +22764,7 @@ export namespace Prisma {
   export type NoteUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     episodeId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     subjective?: NullableStringFieldUpdateOperationsInput | string | null
     objective?: NullableStringFieldUpdateOperationsInput | string | null
     assessment?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22656,6 +22783,7 @@ export namespace Prisma {
     temperature?: number | null
     oxygenSat?: number | null
     glucose?: number | null
+    weight?: number | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
@@ -22673,6 +22801,7 @@ export namespace Prisma {
     temperature?: number | null
     oxygenSat?: number | null
     glucose?: number | null
+    weight?: number | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
@@ -22688,6 +22817,7 @@ export namespace Prisma {
     temperature?: NullableFloatFieldUpdateOperationsInput | number | null
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
+    weight?: NullableFloatFieldUpdateOperationsInput | number | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
@@ -22705,6 +22835,7 @@ export namespace Prisma {
     temperature?: NullableFloatFieldUpdateOperationsInput | number | null
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
+    weight?: NullableFloatFieldUpdateOperationsInput | number | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
@@ -22721,6 +22852,7 @@ export namespace Prisma {
     temperature?: number | null
     oxygenSat?: number | null
     glucose?: number | null
+    weight?: number | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
@@ -22736,6 +22868,7 @@ export namespace Prisma {
     temperature?: NullableFloatFieldUpdateOperationsInput | number | null
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
+    weight?: NullableFloatFieldUpdateOperationsInput | number | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
@@ -22752,6 +22885,7 @@ export namespace Prisma {
     temperature?: NullableFloatFieldUpdateOperationsInput | number | null
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
+    weight?: NullableFloatFieldUpdateOperationsInput | number | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
@@ -23315,6 +23449,9 @@ export namespace Prisma {
     birthDate?: SortOrder
     age?: SortOrder
     sex?: SortOrder
+    bloodType?: SortOrder
+    bloodTypeRecordedBy?: SortOrder
+    bloodTypeUpdatedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -23331,6 +23468,9 @@ export namespace Prisma {
     birthDate?: SortOrder
     age?: SortOrder
     sex?: SortOrder
+    bloodType?: SortOrder
+    bloodTypeRecordedBy?: SortOrder
+    bloodTypeUpdatedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -23343,6 +23483,9 @@ export namespace Prisma {
     birthDate?: SortOrder
     age?: SortOrder
     sex?: SortOrder
+    bloodType?: SortOrder
+    bloodTypeRecordedBy?: SortOrder
+    bloodTypeUpdatedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -23796,6 +23939,7 @@ export namespace Prisma {
   export type NoteCountOrderByAggregateInput = {
     id?: SortOrder
     episodeId?: SortOrder
+    content?: SortOrder
     subjective?: SortOrder
     objective?: SortOrder
     assessment?: SortOrder
@@ -23808,6 +23952,7 @@ export namespace Prisma {
   export type NoteMaxOrderByAggregateInput = {
     id?: SortOrder
     episodeId?: SortOrder
+    content?: SortOrder
     subjective?: SortOrder
     objective?: SortOrder
     assessment?: SortOrder
@@ -23820,6 +23965,7 @@ export namespace Prisma {
   export type NoteMinOrderByAggregateInput = {
     id?: SortOrder
     episodeId?: SortOrder
+    content?: SortOrder
     subjective?: SortOrder
     objective?: SortOrder
     assessment?: SortOrder
@@ -23850,6 +23996,7 @@ export namespace Prisma {
     temperature?: SortOrder
     oxygenSat?: SortOrder
     glucose?: SortOrder
+    weight?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
     recordedBy?: SortOrder
@@ -23864,6 +24011,7 @@ export namespace Prisma {
     temperature?: SortOrder
     oxygenSat?: SortOrder
     glucose?: SortOrder
+    weight?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
   }
@@ -23878,6 +24026,7 @@ export namespace Prisma {
     temperature?: SortOrder
     oxygenSat?: SortOrder
     glucose?: SortOrder
+    weight?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
     recordedBy?: SortOrder
@@ -23894,6 +24043,7 @@ export namespace Prisma {
     temperature?: SortOrder
     oxygenSat?: SortOrder
     glucose?: SortOrder
+    weight?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
     recordedBy?: SortOrder
@@ -23908,6 +24058,7 @@ export namespace Prisma {
     temperature?: SortOrder
     oxygenSat?: SortOrder
     glucose?: SortOrder
+    weight?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
   }
@@ -25801,6 +25952,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     allergies?: AllergyCreateNestedManyWithoutPatientInput
@@ -25816,6 +25970,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
@@ -25864,6 +26021,7 @@ export namespace Prisma {
 
   export type NoteCreateWithoutEpisodeInput = {
     id?: string
+    content?: string | null
     subjective?: string | null
     objective?: string | null
     assessment?: string | null
@@ -25875,6 +26033,7 @@ export namespace Prisma {
 
   export type NoteUncheckedCreateWithoutEpisodeInput = {
     id?: string
+    content?: string | null
     subjective?: string | null
     objective?: string | null
     assessment?: string | null
@@ -25903,6 +26062,7 @@ export namespace Prisma {
     temperature?: number | null
     oxygenSat?: number | null
     glucose?: number | null
+    weight?: number | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
@@ -25918,6 +26078,7 @@ export namespace Prisma {
     temperature?: number | null
     oxygenSat?: number | null
     glucose?: number | null
+    weight?: number | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
@@ -26190,6 +26351,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     allergies?: AllergyUpdateManyWithoutPatientNestedInput
@@ -26205,6 +26369,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
@@ -26250,6 +26417,7 @@ export namespace Prisma {
     NOT?: NoteScalarWhereInput | NoteScalarWhereInput[]
     id?: StringFilter<"Note"> | string
     episodeId?: StringFilter<"Note"> | string
+    content?: StringNullableFilter<"Note"> | string | null
     subjective?: StringNullableFilter<"Note"> | string | null
     objective?: StringNullableFilter<"Note"> | string | null
     assessment?: StringNullableFilter<"Note"> | string | null
@@ -26288,6 +26456,7 @@ export namespace Prisma {
     temperature?: FloatNullableFilter<"VitalSign"> | number | null
     oxygenSat?: IntNullableFilter<"VitalSign"> | number | null
     glucose?: IntNullableFilter<"VitalSign"> | number | null
+    weight?: FloatNullableFilter<"VitalSign"> | number | null
     painScale?: IntNullableFilter<"VitalSign"> | number | null
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     recordedBy?: StringFilter<"VitalSign"> | string
@@ -26534,6 +26703,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodes?: EpisodeCreateNestedManyWithoutPatientInput
@@ -26549,6 +26721,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodes?: EpisodeUncheckedCreateNestedManyWithoutPatientInput
@@ -26580,6 +26755,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodes?: EpisodeUpdateManyWithoutPatientNestedInput
@@ -26595,6 +26773,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodes?: EpisodeUncheckedUpdateManyWithoutPatientNestedInput
@@ -26994,6 +27175,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodes?: EpisodeCreateNestedManyWithoutPatientInput
@@ -27009,6 +27193,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodes?: EpisodeUncheckedCreateNestedManyWithoutPatientInput
@@ -27101,6 +27288,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodes?: EpisodeUpdateManyWithoutPatientNestedInput
@@ -27116,6 +27306,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodes?: EpisodeUncheckedUpdateManyWithoutPatientNestedInput
@@ -27326,6 +27519,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodes?: EpisodeCreateNestedManyWithoutPatientInput
@@ -27341,6 +27537,9 @@ export namespace Prisma {
     birthDate?: Date | string | null
     age?: number | null
     sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodes?: EpisodeUncheckedCreateNestedManyWithoutPatientInput
@@ -27433,6 +27632,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodes?: EpisodeUpdateManyWithoutPatientNestedInput
@@ -27448,6 +27650,9 @@ export namespace Prisma {
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
     sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodes?: EpisodeUncheckedUpdateManyWithoutPatientNestedInput
@@ -28392,6 +28597,7 @@ export namespace Prisma {
 
   export type NoteCreateManyEpisodeInput = {
     id?: string
+    content?: string | null
     subjective?: string | null
     objective?: string | null
     assessment?: string | null
@@ -28410,6 +28616,7 @@ export namespace Prisma {
     temperature?: number | null
     oxygenSat?: number | null
     glucose?: number | null
+    weight?: number | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
@@ -28522,6 +28729,7 @@ export namespace Prisma {
 
   export type NoteUpdateWithoutEpisodeInput = {
     id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     subjective?: NullableStringFieldUpdateOperationsInput | string | null
     objective?: NullableStringFieldUpdateOperationsInput | string | null
     assessment?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28533,6 +28741,7 @@ export namespace Prisma {
 
   export type NoteUncheckedUpdateWithoutEpisodeInput = {
     id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     subjective?: NullableStringFieldUpdateOperationsInput | string | null
     objective?: NullableStringFieldUpdateOperationsInput | string | null
     assessment?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28544,6 +28753,7 @@ export namespace Prisma {
 
   export type NoteUncheckedUpdateManyWithoutEpisodeInput = {
     id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     subjective?: NullableStringFieldUpdateOperationsInput | string | null
     objective?: NullableStringFieldUpdateOperationsInput | string | null
     assessment?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28562,6 +28772,7 @@ export namespace Prisma {
     temperature?: NullableFloatFieldUpdateOperationsInput | number | null
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
+    weight?: NullableFloatFieldUpdateOperationsInput | number | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
@@ -28577,6 +28788,7 @@ export namespace Prisma {
     temperature?: NullableFloatFieldUpdateOperationsInput | number | null
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
+    weight?: NullableFloatFieldUpdateOperationsInput | number | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
@@ -28592,6 +28804,7 @@ export namespace Prisma {
     temperature?: NullableFloatFieldUpdateOperationsInput | number | null
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
+    weight?: NullableFloatFieldUpdateOperationsInput | number | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string

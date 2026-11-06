@@ -191,7 +191,6 @@ export async function guardarVirales(formData: FormData): Promise<void> {
   const status = String(formData.get('status') ?? 'negativo')
   const details = String(formData.get('details') ?? '').trim()
 
-  // Si existe uno previo, lo actualizamos; si no, lo creamos
   const existente = await prisma.viralSerology.findFirst({
     where: { episodeId },
     orderBy: { updatedAt: 'desc' },
@@ -244,7 +243,6 @@ export async function guardarAccesoVascular(formData: FormData): Promise<void> {
 
   const placementDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
 
-  // Desactivamos accesos previos activos si se coloca uno nuevo
   await prisma.vascularAccess.updateMany({
     where: { episodeId, isActive: true },
     data: { isActive: false },
@@ -275,4 +273,74 @@ export async function guardarAccesoVascular(formData: FormData): Promise<void> {
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+// ─── 7. TIPIFICACIÓN SANGUÍNEA (GRUPO Y RH) ───
+export async function guardarTipificacion(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const bloodType = String(formData.get('bloodType') ?? '').trim().toUpperCase()
+  if (!bloodType) volverAlExpediente(episodeId, 'Selecciona o escribe el tipo de sangre')
+
+  await prisma.patient.update({
+    where: { id: episode.patientId },
+    data: {
+      bloodType,
+      bloodTypeRecordedBy: email,
+      bloodTypeUpdatedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'patient',
+    entityId: episode.patientId,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: { tipificacion: bloodType },
+    reason: 'Registro de tipificación sanguínea',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+// ─── 8. CAMBIAR HABITACIÓN / CAMA (REUBICACIÓN DEL PX) ───
+export async function cambiarUbicacion(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const room = String(formData.get('room') ?? '').trim()
+  const bed = String(formData.get('bed') ?? '').trim()
+
+  if (!room || !bed) volverAlExpediente(episodeId, 'Debe indicar habitación y cama')
+
+  // Consultamos los datos anteriores de forma segura y tipada
+  const previo = await prisma.episode.findUnique({
+    where: { id: episodeId },
+    select: { room: true, bed: true },
+  })
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: { room, bed },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: { habitacion: previo?.room, cama: previo?.bed },
+    newValue: { habitacion: room, cama: bed },
+    reason: 'Reubicación / traslado de cama de paciente',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
 }

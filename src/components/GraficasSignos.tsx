@@ -11,7 +11,7 @@ export type RegistroVital = {
   temperature: number | null
   oxygenSat: number | null
   glucose: number | null
-  painScale: number | null
+  weight: number | null
   diuresis: number | null
 }
 
@@ -80,13 +80,12 @@ const GRAFICAS: Grafica[] = [
     series: [{ nombre: 'Glucosa', campo: 'glucose', color: '#2563eb', rango: [70, 140] }],
   },
   {
-    id: 'dolor',
-    titulo: 'Dolor',
-    corto: 'Dolor',
-    unidad: '/10',
+    id: 'peso',
+    titulo: 'Peso corporal',
+    corto: 'Peso',
+    unidad: 'kg',
     piso: 0,
-    techo: 10,
-    series: [{ nombre: 'Dolor', campo: 'painScale', color: '#2563eb', rango: [0, 3] }],
+    series: [{ nombre: 'Peso', campo: 'weight', color: '#059669', rango: [null, null] }],
   },
   {
     id: 'diuresis',
