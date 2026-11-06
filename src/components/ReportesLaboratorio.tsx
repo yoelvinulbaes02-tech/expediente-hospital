@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { guardarReporteLaboratorio } from '@/app/dashboard/paciente/[id]/actions-clinicas'
 import { TextareaConDeshacer } from '@/components/TextareaConDeshacer'
 
@@ -15,12 +15,12 @@ type ReporteLab = {
 }
 
 const ETIQUETA_ROL: Record<string, string> = {
-  ADMIN: 'Administrador',
+  ADMIN: 'Admin',
   DOCTOR: 'Médico',
   RESIDENT: 'Residente',
-  NURSE: 'Enfermería',
+  NURSE: 'Enf.',
   LAB: 'Laboratorio',
-  READONLY: 'Solo lectura',
+  READONLY: 'Lectura',
 }
 
 export function ReportesLaboratorio({
@@ -36,6 +36,7 @@ export function ReportesLaboratorio({
   roles: Record<string, string>
   puedeRegistrar: boolean
 }) {
+  const [busqueda, setBusqueda] = useState('')
   const [analiticaElegida, setAnaliticaElegida] = useState('')
   const [categoriaElegida, setCategoriaElegida] = useState('HEMATOLOGÍA')
 
@@ -49,62 +50,114 @@ export function ReportesLaboratorio({
     }
   }
 
+  const filtrados = useMemo(() => {
+    if (!busqueda.trim()) return reportes
+    const q = busqueda.toLowerCase().trim()
+    return reportes.filter(
+      (r) =>
+        r.testName.toLowerCase().includes(q) ||
+        r.category.toLowerCase().includes(q) ||
+        r.result.toLowerCase().includes(q)
+    )
+  }, [reportes, busqueda])
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-      <div className="flex justify-between items-center border-b pb-2 mb-4">
+    <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+      {/* Cabecera */}
+      <div className="flex flex-wrap justify-between items-center gap-2 border-b pb-3 mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-xl">🧪</span>
-          <h2 className="text-lg font-bold text-slate-800">Reportes de Laboratorio</h2>
+          <span className="text-lg">🧪</span>
+          <h2 className="text-base font-bold text-slate-800">Reportes de Laboratorio</h2>
+          <span className="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full border">
+            {reportes.length}
+          </span>
         </div>
-        <span className="text-xs text-slate-500 font-semibold">{reportes.length} registrados</span>
+
+        {reportes.length > 4 && (
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="🔍 Filtrar analítica..."
+            className="px-2.5 py-1 border rounded-lg text-xs bg-slate-50 text-slate-900 focus:bg-white focus:ring-1 focus:ring-teal-500 outline-none w-44"
+          />
+        )}
       </div>
 
+      {/* LISTA COMPACTA POR RENGLONES (FORMATO TABLA CLÍNICA) */}
       {reportes.length === 0 ? (
-        <p className="text-sm text-slate-400 py-3">No hay reportes de laboratorio registrados.</p>
+        <p className="text-xs text-slate-400 py-3 italic text-center">
+          No hay analíticas de laboratorio registradas en este expediente.
+        </p>
       ) : (
-        <div className="space-y-3 mb-4">
-          {reportes.map((rep) => (
-            <div key={rep.id} className="border border-slate-200 rounded-lg p-4 bg-slate-50/50">
-              <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
-                <div>
-                  <span className="bg-teal-100 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mr-2">
-                    {rep.category}
-                  </span>
-                  <strong className="text-sm text-slate-800">{rep.testName}</strong>
-                </div>
-                {rep.sampleDate && (
-                  <span className="text-xs text-slate-500">
-                    Fecha:{' '}
-                    {rep.sampleDate.toLocaleDateString('es-DO', {
-                      timeZone: 'America/Santo_Domingo',
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                    })}
-                  </span>
-                )}
-              </div>
-              <p className="text-sm font-mono text-slate-800 whitespace-pre-line bg-white p-3 rounded border border-slate-100">
-                {rep.result}
-              </p>
-              <div className="mt-2 text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5">
-                <span>Registrado por:</span>
-                <strong className="text-slate-700">{nombres[rep.createdBy] ?? rep.createdBy}</strong>
-                {roles[rep.createdBy] && (
-                  <span className="bg-slate-200 text-slate-700 text-[10px] font-bold px-1.5 py-0.2 rounded">
-                    {ETIQUETA_ROL[roles[rep.createdBy]] ?? roles[rep.createdBy]}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto max-h-96 overflow-y-auto border border-slate-200 rounded-lg mb-3">
+          <table className="w-full text-xs text-left border-collapse">
+            <thead className="bg-slate-100 text-slate-700 sticky top-0 z-10 border-b border-slate-200">
+              <tr>
+                <th className="py-2 px-3 font-bold min-w-44">Analítica / Examen</th>
+                <th className="py-2 px-3 font-bold min-w-36">Resultado / Valor</th>
+                <th className="py-2 px-3 font-bold whitespace-nowrap min-w-24">Fecha</th>
+                <th className="py-2 px-3 font-bold whitespace-nowrap min-w-36">Registró</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtrados.map((rep) => (
+                <tr key={rep.id} className="hover:bg-slate-50/80 transition-colors">
+                  {/* Categoría y Nombre */}
+                  <td className="py-2 px-3">
+                    <span className="inline-block bg-teal-50 text-teal-800 text-[10px] font-bold px-1.5 py-0.2 rounded border border-teal-200 uppercase tracking-wider mr-1.5">
+                      {rep.category}
+                    </span>
+                    <strong className="text-slate-800">{rep.testName}</strong>
+                  </td>
+
+                  {/* Resultado en fuente médica monoespaciada */}
+                  <td className="py-2 px-3 font-mono font-bold text-slate-900 whitespace-pre-line bg-slate-50/50">
+                    {rep.result}
+                  </td>
+
+                  {/* Fecha */}
+                  <td className="py-2 px-3 text-slate-500 whitespace-nowrap">
+                    {rep.sampleDate
+                      ? rep.sampleDate.toLocaleDateString('es-DO', {
+                          timeZone: 'America/Santo_Domingo',
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })
+                      : '—'}
+                  </td>
+
+                  {/* Firma y Rol */}
+                  <td className="py-2 px-3 text-slate-600 whitespace-nowrap">
+                    <span className="font-semibold text-slate-700">
+                      {nombres[rep.createdBy] ?? rep.createdBy}
+                    </span>
+                    {roles[rep.createdBy] && (
+                      <span className="ml-1 text-[10px] bg-slate-100 text-slate-600 px-1 py-0.2 rounded font-semibold border">
+                        {ETIQUETA_ROL[roles[rep.createdBy]] ?? roles[rep.createdBy]}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {filtrados.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="py-4 text-center text-slate-400 italic">
+                    No se encontraron analíticas con ese filtro.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
 
+      {/* FORMULARIO PARA REGISTRAR NUEVA ANALÍTICA */}
       {puedeRegistrar && (
-        <details className="pt-3 border-t">
-          <summary className="text-sm font-bold text-teal-700 hover:text-teal-800 cursor-pointer py-1 select-none">
-            + Agregar reporte de analítica de laboratorio
+        <details className="pt-2 border-t">
+          <summary className="text-xs font-bold text-teal-700 hover:text-teal-800 cursor-pointer py-1 select-none flex items-center gap-1">
+            <span>+</span> Agregar nueva analítica de laboratorio
           </summary>
           <form action={guardarReporteLaboratorio} className="space-y-3 mt-3">
             <input type="hidden" name="episodeId" value={episodeId} />
@@ -112,7 +165,7 @@ export function ReportesLaboratorio({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                   Seleccionar Analítica / Examen *
                 </label>
                 <select
@@ -120,7 +173,7 @@ export function ReportesLaboratorio({
                   required
                   value={analiticaElegida}
                   onChange={handleSelect}
-                  className="w-full px-3 py-2 border rounded-lg text-sm bg-white text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-white text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                 >
                   <option value="">Seleccione un análisis...</option>
 
@@ -247,43 +300,43 @@ export function ReportesLaboratorio({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Fecha de la Muestra</label>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">Fecha de la Muestra</label>
                 <input
                   name="sampleDate"
                   type="date"
-                  className="w-full px-3 py-2 border rounded-lg text-sm bg-white text-slate-900"
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-white text-slate-900"
                 />
               </div>
             </div>
 
             {analiticaElegida === 'OTRO' && (
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Escriba el nombre de la analítica *</label>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">Escriba el nombre de la analítica *</label>
                 <input
                   name="customTest"
                   required
                   placeholder="Ej. Procalcitonina, Dimero D..."
-                  className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900"
+                  className="w-full px-3 py-1.5 border rounded-lg text-xs text-slate-900"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                 Resultado / Valores *
               </label>
               <TextareaConDeshacer
                 name="result"
-                rows={3}
+                rows={2}
                 required
-                placeholder="Escribe los valores obtenidos, unidades o reporte (ej. Glucosa: 110 mg/dL, Leucocitos: 7,500/mm³...)"
-                className="w-full px-3 py-2 border rounded-lg text-sm font-mono text-slate-900 focus:ring-2 focus:ring-teal-500"
+                placeholder="Escribe los valores obtenidos (ej. 60 mm/h, o Leucocitos: 8,500, Hb: 12.3...)"
+                className="w-full px-3 py-1.5 border rounded-lg text-xs font-mono text-slate-900 focus:ring-2 focus:ring-teal-500"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-teal-700 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-teal-800 transition-colors shadow-sm"
+              className="w-full bg-teal-700 text-white py-2 rounded-lg text-xs font-bold hover:bg-teal-800 transition-colors shadow-sm"
             >
               Guardar Resultado de Laboratorio
             </button>
