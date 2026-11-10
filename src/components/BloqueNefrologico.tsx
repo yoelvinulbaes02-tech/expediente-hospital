@@ -89,10 +89,9 @@ export function BloqueNefrologico({
                 <p className="text-sm font-bold text-slate-800">{acceso.type}</p>
                 <p className="text-xs text-slate-600">{acceso.site ?? 'Sitio no especificado'}</p>
                 
-                {/* OPCIÓN: FECHA DESCONOCIDA O CÁLCULO DE DÍAS */}
                 {acceso.unknownPlacementDate ? (
                   <p className="text-xs font-bold text-amber-700 mt-1">
-                    ❓ Fecha de colocación desconocida
+                    ❓ Se desconoce fecha
                   </p>
                 ) : acceso.placementDate ? (
                   <p className="text-xs font-semibold text-indigo-700 mt-1">
@@ -142,7 +141,7 @@ export function BloqueNefrologico({
                 />
                 <label className="flex items-center gap-1.5 text-[11px] text-slate-700 font-medium cursor-pointer">
                   <input name="unknownPlacementDate" type="checkbox" className="rounded text-blue-600" />
-                  <span>No se sabe cuándo se colocó</span>
+                  <span>Se desconoce fecha</span>
                 </label>
                 <button className="w-full bg-slate-800 text-white text-xs py-1.5 rounded font-medium hover:bg-slate-900">
                   Guardar

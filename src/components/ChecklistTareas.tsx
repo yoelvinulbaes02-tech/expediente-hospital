@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { crearTarea, marcarTarea } from '@/app/dashboard/paciente/[id]/actions-tareas'
 
 type Tarea = {
@@ -64,9 +64,18 @@ export function ChecklistTareas({
   const [mostrarHechas, setMostrarHechas] = useState(false)
   const [tareaACancelar, setTareaACancelar] = useState<string | null>(null)
   const [motivoCancelacion, setMotivoCancelacion] = useState('')
+  const dateInputRef = useRef<HTMLInputElement>(null)
 
   const pendientes = tareas.filter((t) => t.status === 'pendiente')
   const finalizadas = tareas.filter((t) => t.status !== 'pendiente')
+
+  const abrirSelectorFecha = () => {
+    try {
+      dateInputRef.current?.showPicker()
+    } catch {
+      dateInputRef.current?.focus()
+    }
+  }
 
   return (
     <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
@@ -94,7 +103,7 @@ export function ChecklistTareas({
         )}
       </div>
 
-      {/* FORMULARIO: AGREGAR TAREA CON CALENDARIO VISIBLE */}
+      {/* FORMULARIO: AGREGAR TAREA CON BOTÓN DE CALENDARIO VISIBLE Y CLIC DIRECTO */}
       {puedeAgregar && (
         <form action={crearTarea} className="bg-slate-50 dark:bg-slate-700/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-600 mb-5 space-y-3">
           <input type="hidden" name="episodeId" value={episodeId} />
@@ -119,14 +128,27 @@ export function ChecklistTareas({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
             <div className="flex items-center gap-2">
               <label htmlFor="programada" className="text-xs font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                📅 Programada para (Opcional):
+                Programada para (Opcional):
               </label>
-              <input
-                id="programada"
-                name="programada"
-                type="datetime-local"
-                className="px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="relative flex items-center">
+                <input
+                  id="programada"
+                  ref={dateInputRef}
+                  name="programada"
+                  type="datetime-local"
+                  onClick={abrirSelectorFecha}
+                  className="px-2.5 py-1.5 pr-8 border rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer [color-scheme:light] dark:[color-scheme:dark]"
+                />
+                <button
+                  type="button"
+                  onClick={abrirSelectorFecha}
+                  className="absolute right-2 text-base cursor-pointer hover:scale-110 transition-transform"
+                  title="Abrir calendario"
+                  aria-label="Abrir calendario"
+                >
+                  📅
+                </button>
+              </div>
             </div>
             <button
               type="submit"
@@ -182,7 +204,7 @@ export function ChecklistTareas({
                     <input type="hidden" name="accion" value="hecha" />
                     <button
                       type="submit"
-                      className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors shadow-xs"
+                      className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
                     >
                       ✓ Realizada
                     </button>
@@ -194,7 +216,7 @@ export function ChecklistTareas({
                       setTareaACancelar(t.id)
                       setMotivoCancelacion('')
                     }}
-                    className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 font-medium px-2 py-1"
+                    className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 font-medium px-2 py-1 cursor-pointer"
                   >
                     ✕ Cancelar
                   </button>
@@ -211,7 +233,7 @@ export function ChecklistTareas({
         )}
       </div>
 
-      {/* MODAL / FORMULARIO PARA MOTIVO DE CANCELACIÓN */}
+      {/* MODAL PARA MOTIVO DE CANCELACIÓN */}
       {tareaACancelar && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 dark:border-slate-700 space-y-3">
@@ -289,7 +311,7 @@ export function ChecklistTareas({
                 <form action={marcarTarea}>
                   <input type="hidden" name="taskId" value={t.id} />
                   <input type="hidden" name="accion" value="reabrir" />
-                  <button type="submit" className="text-[11px] text-blue-600 hover:underline font-semibold">
+                  <button type="submit" className="text-[11px] text-blue-600 hover:underline font-semibold cursor-pointer">
                     Reabrir
                   </button>
                 </form>
