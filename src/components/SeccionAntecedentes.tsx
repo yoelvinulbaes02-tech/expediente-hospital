@@ -1,5 +1,4 @@
 import { guardarAntecedentes } from '@/app/dashboard/paciente/[id]/actions-clinicas'
-import { TextareaConDeshacer } from '@/components/TextareaConDeshacer'
 
 type Antecedentes = {
   pathological: string | null
@@ -8,16 +7,29 @@ type Antecedentes = {
   habits: string | null
   medications: string | null
   updatedBy: string | null
-  updatedAt: Date
+  updatedAt: Date | string | null
 }
 
 const ETIQUETA_ROL: Record<string, string> = {
-  ADMIN: 'Administrador',
+  ADMIN: 'Admin',
   DOCTOR: 'Médico',
   RESIDENT: 'Residente',
-  NURSE: 'Enfermería',
+  NURSE: 'Enf.',
   LAB: 'Laboratorio',
-  READONLY: 'Solo lectura',
+  READONLY: 'Lectura',
+}
+
+const fmtFecha = (d: Date | string | null) => {
+  if (!d) return ''
+  const f = new Date(d)
+  return f.toLocaleString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 export function SeccionAntecedentes({
@@ -36,146 +48,176 @@ export function SeccionAntecedentes({
   const tieneDatos =
     antecedentes &&
     (antecedentes.pathological ||
+      antecedentes.medications ||
       antecedentes.surgical ||
       antecedentes.family ||
-      antecedentes.habits ||
-      antecedentes.medications)
-
-  const textareaClass = 'w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900 focus:ring-1 focus:ring-blue-500'
+      antecedentes.habits)
 
   return (
-    <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-      <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-3">
-        📋 Antecedentes del Paciente
-      </h2>
+    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-2 mb-3">
+        <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span>📋</span> Antecedentes del Paciente
+        </h2>
 
-      {!tieneDatos ? (
-        <p className="text-xs text-slate-400 py-1">No hay antecedentes registrados para este paciente.</p>
-      ) : (
-        <div className="space-y-2 text-xs text-slate-700 mb-3">
-          {antecedentes.pathological && (
-            <p>
-              <strong className="text-slate-900">Patológicos:</strong> {antecedentes.pathological}
-            </p>
-          )}
-          {antecedentes.surgical && (
-            <p>
-              <strong className="text-slate-900">Quirúrgicos:</strong> {antecedentes.surgical}
-            </p>
-          )}
-          {antecedentes.family && (
-            <p>
-              <strong className="text-slate-900">Familiares:</strong> {antecedentes.family}
-            </p>
-          )}
-          {antecedentes.medications && (
-            <p>
-              <strong className="text-slate-900">Medicamentos habituales:</strong> {antecedentes.medications}
-            </p>
-          )}
-          {antecedentes.habits && (
-            <p>
-              <strong className="text-slate-900">Hábitos:</strong> {antecedentes.habits}
-            </p>
-          )}
+        {puedeRegistrar && (
+          <details className="inline-block relative print:hidden">
+            <summary className="list-none cursor-pointer text-xs bg-slate-100 dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-200 transition-colors">
+              {tieneDatos ? '✏️ Actualizar' : '+ Registrar'}
+            </summary>
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-300 dark:border-slate-700 shadow-2xl z-30 text-left">
+              <p className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2 border-b pb-1">
+                Antecedentes Clínicos:
+              </p>
+              <form action={guardarAntecedentes} className="space-y-2.5">
+                <input type="hidden" name="episodeId" value={episodeId} />
 
-          {/* FIRMA Y TRAZABILIDAD CLÍNICA */}
-          {antecedentes.updatedBy && (
-            <div className="mt-3 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between text-[11px] text-slate-500">
-              <div>
-                <span>Actualizado por: </span>
-                <strong className="text-slate-700">{nombres[antecedentes.updatedBy] ?? antecedentes.updatedBy}</strong>
-                {roles[antecedentes.updatedBy] && (
-                  <span className="ml-1 bg-slate-100 text-slate-700 text-[10px] font-bold px-1.5 py-0.2 rounded border">
-                    {ETIQUETA_ROL[roles[antecedentes.updatedBy]] ?? roles[antecedentes.updatedBy]}
-                  </span>
-                )}
-              </div>
-              <span className="text-slate-400 text-[10px]">
-                {antecedentes.updatedAt.toLocaleString('es-DO', {
-                  timeZone: 'America/Santo_Domingo',
-                  day: '2-digit',
-                  month: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </span>
+                {/* 1. PATOLÓGICOS */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    Patológicos:
+                  </label>
+                  <textarea
+                    name="pathological"
+                    rows={2}
+                    defaultValue={antecedentes?.pathological ?? ''}
+                    placeholder="Ej. HTA (10 años), DM2, ERC..."
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* 2. MEDICAMENTOS (DIRECTAMENTE DEBAJO DE PATOLÓGICOS) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-blue-800 dark:text-blue-300">
+                    Medicamentos habituales:
+                  </label>
+                  <textarea
+                    name="medications"
+                    rows={2}
+                    defaultValue={antecedentes?.medications ?? ''}
+                    placeholder="Ej. Losartán 50mg VO c/12h, Amlodipina 5mg..."
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* 3. QUIRÚRGICOS */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    Quirúrgicos:
+                  </label>
+                  <textarea
+                    name="surgical"
+                    rows={2}
+                    defaultValue={antecedentes?.surgical ?? ''}
+                    placeholder="Ej. Apendicectomía (2018)..."
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* 4. FAMILIARES */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    Heredofamiliares:
+                  </label>
+                  <textarea
+                    name="family"
+                    rows={2}
+                    defaultValue={antecedentes?.family ?? ''}
+                    placeholder="Ej. Madre con ERC, Padre con HTA..."
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* 5. HÁBITOS */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    Hábitos tóxicos:
+                  </label>
+                  <textarea
+                    name="habits"
+                    rows={2}
+                    defaultValue={antecedentes?.habits ?? ''}
+                    placeholder="Ej. Tabaquismo negado, alcohol ocasional..."
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-slate-800 dark:bg-slate-700 text-white text-xs py-2 rounded-lg font-bold hover:bg-slate-900 transition-colors mt-1"
+                >
+                  Guardar Antecedentes
+                </button>
+              </form>
+            </div>
+          </details>
+        )}
+      </div>
+
+      {tieneDatos ? (
+        <div className="space-y-2 text-xs">
+          {/* 1. PATOLÓGICOS */}
+          <div>
+            <span className="font-bold text-slate-700 dark:text-slate-300">Patológicos: </span>
+            <span className="text-slate-800 dark:text-slate-200">
+              {antecedentes?.pathological || 'No referidos'}
+            </span>
+          </div>
+
+          {/* 2. MEDICAMENTOS (DIRECTAMENTE DEBAJO DE PATOLÓGICOS) */}
+          <div>
+            <span className="font-bold text-blue-800 dark:text-blue-300">Medicamentos: </span>
+            <span className="text-slate-800 dark:text-slate-200 font-medium">
+              {antecedentes?.medications || 'No referidos'}
+            </span>
+          </div>
+
+          {/* 3. QUIRÚRGICOS */}
+          <div>
+            <span className="font-bold text-slate-700 dark:text-slate-300">Quirúrgicos: </span>
+            <span className="text-slate-800 dark:text-slate-200">
+              {antecedentes?.surgical || 'No referidos'}
+            </span>
+          </div>
+
+          {/* 4. FAMILIARES */}
+          <div>
+            <span className="font-bold text-slate-700 dark:text-slate-300">Familiares: </span>
+            <span className="text-slate-800 dark:text-slate-200">
+              {antecedentes?.family || 'No referidos'}
+            </span>
+          </div>
+
+          {/* 5. HÁBITOS */}
+          <div>
+            <span className="font-bold text-slate-700 dark:text-slate-300">Hábitos: </span>
+            <span className="text-slate-800 dark:text-slate-200">
+              {antecedentes?.habits || 'No referidos'}
+            </span>
+          </div>
+
+          {/* REGISTRO DE AUDITORÍA */}
+          {antecedentes?.updatedBy && (
+            <div className="pt-2 mt-2 border-t border-slate-100 dark:border-slate-700 text-[11px] text-slate-400">
+              <span>Actualizado por: </span>
+              <strong className="text-slate-600 dark:text-slate-300">
+                {nombres[antecedentes.updatedBy] ?? antecedentes.updatedBy}
+              </strong>
+              {roles[antecedentes.updatedBy] && (
+                <span className="ml-1 px-1.5 py-0.2 bg-slate-100 dark:bg-slate-700 rounded text-[10px] font-bold">
+                  {ETIQUETA_ROL[roles[antecedentes.updatedBy]] ?? roles[antecedentes.updatedBy]}
+                </span>
+              )}
+              {antecedentes.updatedAt && (
+                <span> • {fmtFecha(antecedentes.updatedAt)}</span>
+              )}
             </div>
           )}
         </div>
-      )}
-
-      {puedeRegistrar && (
-        <details className="mt-3 pt-3 border-t">
-          <summary className="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer py-1">
-            {tieneDatos ? '✏️ Editar antecedentes' : '+ Registrar antecedentes'}
-          </summary>
-          <form action={guardarAntecedentes} className="space-y-3 mt-3">
-            <input type="hidden" name="episodeId" value={episodeId} />
-            
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Patológicos</label>
-              <TextareaConDeshacer
-                name="pathological"
-                rows={2}
-                defaultValue={antecedentes?.pathological ?? ''}
-                placeholder="Ej. DM2 de 10 años de evolución, HTA..."
-                className={textareaClass}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Quirúrgicos</label>
-              <TextareaConDeshacer
-                name="surgical"
-                rows={1}
-                defaultValue={antecedentes?.surgical ?? ''}
-                placeholder="Ej. Apendicectomía en 2012"
-                className={textareaClass}
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Medicamentos habituales</label>
-              <TextareaConDeshacer
-                name="medications"
-                rows={2}
-                defaultValue={antecedentes?.medications ?? ''}
-                placeholder="Ej. Losartán 50mg c/12h, Amlodipina 5mg..."
-                className={textareaClass}
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Familiares</label>
-              <TextareaConDeshacer
-                name="family"
-                rows={1}
-                defaultValue={antecedentes?.family ?? ''}
-                placeholder="Ej. Madre con ERC, Padre fallecido por IAM"
-                className={textareaClass}
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">Hábitos</label>
-              <TextareaConDeshacer
-                name="habits"
-                rows={1}
-                defaultValue={antecedentes?.habits ?? ''}
-                placeholder="Ej. Tabaquismo negado, Alcohol ocasional"
-                className={textareaClass}
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-slate-800 text-white py-2 rounded-lg text-xs font-bold hover:bg-slate-900 transition-colors"
-            >
-              Guardar Antecedentes
-            </button>
-          </form>
-        </details>
+      ) : (
+        <p className="text-xs text-slate-400 italic py-1">
+          Sin antecedentes registrados en el expediente.
+        </p>
       )}
     </div>
   )
