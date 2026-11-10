@@ -12,6 +12,8 @@ import {
   cambiarUbicacion,
   modificarDatosPaciente,
   modificarDiagnosticos,
+  transferirAPropio,
+  finalizarInterconsulta,
 } from './actions-clinicas'
 import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
@@ -119,11 +121,15 @@ export default async function ExpedientePage({
   const entregaPendiente = episode.handoffs[0]
   const esInterconsulta = episode.serviceType === 'interconsulta'
 
-  // Cálculo de estancia
   const diffTiempo = new Date().getTime() - new Date(episode.admissionDate).getTime()
   const diasEstancia = Math.max(1, Math.floor(diffTiempo / (1000 * 60 * 60 * 24)) + 1)
 
-  // Recolectar emails de firmas
+  let diasHospital: number | null = null
+  if (episode.hospitalAdmissionDate) {
+    const diffHosp = new Date().getTime() - new Date(episode.hospitalAdmissionDate).getTime()
+    diasHospital = Math.max(1, Math.floor(diffHosp / (1000 * 60 * 60 * 24)) + 1)
+  }
+
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => emails.add(v.recordedBy))
@@ -205,13 +211,13 @@ export default async function ExpedientePage({
           <div className="bg-amber-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xl">🔒</span>
-              <strong>Expediente Cerrado:</strong> Este paciente ha sido dado de alta.
+              <strong>Expediente Cerrado:</strong> {esInterconsulta ? 'Esta interconsulta ha sido finalizada y dada de alta.' : 'Este paciente ha sido dado de alta.'}
             </div>
             <Link href="/dashboard/archivo" className="text-sm font-bold underline hover:text-amber-900">Volver al Archivo</Link>
           </div>
         )}
 
-        {/* CABECERA PRINCIPAL CON EDICIÓN DE NOMBRE Y DATOS */}
+        {/* CABECERA PRINCIPAL */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
             <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block font-medium">
@@ -223,7 +229,7 @@ export default async function ExpedientePage({
                 {episode.patient.firstName} {episode.patient.lastName}
               </h1>
 
-              {/* BOTÓN: MODIFICAR DATOS DEL PACIENTE */}
+              {/* MODIFICAR DATOS DEL PACIENTE */}
               {permisos.puedeRegistrar && (
                 <details className="relative inline-block">
                   <summary className="list-none cursor-pointer text-xs bg-white text-slate-600 px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-50 font-medium">
@@ -285,16 +291,79 @@ export default async function ExpedientePage({
             </div>
           </div>
 
+          {/* BOTONES SUPERIORES: ENTREGA, ALTA O TRASLADO */}
           <div className="flex flex-wrap items-center gap-2">
             {!esSoloLectura && (
               <Link href={`/dashboard/paciente/${episode.id}/turno`} className="bg-indigo-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">
                 📋 Entrega de Turno
               </Link>
             )}
+
+            {/* BOTÓN ALTA O FINALIZAR INTERCONSULTA */}
             {permisos.puedeEditar && (
-              <Link href={`/dashboard/paciente/${episode.id}/alta`} className="bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
-                🚪 Dar de Alta
-              </Link>
+              esInterconsulta ? (
+                <details className="relative">
+                  <summary className="list-none cursor-pointer bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
+                    🚪 Finalizar Interconsulta (Dar de Alta)
+                  </summary>
+                  <div className="absolute right-0 mt-2 w-80 bg-white p-4 rounded-xl border border-red-200 shadow-xl z-30 text-left">
+                    <p className="text-xs font-bold text-red-900 mb-1">Cierre de Interconsulta:</p>
+                    <p className="text-[11px] text-slate-500 mb-2">
+                      Escriba la conclusión médica y recomendaciones finales para cerrar la interconsulta:
+                    </p>
+                    <form action={finalizarInterconsulta} className="space-y-2">
+                      <input type="hidden" name="episodeId" value={episode.id} />
+                      <textarea
+                        name="conclusion"
+                        required
+                        rows={3}
+                        placeholder="Ej. Paciente compensado. Se suspende seguimiento por el servicio..."
+                        className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                      />
+                      <button type="submit" className="w-full bg-red-600 text-white text-xs py-1.5 rounded font-bold hover:bg-red-700">
+                        Confirmar y Finalizar Interconsulta
+                      </button>
+                    </form>
+                  </div>
+                </details>
+              ) : (
+                <Link href={`/dashboard/paciente/${episode.id}/alta`} className="bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
+                  🚪 Dar de Alta
+                </Link>
+              )
+            )}
+
+            {/* BOTÓN: PASAR INTERCONSULTA A PROPIO DE SALA */}
+            {!esSoloLectura && esInterconsulta && (
+              <details className="relative">
+                <summary className="list-none cursor-pointer bg-emerald-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm">
+                  🔄 Ingresar a Sala (Pasar a Propio)
+                </summary>
+                <div className="absolute right-0 mt-2 w-80 bg-white p-4 rounded-xl border border-emerald-300 shadow-xl z-30 text-left">
+                  <p className="text-xs font-bold text-emerald-900 mb-1">Traslado a Paciente Propio:</p>
+                  <p className="text-[11px] text-slate-500 mb-2">
+                    Asigne la habitación de sala para transferir este paciente a su servicio directo:
+                  </p>
+                  <form action={transferirAPropio} className="space-y-2">
+                    <input type="hidden" name="episodeId" value={episode.id} />
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600">Habitación de Sala *</label>
+                      <input name="room" required placeholder="Ej. 104" className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600">Cama de Sala *</label>
+                      <input name="bed" required placeholder="Ej. A" className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600">Médico Tratante / Residente:</label>
+                      <input name="attendingDoctor" placeholder="Ej. Dra. Gómez (R3)" className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
+                    </div>
+                    <button type="submit" className="w-full bg-emerald-700 text-white text-xs py-1.5 rounded font-bold hover:bg-emerald-800 mt-1">
+                      Confirmar Ingreso a Sala
+                    </button>
+                  </form>
+                </div>
+              </details>
             )}
 
             {/* UBICACIÓN */}
@@ -337,8 +406,6 @@ export default async function ExpedientePage({
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 {esInterconsulta ? 'Motivo y Diagnóstico de Interconsulta' : 'Diagnósticos del Paciente'}
               </span>
-
-              {/* BOTÓN: MODIFICAR DIAGNÓSTICOS */}
               {permisos.puedeRegistrar && (
                 <details className="inline-block relative">
                   <summary className="list-none cursor-pointer text-[11px] text-blue-600 hover:text-blue-800 font-semibold underline">
@@ -476,6 +543,11 @@ export default async function ExpedientePage({
 
                 {esInterconsulta ? (
                   <>
+                    {episode.hospitalAdmissionDate && (
+                      <p>
+                        <strong>Ingreso general al Hospital:</strong> {fechaCorta(episode.hospitalAdmissionDate)} (Día {diasHospital})
+                      </p>
+                    )}
                     <p><strong>Servicio solicitante:</strong> {episode.consultingDepartment}</p>
                     <p><strong>Residente interconsultado:</strong> {episode.consultingResident}</p>
                     <p><strong>Motivo:</strong> {episode.chiefComplaint}</p>
@@ -501,52 +573,83 @@ export default async function ExpedientePage({
               puedeRegistrar={permisos.puedeRegistrar}
             />
 
-            {/* SIGNOS VITALES */}
+            {/* FORMULARIO DE SIGNOS VITALES / DIURESIS */}
             {permisos.puedeRegistrar && (
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Registrar Signos Vitales</h2>
-                <form action={guardarSignosVitales} className="space-y-3">
-                  <input type="hidden" name="episodeId" value={episode.id} />
-                  <div className="grid grid-cols-2 gap-3 md:gap-2">
-                    <div className="col-span-2">
-                      <label className="block text-xs font-medium text-slate-700 mb-1">Presión (Sist/Diast)</label>
-                      <div className="flex gap-2 md:gap-1">
-                        <input name="systolic" type="number" inputMode="numeric" placeholder="120" className={entradaVital} />
-                        <input name="diastolic" type="number" inputMode="numeric" placeholder="80" className={entradaVital} />
+              esInterconsulta ? (
+                <div className="bg-white p-5 rounded-xl shadow-sm border border-purple-200">
+                  <div className="flex items-center gap-2 border-b pb-2 mb-4">
+                    <span className="text-lg">💧</span>
+                    <h2 className="text-base font-bold text-purple-900">Reporte de Diuresis</h2>
+                  </div>
+                  <form action={guardarSignosVitales} className="space-y-3">
+                    <input type="hidden" name="episodeId" value={episode.id} />
+                    <div>
+                      <label className="block text-xs font-bold text-sky-800 mb-1">
+                        Diuresis (mL) *
+                      </label>
+                      <input
+                        name="diuresis"
+                        type="number"
+                        inputMode="numeric"
+                        required
+                        placeholder="Ej. 650"
+                        className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900 font-bold focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-purple-700 text-white py-2.5 rounded-lg text-xs font-bold hover:bg-purple-800 transition-colors shadow-sm"
+                    >
+                      Guardar Reporte de Diuresis
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                  <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Registrar Signos Vitales</h2>
+                  <form action={guardarSignosVitales} className="space-y-3">
+                    <input type="hidden" name="episodeId" value={episode.id} />
+                    <div className="grid grid-cols-2 gap-3 md:gap-2">
+                      <div className="col-span-2">
+                        <label className="block text-xs font-medium text-slate-700 mb-1">Presión (Sist/Diast)</label>
+                        <div className="flex gap-2 md:gap-1">
+                          <input name="systolic" type="number" inputMode="numeric" placeholder="120" className={entradaVital} />
+                          <input name="diastolic" type="number" inputMode="numeric" placeholder="80" className={entradaVital} />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">F. Cardíaca</label>
+                        <input name="heartRate" type="number" inputMode="numeric" placeholder="75" className={entradaVital} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">F. Resp.</label>
+                        <input name="respiratoryRate" type="number" inputMode="numeric" placeholder="16" className={entradaVital} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">Temp (°C)</label>
+                        <input name="temperature" type="number" inputMode="decimal" step="0.1" placeholder="36.5" className={entradaVital} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">SpO2 (%)</label>
+                        <input name="oxygenSat" type="number" inputMode="numeric" placeholder="98" className={entradaVital} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">Glucosa (mg/dL)</label>
+                        <input name="glucose" type="number" inputMode="numeric" placeholder="100" className={entradaVital} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-emerald-800 mb-1">Peso (kg)</label>
+                        <input name="weight" type="number" inputMode="decimal" step="0.1" placeholder="70.5" className={entradaVital} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-xs font-bold text-sky-800 mb-1">Diuresis (mL)</label>
+                        <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">F. Cardíaca</label>
-                      <input name="heartRate" type="number" inputMode="numeric" placeholder="75" className={entradaVital} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">F. Resp.</label>
-                      <input name="respiratoryRate" type="number" inputMode="numeric" placeholder="16" className={entradaVital} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">Temp (°C)</label>
-                      <input name="temperature" type="number" inputMode="decimal" step="0.1" placeholder="36.5" className={entradaVital} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">SpO2 (%)</label>
-                      <input name="oxygenSat" type="number" inputMode="numeric" placeholder="98" className={entradaVital} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">Glucosa (mg/dL)</label>
-                      <input name="glucose" type="number" inputMode="numeric" placeholder="100" className={entradaVital} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-emerald-800 mb-1">Peso (kg)</label>
-                      <input name="weight" type="number" inputMode="decimal" step="0.1" placeholder="70.5" className={entradaVital} />
-                    </div>
-                    <div className="col-span-2">
-                      <label className="block text-xs font-bold text-sky-800 mb-1">Diuresis (mL)</label>
-                      <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
-                    </div>
-                  </div>
-                  <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
-                </form>
-              </div>
+                    <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
+                  </form>
+                </div>
+              )
             )}
 
             {/* Alergias */}

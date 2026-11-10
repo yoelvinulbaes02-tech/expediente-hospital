@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
 import { exigirPermiso, volverAlExpediente } from '@/lib/permisos'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 // ─── 1. ANTECEDENTES ───
 export async function guardarAntecedentes(formData: FormData): Promise<void> {
@@ -474,4 +475,101 @@ export async function modificarDiagnosticos(formData: FormData): Promise<void> {
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
   revalidatePath('/dashboard')
+}
+
+// ─── 12. PASAR DE INTERCONSULTA A PROPIO (SALA) ───
+export async function transferirAPropio(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email } = await exigirPermiso(episodeId, 'registrar')
+
+  const room = String(formData.get('room') ?? '').trim()
+  const bed = String(formData.get('bed') ?? '').trim()
+  const attendingDoctor = String(formData.get('attendingDoctor') ?? '').trim()
+
+  if (!room || !bed) volverAlExpediente(episodeId, 'Indique la habitación y cama de sala asignadas')
+
+  const episodePrevio = await prisma.episode.findUnique({
+    where: { id: episodeId },
+    select: { patientId: true },
+  })
+  if (!episodePrevio) redirect('/dashboard')
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: {
+      serviceType: 'propio',
+      room,
+      bed,
+      attendingDoctor: attendingDoctor || null,
+      admissionType: 'Traslado desde Interconsulta',
+    },
+  })
+
+  await prisma.note.create({
+    data: {
+      episodeId,
+      content: `*** INGRESO A SALA DESDE INTERCONSULTA ***\nPaciente recibido formalmente bajo el servicio de sala en Hab. ${room} - Cama ${bed}.\nMédico tratante: ${attendingDoctor || 'Asignado a sala'}.`,
+      status: 'firmada',
+      createdBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode',
+    entityId: episodeId,
+    patientId: episodePrevio.patientId,
+    episodeId,
+    newValue: { serviceType: 'propio', room, bed, attendingDoctor },
+    reason: 'Paciente transferido de Interconsulta a Paciente Propio de Sala',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+// ─── 13. FINALIZAR / DAR DE ALTA A INTERCONSULTA ───
+export async function finalizarInterconsulta(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email } = await exigirPermiso(episodeId, 'registrar')
+
+  const conclusion = String(formData.get('conclusion') ?? '').trim()
+  if (!conclusion) volverAlExpediente(episodeId, 'Escriba la conclusión o nota de alta de la interconsulta')
+
+  const episodePrevio = await prisma.episode.findUnique({
+    where: { id: episodeId },
+    select: { patientId: true },
+  })
+  if (!episodePrevio) redirect('/dashboard')
+
+  await prisma.note.create({
+    data: {
+      episodeId,
+      content: `*** ALTA / CIERRE DE INTERCONSULTA ***\nConclusión médica y recomendaciones al servicio tratante:\n${conclusion}`,
+      status: 'firmada',
+      createdBy: email,
+    },
+  })
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: { status: 'closed' },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode',
+    entityId: episodeId,
+    patientId: episodePrevio.patientId,
+    episodeId,
+    newValue: { status: 'closed', altaInterconsulta: conclusion },
+    reason: 'Interconsulta finalizada y dada de alta',
+  })
+
+  revalidatePath('/dashboard')
+  redirect('/dashboard')
 }
