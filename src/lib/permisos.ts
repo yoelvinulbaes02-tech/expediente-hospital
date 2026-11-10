@@ -2,9 +2,9 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 
-// EXPORTACIÓN REQUERIDA POR ACTIONS-TURNO Y TURNO/PAGE
-export const ROLES_MEDICOS = ['DOCTOR', 'RESIDENT'] as const
-export const ROLES_CLINICOS = ['ADMIN', 'DOCTOR', 'RESIDENT', 'NURSE', 'LAB'] as const
+// TIPADO COMO readonly string[] PARA PERMITIR VALIDACIONES DE ROLES (INCLUYENDO ADMIN Y STRINGS)
+export const ROLES_MEDICOS: readonly string[] = ['DOCTOR', 'RESIDENT']
+export const ROLES_CLINICOS: readonly string[] = ['ADMIN', 'DOCTOR', 'RESIDENT', 'NURSE', 'LAB']
 
 export type Permisos = {
   activo: boolean
@@ -59,7 +59,7 @@ export function calcularPermisos(role: string, userId: string, episode: any): Pe
 
 export async function exigirPermiso(
   episodeId: string,
-  accion: 'registrar' | 'editar' | 'tareas' | 'alta'
+  accion: 'registrar' | 'editar' | 'tareas' | 'alta' | 'tomar' | string
 ) {
   const session = await auth()
   if (!session?.user?.id) redirect('/login')
@@ -68,6 +68,7 @@ export async function exigirPermiso(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const role = String((session.user as any)?.role ?? 'READONLY')
   const email = session.user.email ?? ''
+  const nombre = session.user.name || email
 
   const episode = await prisma.episode.findUnique({
     where: { id: episodeId },
@@ -93,10 +94,14 @@ export async function exigirPermiso(
     volverAlExpediente(episodeId, 'No tienes permiso para gestionar pendientes.')
   }
 
+  if (accion === 'tomar' && !esAdmin && !esMedico) {
+    volverAlExpediente(episodeId, 'Solo médicos o residentes pueden tomar a cargo un paciente.')
+  }
+
   // ACCIÓN DE ALTA O EDICIÓN: PERMITIDA A CUALQUIER MÉDICO, RESIDENTE O ADMIN
   if ((accion === 'editar' || accion === 'alta') && !esAdmin && !esMedico && !esResponsable) {
     volverAlExpediente(episodeId, 'Solo médicos o residentes de guardia pueden realizar esta acción.')
   }
 
-  return { userId, role, email, episode }
+  return { userId, role, email, nombre, episode }
 }
