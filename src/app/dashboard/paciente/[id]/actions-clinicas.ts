@@ -142,7 +142,7 @@ export async function registrarTFG(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// ─── 4. REPORTES DE LABORATORIO Y ANALÍTICAS (NUEVO) ───
+// ─── 4. REPORTES DE LABORATORIO ───
 export async function guardarReporteLaboratorio(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
@@ -283,9 +283,10 @@ export async function guardarAccesoVascular(formData: FormData): Promise<void> {
   const type = String(formData.get('type') ?? 'Catéter').trim()
   const site = String(formData.get('site') ?? '').trim()
   const fechaStr = String(formData.get('placementDate') ?? '').trim()
+  const unknownDate = formData.get('unknownPlacementDate') === 'on'
   const notes = String(formData.get('notes') ?? '').trim()
 
-  const placementDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
+  const placementDate = unknownDate ? null : fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
 
   await prisma.vascularAccess.updateMany({
     where: { episodeId, isActive: true },
@@ -298,6 +299,7 @@ export async function guardarAccesoVascular(formData: FormData): Promise<void> {
       type,
       site: site || null,
       placementDate,
+      unknownPlacementDate: unknownDate,
       notes: notes || null,
       isActive: true,
       createdBy: email,
@@ -312,7 +314,7 @@ export async function guardarAccesoVascular(formData: FormData): Promise<void> {
     entityId: acceso.id,
     patientId: episode.patientId,
     episodeId,
-    newValue: { tipo: type, sitio: site, fecha: fechaStr },
+    newValue: { tipo: type, sitio: site, fechaDesconocida: unknownDate },
     reason: 'Registro de acceso vascular activo',
   })
 
@@ -382,6 +384,92 @@ export async function cambiarUbicacion(formData: FormData): Promise<void> {
     oldValue: { habitacion: previo?.room, cama: previo?.bed },
     newValue: { habitacion: room, cama: bed },
     reason: 'Reubicación / traslado de cama de paciente',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+// ─── 10. MODIFICAR NOMBRE Y DATOS DEL PACIENTE ───
+export async function modificarDatosPaciente(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const firstName = String(formData.get('firstName') ?? '').trim()
+  const lastName = String(formData.get('lastName') ?? '').trim()
+  const age = parseInt(String(formData.get('age') ?? '0'), 10)
+  const sex = String(formData.get('sex') ?? '').trim()
+
+  if (firstName.length < 2 || lastName.length < 2) {
+    volverAlExpediente(episodeId, 'Escriba un nombre y apellido válidos')
+  }
+
+  const previo = await prisma.patient.findUnique({
+    where: { id: episode.patientId },
+    select: { firstName: true, lastName: true, age: true, sex: true },
+  })
+
+  await prisma.patient.update({
+    where: { id: episode.patientId },
+    data: {
+      firstName,
+      lastName,
+      age: isNaN(age) ? null : age,
+      sex,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'patient',
+    entityId: episode.patientId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: previo,
+    newValue: { firstName, lastName, age, sex },
+    reason: 'Modificación de datos demográficos del paciente',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+// ─── 11. MODIFICAR DIAGNÓSTICOS ───
+export async function modificarDiagnosticos(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const primaryDiagnosis = String(formData.get('primaryDiagnosis') ?? '').trim()
+  const secondaryDiagnoses = String(formData.get('secondaryDiagnoses') ?? '').trim()
+
+  if (!primaryDiagnosis) volverAlExpediente(episodeId, 'Escriba el diagnóstico principal')
+
+  const previo = await prisma.episode.findUnique({
+    where: { id: episodeId },
+    select: { primaryDiagnosis: true, secondaryDiagnoses: true },
+  })
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: {
+      primaryDiagnosis,
+      secondaryDiagnoses: secondaryDiagnoses || null,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: previo,
+    newValue: { primaryDiagnosis, secondaryDiagnoses },
+    reason: 'Actualización de diagnósticos del paciente',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

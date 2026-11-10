@@ -13,13 +13,14 @@ const CAMPOS = [
   { campo: 'temperature', etiqueta: 'Temperatura', min: 30, max: 45, entero: false },
   { campo: 'oxygenSat', etiqueta: 'SpO2', min: 30, max: 100, entero: true },
   { campo: 'glucose', etiqueta: 'Glucosa', min: 10, max: 1500, entero: true },
-  { campo: 'weight', etiqueta: 'Peso', min: 1, max: 500, entero: false },
+  { campo: 'weight', etiqueta: 'Peso', min: 1, max: 1000, entero: false },
   { campo: 'diuresis', etiqueta: 'Diuresis', min: 0, max: 15000, entero: true },
 ] as const
 
 export async function guardarSignosVitales(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+  const weightUnit = String(formData.get('weightUnit') ?? 'kg').trim()
 
   const valores: Record<string, number | null> = {}
 
@@ -65,6 +66,7 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
       oxygenSat,
       glucose,
       weight,
+      weightUnit: weight ? weightUnit : 'kg',
       diuresis,
       recordedBy: email,
     },
@@ -78,8 +80,60 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
     entityId: nuevoRegistro.id,
     patientId: episode.patientId,
     episodeId,
-    newValue: { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, weight, diuresis },
+    newValue: { systolic, diastolic, heartRate, respiratoryRate, temperature, oxygenSat, glucose, weight, weightUnit, diuresis },
     reason: 'Registro de signos vitales, peso y diuresis',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+export async function modificarSignosVitales(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const vitalId = String(formData.get('vitalId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+  const weightUnit = String(formData.get('weightUnit') ?? 'kg').trim()
+
+  const previo = await prisma.vitalSign.findUnique({
+    where: { id: vitalId },
+  })
+  if (!previo) volverAlExpediente(episodeId, 'Registro de signos no encontrado')
+
+  const valores: Record<string, number | null> = {}
+
+  for (const c of CAMPOS) {
+    const texto = String(formData.get(c.campo) ?? '').trim()
+    if (texto === '') {
+      valores[c.campo] = null
+      continue
+    }
+    const n = Number(texto)
+    if (!Number.isFinite(n) || n < c.min || n > c.max) {
+      volverAlExpediente(episodeId, `${c.etiqueta} inválido`)
+    }
+    valores[c.campo] = n
+  }
+
+  await prisma.vitalSign.update({
+    where: { id: vitalId },
+    data: {
+      ...valores,
+      weightUnit: valores.weight ? weightUnit : previo.weightUnit,
+      updatedBy: email,
+      updatedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'vital_sign',
+    entityId: vitalId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: previo,
+    newValue: { ...valores, updatedBy: email },
+    reason: 'Corrección / modificación de signos vitales',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
