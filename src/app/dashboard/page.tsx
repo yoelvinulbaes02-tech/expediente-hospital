@@ -23,7 +23,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const nombreMedico = session.user?.name || ''
   const esAdmin = userRole === 'ADMIN'
 
-  // Consulta de episodios activos incluyendo los diagnósticos
   const episodes = await prisma.episode.findMany({
     where: {
       status: 'active',
@@ -65,18 +64,15 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-3 shadow-sm sticky top-0 z-10 transition-colors duration-300">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 shrink-0 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">H</div>
+          <div className="w-10 h-10 shrink-0 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xl shadow-xs">
+            ST
+          </div>
           <div className="min-w-0">
-            <h1 className="text-base md:text-lg font-bold text-slate-800 dark:text-slate-100 truncate">Hospital General</h1>
+            <h1 className="text-base md:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight">
+              Shift Tracker
+            </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-              {esAdmin ? (
-                <>
-                  <span className="md:hidden">Administrador</span>
-                  <span className="hidden md:inline">Vista de Administrador (Todos)</span>
-                </>
-              ) : (
-                `Panel de ${nombreMedico}`
-              )}
+              {esAdmin ? 'Panel de Administración' : `Guardia: ${nombreMedico}`}
             </p>
           </div>
         </div>

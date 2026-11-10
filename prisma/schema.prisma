@@ -77,40 +77,43 @@ model Patient {
 }
 
 model Episode {
-  id                   String    @id @default(cuid())
-  patientId            String
-  serviceType          String    @default("propio") // "propio" (Sala) | "interconsulta"
-  consultingDepartment String?   // Ej. UCI, Cirugía, Medicina Interna
-  consultingResident   String?   // Residente a cargo de la interconsulta
-  admissionDate        DateTime  @default(now())
-  admissionType        String
-  chiefComplaint       String?
-  status               String    @default("active")
-  room                 String?
-  bed                  String?
-  attendingDoctor      String?   // Médico tratante / residente de ingreso
-  admittingDoctor      String?   // MA que lo ingresó
-  primaryDiagnosis     String?
-  secondaryDiagnoses   String?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                    String    @id @default(cuid())
+  patientId             String
+  serviceType           String    @default("propio") // "propio" | "interconsulta"
+  consultingDepartment  String?
+  consultingResident    String?
+  hospitalAdmissionDate DateTime? @db.Timestamptz // Fecha en que ingresó al hospital
+  admissionDate         DateTime  @default(now()) @db.Timestamptz // Fecha de ingreso a sala o de interconsulta
+  admissionType         String
+  chiefComplaint        String?
+  status                String    @default("active") // "active" | "closed"
+  room                  String?
+  bed                   String?
+  attendingDoctor       String?
+  admittingDoctor       String?
+  primaryDiagnosis      String?
+  secondaryDiagnoses    String?
+  initialWeight         Float?    // Peso inicial
+  initialWeightUnit     String?   @default("kg") // "kg" | "lb"
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
-  patient              Patient   @relation(fields: [patientId], references: [id])
-  allergies            Allergy[]
-  notes                Note[]
-  vitals               VitalSign[]
-  handoffs             Handoff[]
-  responsibleId        String?
-  responsibleSince     DateTime? @db.Timestamptz
-  responsible          User?     @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
-  tasks                Task[]
+  patient               Patient   @relation(fields: [patientId], references: [id])
+  allergies             Allergy[]
+  notes                 Note[]
+  vitals                VitalSign[]
+  handoffs              Handoff[]
+  responsibleId         String?
+  responsibleSince      DateTime? @db.Timestamptz
+  responsible           User?     @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
+  tasks                 Task[]
 
-  importantAlerts      ImportantAlert[]
-  gfrRecords           GfrRecord[]
-  labReports           LabReport[]
-  studyReports         StudyReport[]
-  viralSerologies      ViralSerology[]
-  vascularAccesses     VascularAccess[]
+  importantAlerts       ImportantAlert[]
+  gfrRecords            GfrRecord[]
+  labReports            LabReport[]
+  studyReports          StudyReport[]
+  viralSerologies       ViralSerology[]
+  vascularAccesses      VascularAccess[]
 
   @@index([responsibleId])
   @@index([serviceType, status])
@@ -158,7 +161,7 @@ model GfrRecord {
   @@index([episodeId])
 }
 
-// ─── REPORTES DE LABORATORIO Y ANALÍTICAS ───
+// ─── REPORTES DE LABORATORIO ───
 model LabReport {
   id         String    @id @default(cuid())
   episodeId  String
@@ -208,17 +211,18 @@ model ViralSerology {
 
 // ─── ACCESOS VASCULARES ───
 model VascularAccess {
-  id            String    @id @default(cuid())
-  episodeId     String
-  type          String
-  site          String?
-  placementDate DateTime? @db.Timestamptz
-  notes         String?
-  isActive      Boolean   @default(true)
-  createdBy     String
-  createdAt     DateTime  @default(now()) @db.Timestamptz
+  id                   String    @id @default(cuid())
+  episodeId            String
+  type                 String
+  site                 String?
+  placementDate        DateTime? @db.Timestamptz
+  unknownPlacementDate Boolean   @default(false)
+  notes                String?
+  isActive             Boolean   @default(true)
+  createdBy            String
+  createdAt            DateTime  @default(now()) @db.Timestamptz
 
-  episode       Episode   @relation(fields: [episodeId], references: [id])
+  episode              Episode   @relation(fields: [episodeId], references: [id])
 
   @@index([episodeId, isActive])
 }
@@ -258,7 +262,7 @@ model Note {
 
 // ─── SIGNOS VITALES ───
 model VitalSign {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   episodeId       String
   systolic        Int?
   diastolic       Int?
@@ -268,12 +272,15 @@ model VitalSign {
   oxygenSat       Int?
   glucose         Int?
   weight          Float?
+  weightUnit      String?   @default("kg") // "kg" | "lb"
   painScale       Int?
   diuresis        Int?
   recordedBy      String
-  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedBy       String?   // Quién modificó la toma
+  updatedAt       DateTime? @db.Timestamptz
+  createdAt       DateTime  @default(now()) @db.Timestamptz
 
-  episode         Episode  @relation(fields: [episodeId], references: [id])
+  episode         Episode   @relation(fields: [episodeId], references: [id])
 }
 
 enum HandoffStatus {

@@ -4,17 +4,39 @@ import { useState } from 'react'
 import { crearPaciente } from './actions'
 import Link from 'next/link'
 
+const ESPECIALIDADES = [
+  'Unidad de Cuidados Intensivos (UCI)',
+  'Cirugía General',
+  'Medicina Interna',
+  'Emergencia / Triaje',
+  'Ginecología y Obstetricia',
+  'Ortopedia y Traumatología',
+  'Cardiología',
+  'Neurología / Neurocirugía',
+  'Gastroenterología',
+  'Neumología',
+  'Infectología',
+  'Oncología',
+  'Urología',
+  'Pediatría',
+  'OTRO',
+]
+
 export default function NuevoPacientePage() {
   const [tipoGuardia, setTipoGuardia] = useState<'propio' | 'interconsulta'>('propio')
+  const [deptoSeleccionado, setDeptoSeleccionado] = useState('')
+  const [unidadPeso, setUnidadPeso] = useState<'kg' | 'lb'>('kg')
+
+  const hoyLocal = new Date().toISOString().slice(0, 16)
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Ingreso de Paciente</h1>
+            <h1 className="text-2xl font-bold text-slate-800">Ingreso a Shift Tracker</h1>
             <p className="text-sm text-slate-500">
-              Seleccione el área de guardia para abrir el expediente clínico correspondiente.
+              Seleccione el tipo de paciente para abrir el registro en la guardia.
             </p>
           </div>
           <Link href="/dashboard" className="text-sm text-blue-600 hover:underline font-medium">
@@ -22,7 +44,6 @@ export default function NuevoPacientePage() {
           </Link>
         </div>
 
-        {/* SELECTOR DE TIPO DE GUARDIA */}
         <div className="grid grid-cols-2 gap-3 mb-6 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
           <button
             type="button"
@@ -51,7 +72,7 @@ export default function NuevoPacientePage() {
         <form action={crearPaciente} className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
           <input type="hidden" name="serviceType" value={tipoGuardia} />
 
-          {/* SECCIÓN 1: Identificación */}
+          {/* SECCIÓN 1: Identificación y Peso Inicial */}
           <div>
             <h2 className="text-lg font-semibold text-slate-700 mb-4 border-b pb-2">1. Identificación del Paciente</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -78,6 +99,30 @@ export default function NuevoPacientePage() {
                   <option value="Femenino">Femenino</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">
+                  Peso Inicial de Ingreso (Opcional)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    name="initialWeight"
+                    type="number"
+                    step="0.1"
+                    placeholder="Ej. 70 o 154"
+                    className="flex-1 px-3 py-2 border rounded-lg text-slate-900 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <select
+                    name="initialWeightUnit"
+                    value={unidadPeso}
+                    onChange={(e) => setUnidadPeso(e.target.value as 'kg' | 'lb')}
+                    className="w-20 px-2 py-2 border rounded-lg bg-slate-100 font-bold text-slate-700 outline-none"
+                  >
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -87,30 +132,57 @@ export default function NuevoPacientePage() {
               {tipoGuardia === 'propio' ? '2. Datos del Ingreso a Sala' : '2. Datos de la Interconsulta'}
             </h2>
 
+            <div className="mb-4">
+              <label className="block text-sm font-bold text-slate-800 mb-1">
+                📅 {tipoGuardia === 'interconsulta' ? 'Fecha y Hora de la Interconsulta *' : 'Fecha y Hora Real de Ingreso *'}
+              </label>
+              <input
+                name="admissionDate"
+                type="datetime-local"
+                required
+                defaultValue={hoyLocal}
+                className="w-full md:w-72 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none font-semibold"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">
+                Puede seleccionar una fecha y hora previa si el paciente ingresó antes.
+              </p>
+            </div>
+
             {tipoGuardia === 'interconsulta' ? (
-              /* CAMPOS ESPECÍFICOS DE INTERCONSULTA */
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-purple-50/50 p-4 rounded-xl border border-purple-200">
                 <div>
                   <label className="block text-sm font-bold text-purple-900 mb-1">
-                    Departamento Interconsultante *
+                    Departamento / Servicio Interconsultante *
                   </label>
                   <select
                     name="consultingDepartment"
                     required
-                    className="w-full px-3 py-2 border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none"
+                    value={deptoSeleccionado}
+                    onChange={(e) => setDeptoSeleccionado(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none text-sm"
                   >
-                    <option value="">Seleccione departamento...</option>
-                    <option value="Unidad de Cuidados Intensivos (UCI)">Unidad de Cuidados Intensivos (UCI)</option>
-                    <option value="Cirugía General">Cirugía General</option>
-                    <option value="Medicina Interna">Medicina Interna</option>
-                    <option value="Emergencia">Emergencia / Triaje</option>
-                    <option value="Ginecología y Obstetricia">Ginecología y Obstetricia</option>
-                    <option value="Ortopedia y Traumatología">Ortopedia y Traumatología</option>
-                    <option value="Cardiología">Cardiología</option>
-                    <option value="Pediatría">Pediatría</option>
-                    <option value="Otro Departamento">Otro Departamento</option>
+                    <option value="">Seleccione especialidad...</option>
+                    {ESPECIALIDADES.map((esp) => (
+                      <option key={esp} value={esp}>
+                        {esp === 'OTRO' ? 'Otra especialidad (Escribir cuál)...' : esp}
+                      </option>
+                    ))}
                   </select>
                 </div>
+
+                {deptoSeleccionado === 'OTRO' && (
+                  <div>
+                    <label className="block text-sm font-bold text-purple-900 mb-1">
+                      Escriba el nombre del departamento *
+                    </label>
+                    <input
+                      name="customConsultingDepartment"
+                      required
+                      placeholder="Ej. Quemados, Trasplante..."
+                      className="w-full px-3 py-2 border rounded-lg bg-white text-slate-900 text-sm"
+                    />
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-bold text-purple-900 mb-1">
@@ -120,18 +192,29 @@ export default function NuevoPacientePage() {
                     name="consultingResident"
                     required
                     placeholder="Ej. Dr. Martínez (R2)"
-                    className="w-full px-3 py-2 border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Ubicación / Habitación en el Servicio *</label>
-                  <input name="room" required className="w-full px-3 py-2 border rounded-lg text-slate-900 placeholder:text-slate-400" placeholder="Ej. UCI Cama 4, o Sala 302" />
+                  <label className="block text-xs font-semibold text-purple-950 mb-1">
+                    Fecha en que ingresó al Hospital (Opcional):
+                  </label>
+                  <input
+                    name="hospitalAdmissionDate"
+                    type="date"
+                    className="w-full px-3 py-2 border rounded-lg bg-white text-slate-900 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Ubicación / Sala en el Servicio *</label>
+                  <input name="room" required className="w-full px-3 py-2 border rounded-lg text-slate-900 text-sm" placeholder="Ej. UCI Cama 4, o Sala 302" />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Cama *</label>
-                  <input name="bed" required className="w-full px-3 py-2 border rounded-lg text-slate-900 placeholder:text-slate-400" placeholder="Ej. A o 1" />
+                  <input name="bed" required className="w-full px-3 py-2 border rounded-lg text-slate-900 text-sm" placeholder="Ej. A o 1" />
                 </div>
 
                 <div className="md:col-span-2">
@@ -140,17 +223,15 @@ export default function NuevoPacientePage() {
                     name="chiefComplaint"
                     required
                     placeholder="Ej. Evaluación por Lesión Renal Aguda / Criterio de hemodiálisis de urgencia"
-                    className="w-full px-3 py-2 border rounded-lg text-slate-900 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 border rounded-lg text-slate-900 text-sm"
                   />
                 </div>
 
-                {/* Campos ocultos compatibles para interconsultas */}
                 <input type="hidden" name="admissionType" value="Interconsulta" />
                 <input type="hidden" name="admittingDoctor" value="Interconsulta Solicitada" />
                 <input type="hidden" name="attendingDoctor" value="Residente Interconsultas" />
               </div>
             ) : (
-              /* CAMPOS HABITUALES DE PACIENTE PROPIO */
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Forma de Ingreso *</label>
@@ -203,7 +284,7 @@ export default function NuevoPacientePage() {
                 <input
                   name="secondaryDiagnoses"
                   className="w-full px-3 py-2 border rounded-lg text-slate-900 placeholder:text-slate-400"
-                  placeholder="Ej. Choque séptico, Neumonía adquirida en la comunidad"
+                  placeholder="Ej. Choque séptico, Neumonía"
                 />
               </div>
             </div>

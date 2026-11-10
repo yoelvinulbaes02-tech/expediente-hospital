@@ -173,6 +173,7 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   serviceType: 'serviceType',
   consultingDepartment: 'consultingDepartment',
   consultingResident: 'consultingResident',
+  hospitalAdmissionDate: 'hospitalAdmissionDate',
   admissionDate: 'admissionDate',
   admissionType: 'admissionType',
   chiefComplaint: 'chiefComplaint',
@@ -183,6 +184,8 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   admittingDoctor: 'admittingDoctor',
   primaryDiagnosis: 'primaryDiagnosis',
   secondaryDiagnoses: 'secondaryDiagnoses',
+  initialWeight: 'initialWeight',
+  initialWeightUnit: 'initialWeightUnit',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   responsibleId: 'responsibleId',
@@ -256,6 +259,7 @@ exports.Prisma.VascularAccessScalarFieldEnum = {
   type: 'type',
   site: 'site',
   placementDate: 'placementDate',
+  unknownPlacementDate: 'unknownPlacementDate',
   notes: 'notes',
   isActive: 'isActive',
   createdBy: 'createdBy',
@@ -299,9 +303,12 @@ exports.Prisma.VitalSignScalarFieldEnum = {
   oxygenSat: 'oxygenSat',
   glucose: 'glucose',
   weight: 'weight',
+  weightUnit: 'weightUnit',
   painScale: 'painScale',
   diuresis: 'diuresis',
   recordedBy: 'recordedBy',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt',
   createdAt: 'createdAt'
 };
 

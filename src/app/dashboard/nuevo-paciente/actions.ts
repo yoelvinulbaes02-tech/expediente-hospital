@@ -11,8 +11,24 @@ export async function crearPaciente(formData: FormData) {
   if (!session) throw new Error('No autorizado')
 
   const serviceType = String(formData.get('serviceType') ?? 'propio').trim()
-  const consultingDepartment = String(formData.get('consultingDepartment') ?? '').trim()
+  const deptoRaw = String(formData.get('consultingDepartment') ?? '').trim()
+  const customDepto = String(formData.get('customConsultingDepartment') ?? '').trim()
+  const consultingDepartment = deptoRaw === 'OTRO' ? customDepto : deptoRaw
   const consultingResident = String(formData.get('consultingResident') ?? '').trim()
+
+  const fechaIngresoHospitalStr = String(formData.get('hospitalAdmissionDate') ?? '').trim()
+  const hospitalAdmissionDate = fechaIngresoHospitalStr
+    ? new Date(`${fechaIngresoHospitalStr}T12:00:00-04:00`)
+    : null
+
+  const admissionDateStr = String(formData.get('admissionDate') ?? '').trim()
+  const admissionDate = admissionDateStr
+    ? new Date(`${admissionDateStr}:00-04:00`)
+    : new Date()
+
+  const initialWeightStr = String(formData.get('initialWeight') ?? '').trim()
+  const initialWeight = initialWeightStr ? parseFloat(initialWeightStr) : null
+  const initialWeightUnit = String(formData.get('initialWeightUnit') ?? 'kg').trim()
 
   const expedienteNumber = String(formData.get('expedienteNumber') ?? '').trim()
   const firstName = String(formData.get('firstName') ?? '').trim()
@@ -49,6 +65,8 @@ export async function crearPaciente(formData: FormData) {
           serviceType,
           consultingDepartment: consultingDepartment || null,
           consultingResident: consultingResident || null,
+          hospitalAdmissionDate,
+          admissionDate,
           admissionType,
           chiefComplaint,
           room,
@@ -57,6 +75,8 @@ export async function crearPaciente(formData: FormData) {
           attendingDoctor: attendingDoctor || consultingResident || null,
           primaryDiagnosis: primaryDiagnosis || null,
           secondaryDiagnoses: secondaryDiagnoses || null,
+          initialWeight,
+          initialWeightUnit,
         },
       },
     },
@@ -64,6 +84,18 @@ export async function crearPaciente(formData: FormData) {
   })
 
   const episodeId = nuevoPaciente.episodes[0].id
+
+  if (initialWeight !== null && !isNaN(initialWeight)) {
+    await prisma.vitalSign.create({
+      data: {
+        episodeId,
+        weight: initialWeight,
+        weightUnit: initialWeightUnit,
+        recordedBy: session.user?.email || 'desconocido',
+        createdAt: admissionDate,
+      },
+    })
+  }
 
   await prisma.allergy.create({
     data: {
@@ -91,9 +123,9 @@ export async function crearPaciente(formData: FormData) {
       expedienteNumber,
       tipoGuardia: serviceType,
       departamento: consultingDepartment,
-      residente: consultingResident,
+      fechaIngreso: admissionDate.toISOString(),
+      pesoInicial: initialWeight ? `${initialWeight} ${initialWeightUnit}` : null,
       nombre: `${firstName} ${lastName}`,
-      diagnosticoPrincipal: primaryDiagnosis,
     },
     reason: `Apertura de expediente (${serviceType === 'interconsulta' ? 'Interconsulta' : 'Paciente Propio'})`,
   })

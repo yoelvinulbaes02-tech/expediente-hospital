@@ -6190,8 +6190,18 @@ export namespace Prisma {
 
   export type AggregateEpisode = {
     _count: EpisodeCountAggregateOutputType | null
+    _avg: EpisodeAvgAggregateOutputType | null
+    _sum: EpisodeSumAggregateOutputType | null
     _min: EpisodeMinAggregateOutputType | null
     _max: EpisodeMaxAggregateOutputType | null
+  }
+
+  export type EpisodeAvgAggregateOutputType = {
+    initialWeight: number | null
+  }
+
+  export type EpisodeSumAggregateOutputType = {
+    initialWeight: number | null
   }
 
   export type EpisodeMinAggregateOutputType = {
@@ -6200,6 +6210,7 @@ export namespace Prisma {
     serviceType: string | null
     consultingDepartment: string | null
     consultingResident: string | null
+    hospitalAdmissionDate: Date | null
     admissionDate: Date | null
     admissionType: string | null
     chiefComplaint: string | null
@@ -6210,6 +6221,8 @@ export namespace Prisma {
     admittingDoctor: string | null
     primaryDiagnosis: string | null
     secondaryDiagnoses: string | null
+    initialWeight: number | null
+    initialWeightUnit: string | null
     createdAt: Date | null
     updatedAt: Date | null
     responsibleId: string | null
@@ -6222,6 +6235,7 @@ export namespace Prisma {
     serviceType: string | null
     consultingDepartment: string | null
     consultingResident: string | null
+    hospitalAdmissionDate: Date | null
     admissionDate: Date | null
     admissionType: string | null
     chiefComplaint: string | null
@@ -6232,6 +6246,8 @@ export namespace Prisma {
     admittingDoctor: string | null
     primaryDiagnosis: string | null
     secondaryDiagnoses: string | null
+    initialWeight: number | null
+    initialWeightUnit: string | null
     createdAt: Date | null
     updatedAt: Date | null
     responsibleId: string | null
@@ -6244,6 +6260,7 @@ export namespace Prisma {
     serviceType: number
     consultingDepartment: number
     consultingResident: number
+    hospitalAdmissionDate: number
     admissionDate: number
     admissionType: number
     chiefComplaint: number
@@ -6254,6 +6271,8 @@ export namespace Prisma {
     admittingDoctor: number
     primaryDiagnosis: number
     secondaryDiagnoses: number
+    initialWeight: number
+    initialWeightUnit: number
     createdAt: number
     updatedAt: number
     responsibleId: number
@@ -6262,12 +6281,21 @@ export namespace Prisma {
   }
 
 
+  export type EpisodeAvgAggregateInputType = {
+    initialWeight?: true
+  }
+
+  export type EpisodeSumAggregateInputType = {
+    initialWeight?: true
+  }
+
   export type EpisodeMinAggregateInputType = {
     id?: true
     patientId?: true
     serviceType?: true
     consultingDepartment?: true
     consultingResident?: true
+    hospitalAdmissionDate?: true
     admissionDate?: true
     admissionType?: true
     chiefComplaint?: true
@@ -6278,6 +6306,8 @@ export namespace Prisma {
     admittingDoctor?: true
     primaryDiagnosis?: true
     secondaryDiagnoses?: true
+    initialWeight?: true
+    initialWeightUnit?: true
     createdAt?: true
     updatedAt?: true
     responsibleId?: true
@@ -6290,6 +6320,7 @@ export namespace Prisma {
     serviceType?: true
     consultingDepartment?: true
     consultingResident?: true
+    hospitalAdmissionDate?: true
     admissionDate?: true
     admissionType?: true
     chiefComplaint?: true
@@ -6300,6 +6331,8 @@ export namespace Prisma {
     admittingDoctor?: true
     primaryDiagnosis?: true
     secondaryDiagnoses?: true
+    initialWeight?: true
+    initialWeightUnit?: true
     createdAt?: true
     updatedAt?: true
     responsibleId?: true
@@ -6312,6 +6345,7 @@ export namespace Prisma {
     serviceType?: true
     consultingDepartment?: true
     consultingResident?: true
+    hospitalAdmissionDate?: true
     admissionDate?: true
     admissionType?: true
     chiefComplaint?: true
@@ -6322,6 +6356,8 @@ export namespace Prisma {
     admittingDoctor?: true
     primaryDiagnosis?: true
     secondaryDiagnoses?: true
+    initialWeight?: true
+    initialWeightUnit?: true
     createdAt?: true
     updatedAt?: true
     responsibleId?: true
@@ -6367,6 +6403,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: EpisodeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EpisodeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: EpisodeMinAggregateInputType
@@ -6397,6 +6445,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: EpisodeCountAggregateInputType | true
+    _avg?: EpisodeAvgAggregateInputType
+    _sum?: EpisodeSumAggregateInputType
     _min?: EpisodeMinAggregateInputType
     _max?: EpisodeMaxAggregateInputType
   }
@@ -6407,6 +6457,7 @@ export namespace Prisma {
     serviceType: string
     consultingDepartment: string | null
     consultingResident: string | null
+    hospitalAdmissionDate: Date | null
     admissionDate: Date
     admissionType: string
     chiefComplaint: string | null
@@ -6417,11 +6468,15 @@ export namespace Prisma {
     admittingDoctor: string | null
     primaryDiagnosis: string | null
     secondaryDiagnoses: string | null
+    initialWeight: number | null
+    initialWeightUnit: string | null
     createdAt: Date
     updatedAt: Date
     responsibleId: string | null
     responsibleSince: Date | null
     _count: EpisodeCountAggregateOutputType | null
+    _avg: EpisodeAvgAggregateOutputType | null
+    _sum: EpisodeSumAggregateOutputType | null
     _min: EpisodeMinAggregateOutputType | null
     _max: EpisodeMaxAggregateOutputType | null
   }
@@ -6446,6 +6501,7 @@ export namespace Prisma {
     serviceType?: boolean
     consultingDepartment?: boolean
     consultingResident?: boolean
+    hospitalAdmissionDate?: boolean
     admissionDate?: boolean
     admissionType?: boolean
     chiefComplaint?: boolean
@@ -6456,6 +6512,8 @@ export namespace Prisma {
     admittingDoctor?: boolean
     primaryDiagnosis?: boolean
     secondaryDiagnoses?: boolean
+    initialWeight?: boolean
+    initialWeightUnit?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     responsibleId?: boolean
@@ -6482,6 +6540,7 @@ export namespace Prisma {
     serviceType?: boolean
     consultingDepartment?: boolean
     consultingResident?: boolean
+    hospitalAdmissionDate?: boolean
     admissionDate?: boolean
     admissionType?: boolean
     chiefComplaint?: boolean
@@ -6492,6 +6551,8 @@ export namespace Prisma {
     admittingDoctor?: boolean
     primaryDiagnosis?: boolean
     secondaryDiagnoses?: boolean
+    initialWeight?: boolean
+    initialWeightUnit?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     responsibleId?: boolean
@@ -6506,6 +6567,7 @@ export namespace Prisma {
     serviceType?: boolean
     consultingDepartment?: boolean
     consultingResident?: boolean
+    hospitalAdmissionDate?: boolean
     admissionDate?: boolean
     admissionType?: boolean
     chiefComplaint?: boolean
@@ -6516,6 +6578,8 @@ export namespace Prisma {
     admittingDoctor?: boolean
     primaryDiagnosis?: boolean
     secondaryDiagnoses?: boolean
+    initialWeight?: boolean
+    initialWeightUnit?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     responsibleId?: boolean
@@ -6530,6 +6594,7 @@ export namespace Prisma {
     serviceType?: boolean
     consultingDepartment?: boolean
     consultingResident?: boolean
+    hospitalAdmissionDate?: boolean
     admissionDate?: boolean
     admissionType?: boolean
     chiefComplaint?: boolean
@@ -6540,13 +6605,15 @@ export namespace Prisma {
     admittingDoctor?: boolean
     primaryDiagnosis?: boolean
     secondaryDiagnoses?: boolean
+    initialWeight?: boolean
+    initialWeightUnit?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     responsibleId?: boolean
     responsibleSince?: boolean
   }
 
-  export type EpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "serviceType" | "consultingDepartment" | "consultingResident" | "admissionDate" | "admissionType" | "chiefComplaint" | "status" | "room" | "bed" | "attendingDoctor" | "admittingDoctor" | "primaryDiagnosis" | "secondaryDiagnoses" | "createdAt" | "updatedAt" | "responsibleId" | "responsibleSince", ExtArgs["result"]["episode"]>
+  export type EpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "serviceType" | "consultingDepartment" | "consultingResident" | "hospitalAdmissionDate" | "admissionDate" | "admissionType" | "chiefComplaint" | "status" | "room" | "bed" | "attendingDoctor" | "admittingDoctor" | "primaryDiagnosis" | "secondaryDiagnoses" | "initialWeight" | "initialWeightUnit" | "createdAt" | "updatedAt" | "responsibleId" | "responsibleSince", ExtArgs["result"]["episode"]>
   export type EpisodeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     patient?: boolean | PatientDefaultArgs<ExtArgs>
     allergies?: boolean | Episode$allergiesArgs<ExtArgs>
@@ -6595,6 +6662,7 @@ export namespace Prisma {
       serviceType: string
       consultingDepartment: string | null
       consultingResident: string | null
+      hospitalAdmissionDate: Date | null
       admissionDate: Date
       admissionType: string
       chiefComplaint: string | null
@@ -6605,6 +6673,8 @@ export namespace Prisma {
       admittingDoctor: string | null
       primaryDiagnosis: string | null
       secondaryDiagnoses: string | null
+      initialWeight: number | null
+      initialWeightUnit: string | null
       createdAt: Date
       updatedAt: Date
       responsibleId: string | null
@@ -7050,6 +7120,7 @@ export namespace Prisma {
     readonly serviceType: FieldRef<"Episode", 'String'>
     readonly consultingDepartment: FieldRef<"Episode", 'String'>
     readonly consultingResident: FieldRef<"Episode", 'String'>
+    readonly hospitalAdmissionDate: FieldRef<"Episode", 'DateTime'>
     readonly admissionDate: FieldRef<"Episode", 'DateTime'>
     readonly admissionType: FieldRef<"Episode", 'String'>
     readonly chiefComplaint: FieldRef<"Episode", 'String'>
@@ -7060,6 +7131,8 @@ export namespace Prisma {
     readonly admittingDoctor: FieldRef<"Episode", 'String'>
     readonly primaryDiagnosis: FieldRef<"Episode", 'String'>
     readonly secondaryDiagnoses: FieldRef<"Episode", 'String'>
+    readonly initialWeight: FieldRef<"Episode", 'Float'>
+    readonly initialWeightUnit: FieldRef<"Episode", 'String'>
     readonly createdAt: FieldRef<"Episode", 'DateTime'>
     readonly updatedAt: FieldRef<"Episode", 'DateTime'>
     readonly responsibleId: FieldRef<"Episode", 'String'>
@@ -14371,6 +14444,7 @@ export namespace Prisma {
     type: string | null
     site: string | null
     placementDate: Date | null
+    unknownPlacementDate: boolean | null
     notes: string | null
     isActive: boolean | null
     createdBy: string | null
@@ -14383,6 +14457,7 @@ export namespace Prisma {
     type: string | null
     site: string | null
     placementDate: Date | null
+    unknownPlacementDate: boolean | null
     notes: string | null
     isActive: boolean | null
     createdBy: string | null
@@ -14395,6 +14470,7 @@ export namespace Prisma {
     type: number
     site: number
     placementDate: number
+    unknownPlacementDate: number
     notes: number
     isActive: number
     createdBy: number
@@ -14409,6 +14485,7 @@ export namespace Prisma {
     type?: true
     site?: true
     placementDate?: true
+    unknownPlacementDate?: true
     notes?: true
     isActive?: true
     createdBy?: true
@@ -14421,6 +14498,7 @@ export namespace Prisma {
     type?: true
     site?: true
     placementDate?: true
+    unknownPlacementDate?: true
     notes?: true
     isActive?: true
     createdBy?: true
@@ -14433,6 +14511,7 @@ export namespace Prisma {
     type?: true
     site?: true
     placementDate?: true
+    unknownPlacementDate?: true
     notes?: true
     isActive?: true
     createdBy?: true
@@ -14518,6 +14597,7 @@ export namespace Prisma {
     type: string
     site: string | null
     placementDate: Date | null
+    unknownPlacementDate: boolean
     notes: string | null
     isActive: boolean
     createdBy: string
@@ -14547,6 +14627,7 @@ export namespace Prisma {
     type?: boolean
     site?: boolean
     placementDate?: boolean
+    unknownPlacementDate?: boolean
     notes?: boolean
     isActive?: boolean
     createdBy?: boolean
@@ -14560,6 +14641,7 @@ export namespace Prisma {
     type?: boolean
     site?: boolean
     placementDate?: boolean
+    unknownPlacementDate?: boolean
     notes?: boolean
     isActive?: boolean
     createdBy?: boolean
@@ -14573,6 +14655,7 @@ export namespace Prisma {
     type?: boolean
     site?: boolean
     placementDate?: boolean
+    unknownPlacementDate?: boolean
     notes?: boolean
     isActive?: boolean
     createdBy?: boolean
@@ -14586,13 +14669,14 @@ export namespace Prisma {
     type?: boolean
     site?: boolean
     placementDate?: boolean
+    unknownPlacementDate?: boolean
     notes?: boolean
     isActive?: boolean
     createdBy?: boolean
     createdAt?: boolean
   }
 
-  export type VascularAccessOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "type" | "site" | "placementDate" | "notes" | "isActive" | "createdBy" | "createdAt", ExtArgs["result"]["vascularAccess"]>
+  export type VascularAccessOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "type" | "site" | "placementDate" | "unknownPlacementDate" | "notes" | "isActive" | "createdBy" | "createdAt", ExtArgs["result"]["vascularAccess"]>
   export type VascularAccessInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -14614,6 +14698,7 @@ export namespace Prisma {
       type: string
       site: string | null
       placementDate: Date | null
+      unknownPlacementDate: boolean
       notes: string | null
       isActive: boolean
       createdBy: string
@@ -15047,6 +15132,7 @@ export namespace Prisma {
     readonly type: FieldRef<"VascularAccess", 'String'>
     readonly site: FieldRef<"VascularAccess", 'String'>
     readonly placementDate: FieldRef<"VascularAccess", 'DateTime'>
+    readonly unknownPlacementDate: FieldRef<"VascularAccess", 'Boolean'>
     readonly notes: FieldRef<"VascularAccess", 'String'>
     readonly isActive: FieldRef<"VascularAccess", 'Boolean'>
     readonly createdBy: FieldRef<"VascularAccess", 'String'>
@@ -17783,9 +17869,12 @@ export namespace Prisma {
     oxygenSat: number | null
     glucose: number | null
     weight: number | null
+    weightUnit: string | null
     painScale: number | null
     diuresis: number | null
     recordedBy: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
     createdAt: Date | null
   }
 
@@ -17800,9 +17889,12 @@ export namespace Prisma {
     oxygenSat: number | null
     glucose: number | null
     weight: number | null
+    weightUnit: string | null
     painScale: number | null
     diuresis: number | null
     recordedBy: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
     createdAt: Date | null
   }
 
@@ -17817,9 +17909,12 @@ export namespace Prisma {
     oxygenSat: number
     glucose: number
     weight: number
+    weightUnit: number
     painScale: number
     diuresis: number
     recordedBy: number
+    updatedBy: number
+    updatedAt: number
     createdAt: number
     _all: number
   }
@@ -17862,9 +17957,12 @@ export namespace Prisma {
     oxygenSat?: true
     glucose?: true
     weight?: true
+    weightUnit?: true
     painScale?: true
     diuresis?: true
     recordedBy?: true
+    updatedBy?: true
+    updatedAt?: true
     createdAt?: true
   }
 
@@ -17879,9 +17977,12 @@ export namespace Prisma {
     oxygenSat?: true
     glucose?: true
     weight?: true
+    weightUnit?: true
     painScale?: true
     diuresis?: true
     recordedBy?: true
+    updatedBy?: true
+    updatedAt?: true
     createdAt?: true
   }
 
@@ -17896,9 +17997,12 @@ export namespace Prisma {
     oxygenSat?: true
     glucose?: true
     weight?: true
+    weightUnit?: true
     painScale?: true
     diuresis?: true
     recordedBy?: true
+    updatedBy?: true
+    updatedAt?: true
     createdAt?: true
     _all?: true
   }
@@ -18000,9 +18104,12 @@ export namespace Prisma {
     oxygenSat: number | null
     glucose: number | null
     weight: number | null
+    weightUnit: string | null
     painScale: number | null
     diuresis: number | null
     recordedBy: string
+    updatedBy: string | null
+    updatedAt: Date | null
     createdAt: Date
     _count: VitalSignCountAggregateOutputType | null
     _avg: VitalSignAvgAggregateOutputType | null
@@ -18036,9 +18143,12 @@ export namespace Prisma {
     oxygenSat?: boolean
     glucose?: boolean
     weight?: boolean
+    weightUnit?: boolean
     painScale?: boolean
     diuresis?: boolean
     recordedBy?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     createdAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["vitalSign"]>
@@ -18054,9 +18164,12 @@ export namespace Prisma {
     oxygenSat?: boolean
     glucose?: boolean
     weight?: boolean
+    weightUnit?: boolean
     painScale?: boolean
     diuresis?: boolean
     recordedBy?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     createdAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["vitalSign"]>
@@ -18072,9 +18185,12 @@ export namespace Prisma {
     oxygenSat?: boolean
     glucose?: boolean
     weight?: boolean
+    weightUnit?: boolean
     painScale?: boolean
     diuresis?: boolean
     recordedBy?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     createdAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["vitalSign"]>
@@ -18090,13 +18206,16 @@ export namespace Prisma {
     oxygenSat?: boolean
     glucose?: boolean
     weight?: boolean
+    weightUnit?: boolean
     painScale?: boolean
     diuresis?: boolean
     recordedBy?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     createdAt?: boolean
   }
 
-  export type VitalSignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "systolic" | "diastolic" | "heartRate" | "respiratoryRate" | "temperature" | "oxygenSat" | "glucose" | "weight" | "painScale" | "diuresis" | "recordedBy" | "createdAt", ExtArgs["result"]["vitalSign"]>
+  export type VitalSignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "systolic" | "diastolic" | "heartRate" | "respiratoryRate" | "temperature" | "oxygenSat" | "glucose" | "weight" | "weightUnit" | "painScale" | "diuresis" | "recordedBy" | "updatedBy" | "updatedAt" | "createdAt", ExtArgs["result"]["vitalSign"]>
   export type VitalSignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -18123,9 +18242,12 @@ export namespace Prisma {
       oxygenSat: number | null
       glucose: number | null
       weight: number | null
+      weightUnit: string | null
       painScale: number | null
       diuresis: number | null
       recordedBy: string
+      updatedBy: string | null
+      updatedAt: Date | null
       createdAt: Date
     }, ExtArgs["result"]["vitalSign"]>
     composites: {}
@@ -18561,9 +18683,12 @@ export namespace Prisma {
     readonly oxygenSat: FieldRef<"VitalSign", 'Int'>
     readonly glucose: FieldRef<"VitalSign", 'Int'>
     readonly weight: FieldRef<"VitalSign", 'Float'>
+    readonly weightUnit: FieldRef<"VitalSign", 'String'>
     readonly painScale: FieldRef<"VitalSign", 'Int'>
     readonly diuresis: FieldRef<"VitalSign", 'Int'>
     readonly recordedBy: FieldRef<"VitalSign", 'String'>
+    readonly updatedBy: FieldRef<"VitalSign", 'String'>
+    readonly updatedAt: FieldRef<"VitalSign", 'DateTime'>
     readonly createdAt: FieldRef<"VitalSign", 'DateTime'>
   }
     
@@ -21303,6 +21428,7 @@ export namespace Prisma {
     serviceType: 'serviceType',
     consultingDepartment: 'consultingDepartment',
     consultingResident: 'consultingResident',
+    hospitalAdmissionDate: 'hospitalAdmissionDate',
     admissionDate: 'admissionDate',
     admissionType: 'admissionType',
     chiefComplaint: 'chiefComplaint',
@@ -21313,6 +21439,8 @@ export namespace Prisma {
     admittingDoctor: 'admittingDoctor',
     primaryDiagnosis: 'primaryDiagnosis',
     secondaryDiagnoses: 'secondaryDiagnoses',
+    initialWeight: 'initialWeight',
+    initialWeightUnit: 'initialWeightUnit',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     responsibleId: 'responsibleId',
@@ -21407,6 +21535,7 @@ export namespace Prisma {
     type: 'type',
     site: 'site',
     placementDate: 'placementDate',
+    unknownPlacementDate: 'unknownPlacementDate',
     notes: 'notes',
     isActive: 'isActive',
     createdBy: 'createdBy',
@@ -21459,9 +21588,12 @@ export namespace Prisma {
     oxygenSat: 'oxygenSat',
     glucose: 'glucose',
     weight: 'weight',
+    weightUnit: 'weightUnit',
     painScale: 'painScale',
     diuresis: 'diuresis',
     recordedBy: 'recordedBy',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt',
     createdAt: 'createdAt'
   };
 
@@ -21972,6 +22104,7 @@ export namespace Prisma {
     serviceType?: StringFilter<"Episode"> | string
     consultingDepartment?: StringNullableFilter<"Episode"> | string | null
     consultingResident?: StringNullableFilter<"Episode"> | string | null
+    hospitalAdmissionDate?: DateTimeNullableFilter<"Episode"> | Date | string | null
     admissionDate?: DateTimeFilter<"Episode"> | Date | string
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
@@ -21982,6 +22115,8 @@ export namespace Prisma {
     admittingDoctor?: StringNullableFilter<"Episode"> | string | null
     primaryDiagnosis?: StringNullableFilter<"Episode"> | string | null
     secondaryDiagnoses?: StringNullableFilter<"Episode"> | string | null
+    initialWeight?: FloatNullableFilter<"Episode"> | number | null
+    initialWeightUnit?: StringNullableFilter<"Episode"> | string | null
     createdAt?: DateTimeFilter<"Episode"> | Date | string
     updatedAt?: DateTimeFilter<"Episode"> | Date | string
     responsibleId?: StringNullableFilter<"Episode"> | string | null
@@ -22007,6 +22142,7 @@ export namespace Prisma {
     serviceType?: SortOrder
     consultingDepartment?: SortOrderInput | SortOrder
     consultingResident?: SortOrderInput | SortOrder
+    hospitalAdmissionDate?: SortOrderInput | SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrderInput | SortOrder
@@ -22017,6 +22153,8 @@ export namespace Prisma {
     admittingDoctor?: SortOrderInput | SortOrder
     primaryDiagnosis?: SortOrderInput | SortOrder
     secondaryDiagnoses?: SortOrderInput | SortOrder
+    initialWeight?: SortOrderInput | SortOrder
+    initialWeightUnit?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     responsibleId?: SortOrderInput | SortOrder
@@ -22045,6 +22183,7 @@ export namespace Prisma {
     serviceType?: StringFilter<"Episode"> | string
     consultingDepartment?: StringNullableFilter<"Episode"> | string | null
     consultingResident?: StringNullableFilter<"Episode"> | string | null
+    hospitalAdmissionDate?: DateTimeNullableFilter<"Episode"> | Date | string | null
     admissionDate?: DateTimeFilter<"Episode"> | Date | string
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
@@ -22055,6 +22194,8 @@ export namespace Prisma {
     admittingDoctor?: StringNullableFilter<"Episode"> | string | null
     primaryDiagnosis?: StringNullableFilter<"Episode"> | string | null
     secondaryDiagnoses?: StringNullableFilter<"Episode"> | string | null
+    initialWeight?: FloatNullableFilter<"Episode"> | number | null
+    initialWeightUnit?: StringNullableFilter<"Episode"> | string | null
     createdAt?: DateTimeFilter<"Episode"> | Date | string
     updatedAt?: DateTimeFilter<"Episode"> | Date | string
     responsibleId?: StringNullableFilter<"Episode"> | string | null
@@ -22080,6 +22221,7 @@ export namespace Prisma {
     serviceType?: SortOrder
     consultingDepartment?: SortOrderInput | SortOrder
     consultingResident?: SortOrderInput | SortOrder
+    hospitalAdmissionDate?: SortOrderInput | SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrderInput | SortOrder
@@ -22090,13 +22232,17 @@ export namespace Prisma {
     admittingDoctor?: SortOrderInput | SortOrder
     primaryDiagnosis?: SortOrderInput | SortOrder
     secondaryDiagnoses?: SortOrderInput | SortOrder
+    initialWeight?: SortOrderInput | SortOrder
+    initialWeightUnit?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     responsibleId?: SortOrderInput | SortOrder
     responsibleSince?: SortOrderInput | SortOrder
     _count?: EpisodeCountOrderByAggregateInput
+    _avg?: EpisodeAvgOrderByAggregateInput
     _max?: EpisodeMaxOrderByAggregateInput
     _min?: EpisodeMinOrderByAggregateInput
+    _sum?: EpisodeSumOrderByAggregateInput
   }
 
   export type EpisodeScalarWhereWithAggregatesInput = {
@@ -22108,6 +22254,7 @@ export namespace Prisma {
     serviceType?: StringWithAggregatesFilter<"Episode"> | string
     consultingDepartment?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     consultingResident?: StringNullableWithAggregatesFilter<"Episode"> | string | null
+    hospitalAdmissionDate?: DateTimeNullableWithAggregatesFilter<"Episode"> | Date | string | null
     admissionDate?: DateTimeWithAggregatesFilter<"Episode"> | Date | string
     admissionType?: StringWithAggregatesFilter<"Episode"> | string
     chiefComplaint?: StringNullableWithAggregatesFilter<"Episode"> | string | null
@@ -22118,6 +22265,8 @@ export namespace Prisma {
     admittingDoctor?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     primaryDiagnosis?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     secondaryDiagnoses?: StringNullableWithAggregatesFilter<"Episode"> | string | null
+    initialWeight?: FloatNullableWithAggregatesFilter<"Episode"> | number | null
+    initialWeightUnit?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Episode"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Episode"> | Date | string
     responsibleId?: StringNullableWithAggregatesFilter<"Episode"> | string | null
@@ -22533,6 +22682,7 @@ export namespace Prisma {
     type?: StringFilter<"VascularAccess"> | string
     site?: StringNullableFilter<"VascularAccess"> | string | null
     placementDate?: DateTimeNullableFilter<"VascularAccess"> | Date | string | null
+    unknownPlacementDate?: BoolFilter<"VascularAccess"> | boolean
     notes?: StringNullableFilter<"VascularAccess"> | string | null
     isActive?: BoolFilter<"VascularAccess"> | boolean
     createdBy?: StringFilter<"VascularAccess"> | string
@@ -22546,6 +22696,7 @@ export namespace Prisma {
     type?: SortOrder
     site?: SortOrderInput | SortOrder
     placementDate?: SortOrderInput | SortOrder
+    unknownPlacementDate?: SortOrder
     notes?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
@@ -22562,6 +22713,7 @@ export namespace Prisma {
     type?: StringFilter<"VascularAccess"> | string
     site?: StringNullableFilter<"VascularAccess"> | string | null
     placementDate?: DateTimeNullableFilter<"VascularAccess"> | Date | string | null
+    unknownPlacementDate?: BoolFilter<"VascularAccess"> | boolean
     notes?: StringNullableFilter<"VascularAccess"> | string | null
     isActive?: BoolFilter<"VascularAccess"> | boolean
     createdBy?: StringFilter<"VascularAccess"> | string
@@ -22575,6 +22727,7 @@ export namespace Prisma {
     type?: SortOrder
     site?: SortOrderInput | SortOrder
     placementDate?: SortOrderInput | SortOrder
+    unknownPlacementDate?: SortOrder
     notes?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
@@ -22593,6 +22746,7 @@ export namespace Prisma {
     type?: StringWithAggregatesFilter<"VascularAccess"> | string
     site?: StringNullableWithAggregatesFilter<"VascularAccess"> | string | null
     placementDate?: DateTimeNullableWithAggregatesFilter<"VascularAccess"> | Date | string | null
+    unknownPlacementDate?: BoolWithAggregatesFilter<"VascularAccess"> | boolean
     notes?: StringNullableWithAggregatesFilter<"VascularAccess"> | string | null
     isActive?: BoolWithAggregatesFilter<"VascularAccess"> | boolean
     createdBy?: StringWithAggregatesFilter<"VascularAccess"> | string
@@ -22776,9 +22930,12 @@ export namespace Prisma {
     oxygenSat?: IntNullableFilter<"VitalSign"> | number | null
     glucose?: IntNullableFilter<"VitalSign"> | number | null
     weight?: FloatNullableFilter<"VitalSign"> | number | null
+    weightUnit?: StringNullableFilter<"VitalSign"> | string | null
     painScale?: IntNullableFilter<"VitalSign"> | number | null
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     recordedBy?: StringFilter<"VitalSign"> | string
+    updatedBy?: StringNullableFilter<"VitalSign"> | string | null
+    updatedAt?: DateTimeNullableFilter<"VitalSign"> | Date | string | null
     createdAt?: DateTimeFilter<"VitalSign"> | Date | string
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
   }
@@ -22794,9 +22951,12 @@ export namespace Prisma {
     oxygenSat?: SortOrderInput | SortOrder
     glucose?: SortOrderInput | SortOrder
     weight?: SortOrderInput | SortOrder
+    weightUnit?: SortOrderInput | SortOrder
     painScale?: SortOrderInput | SortOrder
     diuresis?: SortOrderInput | SortOrder
     recordedBy?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     episode?: EpisodeOrderByWithRelationInput
   }
@@ -22815,9 +22975,12 @@ export namespace Prisma {
     oxygenSat?: IntNullableFilter<"VitalSign"> | number | null
     glucose?: IntNullableFilter<"VitalSign"> | number | null
     weight?: FloatNullableFilter<"VitalSign"> | number | null
+    weightUnit?: StringNullableFilter<"VitalSign"> | string | null
     painScale?: IntNullableFilter<"VitalSign"> | number | null
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     recordedBy?: StringFilter<"VitalSign"> | string
+    updatedBy?: StringNullableFilter<"VitalSign"> | string | null
+    updatedAt?: DateTimeNullableFilter<"VitalSign"> | Date | string | null
     createdAt?: DateTimeFilter<"VitalSign"> | Date | string
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
   }, "id">
@@ -22833,9 +22996,12 @@ export namespace Prisma {
     oxygenSat?: SortOrderInput | SortOrder
     glucose?: SortOrderInput | SortOrder
     weight?: SortOrderInput | SortOrder
+    weightUnit?: SortOrderInput | SortOrder
     painScale?: SortOrderInput | SortOrder
     diuresis?: SortOrderInput | SortOrder
     recordedBy?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: VitalSignCountOrderByAggregateInput
     _avg?: VitalSignAvgOrderByAggregateInput
@@ -22858,9 +23024,12 @@ export namespace Prisma {
     oxygenSat?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     glucose?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     weight?: FloatNullableWithAggregatesFilter<"VitalSign"> | number | null
+    weightUnit?: StringNullableWithAggregatesFilter<"VitalSign"> | string | null
     painScale?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     diuresis?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     recordedBy?: StringWithAggregatesFilter<"VitalSign"> | string
+    updatedBy?: StringNullableWithAggregatesFilter<"VitalSign"> | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"VitalSign"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"VitalSign"> | Date | string
   }
 
@@ -23376,6 +23545,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -23386,6 +23556,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -23410,6 +23582,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -23420,6 +23593,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -23442,6 +23617,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23452,6 +23628,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23476,6 +23654,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23486,6 +23665,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23509,6 +23690,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -23519,6 +23701,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -23530,6 +23714,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23540,6 +23725,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23551,6 +23738,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23561,6 +23749,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23992,6 +24182,7 @@ export namespace Prisma {
     type: string
     site?: string | null
     placementDate?: Date | string | null
+    unknownPlacementDate?: boolean
     notes?: string | null
     isActive?: boolean
     createdBy: string
@@ -24005,6 +24196,7 @@ export namespace Prisma {
     type: string
     site?: string | null
     placementDate?: Date | string | null
+    unknownPlacementDate?: boolean
     notes?: string | null
     isActive?: boolean
     createdBy: string
@@ -24016,6 +24208,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     site?: NullableStringFieldUpdateOperationsInput | string | null
     placementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    unknownPlacementDate?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
@@ -24029,6 +24222,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     site?: NullableStringFieldUpdateOperationsInput | string | null
     placementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    unknownPlacementDate?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
@@ -24041,6 +24235,7 @@ export namespace Prisma {
     type: string
     site?: string | null
     placementDate?: Date | string | null
+    unknownPlacementDate?: boolean
     notes?: string | null
     isActive?: boolean
     createdBy: string
@@ -24052,6 +24247,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     site?: NullableStringFieldUpdateOperationsInput | string | null
     placementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    unknownPlacementDate?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
@@ -24064,6 +24260,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     site?: NullableStringFieldUpdateOperationsInput | string | null
     placementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    unknownPlacementDate?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
@@ -24259,9 +24456,12 @@ export namespace Prisma {
     oxygenSat?: number | null
     glucose?: number | null
     weight?: number | null
+    weightUnit?: string | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     createdAt?: Date | string
     episode: EpisodeCreateNestedOneWithoutVitalsInput
   }
@@ -24277,9 +24477,12 @@ export namespace Prisma {
     oxygenSat?: number | null
     glucose?: number | null
     weight?: number | null
+    weightUnit?: string | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -24293,9 +24496,12 @@ export namespace Prisma {
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
     weight?: NullableFloatFieldUpdateOperationsInput | number | null
+    weightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episode?: EpisodeUpdateOneRequiredWithoutVitalsNestedInput
   }
@@ -24311,9 +24517,12 @@ export namespace Prisma {
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
     weight?: NullableFloatFieldUpdateOperationsInput | number | null
+    weightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -24328,9 +24537,12 @@ export namespace Prisma {
     oxygenSat?: number | null
     glucose?: number | null
     weight?: number | null
+    weightUnit?: string | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -24344,9 +24556,12 @@ export namespace Prisma {
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
     weight?: NullableFloatFieldUpdateOperationsInput | number | null
+    weightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -24361,9 +24576,12 @@ export namespace Prisma {
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
     weight?: NullableFloatFieldUpdateOperationsInput | number | null
+    weightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -24999,6 +25217,17 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type PatientScalarRelationFilter = {
     is?: PatientWhereInput
     isNot?: PatientWhereInput
@@ -25105,6 +25334,7 @@ export namespace Prisma {
     serviceType?: SortOrder
     consultingDepartment?: SortOrder
     consultingResident?: SortOrder
+    hospitalAdmissionDate?: SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
@@ -25115,10 +25345,16 @@ export namespace Prisma {
     admittingDoctor?: SortOrder
     primaryDiagnosis?: SortOrder
     secondaryDiagnoses?: SortOrder
+    initialWeight?: SortOrder
+    initialWeightUnit?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     responsibleId?: SortOrder
     responsibleSince?: SortOrder
+  }
+
+  export type EpisodeAvgOrderByAggregateInput = {
+    initialWeight?: SortOrder
   }
 
   export type EpisodeMaxOrderByAggregateInput = {
@@ -25127,6 +25363,7 @@ export namespace Prisma {
     serviceType?: SortOrder
     consultingDepartment?: SortOrder
     consultingResident?: SortOrder
+    hospitalAdmissionDate?: SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
@@ -25137,6 +25374,8 @@ export namespace Prisma {
     admittingDoctor?: SortOrder
     primaryDiagnosis?: SortOrder
     secondaryDiagnoses?: SortOrder
+    initialWeight?: SortOrder
+    initialWeightUnit?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     responsibleId?: SortOrder
@@ -25149,6 +25388,7 @@ export namespace Prisma {
     serviceType?: SortOrder
     consultingDepartment?: SortOrder
     consultingResident?: SortOrder
+    hospitalAdmissionDate?: SortOrder
     admissionDate?: SortOrder
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
@@ -25159,10 +25399,32 @@ export namespace Prisma {
     admittingDoctor?: SortOrder
     primaryDiagnosis?: SortOrder
     secondaryDiagnoses?: SortOrder
+    initialWeight?: SortOrder
+    initialWeightUnit?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     responsibleId?: SortOrder
     responsibleSince?: SortOrder
+  }
+
+  export type EpisodeSumOrderByAggregateInput = {
+    initialWeight?: SortOrder
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type MedicalHistoryCountOrderByAggregateInput = {
@@ -25394,6 +25656,7 @@ export namespace Prisma {
     type?: SortOrder
     site?: SortOrder
     placementDate?: SortOrder
+    unknownPlacementDate?: SortOrder
     notes?: SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
@@ -25406,6 +25669,7 @@ export namespace Prisma {
     type?: SortOrder
     site?: SortOrder
     placementDate?: SortOrder
+    unknownPlacementDate?: SortOrder
     notes?: SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
@@ -25418,6 +25682,7 @@ export namespace Prisma {
     type?: SortOrder
     site?: SortOrder
     placementDate?: SortOrder
+    unknownPlacementDate?: SortOrder
     notes?: SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
@@ -25502,17 +25767,6 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
-  export type FloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
   export type VitalSignCountOrderByAggregateInput = {
     id?: SortOrder
     episodeId?: SortOrder
@@ -25524,9 +25778,12 @@ export namespace Prisma {
     oxygenSat?: SortOrder
     glucose?: SortOrder
     weight?: SortOrder
+    weightUnit?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
     recordedBy?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -25554,9 +25811,12 @@ export namespace Prisma {
     oxygenSat?: SortOrder
     glucose?: SortOrder
     weight?: SortOrder
+    weightUnit?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
     recordedBy?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -25571,9 +25831,12 @@ export namespace Prisma {
     oxygenSat?: SortOrder
     glucose?: SortOrder
     weight?: SortOrder
+    weightUnit?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
     recordedBy?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -25588,22 +25851,6 @@ export namespace Prisma {
     weight?: SortOrder
     painScale?: SortOrder
     diuresis?: SortOrder
-  }
-
-  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type EnumHandoffStatusFilter<$PrismaModel = never> = {
@@ -26160,6 +26407,14 @@ export namespace Prisma {
     connect?: VascularAccessWhereUniqueInput | VascularAccessWhereUniqueInput[]
   }
 
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type PatientUpdateOneRequiredWithoutEpisodesNestedInput = {
     create?: XOR<PatientCreateWithoutEpisodesInput, PatientUncheckedCreateWithoutEpisodesInput>
     connectOrCreate?: PatientCreateOrConnectWithoutEpisodesInput
@@ -26654,14 +26909,6 @@ export namespace Prisma {
     connect?: EpisodeWhereUniqueInput
   }
 
-  export type NullableFloatFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type EpisodeUpdateOneRequiredWithoutVitalsNestedInput = {
     create?: XOR<EpisodeCreateWithoutVitalsInput, EpisodeUncheckedCreateWithoutVitalsInput>
     connectOrCreate?: EpisodeCreateOrConnectWithoutVitalsInput
@@ -26954,22 +27201,6 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
-  }
-
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -26984,6 +27215,22 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
   }
 
   export type NestedEnumHandoffStatusFilter<$PrismaModel = never> = {
@@ -27056,6 +27303,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -27066,6 +27314,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -27089,6 +27339,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -27099,6 +27350,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -27189,6 +27442,7 @@ export namespace Prisma {
     serviceType?: StringFilter<"Episode"> | string
     consultingDepartment?: StringNullableFilter<"Episode"> | string | null
     consultingResident?: StringNullableFilter<"Episode"> | string | null
+    hospitalAdmissionDate?: DateTimeNullableFilter<"Episode"> | Date | string | null
     admissionDate?: DateTimeFilter<"Episode"> | Date | string
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
@@ -27199,6 +27453,8 @@ export namespace Prisma {
     admittingDoctor?: StringNullableFilter<"Episode"> | string | null
     primaryDiagnosis?: StringNullableFilter<"Episode"> | string | null
     secondaryDiagnoses?: StringNullableFilter<"Episode"> | string | null
+    initialWeight?: FloatNullableFilter<"Episode"> | number | null
+    initialWeightUnit?: StringNullableFilter<"Episode"> | string | null
     createdAt?: DateTimeFilter<"Episode"> | Date | string
     updatedAt?: DateTimeFilter<"Episode"> | Date | string
     responsibleId?: StringNullableFilter<"Episode"> | string | null
@@ -27278,6 +27534,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -27288,6 +27545,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -27310,6 +27569,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -27320,6 +27580,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -27665,9 +27927,12 @@ export namespace Prisma {
     oxygenSat?: number | null
     glucose?: number | null
     weight?: number | null
+    weightUnit?: string | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -27681,9 +27946,12 @@ export namespace Prisma {
     oxygenSat?: number | null
     glucose?: number | null
     weight?: number | null
+    weightUnit?: string | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -27937,6 +28205,7 @@ export namespace Prisma {
     type: string
     site?: string | null
     placementDate?: Date | string | null
+    unknownPlacementDate?: boolean
     notes?: string | null
     isActive?: boolean
     createdBy: string
@@ -27948,6 +28217,7 @@ export namespace Prisma {
     type: string
     site?: string | null
     placementDate?: Date | string | null
+    unknownPlacementDate?: boolean
     notes?: string | null
     isActive?: boolean
     createdBy: string
@@ -28089,9 +28359,12 @@ export namespace Prisma {
     oxygenSat?: IntNullableFilter<"VitalSign"> | number | null
     glucose?: IntNullableFilter<"VitalSign"> | number | null
     weight?: FloatNullableFilter<"VitalSign"> | number | null
+    weightUnit?: StringNullableFilter<"VitalSign"> | string | null
     painScale?: IntNullableFilter<"VitalSign"> | number | null
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     recordedBy?: StringFilter<"VitalSign"> | string
+    updatedBy?: StringNullableFilter<"VitalSign"> | string | null
+    updatedAt?: DateTimeNullableFilter<"VitalSign"> | Date | string | null
     createdAt?: DateTimeFilter<"VitalSign"> | Date | string
   }
 
@@ -28351,6 +28624,7 @@ export namespace Prisma {
     type?: StringFilter<"VascularAccess"> | string
     site?: StringNullableFilter<"VascularAccess"> | string | null
     placementDate?: DateTimeNullableFilter<"VascularAccess"> | Date | string | null
+    unknownPlacementDate?: BoolFilter<"VascularAccess"> | boolean
     notes?: StringNullableFilter<"VascularAccess"> | string | null
     isActive?: BoolFilter<"VascularAccess"> | boolean
     createdBy?: StringFilter<"VascularAccess"> | string
@@ -28450,6 +28724,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28460,6 +28735,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -28483,6 +28760,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28493,6 +28771,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -28530,6 +28810,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28540,6 +28821,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28563,6 +28846,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28573,6 +28857,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28594,6 +28880,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28604,6 +28891,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -28627,6 +28916,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28637,6 +28927,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -28674,6 +28966,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28684,6 +28977,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28707,6 +29002,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28717,6 +29013,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28738,6 +29036,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28748,6 +29047,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -28771,6 +29072,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28781,6 +29083,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -28818,6 +29122,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28828,6 +29133,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28851,6 +29158,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28861,6 +29169,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28882,6 +29192,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28892,6 +29203,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -28915,6 +29228,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -28925,6 +29239,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -28962,6 +29278,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28972,6 +29289,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28995,6 +29314,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29005,6 +29325,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29067,6 +29389,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29077,6 +29400,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -29100,6 +29425,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29110,6 +29436,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -29194,6 +29522,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29204,6 +29533,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29227,6 +29558,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29237,6 +29569,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29258,6 +29592,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29268,6 +29603,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -29291,6 +29628,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29301,6 +29639,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -29338,6 +29678,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29348,6 +29689,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29371,6 +29714,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29381,6 +29725,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29443,6 +29789,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29453,6 +29800,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -29476,6 +29825,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29486,6 +29836,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -29570,6 +29922,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29580,6 +29933,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29603,6 +29958,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29613,6 +29969,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29634,6 +29992,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29644,6 +30003,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -29667,6 +30028,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29677,6 +30039,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -29714,6 +30078,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29724,6 +30089,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29747,6 +30114,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29757,6 +30125,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29778,6 +30148,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29788,6 +30159,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -29811,6 +30184,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29821,6 +30195,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -29858,6 +30234,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29868,6 +30245,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29891,6 +30270,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29901,6 +30281,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29922,6 +30304,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29932,6 +30315,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -29955,6 +30340,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -29965,6 +30351,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -30002,6 +30390,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30012,6 +30401,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30035,6 +30426,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30045,6 +30437,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30066,6 +30460,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -30076,6 +30471,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -30099,6 +30496,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -30109,6 +30507,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -30146,6 +30546,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30156,6 +30557,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30179,6 +30582,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30189,6 +30593,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30230,6 +30636,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -30240,6 +30647,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleSince?: Date | string | null
@@ -30307,6 +30716,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30317,6 +30727,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30340,6 +30752,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30350,6 +30763,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30372,6 +30787,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30382,6 +30798,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30392,6 +30810,7 @@ export namespace Prisma {
     serviceType?: string
     consultingDepartment?: string | null
     consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
     admissionDate?: Date | string
     admissionType: string
     chiefComplaint?: string | null
@@ -30402,6 +30821,8 @@ export namespace Prisma {
     admittingDoctor?: string | null
     primaryDiagnosis?: string | null
     secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     responsibleId?: string | null
@@ -30434,6 +30855,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30444,6 +30866,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30466,6 +30890,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30476,6 +30901,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30498,6 +30925,7 @@ export namespace Prisma {
     serviceType?: StringFieldUpdateOperationsInput | string
     consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30508,6 +30936,8 @@ export namespace Prisma {
     admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
     primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30611,9 +31041,12 @@ export namespace Prisma {
     oxygenSat?: number | null
     glucose?: number | null
     weight?: number | null
+    weightUnit?: string | null
     painScale?: number | null
     diuresis?: number | null
     recordedBy: string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -30689,6 +31122,7 @@ export namespace Prisma {
     type: string
     site?: string | null
     placementDate?: Date | string | null
+    unknownPlacementDate?: boolean
     notes?: string | null
     isActive?: boolean
     createdBy: string
@@ -30777,9 +31211,12 @@ export namespace Prisma {
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
     weight?: NullableFloatFieldUpdateOperationsInput | number | null
+    weightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -30793,9 +31230,12 @@ export namespace Prisma {
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
     weight?: NullableFloatFieldUpdateOperationsInput | number | null
+    weightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -30809,9 +31249,12 @@ export namespace Prisma {
     oxygenSat?: NullableIntFieldUpdateOperationsInput | number | null
     glucose?: NullableIntFieldUpdateOperationsInput | number | null
     weight?: NullableFloatFieldUpdateOperationsInput | number | null
+    weightUnit?: NullableStringFieldUpdateOperationsInput | string | null
     painScale?: NullableIntFieldUpdateOperationsInput | number | null
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     recordedBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -31021,6 +31464,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     site?: NullableStringFieldUpdateOperationsInput | string | null
     placementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    unknownPlacementDate?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
@@ -31032,6 +31476,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     site?: NullableStringFieldUpdateOperationsInput | string | null
     placementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    unknownPlacementDate?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
@@ -31043,6 +31488,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     site?: NullableStringFieldUpdateOperationsInput | string | null
     placementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    unknownPlacementDate?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
