@@ -10,6 +10,7 @@ type Episodio = {
   serviceType?: string | null
   consultingDepartment?: string | null
   consultingResident?: string | null
+  hospitalAdmissionDate?: Date | string | null
   admissionDate: Date | string
   room: string | null
   bed: string | null
@@ -18,6 +19,8 @@ type Episodio = {
   admittingDoctor?: string | null
   primaryDiagnosis?: string | null
   secondaryDiagnoses?: string | null
+  initialWeight?: number | null
+  initialWeightUnit?: string | null
   responsibleId: string | null
   responsible: { fullName: string } | null
   _count: { tasks: number }
@@ -56,14 +59,12 @@ function compararUbicacion(a: Episodio, b: Episodio): number {
   return bedA.localeCompare(bedB, undefined, { numeric: true, sensitivity: 'base' })
 }
 
-const fmtFechaIngreso = (d: Date | string) => {
+const fmtFechaCorta = (d: Date | string) => {
   const f = new Date(d)
-  return f.toLocaleString('es-DO', {
+  return f.toLocaleDateString('es-DO', {
     timeZone: 'America/Santo_Domingo',
     day: '2-digit',
     month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
   })
 }
 
@@ -134,7 +135,7 @@ export function ListaPacientes({
 
   return (
     <>
-      {/* CAMBIO DE GUARDIA / ÁREAS DIVIDIDAS */}
+      {/* SELECTOR DE GUARDIA */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
         <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
           <button
@@ -184,7 +185,6 @@ export function ListaPacientes({
         </Link>
       </div>
 
-      {/* BÚSQUEDA Y ARCHIVO */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
           {areaGuardia === 'propio' ? '🏥 Sala de Hospitalización' : '📋 Pacientes de Interconsulta'}
@@ -248,9 +248,14 @@ export function ListaPacientes({
           const meLoEntregaron = !!entregaPendiente && entregaPendiente.recibidoPor.toLowerCase() === miEmail.toLowerCase()
           const esInterconsulta = episode.serviceType === 'interconsulta'
 
-          // Cálculo de días de estancia para la tarjeta
-          const diffTiempo = new Date().getTime() - new Date(episode.admissionDate).getTime()
-          const dias = Math.max(1, Math.floor(diffTiempo / (1000 * 60 * 60 * 24)) + 1)
+          const diffInterconsulta = new Date().getTime() - new Date(episode.admissionDate).getTime()
+          const diaInterconsulta = Math.max(1, Math.floor(diffInterconsulta / (1000 * 60 * 60 * 24)) + 1)
+
+          let diaHospital: number | null = null
+          if (episode.hospitalAdmissionDate) {
+            const diffHosp = new Date().getTime() - new Date(episode.hospitalAdmissionDate).getTime()
+            diaHospital = Math.max(1, Math.floor(diffHosp / (1000 * 60 * 60 * 24)) + 1)
+          }
 
           return (
             <div
@@ -293,14 +298,43 @@ export function ListaPacientes({
                   </div>
                 </div>
 
-                {/* FECHA/HORA DE INGRESO Y DÍA DE INTERNAMIENTO EN LA TARJETA */}
-                <div className="flex items-center gap-2 text-[11px] text-slate-500 bg-slate-50 dark:bg-slate-700/50 px-2.5 py-1 rounded-md mb-2 border border-slate-100 dark:border-slate-700">
-                  <span>📅 Ingreso: <strong>{fmtFechaIngreso(episode.admissionDate)}</strong></span>
-                  <span>•</span>
-                  <span className="font-bold text-blue-700 dark:text-blue-300">Día {dias}</span>
+                {/* DATOS DE INGRESO Y DÍAS DE INTERCONSULTA */}
+                <div className="bg-slate-50 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 mb-2 space-y-1">
+                  {esInterconsulta ? (
+                    <>
+                      <div className="flex flex-wrap items-center justify-between gap-1">
+                        <span>
+                          📅 <strong>Interconsulta:</strong> {fmtFechaCorta(episode.admissionDate)}
+                        </span>
+                        <span className="font-bold text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.2 rounded">
+                          Día {diaInterconsulta} de interconsulta
+                        </span>
+                      </div>
+                      {episode.hospitalAdmissionDate && (
+                        <p className="text-[11px] text-slate-500">
+                          🏥 <strong>Ingreso al Hospital:</strong> {fmtFechaCorta(episode.hospitalAdmissionDate)} (Día {diaHospital} de estancia hospitalaria)
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex flex-wrap items-center justify-between gap-1">
+                      <span>
+                        📅 <strong>Ingreso a Sala:</strong> {fmtFechaCorta(episode.admissionDate)}
+                      </span>
+                      <span className="font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded">
+                        Día {diaInterconsulta} de internamiento
+                      </span>
+                    </div>
+                  )}
+
+                  {episode.initialWeight && (
+                    <p className="text-[11px] text-emerald-800 font-semibold">
+                      ⚖️ Peso inicial: {episode.initialWeight} {episode.initialWeightUnit ?? 'kg'}
+                    </p>
+                  )}
                 </div>
 
-                <div className="mb-4 mt-2 space-y-1 text-xs sm:text-sm">
+                <div className="mb-4 space-y-1 text-xs sm:text-sm">
                   {esInterconsulta ? (
                     <>
                       <p className="font-semibold text-purple-900 dark:text-purple-300">

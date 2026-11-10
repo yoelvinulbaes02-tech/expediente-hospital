@@ -25,6 +25,7 @@ import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
 import { ReportesLaboratorio } from '@/components/ReportesLaboratorio'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
 import { FormularioNotaEvolucion } from '@/components/FormularioNotaEvolucion'
+import { BotonImprimirSignos } from '@/components/BotonImprimirSignos'
 
 const ETIQUETA_ROL: Record<string, string> = {
   ADMIN: 'Administrador',
@@ -102,7 +103,7 @@ export default async function ExpedientePage({
       allergies: true,
       responsible: { select: { fullName: true } },
       notes: { orderBy: { createdAt: 'desc' } },
-      vitals: { orderBy: { createdAt: 'desc' }, take: 20 },
+      vitals: { orderBy: { createdAt: 'desc' }, take: 30 },
       tasks: { orderBy: { createdAt: 'asc' } },
       handoffs: { where: { status: 'PENDIENTE' }, take: 1 },
       importantAlerts: { orderBy: { createdAt: 'desc' } },
@@ -121,6 +122,7 @@ export default async function ExpedientePage({
   const entregaPendiente = episode.handoffs[0]
   const esInterconsulta = episode.serviceType === 'interconsulta'
 
+  // Cálculo de estancia
   const diffTiempo = new Date().getTime() - new Date(episode.admissionDate).getTime()
   const diasEstancia = Math.max(1, Math.floor(diffTiempo / (1000 * 60 * 60 * 24)) + 1)
 
@@ -206,13 +208,13 @@ export default async function ExpedientePage({
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {error && (
-          <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4">
+          <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4 print:hidden">
             ⚠️ {error}
           </div>
         )}
 
         {esSoloLectura && (
-          <div className="bg-amber-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
+          <div className="bg-amber-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between print:hidden">
             <div className="flex items-center gap-2">
               <span className="text-xl">🔒</span>
               <strong>Expediente Cerrado:</strong> {esInterconsulta ? 'Esta interconsulta ha sido finalizada y dada de alta.' : 'Este paciente ha sido dado de alta.'}
@@ -221,10 +223,10 @@ export default async function ExpedientePage({
           </div>
         )}
 
-        {/* CABECERA PRINCIPAL */}
+        {/* CABECERA PRINCIPAL (OPTIMIZADA PARA PANTALLA E IMPRESIÓN) */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
-            <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block font-medium">
+            <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block font-medium print:hidden">
               ← Volver a Shift Tracker
             </Link>
 
@@ -235,7 +237,7 @@ export default async function ExpedientePage({
 
               {/* MODIFICAR DATOS DEL PACIENTE */}
               {permisos.puedeRegistrar && (
-                <details className="relative inline-block">
+                <details className="relative inline-block print:hidden">
                   <summary className="list-none cursor-pointer text-xs bg-white text-slate-600 px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-50 font-medium">
                     ✏️ Modificar datos
                   </summary>
@@ -246,11 +248,11 @@ export default async function ExpedientePage({
                     <form action={modificarDatosPaciente} className="space-y-2">
                       <input type="hidden" name="episodeId" value={episode.id} />
                       <div>
-                        <label className="block text-[11px] text-slate-500">Nombres:</label>
+                        <label className="block text-[11px] font-semibold text-slate-500">Nombres:</label>
                         <input name="firstName" defaultValue={episode.patient.firstName} required className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
                       </div>
                       <div>
-                        <label className="block text-[11px] text-slate-500">Apellidos:</label>
+                        <label className="block text-[11px] font-semibold text-slate-500">Apellidos:</label>
                         <input name="lastName" defaultValue={episode.patient.lastName} required className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
@@ -295,7 +297,8 @@ export default async function ExpedientePage({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          {/* ACCIONES SUPERIORES (OCULTAS AL IMPRIMIR) */}
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
             {!esSoloLectura && (
               <Link href={`/dashboard/paciente/${episode.id}/turno`} className="bg-indigo-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">
                 📋 Entrega de Turno
@@ -414,7 +417,7 @@ export default async function ExpedientePage({
                 {esInterconsulta ? 'Motivo y Diagnóstico de Interconsulta' : 'Diagnósticos del Paciente'}
               </span>
               {permisos.puedeRegistrar && (
-                <details className="inline-block relative">
+                <details className="inline-block relative print:hidden">
                   <summary className="list-none cursor-pointer text-[11px] text-blue-600 hover:text-blue-800 font-semibold underline">
                     ✏️ Modificar diagnósticos
                   </summary>
@@ -491,35 +494,41 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* 1. NOTAS IMPORTANTES */}
-        <NotasImportantes
-          episodeId={episode.id}
-          alertas={episode.importantAlerts}
-          nombres={nombres}
-          puedeRegistrar={permisos.puedeRegistrar}
-        />
+        {/* 1. NOTAS IMPORTANTES (OCULTAS AL IMPRIMIR) */}
+        <div className="print:hidden">
+          <NotasImportantes
+            episodeId={episode.id}
+            alertas={episode.importantAlerts}
+            nombres={nombres}
+            puedeRegistrar={permisos.puedeRegistrar}
+          />
+        </div>
 
-        {/* 2. ACCESO VASCULAR, VIRALES, TIPIFICACIÓN Y TFG */}
-        <BloqueNefrologico
-          episodeId={episode.id}
-          acceso={episode.vascularAccesses[0] ?? null}
-          virales={episode.viralSerologies[0] ?? null}
-          tfgActual={episode.gfrRecords[0] ?? null}
-          tipificacion={{
-            bloodType: episode.patient.bloodType,
-            recordedBy: episode.patient.bloodTypeRecordedBy,
-            updatedAt: episode.patient.bloodTypeUpdatedAt,
-          }}
-          nombres={nombres}
-          roles={roles}
-          puedeRegistrar={permisos.puedeRegistrar}
-        />
+        {/* 2. ACCESO VASCULAR, VIRALES, TIPIFICACIÓN Y TFG (OCULTAS AL IMPRIMIR) */}
+        <div className="print:hidden">
+          <BloqueNefrologico
+            episodeId={episode.id}
+            acceso={episode.vascularAccesses[0] ?? null}
+            virales={episode.viralSerologies[0] ?? null}
+            tfgActual={episode.gfrRecords[0] ?? null}
+            tipificacion={{
+              bloodType: episode.patient.bloodType,
+              recordedBy: episode.patient.bloodTypeRecordedBy,
+              updatedAt: episode.patient.bloodTypeUpdatedAt,
+            }}
+            nombres={nombres}
+            roles={roles}
+            puedeRegistrar={permisos.puedeRegistrar}
+          />
+        </div>
 
-        <BannerAlergias alergias={episode.allergies} />
+        <div className="print:hidden">
+          <BannerAlergias alergias={episode.allergies} />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           {/* Columna Izquierda */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6 print:hidden">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
                 {esInterconsulta ? 'Datos de la Interconsulta' : 'Datos del Ingreso a Sala'}
@@ -580,7 +589,7 @@ export default async function ExpedientePage({
               puedeRegistrar={permisos.puedeRegistrar}
             />
 
-            {/* FORMULARIO DE SIGNOS VITALES / DIURESIS CON SELECTOR KG / LB */}
+            {/* FORMULARIO DE SIGNOS VITALES */}
             {permisos.puedeRegistrar && (
               esInterconsulta ? (
                 <div className="bg-white p-5 rounded-xl shadow-sm border border-purple-200">
@@ -711,45 +720,55 @@ export default async function ExpedientePage({
 
           {/* Columna Derecha */}
           <div className="lg:col-span-2 space-y-6">
-            <ChecklistTareas
-              episodeId={episode.id}
-              tareas={episode.tasks}
-              nombres={nombres}
-              puedeMarcar={permisos.puedeMarcarTareas}
-              puedeEditar={permisos.puedeEditar}
-              puedeAgregar={permisos.puedeRegistrar}
-            />
+            <div className="print:hidden">
+              <ChecklistTareas
+                episodeId={episode.id}
+                tareas={episode.tasks}
+                nombres={nombres}
+                puedeMarcar={permisos.puedeMarcarTareas}
+                puedeEditar={permisos.puedeEditar}
+                puedeAgregar={permisos.puedeRegistrar}
+              />
+            </div>
 
-            {/* 4. REPORTES DE LABORATORIO */}
-            <ReportesLaboratorio
-              episodeId={episode.id}
-              reportes={episode.labReports}
-              nombres={nombres}
-              roles={roles}
-              puedeRegistrar={permisos.puedeRegistrar}
-            />
+            {/* 4. REPORTES DE LABORATORIO (OCULTAS AL IMPRIMIR) */}
+            <div className="print:hidden">
+              <ReportesLaboratorio
+                episodeId={episode.id}
+                reportes={episode.labReports}
+                nombres={nombres}
+                roles={roles}
+                puedeRegistrar={permisos.puedeRegistrar}
+              />
+            </div>
 
-            {/* 5. REPORTES DE ESTUDIOS */}
-            <ReportesEstudios
-              episodeId={episode.id}
-              estudios={episode.studyReports}
-              nombres={nombres}
-              puedeRegistrar={permisos.puedeRegistrar}
-            />
+            {/* 5. REPORTES DE ESTUDIOS (OCULTAS AL IMPRIMIR) */}
+            <div className="print:hidden">
+              <ReportesEstudios
+                episodeId={episode.id}
+                estudios={episode.studyReports}
+                nombres={nombres}
+                puedeRegistrar={permisos.puedeRegistrar}
+              />
+            </div>
 
-            {/* Tendencia */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            {/* Tendencia (OCULTA AL IMPRIMIR) */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:hidden">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
                 {esInterconsulta ? 'Control y Tendencia de Diuresis' : 'Tendencia de Signos Vitales, Peso y Diuresis'}
               </h2>
               <GraficasSignos registros={registrosGrafica} />
             </div>
 
-            {/* TABLA DE SIGNOS VITALES CON BOTÓN DE MODIFICAR (✏️) Y REGISTRO DE QUIÉN EDITÓ */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
-              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
-                {esInterconsulta ? 'Historial de Diuresis' : 'Últimos Signos Vitales'}
-              </h2>
+            {/* TABLA DE SIGNOS VITALES CON BOTÓN DE IMPRESIÓN OFICIAL */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto print:border-none print:shadow-none print:p-0">
+              <div className="flex justify-between items-center border-b pb-2 mb-4">
+                <h2 className="text-lg font-bold text-slate-800">
+                  {esInterconsulta ? 'Historial de Diuresis' : 'Últimos Signos Vitales'}
+                </h2>
+                <BotonImprimirSignos />
+              </div>
+
               <table className="w-full text-xs text-left">
                 <thead className="bg-slate-100 text-slate-600">
                   <tr>
@@ -761,7 +780,7 @@ export default async function ExpedientePage({
                     <th className="px-3 py-2">Peso</th>
                     <th className="px-3 py-2 font-bold text-sky-800">Diuresis</th>
                     <th className="px-3 py-2">Registró</th>
-                    {permisos.puedeRegistrar && <th className="px-3 py-2 text-right">Editar</th>}
+                    {permisos.puedeRegistrar && <th className="px-3 py-2 text-right print:hidden">Editar</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -789,9 +808,9 @@ export default async function ExpedientePage({
                         )}
                       </td>
 
-                      {/* BOTÓN ✏️ PARA CORREGIR TOMA DE SIGNOS */}
+                      {/* BOTÓN ✏️ PARA EDITAR TOMA */}
                       {permisos.puedeRegistrar && (
-                        <td className="px-3 py-2 text-right">
+                        <td className="px-3 py-2 text-right print:hidden">
                           <details className="relative inline-block text-left">
                             <summary className="list-none cursor-pointer text-blue-600 hover:text-blue-800 font-semibold">
                               ✏️
@@ -853,13 +872,15 @@ export default async function ExpedientePage({
               </table>
             </div>
 
-            {/* 6. EVOLUCIÓN */}
+            {/* 6. EVOLUCIÓN (OCULTA AL IMPRIMIR) */}
             {permisos.puedeRegistrar && (
-              <FormularioNotaEvolucion episodeId={episode.id} action={guardarNota} />
+              <div className="print:hidden">
+                <FormularioNotaEvolucion episodeId={episode.id} action={guardarNota} />
+              </div>
             )}
 
-            {/* Historial de Notas */}
-            <div className="space-y-4">
+            {/* Historial de Notas (OCULTO AL IMPRIMIR SIGNOS) */}
+            <div className="space-y-4 print:hidden">
               <h2 className="text-lg font-bold text-slate-800">Historial de Evoluciones</h2>
               {episode.notes.length === 0 && <p className="text-slate-500 text-sm">No hay evoluciones registradas.</p>}
               {episode.notes.map((nota) => (

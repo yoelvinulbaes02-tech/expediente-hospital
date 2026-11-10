@@ -10,6 +10,7 @@ type Acceso = {
   type: string
   site: string | null
   placementDate: Date | null
+  unknownPlacementDate: boolean
   notes: string | null
   createdBy: string
   createdAt: Date
@@ -35,12 +36,12 @@ type Tipificacion = {
 }
 
 const ETIQUETA_ROL: Record<string, string> = {
-  ADMIN: 'Administrador',
+  ADMIN: 'Admin',
   DOCTOR: 'Médico',
   RESIDENT: 'Residente',
-  NURSE: 'Enfermería',
+  NURSE: 'Enf.',
   LAB: 'Laboratorio',
-  READONLY: 'Solo lectura',
+  READONLY: 'Lectura',
 }
 
 export function BloqueNefrologico({
@@ -63,7 +64,7 @@ export function BloqueNefrologico({
   puedeRegistrar: boolean
 }) {
   let diasAcceso: number | null = null
-  if (acceso?.placementDate) {
+  if (acceso?.placementDate && !acceso.unknownPlacementDate) {
     const diff = new Date().getTime() - new Date(acceso.placementDate).getTime()
     diasAcceso = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)))
   }
@@ -71,7 +72,7 @@ export function BloqueNefrologico({
   const esViralNegativo = !virales || virales.status === 'negativo'
 
   return (
-    <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6">
+    <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6 print:hidden">
       <h2 className="text-base font-bold text-slate-800 border-b pb-2 mb-4">
         🩺 Acceso Vascular, Virales, Tipificación y TFG
       </h2>
@@ -87,11 +88,18 @@ export function BloqueNefrologico({
               <div>
                 <p className="text-sm font-bold text-slate-800">{acceso.type}</p>
                 <p className="text-xs text-slate-600">{acceso.site ?? 'Sitio no especificado'}</p>
-                {acceso.placementDate && (
+                
+                {/* OPCIÓN: FECHA DESCONOCIDA O CÁLCULO DE DÍAS */}
+                {acceso.unknownPlacementDate ? (
+                  <p className="text-xs font-bold text-amber-700 mt-1">
+                    ❓ Fecha de colocación desconocida
+                  </p>
+                ) : acceso.placementDate ? (
                   <p className="text-xs font-semibold text-indigo-700 mt-1">
                     📅 Colocado hace {diasAcceso} día{diasAcceso === 1 ? '' : 's'}
                   </p>
-                )}
+                ) : null}
+
                 <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
                   <span>Registró: </span>
                   <strong className="text-slate-700">{nombres[acceso.createdBy] ?? acceso.createdBy}</strong>
@@ -132,6 +140,10 @@ export function BloqueNefrologico({
                   type="date"
                   className="w-full px-2 py-1.5 border rounded text-xs text-slate-900"
                 />
+                <label className="flex items-center gap-1.5 text-[11px] text-slate-700 font-medium cursor-pointer">
+                  <input name="unknownPlacementDate" type="checkbox" className="rounded text-blue-600" />
+                  <span>No se sabe cuándo se colocó</span>
+                </label>
                 <button className="w-full bg-slate-800 text-white text-xs py-1.5 rounded font-medium hover:bg-slate-900">
                   Guardar
                 </button>
@@ -202,7 +214,7 @@ export function BloqueNefrologico({
           )}
         </div>
 
-        {/* 3. TIPIFICACIÓN SANGUÍNEA */}
+        {/* 3. TIPIFICACIÓN */}
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
