@@ -2,6 +2,10 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 
+// EXPORTACIÓN REQUERIDA POR ACTIONS-TURNO Y TURNO/PAGE
+export const ROLES_MEDICOS = ['DOCTOR', 'RESIDENT'] as const
+export const ROLES_CLINICOS = ['ADMIN', 'DOCTOR', 'RESIDENT', 'NURSE', 'LAB'] as const
+
 export type Permisos = {
   activo: boolean
   esAdmin: boolean

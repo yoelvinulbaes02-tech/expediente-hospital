@@ -50,7 +50,7 @@ export function ChecklistTareas({
   nombres,
   roles = {},
   puedeMarcar,
-  puedeEditar,
+  puedeEditar: _puedeEditar,
   puedeAgregar,
 }: {
   episodeId: string
@@ -96,14 +96,14 @@ export function ChecklistTareas({
           <button
             type="button"
             onClick={() => setMostrarHechas(!mostrarHechas)}
-            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
           >
             {mostrarHechas ? 'Ocultar completadas' : `Ver completadas / canceladas (${finalizadas.length})`}
           </button>
         )}
       </div>
 
-      {/* FORMULARIO: AGREGAR TAREA CON BOTÓN DE CALENDARIO VISIBLE Y CLIC DIRECTO */}
+      {/* FORMULARIO: AGREGAR TAREA CON BOTÓN DE CALENDARIO VISIBLE */}
       {puedeAgregar && (
         <form action={crearTarea} className="bg-slate-50 dark:bg-slate-700/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-600 mb-5 space-y-3">
           <input type="hidden" name="episodeId" value={episodeId} />
@@ -137,7 +137,7 @@ export function ChecklistTareas({
                   name="programada"
                   type="datetime-local"
                   onClick={abrirSelectorFecha}
-                  className="px-2.5 py-1.5 pr-8 border rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer [color-scheme:light] dark:[color-scheme:dark]"
+                  className="px-2.5 py-1.5 pr-8 border rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer scheme-light dark:scheme-dark"
                 />
                 <button
                   type="button"
@@ -152,7 +152,7 @@ export function ChecklistTareas({
             </div>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap cursor-pointer"
             >
               + Agregar al Checklist
             </button>
@@ -174,7 +174,7 @@ export function ChecklistTareas({
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${catInfo.color}`}>
                     {catInfo.label}
                   </span>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 break-words">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 wrap-break-word">
                     {t.title}
                   </p>
                 </div>
@@ -259,14 +259,14 @@ export function ChecklistTareas({
                 <button
                   type="button"
                   onClick={() => setTareaACancelar(null)}
-                  className="px-3 py-1.5 rounded-lg text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100"
+                  className="px-3 py-1.5 rounded-lg text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 cursor-pointer"
                 >
                   Regresar
                 </button>
                 <button
                   type="submit"
                   disabled={motivoCancelacion.trim().length < 3}
-                  className="bg-red-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 disabled:opacity-50"
+                  className="bg-red-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 disabled:opacity-50 cursor-pointer"
                 >
                   Confirmar Cancelación
                 </button>
