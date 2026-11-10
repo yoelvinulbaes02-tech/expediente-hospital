@@ -87,6 +87,7 @@ export async function guardarSignosVitales(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
+// ─── MODIFICAR TOMA DE SIGNOS VITALES / PESO (CON TRAZABILIDAD) ───
 export async function modificarSignosVitales(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const vitalId = String(formData.get('vitalId') ?? '')
@@ -133,7 +134,7 @@ export async function modificarSignosVitales(formData: FormData): Promise<void> 
     episodeId,
     oldValue: previo,
     newValue: { ...valores, updatedBy: email },
-    reason: 'Corrección / modificación de signos vitales',
+    reason: 'Corrección / modificación de toma de signos vitales',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

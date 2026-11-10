@@ -6,7 +6,7 @@ import { ChecklistTareas } from '@/components/ChecklistTareas'
 import Link from 'next/link'
 import { agregarAlergia, marcarSinAlergias } from './actions'
 import { guardarNota } from './actions-notas'
-import { guardarSignosVitales } from './actions-vitales'
+import { guardarSignosVitales, modificarSignosVitales } from './actions-vitales'
 import { tomarACargo, reasignarResponsable } from './actions-responsable'
 import {
   cambiarUbicacion,
@@ -130,6 +130,7 @@ export default async function ExpedientePage({
     diasHospital = Math.max(1, Math.floor(diffHosp / (1000 * 60 * 60 * 24)) + 1)
   }
 
+  // Recolectar emails de firmas
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => {
@@ -245,11 +246,11 @@ export default async function ExpedientePage({
                     <form action={modificarDatosPaciente} className="space-y-2">
                       <input type="hidden" name="episodeId" value={episode.id} />
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-500">Nombres:</label>
+                        <label className="block text-[11px] text-slate-500">Nombres:</label>
                         <input name="firstName" defaultValue={episode.patient.firstName} required className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-500">Apellidos:</label>
+                        <label className="block text-[11px] text-slate-500">Apellidos:</label>
                         <input name="lastName" defaultValue={episode.patient.lastName} required className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
@@ -294,7 +295,6 @@ export default async function ExpedientePage({
             </div>
           </div>
 
-          {/* BOTONES SUPERIORES: ENTREGA, ALTA O TRASLADO */}
           <div className="flex flex-wrap items-center gap-2">
             {!esSoloLectura && (
               <Link href={`/dashboard/paciente/${episode.id}/turno`} className="bg-indigo-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">
@@ -302,7 +302,7 @@ export default async function ExpedientePage({
               </Link>
             )}
 
-            {/* BOTÓN ALTA / FINALIZAR INTERCONSULTA (VISIBLE PARA TODO PERSONAL CLÍNICO EN INTERCONSULTAS) */}
+            {/* BOTÓN ALTA O FINALIZAR INTERCONSULTA */}
             {!esSoloLectura && (
               esInterconsulta ? (
                 permisos.puedeRegistrar && (
@@ -340,7 +340,7 @@ export default async function ExpedientePage({
               )
             )}
 
-            {/* BOTÓN: PASAR INTERCONSULTA A PROPIO DE SALA */}
+            {/* PASAR INTERCONSULTA A SALA */}
             {!esSoloLectura && esInterconsulta && (
               <details className="relative">
                 <summary className="list-none cursor-pointer bg-emerald-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm">
@@ -580,7 +580,7 @@ export default async function ExpedientePage({
               puedeRegistrar={permisos.puedeRegistrar}
             />
 
-            {/* FORMULARIO DE SIGNOS VITALES / DIURESIS */}
+            {/* FORMULARIO DE SIGNOS VITALES / DIURESIS CON SELECTOR KG / LB */}
             {permisos.puedeRegistrar && (
               esInterconsulta ? (
                 <div className="bg-white p-5 rounded-xl shadow-sm border border-purple-200">
@@ -602,6 +602,24 @@ export default async function ExpedientePage({
                         placeholder="Ej. 650"
                         className="w-full px-3 py-2 border rounded-lg text-sm text-slate-900 font-bold focus:ring-2 focus:ring-purple-500"
                       />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">
+                        Peso actual:
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          name="weight"
+                          type="number"
+                          step="0.1"
+                          placeholder="Ej. 70 o 154"
+                          className="flex-1 px-3 py-1.5 border rounded-lg text-xs text-slate-900"
+                        />
+                        <select name="weightUnit" className="w-16 px-1.5 py-1.5 border rounded-lg text-xs bg-slate-100 font-bold">
+                          <option value="kg">kg</option>
+                          <option value="lb">lb</option>
+                        </select>
+                      </div>
                     </div>
                     <button
                       type="submit"
@@ -644,10 +662,19 @@ export default async function ExpedientePage({
                         <label className="block text-xs font-medium text-slate-700 mb-1">Glucosa (mg/dL)</label>
                         <input name="glucose" type="number" inputMode="numeric" placeholder="100" className={entradaVital} />
                       </div>
+
+                      {/* PESO CON SELECTOR KG / LB */}
                       <div>
-                        <label className="block text-xs font-bold text-emerald-800 mb-1">Peso (kg)</label>
-                        <input name="weight" type="number" inputMode="decimal" step="0.1" placeholder="70.5" className={entradaVital} />
+                        <label className="block text-xs font-bold text-emerald-800 mb-1">Peso</label>
+                        <div className="flex gap-1">
+                          <input name="weight" type="number" inputMode="decimal" step="0.1" placeholder="70.5" className="flex-1 px-2 py-1 border rounded text-xs text-slate-900" />
+                          <select name="weightUnit" className="px-1.5 py-1 border rounded text-xs bg-slate-100 font-bold">
+                            <option value="kg">kg</option>
+                            <option value="lb">lb</option>
+                          </select>
+                        </div>
                       </div>
+
                       <div className="col-span-2">
                         <label className="block text-xs font-bold text-sky-800 mb-1">Diuresis (mL)</label>
                         <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
@@ -718,39 +745,109 @@ export default async function ExpedientePage({
               <GraficasSignos registros={registrosGrafica} />
             </div>
 
-            {/* Tabla de Signos */}
+            {/* TABLA DE SIGNOS VITALES CON BOTÓN DE MODIFICAR (✏️) Y REGISTRO DE QUIÉN EDITÓ */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
-              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Últimos Signos Vitales</h2>
-              <table className="w-full text-sm text-left">
+              <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
+                {esInterconsulta ? 'Historial de Diuresis' : 'Últimos Signos Vitales'}
+              </h2>
+              <table className="w-full text-xs text-left">
                 <thead className="bg-slate-100 text-slate-600">
                   <tr>
                     <th className="px-3 py-2 whitespace-nowrap">Fecha / Hora</th>
-                    <th className="px-3 py-2">TA</th>
-                    <th className="px-3 py-2">FC</th>
-                    <th className="px-3 py-2">Temp</th>
-                    <th className="px-3 py-2">SpO2</th>
+                    {!esInterconsulta && <th className="px-3 py-2">TA</th>}
+                    {!esInterconsulta && <th className="px-3 py-2">FC</th>}
+                    {!esInterconsulta && <th className="px-3 py-2">Temp</th>}
+                    {!esInterconsulta && <th className="px-3 py-2">SpO2</th>}
                     <th className="px-3 py-2">Peso</th>
-                    <th className="px-3 py-2">Diuresis</th>
+                    <th className="px-3 py-2 font-bold text-sky-800">Diuresis</th>
                     <th className="px-3 py-2">Registró</th>
+                    {permisos.puedeRegistrar && <th className="px-3 py-2 text-right">Editar</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {episode.vitals.map((v) => (
-                    <tr key={v.id} className="border-b">
-                      <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">{fechaCorta(v.createdAt)}</td>
-                      <td className={`px-3 py-2 font-medium ${esAnormal('sys', v.systolic) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>
-                        {v.systolic ? `${v.systolic}/${v.diastolic}` : '—'}
+                    <tr key={v.id} className="border-b hover:bg-slate-50">
+                      <td className="px-3 py-2 text-slate-500 whitespace-nowrap">{fechaCorta(v.createdAt)}</td>
+                      {!esInterconsulta && (
+                        <td className={`px-3 py-2 font-medium ${esAnormal('sys', v.systolic) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>
+                          {v.systolic ? `${v.systolic}/${v.diastolic}` : '—'}
+                        </td>
+                      )}
+                      {!esInterconsulta && <td className="px-3 py-2 text-slate-800">{v.heartRate ?? '—'}</td>}
+                      {!esInterconsulta && <td className="px-3 py-2 text-slate-800">{v.temperature ?? '—'}</td>}
+                      {!esInterconsulta && <td className="px-3 py-2 text-slate-800">{v.oxygenSat ?? '—'}</td>}
+                      <td className="px-3 py-2 font-bold text-emerald-700">
+                        {v.weight ? `${v.weight} ${v.weightUnit ?? 'kg'}` : '—'}
                       </td>
-                      <td className="px-3 py-2 text-slate-800">{v.heartRate ?? '—'}</td>
-                      <td className="px-3 py-2 text-slate-800">{v.temperature ?? '—'}</td>
-                      <td className="px-3 py-2 text-slate-800">{v.oxygenSat ?? '—'}</td>
-                      <td className="px-3 py-2 font-bold text-emerald-700">{v.weight ? `${v.weight} kg` : '—'}</td>
                       <td className="px-3 py-2 font-bold text-sky-800">{v.diuresis ? `${v.diuresis} mL` : '—'}</td>
-                      <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">{nombres[v.recordedBy] ?? v.recordedBy}</td>
+                      <td className="px-3 py-2 text-slate-500 whitespace-nowrap">
+                        <span>{nombres[v.recordedBy] ?? v.recordedBy}</span>
+                        {v.updatedBy && (
+                          <span className="block text-[10px] text-amber-700 font-medium">
+                            Editado por {nombres[v.updatedBy] ?? v.updatedBy}
+                          </span>
+                        )}
+                      </td>
+
+                      {/* BOTÓN ✏️ PARA CORREGIR TOMA DE SIGNOS */}
+                      {permisos.puedeRegistrar && (
+                        <td className="px-3 py-2 text-right">
+                          <details className="relative inline-block text-left">
+                            <summary className="list-none cursor-pointer text-blue-600 hover:text-blue-800 font-semibold">
+                              ✏️
+                            </summary>
+                            <div className="absolute right-0 mt-1 w-64 bg-white p-3 rounded-xl border border-slate-300 shadow-xl z-30">
+                              <p className="text-xs font-bold text-slate-800 mb-2 border-b pb-1">
+                                Corregir toma de signos:
+                              </p>
+                              <form action={modificarSignosVitales} className="space-y-2">
+                                <input type="hidden" name="episodeId" value={episode.id} />
+                                <input type="hidden" name="vitalId" value={v.id} />
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500">Sistólica:</label>
+                                    <input name="systolic" defaultValue={v.systolic ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500">Diastólica:</label>
+                                    <input name="diastolic" defaultValue={v.diastolic ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500">FC:</label>
+                                    <input name="heartRate" defaultValue={v.heartRate ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500">Temp:</label>
+                                    <input name="temperature" defaultValue={v.temperature ?? ''} type="number" step="0.1" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500">Peso:</label>
+                                    <input name="weight" defaultValue={v.weight ?? ''} type="number" step="0.1" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] text-slate-500">Unidad:</label>
+                                    <select name="weightUnit" defaultValue={v.weightUnit ?? 'kg'} className="w-full px-1 py-1 border rounded text-xs bg-white">
+                                      <option value="kg">kg</option>
+                                      <option value="lb">lb</option>
+                                    </select>
+                                  </div>
+                                  <div className="col-span-2">
+                                    <label className="block text-[10px] text-slate-500">Diuresis (mL):</label>
+                                    <input name="diuresis" defaultValue={v.diuresis ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                  </div>
+                                </div>
+                                <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1 rounded font-bold hover:bg-slate-900 mt-1">
+                                  Guardar Corrección
+                                </button>
+                              </form>
+                            </div>
+                          </details>
+                        </td>
+                      )}
                     </tr>
                   ))}
                   {episode.vitals.length === 0 && (
-                    <tr><td colSpan={8} className="text-center py-4 text-slate-400">No hay signos vitales registrados.</td></tr>
+                    <tr><td colSpan={esInterconsulta ? 5 : 9} className="text-center py-4 text-slate-400">No hay registros aún.</td></tr>
                   )}
                 </tbody>
               </table>
