@@ -132,7 +132,10 @@ export default async function ExpedientePage({
 
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
-  episode.vitals.forEach((v) => emails.add(v.recordedBy))
+  episode.vitals.forEach((v) => {
+    emails.add(v.recordedBy)
+    if (v.updatedBy) emails.add(v.updatedBy)
+  })
   episode.importantAlerts.forEach((a) => emails.add(a.createdBy))
   episode.labReports.forEach((l) => emails.add(l.createdBy))
   episode.studyReports.forEach((s) => emails.add(s.createdBy))
@@ -251,11 +254,11 @@ export default async function ExpedientePage({
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-[11px] font-semibold text-slate-500">Edad:</label>
+                          <label className="block text-[11px] text-slate-500">Edad:</label>
                           <input name="age" type="number" defaultValue={episode.patient.age ?? ''} className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
                         </div>
                         <div>
-                          <label className="block text-[11px] font-semibold text-slate-500">Sexo:</label>
+                          <label className="block text-[11px] text-slate-500">Sexo:</label>
                           <select name="sex" defaultValue={episode.patient.sex} className="w-full px-2 py-1 border rounded text-xs bg-white text-slate-900">
                             <option value="Masculino">Masculino</option>
                             <option value="Femenino">Femenino</option>
@@ -299,37 +302,41 @@ export default async function ExpedientePage({
               </Link>
             )}
 
-            {/* BOTÓN ALTA O FINALIZAR INTERCONSULTA */}
-            {permisos.puedeEditar && (
+            {/* BOTÓN ALTA / FINALIZAR INTERCONSULTA (VISIBLE PARA TODO PERSONAL CLÍNICO EN INTERCONSULTAS) */}
+            {!esSoloLectura && (
               esInterconsulta ? (
-                <details className="relative">
-                  <summary className="list-none cursor-pointer bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
-                    🚪 Finalizar Interconsulta (Dar de Alta)
-                  </summary>
-                  <div className="absolute right-0 mt-2 w-80 bg-white p-4 rounded-xl border border-red-200 shadow-xl z-30 text-left">
-                    <p className="text-xs font-bold text-red-900 mb-1">Cierre de Interconsulta:</p>
-                    <p className="text-[11px] text-slate-500 mb-2">
-                      Escriba la conclusión médica y recomendaciones finales para cerrar la interconsulta:
-                    </p>
-                    <form action={finalizarInterconsulta} className="space-y-2">
-                      <input type="hidden" name="episodeId" value={episode.id} />
-                      <textarea
-                        name="conclusion"
-                        required
-                        rows={3}
-                        placeholder="Ej. Paciente compensado. Se suspende seguimiento por el servicio..."
-                        className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
-                      />
-                      <button type="submit" className="w-full bg-red-600 text-white text-xs py-1.5 rounded font-bold hover:bg-red-700">
-                        Confirmar y Finalizar Interconsulta
-                      </button>
-                    </form>
-                  </div>
-                </details>
+                permisos.puedeRegistrar && (
+                  <details className="relative">
+                    <summary className="list-none cursor-pointer bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
+                      🚪 Finalizar Interconsulta (Dar de Alta)
+                    </summary>
+                    <div className="absolute right-0 mt-2 w-80 bg-white p-4 rounded-xl border border-red-200 shadow-xl z-30 text-left">
+                      <p className="text-xs font-bold text-red-900 mb-1">Cierre de Interconsulta:</p>
+                      <p className="text-[11px] text-slate-500 mb-2">
+                        Escriba la conclusión médica y recomendaciones finales para cerrar la interconsulta:
+                      </p>
+                      <form action={finalizarInterconsulta} className="space-y-2">
+                        <input type="hidden" name="episodeId" value={episode.id} />
+                        <textarea
+                          name="conclusion"
+                          required
+                          rows={3}
+                          placeholder="Ej. Paciente compensado. Se suspende seguimiento por el servicio..."
+                          className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                        />
+                        <button type="submit" className="w-full bg-red-600 text-white text-xs py-1.5 rounded font-bold hover:bg-red-700">
+                          Confirmar y Finalizar Interconsulta
+                        </button>
+                      </form>
+                    </div>
+                  </details>
+                )
               ) : (
-                <Link href={`/dashboard/paciente/${episode.id}/alta`} className="bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
-                  🚪 Dar de Alta
-                </Link>
+                permisos.puedeEditar && (
+                  <Link href={`/dashboard/paciente/${episode.id}/alta`} className="bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
+                    🚪 Dar de Alta
+                  </Link>
+                )
               )
             )}
 
@@ -399,7 +406,7 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* RECUADRO FIJO DE DIAGNÓSTICOS CON BOTÓN MODIFICAR */}
+        {/* DIAGNÓSTICOS CON BOTÓN MODIFICAR */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3">
             <div className="flex items-center gap-2">
