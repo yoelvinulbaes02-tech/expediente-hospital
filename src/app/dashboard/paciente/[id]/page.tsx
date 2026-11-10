@@ -26,6 +26,7 @@ import { ReportesLaboratorio } from '@/components/ReportesLaboratorio'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
 import { FormularioNotaEvolucion } from '@/components/FormularioNotaEvolucion'
 import { BotonImprimirSignos } from '@/components/BotonImprimirSignos'
+import { TratamientoActual } from '@/components/TratamientoActual'
 
 const ETIQUETA_ROL: Record<string, string> = {
   ADMIN: 'Administrador',
@@ -93,6 +94,9 @@ export default async function ExpedientePage({
       chiefComplaint: true,
       initialWeight: true,
       initialWeightUnit: true,
+      currentTreatment: true,
+      treatmentUpdatedBy: true,
+      treatmentUpdatedAt: true,
       room: true,
       bed: true,
       patient: {
@@ -152,6 +156,9 @@ export default async function ExpedientePage({
   if (episode.patient.bloodTypeRecordedBy) {
     emails.add(episode.patient.bloodTypeRecordedBy)
   }
+  if (episode.treatmentUpdatedBy) {
+    emails.add(episode.treatmentUpdatedBy)
+  }
   episode.vascularAccesses.forEach((va) => emails.add(va.createdBy))
   episode.viralSerologies.forEach((vs) => emails.add(vs.recordedBy))
   episode.gfrRecords.forEach((gfr) => emails.add(gfr.recordedBy))
@@ -167,15 +174,6 @@ export default async function ExpedientePage({
   })
   const nombres: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.fullName]))
   const roles: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.role]))
-
-  const medicos =
-    role === 'ADMIN' && permisos.activo
-      ? await prisma.user.findMany({
-          where: { isActive: true, role: { in: ['DOCTOR', 'RESIDENT'] } },
-          select: { id: true, fullName: true },
-          orderBy: { fullName: 'asc' },
-        })
-      : []
 
   const esAnormal = (tipo: string, valor: number | null) => {
     if (!valor) return false
@@ -223,7 +221,7 @@ export default async function ExpedientePage({
           </div>
         )}
 
-        {/* CABECERA PRINCIPAL (OPTIMIZADA PARA PANTALLA E IMPRESIÓN) */}
+        {/* CABECERA PRINCIPAL */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
             <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block font-medium print:hidden">
@@ -494,7 +492,18 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* 1. NOTAS IMPORTANTES (OCULTAS AL IMPRIMIR) */}
+        {/* TRATAMIENTO MÉDICO ACTUAL CON TEXTO LIBRE Y FIRMA */}
+        <TratamientoActual
+          episodeId={episode.id}
+          tratamiento={episode.currentTreatment}
+          actualizadoPor={episode.treatmentUpdatedBy}
+          actualizadoAt={episode.treatmentUpdatedAt}
+          nombres={nombres}
+          roles={roles}
+          puedeRegistrar={permisos.puedeRegistrar}
+        />
+
+        {/* 1. NOTAS IMPORTANTES */}
         <div className="print:hidden">
           <NotasImportantes
             episodeId={episode.id}
@@ -504,7 +513,7 @@ export default async function ExpedientePage({
           />
         </div>
 
-        {/* 2. ACCESO VASCULAR, VIRALES, TIPIFICACIÓN Y TFG (OCULTAS AL IMPRIMIR) */}
+        {/* 2. ACCESO VASCULAR, VIRALES, TIPIFICACIÓN Y TFG */}
         <div className="print:hidden">
           <BloqueNefrologico
             episodeId={episode.id}
@@ -725,13 +734,14 @@ export default async function ExpedientePage({
                 episodeId={episode.id}
                 tareas={episode.tasks}
                 nombres={nombres}
+                roles={roles}
                 puedeMarcar={permisos.puedeMarcarTareas}
                 puedeEditar={permisos.puedeEditar}
                 puedeAgregar={permisos.puedeRegistrar}
               />
             </div>
 
-            {/* 4. REPORTES DE LABORATORIO (OCULTAS AL IMPRIMIR) */}
+            {/* 4. REPORTES DE LABORATORIO */}
             <div className="print:hidden">
               <ReportesLaboratorio
                 episodeId={episode.id}
@@ -742,7 +752,7 @@ export default async function ExpedientePage({
               />
             </div>
 
-            {/* 5. REPORTES DE ESTUDIOS (OCULTAS AL IMPRIMIR) */}
+            {/* 5. REPORTES DE ESTUDIOS */}
             <div className="print:hidden">
               <ReportesEstudios
                 episodeId={episode.id}
@@ -752,7 +762,7 @@ export default async function ExpedientePage({
               />
             </div>
 
-            {/* Tendencia (OCULTA AL IMPRIMIR) */}
+            {/* Tendencia */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:hidden">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
                 {esInterconsulta ? 'Control y Tendencia de Diuresis' : 'Tendencia de Signos Vitales, Peso y Diuresis'}
@@ -760,7 +770,7 @@ export default async function ExpedientePage({
               <GraficasSignos registros={registrosGrafica} />
             </div>
 
-            {/* TABLA DE SIGNOS VITALES CON BOTÓN DE IMPRESIÓN OFICIAL */}
+            {/* TABLA DE SIGNOS VITALES */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto print:border-none print:shadow-none print:p-0">
               <div className="flex justify-between items-center border-b pb-2 mb-4">
                 <h2 className="text-lg font-bold text-slate-800">
@@ -872,14 +882,14 @@ export default async function ExpedientePage({
               </table>
             </div>
 
-            {/* 6. EVOLUCIÓN (OCULTA AL IMPRIMIR) */}
+            {/* 6. EVOLUCIÓN */}
             {permisos.puedeRegistrar && (
               <div className="print:hidden">
                 <FormularioNotaEvolucion episodeId={episode.id} action={guardarNota} />
               </div>
             )}
 
-            {/* Historial de Notas (OCULTO AL IMPRIMIR SIGNOS) */}
+            {/* Historial de Notas */}
             <div className="space-y-4 print:hidden">
               <h2 className="text-lg font-bold text-slate-800">Historial de Evoluciones</h2>
               {episode.notes.length === 0 && <p className="text-slate-500 text-sm">No hay evoluciones registradas.</p>}

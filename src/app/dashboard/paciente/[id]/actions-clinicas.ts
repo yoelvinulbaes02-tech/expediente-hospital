@@ -573,3 +573,40 @@ export async function finalizarInterconsulta(formData: FormData): Promise<void> 
   revalidatePath('/dashboard')
   redirect('/dashboard')
 }
+
+// ─── 14. TRATAMIENTO MÉDICO ACTUAL (EDITABLE Y CON FIRMA) ───
+export async function guardarTratamiento(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const treatment = String(formData.get('currentTreatment') ?? '').trim()
+
+  const previo = await prisma.episode.findUnique({
+    where: { id: episodeId },
+    select: { currentTreatment: true, patientId: true },
+  })
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: {
+      currentTreatment: treatment || null,
+      treatmentUpdatedBy: email,
+      treatmentUpdatedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode',
+    entityId: episodeId,
+    patientId: previo?.patientId ?? episode.patientId,
+    episodeId,
+    oldValue: { tratamiento: previo?.currentTreatment },
+    newValue: { tratamiento: treatment, actualizadoPor: email },
+    reason: 'Actualización de tratamiento médico actual del paciente',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}

@@ -79,22 +79,28 @@ model Patient {
 model Episode {
   id                    String    @id @default(cuid())
   patientId             String
-  serviceType           String    @default("propio") // "propio" | "interconsulta"
+  serviceType           String    @default("propio")
   consultingDepartment  String?
   consultingResident    String?
-  hospitalAdmissionDate DateTime? @db.Timestamptz // Fecha en que ingresó al hospital
-  admissionDate         DateTime  @default(now()) @db.Timestamptz // Fecha de ingreso a sala o de interconsulta
+  hospitalAdmissionDate DateTime? @db.Timestamptz
+  admissionDate         DateTime  @default(now()) @db.Timestamptz
   admissionType         String
   chiefComplaint        String?
-  status                String    @default("active") // "active" | "closed"
+  status                String    @default("active")
   room                  String?
   bed                   String?
   attendingDoctor       String?
   admittingDoctor       String?
   primaryDiagnosis      String?
   secondaryDiagnoses    String?
-  initialWeight         Float?    // Peso inicial
-  initialWeightUnit     String?   @default("kg") // "kg" | "lb"
+  initialWeight         Float?
+  initialWeightUnit     String?   @default("kg")
+
+  // TRATAMIENTO ACTUAL DEL PACIENTE
+  currentTreatment      String?   // Esquema de medicamentos, dosis, infusión, etc.
+  treatmentUpdatedBy    String?   // Email de quien registró/modificó
+  treatmentUpdatedAt    DateTime? @db.Timestamptz // Fecha y hora exacta de actualización
+
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
@@ -272,11 +278,11 @@ model VitalSign {
   oxygenSat       Int?
   glucose         Int?
   weight          Float?
-  weightUnit      String?   @default("kg") // "kg" | "lb"
+  weightUnit      String?   @default("kg")
   painScale       Int?
   diuresis        Int?
   recordedBy      String
-  updatedBy       String?   // Quién modificó la toma
+  updatedBy       String?
   updatedAt       DateTime? @db.Timestamptz
   createdAt       DateTime  @default(now()) @db.Timestamptz
 

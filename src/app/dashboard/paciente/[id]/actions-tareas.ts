@@ -8,7 +8,6 @@ import { redirect } from 'next/navigation'
 
 const CATEGORIAS = ['analisis', 'estudio', 'indicacion', 'otro']
 
-// El formulario manda hora local de RD (UTC-4, sin horario de verano)
 function fechaRD(valor: string): Date | null {
   if (!valor) return null
   const base = valor.length === 16 ? `${valor}:00` : valor
@@ -63,19 +62,17 @@ export async function marcarTarea(formData: FormData): Promise<void> {
   if (!tarea) redirect('/dashboard')
   const episodeId = tarea.episodeId
 
-  // Cancelar: solo el médico a cargo. Marcar/reabrir: personal clínico y laboratorio.
-  const { userId, role, email, episode } = await exigirPermiso(
-    episodeId,
-    accion === 'cancelar' ? 'editar' : 'tareas'
-  )
+  // Permitido para todo el equipo clínico de guardia (Médico, Residente, Enfermería, Laboratorio)
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'tareas')
 
   let estadoNuevo = ''
   let razon = ''
+  const ahora = new Date()
 
   if (accion === 'hecha') {
     const r = await prisma.task.updateMany({
       where: { id: taskId, status: 'pendiente' },
-      data: { status: 'hecha', doneBy: email, doneAt: new Date() },
+      data: { status: 'hecha', doneBy: email, doneAt: ahora },
     })
     if (r.count === 0) volverAlExpediente(episodeId, 'Esta tarea ya fue actualizada por otra persona')
     estadoNuevo = 'hecha'
@@ -92,11 +89,16 @@ export async function marcarTarea(formData: FormData): Promise<void> {
     if (motivo.length < 3) volverAlExpediente(episodeId, 'Escribe el motivo de la cancelación')
     const r = await prisma.task.updateMany({
       where: { id: taskId, status: 'pendiente' },
-      data: { status: 'cancelada', cancelReason: motivo },
+      data: {
+        status: 'cancelada',
+        cancelReason: motivo,
+        doneBy: email,
+        doneAt: ahora,
+      },
     })
     if (r.count === 0) volverAlExpediente(episodeId, 'Esta tarea ya fue actualizada por otra persona')
     estadoNuevo = 'cancelada'
-    razon = `Tarea cancelada: ${motivo}`
+    razon = `Tarea cancelada por ${email}: ${motivo}`
   } else {
     redirect(`/dashboard/paciente/${episodeId}`)
   }
@@ -110,7 +112,7 @@ export async function marcarTarea(formData: FormData): Promise<void> {
     patientId: episode.patientId,
     episodeId,
     oldValue: { tarea: tarea.title, estado: tarea.status },
-    newValue: { tarea: tarea.title, estado: estadoNuevo },
+    newValue: { tarea: tarea.title, estado: estadoNuevo, cancelReason: motivo || null },
     reason: razon,
   })
 
