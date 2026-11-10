@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import { guardarAntecedentes } from '@/app/dashboard/paciente/[id]/actions-clinicas'
 
 type Antecedentes = {
@@ -45,6 +48,8 @@ export function SeccionAntecedentes({
   roles: Record<string, string>
   puedeRegistrar: boolean
 }) {
+  const [modalAbierto, setModalAbierto] = useState(false)
+
   const tieneDatos =
     antecedentes &&
     (antecedentes.pathological ||
@@ -61,96 +66,13 @@ export function SeccionAntecedentes({
         </h2>
 
         {puedeRegistrar && (
-          <details className="inline-block relative print:hidden">
-            <summary className="list-none cursor-pointer text-xs bg-slate-100 dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-200 transition-colors">
-              {tieneDatos ? '✏️ Actualizar' : '+ Registrar'}
-            </summary>
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-300 dark:border-slate-700 shadow-2xl z-30 text-left">
-              <p className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2 border-b pb-1">
-                Antecedentes Clínicos:
-              </p>
-              <form action={guardarAntecedentes} className="space-y-2.5">
-                <input type="hidden" name="episodeId" value={episodeId} />
-
-                {/* 1. PATOLÓGICOS */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                    Patológicos:
-                  </label>
-                  <textarea
-                    name="pathological"
-                    rows={2}
-                    defaultValue={antecedentes?.pathological ?? ''}
-                    placeholder="Ej. HTA (10 años), DM2, ERC..."
-                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                {/* 2. MEDICAMENTOS (DIRECTAMENTE DEBAJO DE PATOLÓGICOS) */}
-                <div>
-                  <label className="block text-[11px] font-bold text-blue-800 dark:text-blue-300">
-                    Medicamentos habituales:
-                  </label>
-                  <textarea
-                    name="medications"
-                    rows={2}
-                    defaultValue={antecedentes?.medications ?? ''}
-                    placeholder="Ej. Losartán 50mg VO c/12h, Amlodipina 5mg..."
-                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                {/* 3. QUIRÚRGICOS */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                    Quirúrgicos:
-                  </label>
-                  <textarea
-                    name="surgical"
-                    rows={2}
-                    defaultValue={antecedentes?.surgical ?? ''}
-                    placeholder="Ej. Apendicectomía (2018)..."
-                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                {/* 4. FAMILIARES */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                    Heredofamiliares:
-                  </label>
-                  <textarea
-                    name="family"
-                    rows={2}
-                    defaultValue={antecedentes?.family ?? ''}
-                    placeholder="Ej. Madre con ERC, Padre con HTA..."
-                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                {/* 5. HÁBITOS */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                    Hábitos tóxicos:
-                  </label>
-                  <textarea
-                    name="habits"
-                    rows={2}
-                    defaultValue={antecedentes?.habits ?? ''}
-                    placeholder="Ej. Tabaquismo negado, alcohol ocasional..."
-                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-slate-800 dark:bg-slate-700 text-white text-xs py-2 rounded-lg font-bold hover:bg-slate-900 transition-colors mt-1"
-                >
-                  Guardar Antecedentes
-                </button>
-              </form>
-            </div>
-          </details>
+          <button
+            type="button"
+            onClick={() => setModalAbierto(true)}
+            className="text-xs bg-slate-100 dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-200 transition-colors print:hidden cursor-pointer"
+          >
+            {tieneDatos ? '✏️ Actualizar' : '+ Registrar'}
+          </button>
         )}
       </div>
 
@@ -164,7 +86,7 @@ export function SeccionAntecedentes({
             </span>
           </div>
 
-          {/* 2. MEDICAMENTOS (DIRECTAMENTE DEBAJO DE PATOLÓGICOS) */}
+          {/* 2. MEDICAMENTOS (JUSTO DEBAJO DE PATOLÓGICOS) */}
           <div>
             <span className="font-bold text-blue-800 dark:text-blue-300">Medicamentos: </span>
             <span className="text-slate-800 dark:text-slate-200 font-medium">
@@ -196,7 +118,7 @@ export function SeccionAntecedentes({
             </span>
           </div>
 
-          {/* REGISTRO DE AUDITORÍA */}
+          {/* AUDITORÍA */}
           {antecedentes?.updatedBy && (
             <div className="pt-2 mt-2 border-t border-slate-100 dark:border-slate-700 text-[11px] text-slate-400">
               <span>Actualizado por: </span>
@@ -218,6 +140,122 @@ export function SeccionAntecedentes({
         <p className="text-xs text-slate-400 italic py-1">
           Sin antecedentes registrados en el expediente.
         </p>
+      )}
+
+      {/* VENTANA MODAL CENTRADA PARA EDITAR ANTECEDENTES (NO SE CORTA EN NINGÚN DISPOSITIVO) */}
+      {modalAbierto && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-800 p-5 md:p-6 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+            <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-2">
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <span>📋</span> Antecedentes Clínicos del Paciente
+              </h3>
+              <button
+                type="button"
+                onClick={() => setModalAbierto(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl font-bold leading-none cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form
+              action={async (formData) => {
+                await guardarAntecedentes(formData)
+                setModalAbierto(false)
+              }}
+              className="space-y-3"
+            >
+              <input type="hidden" name="episodeId" value={episodeId} />
+
+              {/* 1. PATOLÓGICOS */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Patológicos:
+                </label>
+                <textarea
+                  name="pathological"
+                  rows={2}
+                  defaultValue={antecedentes?.pathological ?? ''}
+                  placeholder="Ej. HTA (10 años), DM2, ERC..."
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* 2. MEDICAMENTOS (JUSTO DEBAJO DE PATOLÓGICOS) */}
+              <div>
+                <label className="block text-xs font-bold text-blue-800 dark:text-blue-300 mb-1">
+                  Medicamentos habituales:
+                </label>
+                <textarea
+                  name="medications"
+                  rows={2}
+                  defaultValue={antecedentes?.medications ?? ''}
+                  placeholder="Ej. Losartán 50mg VO c/12h, Insulina Glargina 20 UI/noche..."
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* 3. QUIRÚRGICOS */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Quirúrgicos:
+                </label>
+                <textarea
+                  name="surgical"
+                  rows={2}
+                  defaultValue={antecedentes?.surgical ?? ''}
+                  placeholder="Ej. Apendicectomía en 2015..."
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* 4. HEREDOFAMILIARES */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Heredofamiliares:
+                </label>
+                <textarea
+                  name="family"
+                  rows={2}
+                  defaultValue={antecedentes?.family ?? ''}
+                  placeholder="Ej. Madre con ERC en hemodiálisis, Padre con HTA..."
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* 5. HÁBITOS TÓXICOS */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Hábitos tóxicos:
+                </label>
+                <textarea
+                  name="habits"
+                  rows={2}
+                  defaultValue={antecedentes?.habits ?? ''}
+                  placeholder="Ej. Tabaquismo negado, alcohol ocasional..."
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setModalAbierto(false)}
+                  className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-sm"
+                >
+                  Guardar Antecedentes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   )

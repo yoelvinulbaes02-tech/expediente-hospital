@@ -1,86 +1,98 @@
-import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
+import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 
-export const ROLES_MEDICOS: string[] = ['DOCTOR', 'RESIDENT']
-export const ROLES_CLINICOS: string[] = ['DOCTOR', 'RESIDENT', 'NURSE']
-const ROLES_MARCAR_TAREAS: string[] = ['DOCTOR', 'RESIDENT', 'NURSE', 'LAB']
+export type Permisos = {
+  activo: boolean
+  esAdmin: boolean
+  esMedico: boolean
+  esResponsable: boolean
+  sinResponsable: boolean
+  puedeRegistrar: boolean
+  puedeEditar: boolean
+  puedeMarcarTareas: boolean
+  puedeDarAlta: boolean
+  puedeTomar: boolean
+  puedeReasignar: boolean
+  puedeEntregar: boolean
+}
 
-export type EpisodioParaPermisos = { status: string; responsibleId: string | null }
+export function volverAlExpediente(episodeId: string, error: string): never {
+  redirect(`/dashboard/paciente/${episodeId}?error=${encodeURIComponent(error)}`)
+}
 
-export function calcularPermisos(role: string, userId: string, episode: EpisodioParaPermisos) {
-  const activo = episode.status === 'active'
-  const esMedico = ROLES_MEDICOS.includes(role)
-  const esResponsable = episode.responsibleId === userId
-  const sinResponsable = episode.responsibleId === null
-  const medicoACargo = activo && esMedico && esResponsable
-  const clinico = activo && ROLES_CLINICOS.includes(role)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function calcularPermisos(role: string, userId: string, episode: any): Permisos {
+  const activo = episode?.status === 'active'
+  const esAdmin = role === 'ADMIN'
+  const esMedico = role === 'DOCTOR' || role === 'RESIDENT'
+  const esClinico = esAdmin || esMedico || role === 'NURSE' || role === 'LAB'
+  const esResponsable = episode?.responsibleId === userId
+  const sinResponsable = !episode?.responsibleId
+
+  // CUALQUIER MÉDICO O RESIDENTE PUEDE DAR EL ALTA A CUALQUIER PACIENTE
+  const puedeDarAlta = activo && (esAdmin || esMedico)
+  const puedeEditar = activo && (esAdmin || esMedico || esResponsable)
+  const puedeTomar = activo && (esAdmin || esMedico) && (!esResponsable || sinResponsable)
+  const puedeReasignar = activo && esAdmin
+  const puedeEntregar = activo && (esAdmin || esResponsable || esMedico)
 
   return {
     activo,
+    esAdmin,
+    esMedico,
     esResponsable,
     sinResponsable,
-    puedeTomarACargo: activo && esMedico && sinResponsable,
-    // Solo el médico a cargo: entregar turno, dar de alta y cancelar tareas
-    puedeEditar: medicoACargo,
-    // Cualquier usuario clínico: agregar notas, signos vitales, alergias y tareas
-    puedeRegistrar: clinico,
-    puedeRegistrarVitales: clinico, // alias, por compatibilidad con otros archivos
-    // Marcar tareas: personal clínico y laboratorio
-    puedeMarcarTareas: activo && ROLES_MARCAR_TAREAS.includes(role),
+    puedeRegistrar: activo && esClinico,
+    puedeEditar,
+    puedeMarcarTareas: activo && esClinico,
+    puedeDarAlta,
+    puedeTomar,
+    puedeReasignar,
+    puedeEntregar,
   }
 }
 
-export type Accion = 'editar' | 'registrar' | 'vitales' | 'tareas' | 'tomar'
-
-export function volverAlExpediente(episodeId: string, mensaje: string): never {
-  redirect(`/dashboard/paciente/${episodeId}?error=${encodeURIComponent(mensaje)}`)
-}
-
-// Verifica sesión + permiso. Si no hay permiso, regresa al expediente con un mensaje.
-export async function exigirPermiso(episodeId: string, accion: Accion) {
+export async function exigirPermiso(
+  episodeId: string,
+  accion: 'registrar' | 'editar' | 'tareas' | 'alta'
+) {
   const session = await auth()
-  const user = session?.user
-  if (!user?.id) redirect('/login')
-  if (!episodeId) redirect('/dashboard')
+  if (!session?.user?.id) redirect('/login')
+
+  const userId = session.user.id
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const role = String((session.user as any)?.role ?? 'READONLY')
+  const email = session.user.email ?? ''
 
   const episode = await prisma.episode.findUnique({
     where: { id: episodeId },
-    select: { id: true, status: true, patientId: true, responsibleId: true },
+    select: { id: true, patientId: true, status: true, responsibleId: true, serviceType: true },
   })
+
   if (!episode) redirect('/dashboard')
 
-  const role = String(user.role)
-  const permisos = calcularPermisos(role, user.id, episode)
-  const permitido = {
-    editar: permisos.puedeEditar,
-    registrar: permisos.puedeRegistrar,
-    vitales: permisos.puedeRegistrar,
-    tareas: permisos.puedeMarcarTareas,
-    tomar: permisos.puedeTomarACargo,
-  }[accion]
-
-  if (!permitido) {
-    let motivo = 'Solo el médico a cargo puede modificar este paciente'
-    if (!permisos.activo) {
-      motivo = 'El expediente está cerrado'
-    } else if (accion === 'registrar' || accion === 'vitales') {
-      motivo = 'Tu rol no puede agregar información al expediente'
-    } else if (accion === 'tareas') {
-      motivo = 'Tu rol no puede marcar tareas'
-    } else if (accion === 'tomar') {
-      motivo = 'No puedes tomar a cargo este paciente'
-    } else if (permisos.sinResponsable && ROLES_MEDICOS.includes(role)) {
-      motivo = 'Este paciente no tiene médico a cargo. Presiona "Tomar a cargo" primero.'
-    }
-    volverAlExpediente(episodeId, motivo)
+  if (episode.status !== 'active') {
+    volverAlExpediente(episodeId, 'El expediente está cerrado (paciente dado de alta).')
   }
 
-  return {
-    userId: user.id,
-    role,
-    email: user.email ?? 'desconocido',
-    nombre: user.name ?? user.email ?? 'desconocido',
-    episode,
+  const esAdmin = role === 'ADMIN'
+  const esMedico = role === 'DOCTOR' || role === 'RESIDENT'
+  const esClinico = esAdmin || esMedico || role === 'NURSE' || role === 'LAB'
+  const esResponsable = episode.responsibleId === userId
+
+  if (accion === 'registrar' && !esClinico) {
+    volverAlExpediente(episodeId, 'No tienes permiso para registrar datos clínicos.')
   }
+
+  if (accion === 'tareas' && !esClinico) {
+    volverAlExpediente(episodeId, 'No tienes permiso para gestionar pendientes.')
+  }
+
+  // ACCIÓN DE ALTA O EDICIÓN: PERMITIDA A CUALQUIER MÉDICO, RESIDENTE O ADMIN
+  if ((accion === 'editar' || accion === 'alta') && !esAdmin && !esMedico && !esResponsable) {
+    volverAlExpediente(episodeId, 'Solo médicos o residentes de guardia pueden realizar esta acción.')
+  }
+
+  return { userId, role, email, episode }
 }

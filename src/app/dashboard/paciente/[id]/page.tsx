@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { agregarAlergia, marcarSinAlergias } from './actions'
 import { guardarNota } from './actions-notas'
 import { guardarSignosVitales, modificarSignosVitales } from './actions-vitales'
-import { tomarACargo, reasignarResponsable } from './actions-responsable'
 import {
   cambiarUbicacion,
   modificarDatosPaciente,
@@ -72,8 +71,8 @@ export default async function ExpedientePage({
   const { id } = await params
   const { error } = await searchParams
   const userId = session.user.id
-  const role = String(session.user.role)
-  const miEmail = (session.user.email ?? '').toLowerCase()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const role = String((session.user as any)?.role ?? 'READONLY')
 
   const episode = await prisma.episode.findUnique({
     where: { id },
@@ -295,7 +294,7 @@ export default async function ExpedientePage({
             </div>
           </div>
 
-          {/* ACCIONES SUPERIORES (OCULTAS AL IMPRIMIR) */}
+          {/* ACCIONES SUPERIORES */}
           <div className="flex flex-wrap items-center gap-2 print:hidden">
             {!esSoloLectura && (
               <Link href={`/dashboard/paciente/${episode.id}/turno`} className="bg-indigo-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">
@@ -303,10 +302,10 @@ export default async function ExpedientePage({
               </Link>
             )}
 
-            {/* BOTÓN ALTA O FINALIZAR INTERCONSULTA */}
+            {/* BOTÓN ALTA O FINALIZAR INTERCONSULTA (HABILITADO PARA CUALQUIER MÉDICO/RESIDENTE) */}
             {!esSoloLectura && (
               esInterconsulta ? (
-                permisos.puedeRegistrar && (
+                permisos.puedeDarAlta && (
                   <details className="relative">
                     <summary className="list-none cursor-pointer bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
                       🚪 Finalizar Interconsulta (Dar de Alta)
@@ -333,7 +332,7 @@ export default async function ExpedientePage({
                   </details>
                 )
               ) : (
-                permisos.puedeEditar && (
+                permisos.puedeDarAlta && (
                   <Link href={`/dashboard/paciente/${episode.id}/alta`} className="bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
                     🚪 Dar de Alta
                   </Link>
