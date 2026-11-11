@@ -224,7 +224,7 @@ export default async function ExpedientePage({
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
             <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block font-medium print:hidden">
-              ← Volver a Shift Tracker
+              ← Volver a NEXO
             </Link>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -265,7 +265,7 @@ export default async function ExpedientePage({
                           </select>
                         </div>
                       </div>
-                      <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1.5 rounded-lg font-bold hover:bg-slate-900 mt-1">
+                      <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1.5 rounded-lg font-bold hover:bg-slate-900 mt-1 cursor-pointer">
                         Guardar Corrección
                       </button>
                     </form>
@@ -302,7 +302,7 @@ export default async function ExpedientePage({
               </Link>
             )}
 
-            {/* BOTÓN ALTA O FINALIZAR INTERCONSULTA (HABILITADO PARA CUALQUIER MÉDICO/RESIDENTE) */}
+            {/* BOTÓN ALTA O FINALIZAR INTERCONSULTA */}
             {!esSoloLectura && (
               esInterconsulta ? (
                 permisos.puedeDarAlta && (
@@ -324,7 +324,7 @@ export default async function ExpedientePage({
                           placeholder="Ej. Paciente compensado. Se suspende seguimiento por el servicio..."
                           className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
                         />
-                        <button type="submit" className="w-full bg-red-600 text-white text-xs py-1.5 rounded font-bold hover:bg-red-700">
+                        <button type="submit" className="w-full bg-red-600 text-white text-xs py-1.5 rounded font-bold hover:bg-red-700 cursor-pointer">
                           Confirmar y Finalizar Interconsulta
                         </button>
                       </form>
@@ -365,7 +365,7 @@ export default async function ExpedientePage({
                       <label className="block text-[11px] font-semibold text-slate-600">Médico Tratante / Residente:</label>
                       <input name="attendingDoctor" placeholder="Ej. Dra. Gómez (R3)" className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
                     </div>
-                    <button type="submit" className="w-full bg-emerald-700 text-white text-xs py-1.5 rounded font-bold hover:bg-emerald-800 mt-1">
+                    <button type="submit" className="w-full bg-emerald-700 text-white text-xs py-1.5 rounded font-bold hover:bg-emerald-800 mt-1 cursor-pointer">
                       Confirmar Ingreso a Sala
                     </button>
                   </form>
@@ -394,7 +394,7 @@ export default async function ExpedientePage({
                           <label className="block text-[11px] text-slate-500">Cama:</label>
                           <input name="bed" defaultValue={episode.bed ?? ''} required className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
                         </div>
-                        <button type="submit" className="w-full bg-blue-600 text-white text-xs py-1.5 rounded font-bold hover:bg-blue-700">
+                        <button type="submit" className="w-full bg-blue-600 text-white text-xs py-1.5 rounded font-bold hover:bg-blue-700 cursor-pointer">
                           Guardar Reubicación
                         </button>
                       </form>
@@ -440,7 +440,7 @@ export default async function ExpedientePage({
                           className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
                         />
                       </div>
-                      <button type="submit" className="w-full bg-blue-600 text-white text-xs py-1.5 rounded-lg font-bold hover:bg-blue-700">
+                      <button type="submit" className="w-full bg-blue-600 text-white text-xs py-1.5 rounded-lg font-bold hover:bg-blue-700 cursor-pointer">
                         Guardar Diagnósticos
                       </button>
                     </form>
@@ -640,7 +640,7 @@ export default async function ExpedientePage({
                     </div>
                     <button
                       type="submit"
-                      className="w-full bg-purple-700 text-white py-2.5 rounded-lg text-xs font-bold hover:bg-purple-800 transition-colors shadow-sm"
+                      className="w-full bg-purple-700 text-white py-2.5 rounded-lg text-xs font-bold hover:bg-purple-800 transition-colors shadow-sm cursor-pointer"
                     >
                       Guardar Reporte de Diuresis
                     </button>
@@ -697,7 +697,9 @@ export default async function ExpedientePage({
                         <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
                       </div>
                     </div>
-                    <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2">Guardar Signos</button>
+                    <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2 cursor-pointer">
+                      Guardar Signos
+                    </button>
                   </form>
                 </div>
               )
@@ -710,7 +712,7 @@ export default async function ExpedientePage({
                 
                 <form action={marcarSinAlergias}>
                   <input type="hidden" name="episodeId" value={episode.id} />
-                  <button type="submit" className="w-full bg-emerald-50 text-emerald-800 border border-emerald-300 px-3 py-2 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors">
+                  <button type="submit" className="w-full bg-emerald-50 text-emerald-800 border border-emerald-300 px-3 py-2 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors cursor-pointer">
                     ✅ Marcar: Paciente Niega Alergias
                   </button>
                 </form>
@@ -720,7 +722,9 @@ export default async function ExpedientePage({
                   <input type="hidden" name="episodeId" value={episode.id} />
                   <input name="allergen" required className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="Alérgeno (Ej. Penicilina, AINEs...)" />
                   <input name="reaction" className="w-full px-3 py-2 border rounded-lg text-base md:text-sm text-slate-900" placeholder="Reacción (opcional, ej. Edema, rash)" />
-                  <button type="submit" className="w-full bg-red-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-red-700">Guardar Alergia</button>
+                  <button type="submit" className="w-full bg-red-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-red-700 cursor-pointer">
+                    Guardar Alergia
+                  </button>
                 </form>
               </div>
             )}
@@ -864,7 +868,7 @@ export default async function ExpedientePage({
                                     <input name="diuresis" defaultValue={v.diuresis ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
                                   </div>
                                 </div>
-                                <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1 rounded font-bold hover:bg-slate-900 mt-1">
+                                <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1 rounded font-bold hover:bg-slate-900 mt-1 cursor-pointer">
                                   Guardar Corrección
                                 </button>
                               </form>

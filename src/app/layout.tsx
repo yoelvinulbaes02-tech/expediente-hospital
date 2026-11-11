@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Shift Tracker',
-  description: 'Sistema de Guardia Hospitalaria y Seguimiento de Pacientes',
+  title: 'NEXO - Medical Team Workflow',
+  description: 'NEXO: Medical Team Workflow - Sistema de Guardia Hospitalaria y Seguimiento Clínico',
+  icons: {
+    icon: '/logo.png',
+  },
 }
 
 export default function RootLayout({

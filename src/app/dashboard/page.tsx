@@ -62,20 +62,27 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <SessionTimeout />
 
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-3 shadow-sm sticky top-0 z-10 transition-colors duration-300">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 shrink-0 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xl shadow-xs">
-            ST
-          </div>
+      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-2.5 md:py-3 flex justify-between items-center gap-3 shadow-sm sticky top-0 z-10 transition-colors duration-300">
+        <Link href="/dashboard" className="flex items-center gap-3 min-w-0 hover:opacity-95 transition-opacity">
+          <img
+            src="/logo.png"
+            alt="NEXO Logo"
+            className="h-10 md:h-12 w-auto object-contain rounded-md"
+          />
           <div className="min-w-0">
-            <h1 className="text-base md:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight">
-              Shift Tracker
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+            <div className="flex items-baseline gap-2">
+              <h1 className="text-base md:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight leading-tight">
+                NEXO
+              </h1>
+              <span className="text-[10px] md:text-xs font-semibold text-cyan-600 dark:text-cyan-400 tracking-wide hidden sm:inline">
+                Medical Team Workflow
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
               {esAdmin ? 'Panel de Administración' : `Guardia: ${nombreMedico}`}
             </p>
           </div>
-        </div>
+        </Link>
 
         <div className="flex items-center gap-2 md:gap-4 shrink-0">
           <Link
@@ -130,7 +137,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             </Link>
 
             <form action={cerrarSesion}>
-              <button className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">Salir</button>
+              <button className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors cursor-pointer">
+                Salir
+              </button>
             </form>
           </div>
 
@@ -163,7 +172,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               </Link>
 
               <form action={cerrarSesion}>
-                <button className="w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30">
+                <button className="w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 cursor-pointer">
                   Salir
                 </button>
               </form>

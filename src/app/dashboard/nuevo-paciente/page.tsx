@@ -34,7 +34,7 @@ export default function NuevoPacientePage() {
       <div className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Ingreso a Shift Tracker</h1>
+            <h1 className="text-2xl font-bold text-slate-800">Ingreso a NEXO</h1>
             <p className="text-sm text-slate-500">
               Seleccione el tipo de paciente para abrir el registro en la guardia.
             </p>
@@ -305,7 +305,7 @@ export default function NuevoPacientePage() {
             </Link>
             <button
               type="submit"
-              className={`px-6 py-2.5 rounded-lg font-bold text-white transition-colors shadow-sm ${
+              className={`px-6 py-2.5 rounded-lg font-bold text-white transition-colors shadow-sm cursor-pointer ${
                 tipoGuardia === 'interconsulta'
                   ? 'bg-purple-600 hover:bg-purple-700'
                   : 'bg-blue-600 hover:bg-blue-700'
