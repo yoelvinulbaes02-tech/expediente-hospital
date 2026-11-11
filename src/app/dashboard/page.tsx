@@ -62,24 +62,24 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <SessionTimeout />
 
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-3 md:py-3.5 flex justify-between items-center gap-4 shadow-sm sticky top-0 z-10 transition-colors duration-300">
-        {/* IDENTIDAD DE MARCA: LOGO EN TAMAÑO PROMINENTE Y TEXTO ORDENADO */}
-        <Link href="/dashboard" className="flex items-center gap-3.5 min-w-0 hover:opacity-95 transition-opacity">
-          <div className="flex flex-col min-w-0 justify-center">
-            {/* LOGO EN TAMAÑO PROPORCIONAL Y NÍTIDO */}
-            <img
-              src="/Logo.png"
-              alt="NEXO Logo"
-              className="h-12 sm:h-14 md:h-18 w-auto object-contain shrink-0 self-start"
-            />
-            
-            {/* ESLOGAN MEDICAL TEAM WORKFLOW EN CIAN */}
-            <p className="text-[11px] md:text-xs font-bold text-cyan-600 dark:text-cyan-400 tracking-wider uppercase leading-tight mt-1">
-              Medical Team Workflow
-            </p>
-
-            {/* INFORMACIÓN DE GUARDIA */}
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate leading-tight mt-0.5">
+      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-2.5 md:py-3 flex justify-between items-center gap-3 shadow-sm sticky top-0 z-10 transition-colors duration-300">
+        {/* DISEÑO HORIZONTAL LIMPIO Y COMPACTO */}
+        <Link href="/dashboard" className="flex items-center gap-3 min-w-0 hover:opacity-95 transition-opacity">
+          <img
+            src="/Logo.png"
+            alt="NEXO Logo"
+            className="h-10 md:h-12 w-auto object-contain rounded-md shrink-0"
+          />
+          <div className="min-w-0">
+            <div className="flex items-baseline gap-2">
+              <h1 className="text-base md:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight leading-tight">
+                NEXO
+              </h1>
+              <span className="text-[10px] md:text-xs font-semibold text-cyan-600 dark:text-cyan-400 tracking-wide hidden sm:inline">
+                Medical Team Workflow
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
               {esAdmin ? 'Panel de Administración' : `Guardia: ${nombreMedico}`}
             </p>
           </div>

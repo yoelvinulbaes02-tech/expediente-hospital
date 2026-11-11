@@ -36,22 +36,20 @@ export default async function LoginPage({
       </div>
 
       <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 space-y-6">
-        {/* LOGO EN TAMAÑO PROPORCIONAL Y DESTACADO */}
+        {/* LOGO OFICIAL Y MARCA NEXO */}
         <div className="text-center space-y-2">
           <img
             src="/Logo.png"
-            alt="NEXO"
-            className="h-16 md:h-22 w-auto object-contain mx-auto"
+            alt="NEXO Logo"
+            className="h-16 md:h-20 w-auto object-contain mx-auto"
           />
           <div>
-            <p className="text-xs md:text-sm font-bold text-cyan-600 dark:text-cyan-400 tracking-widest uppercase">
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
+              NEXO
+            </h1>
+            <p className="text-xs font-bold text-cyan-600 dark:text-cyan-400 tracking-widest uppercase mt-1">
               Medical Team Workflow
             </p>
-            <div className="w-36 mx-auto my-1.5">
-              <svg viewBox="0 0 100 10" className="w-full h-2 text-cyan-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M0 5 H40 L44 1 L47 9 L50 2 L53 7 L56 5 H100" />
-              </svg>
-            </div>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Sistema de Guardia Hospitalaria y Seguimiento de Pacientes
