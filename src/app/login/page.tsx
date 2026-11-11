@@ -36,10 +36,10 @@ export default async function LoginPage({
       </div>
 
       <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 space-y-6">
-        {/* LOGO Y MARCA NEXO */}
+        {/* LOGO CON /Logo.png */}
         <div className="text-center space-y-2">
           <img
-            src="/logo.png"
+            src="/Logo.png"
             alt="NEXO Logo"
             className="h-16 md:h-20 w-auto object-contain mx-auto"
           />

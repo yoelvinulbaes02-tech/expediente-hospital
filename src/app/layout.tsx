@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: 'NEXO - Medical Team Workflow',
   description: 'NEXO: Medical Team Workflow - Sistema de Guardia Hospitalaria y Seguimiento Clínico',
   icons: {
-    icon: '/logo.png',
+    icon: '/Logo.png',
   },
 }
 
@@ -29,7 +29,6 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* defaultTheme="light" y enableSystem={false} EVITAN QUE LA APP SE PONGA OSCURA SOLA */}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

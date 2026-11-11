@@ -63,10 +63,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <SessionTimeout />
 
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-2 md:py-2.5 flex justify-between items-center gap-3 shadow-sm sticky top-0 z-10 transition-colors duration-300">
-        {/* IDENTIDAD DE MARCA: LOGO + NEXO + MEDICAL TEAM WORKFLOW + GUARDIA */}
         <Link href="/dashboard" className="flex items-center gap-3 min-w-0 hover:opacity-95 transition-opacity">
+          {/* CARGA /Logo.png CON DETECCIÓN INTELIGENTE */}
           <img
-            src="/logo.png"
+            src="/Logo.png"
             alt="NEXO Logo"
             className="h-11 md:h-13 w-auto object-contain rounded shrink-0"
           />
