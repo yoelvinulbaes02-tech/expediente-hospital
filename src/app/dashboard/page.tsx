@@ -6,6 +6,34 @@ import { prisma } from '@/lib/prisma'
 import { ListaPacientes } from '@/components/ListaPacientes'
 import Link from 'next/link'
 
+// COMPONENTE DE LA X CON EL COLOR Y CORTE EXACTO DE TU IMAGEN
+function NexoX({ className = "h-5 md:h-6 w-auto inline-block -mt-1 mx-0.5 align-middle" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 38 34"
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="nexoCyanGradDash" x1="0" y1="34" x2="38" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#007991" />
+          <stop offset="50%" stopColor="#00A2B3" />
+          <stop offset="100%" stopColor="#00C7D9" />
+        </linearGradient>
+      </defs>
+      {/* Brazo superior izquierdo (Azul Marino) */}
+      <path d="M2 3 L12 3 L20 13 L14 19 L2 3 Z" fill="#0D2344" className="dark:fill-slate-200" />
+      {/* Brazo inferior derecho (Azul Marino) */}
+      <path d="M23 18 L28 12 L37 25 C 37 29 33 32 27 32 L20 32 L23 18 Z" fill="#0D2344" className="dark:fill-slate-200" />
+      {/* Barra diagonal principal en Cian con degradado */}
+      <path d="M2 31 C 6 33 11 33 16 32 L36 6 C 36 3 32 2 28 2 L14 18 L2 31 Z" fill="url(#nexoCyanGradDash)" />
+      {/* Faceta 3D central sombreada */}
+      <path d="M16 20 L22 14 L26 19 L19 25 Z" fill="#006C7E" opacity="0.6" />
+    </svg>
+  )
+}
+
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ doc?: string }> }) {
   const session = await auth()
   if (!session) redirect('/login')
@@ -62,24 +90,35 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <SessionTimeout />
 
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-2.5 md:py-3 flex justify-between items-center gap-3 shadow-sm sticky top-0 z-10 transition-colors duration-300">
-        {/* DISEÑO HORIZONTAL LIMPIO Y COMPACTO */}
-        <Link href="/dashboard" className="flex items-center gap-3 min-w-0 hover:opacity-95 transition-opacity">
+      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-2.5 flex justify-between items-center gap-4 shadow-sm sticky top-0 z-10 transition-colors duration-300">
+        {/* IDENTIDAD DE MARCA: LOGO + EL ORDEN EXACTO QUE PEDISTE */}
+        <Link href="/dashboard" className="flex items-center gap-3.5 min-w-0 hover:opacity-95 transition-opacity">
           <img
             src="/Logo.png"
-            alt="NEXO Logo"
-            className="h-10 md:h-12 w-auto object-contain rounded-md shrink-0"
+            alt="NEXO Isotipo"
+            className="h-12 md:h-14 w-auto object-contain shrink-0"
           />
-          <div className="min-w-0">
-            <div className="flex items-baseline gap-2">
-              <h1 className="text-base md:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight leading-tight">
-                NEXO
-              </h1>
-              <span className="text-[10px] md:text-xs font-semibold text-cyan-600 dark:text-cyan-400 tracking-wide hidden sm:inline">
-                Medical Team Workflow
-              </span>
+
+          <div className="flex flex-col min-w-0 justify-center">
+            {/* 1. NEXO (CON LA X EXACTA EN CIAN/TURQUESA) */}
+            <h1 className="text-xl md:text-2xl font-black tracking-tight leading-none text-[#0D2344] dark:text-white flex items-center">
+              NE<NexoX />O
+            </h1>
+
+            {/* 2. MEDICAL TEAM WORKFLOW */}
+            <p className="text-[10px] md:text-xs font-bold text-[#0D2344] dark:text-slate-300 tracking-wider uppercase leading-tight mt-0.5">
+              MEDICAL TEAM WORKFLOW
+            </p>
+
+            {/* 3. LA RAYA CON EL DISEÑO DE PULSO CARDÍACO (ECG) EN COLOR VERDE/CIAN */}
+            <div className="w-28 md:w-36 my-0.5">
+              <svg viewBox="0 0 100 10" className="w-full h-2 text-[#00A8B5]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M0 5 H40 L44 1 L47 9 L50 2 L53 7 L56 5 H100" />
+              </svg>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+
+            {/* 4. GUARDIA: [NOMBRE MÉDICO] */}
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate leading-none mt-0.5 font-medium">
               {esAdmin ? 'Panel de Administración' : `Guardia: ${nombreMedico}`}
             </p>
           </div>
