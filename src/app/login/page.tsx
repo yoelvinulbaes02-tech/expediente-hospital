@@ -36,12 +36,12 @@ export default async function LoginPage({
       </div>
 
       <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 space-y-6">
-        {/* LOGO OFICIAL LIMPIO Y CENTRADO */}
+        {/* LOGO EN TAMAÑO PROPORCIONAL Y DESTACADO */}
         <div className="text-center space-y-2">
           <img
             src="/Logo.png"
             alt="NEXO"
-            className="h-14 md:h-16 w-auto object-contain mx-auto"
+            className="h-16 md:h-22 w-auto object-contain mx-auto"
           />
           <div>
             <p className="text-xs md:text-sm font-bold text-cyan-600 dark:text-cyan-400 tracking-widest uppercase">
