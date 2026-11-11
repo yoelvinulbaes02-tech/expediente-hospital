@@ -36,22 +36,28 @@ export default async function LoginPage({
       </div>
 
       <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 space-y-6">
-        {/* LOGO CON /Logo.png */}
-        <div className="text-center space-y-2">
+        {/* LOGO OFICIAL + TEXTO ESTILIZADO IDÉNTICO AL LOGO */}
+        <div className="text-center space-y-1">
           <img
             src="/Logo.png"
-            alt="NEXO Logo"
-            className="h-16 md:h-20 w-auto object-contain mx-auto"
+            alt="NEXO Isotipo"
+            className="h-20 w-auto object-contain mx-auto mb-2"
           />
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
-              NEXO
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-none text-[#0D2344] dark:text-white">
+              NE<span className="text-[#00A8B5]">X</span>O
             </h1>
-            <p className="text-xs font-bold text-cyan-600 dark:text-cyan-400 tracking-widest uppercase mt-1">
+            <p className="text-xs md:text-sm font-bold text-[#0D2344] dark:text-slate-300 tracking-wider uppercase mt-1">
               Medical Team Workflow
             </p>
+            {/* LÍNEA DE PULSO CARDÍACO (ECG) EN COLOR CIAN */}
+            <div className="w-44 mx-auto my-1">
+              <svg viewBox="0 0 100 10" className="w-full h-2.5 text-[#00A8B5]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M0 5 H40 L44 1 L47 9 L50 2 L53 7 L56 5 H100" />
+              </svg>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400 pt-1">
             Sistema de Guardia Hospitalaria y Seguimiento de Pacientes
           </p>
         </div>
