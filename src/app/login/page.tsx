@@ -1,81 +1,105 @@
-'use client'
+import { auth, signIn } from '@/auth'
+import { redirect } from 'next/navigation'
+import { AuthError } from 'next-auth'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
-import { signIn } from 'next-auth/react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>
+}) {
+  const session = await auth()
+  if (session) redirect('/dashboard')
 
-export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const { error } = await searchParams
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    })
-
-    if (res?.error) {
-      setError('Credenciales incorrectas o usuario inactivo.')
-      setLoading(false)
-    } else {
-      router.push('/dashboard')
-      router.refresh()
+  async function loginAction(formData: FormData) {
+    'use server'
+    try {
+      await signIn('credentials', {
+        email: formData.get('email'),
+        password: formData.get('password'),
+        redirectTo: '/dashboard',
+      })
+    } catch (err) {
+      if (err instanceof AuthError) {
+        redirect('/login?error=Credenciales incorrectas')
+      }
+      throw err
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-slate-200">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-900">Expediente Clínico</h1>
-          <p className="text-slate-500 mt-2">Hospital General - Acceso Seguro</p>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4 transition-colors duration-300 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
+      <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 space-y-6">
+        {/* LOGO Y MARCA NEXO */}
+        <div className="text-center space-y-2">
+          <img
+            src="/logo.png"
+            alt="NEXO Logo"
+            className="h-16 md:h-20 w-auto object-contain mx-auto"
+          />
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
+              NEXO
+            </h1>
+            <p className="text-xs font-bold text-cyan-600 dark:text-cyan-400 tracking-widest uppercase mt-1">
+              Medical Team Workflow
+            </p>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Sistema de Guardia Hospitalaria y Seguimiento de Pacientes
+          </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm text-center border border-red-200">
-            {error}
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-2.5 rounded-lg text-xs font-semibold text-center">
+            ⚠️ {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form action={loginAction} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Correo Electrónico</label>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Correo Electrónico
+            </label>
             <input
+              name="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-900"
-              placeholder="doctor@hospital.test"
               required
+              placeholder="tu-correo@hospital.com"
+              className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Contraseña
+            </label>
             <input
+              name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-900"
-              placeholder="••••••••"
               required
+              placeholder="••••••••"
+              className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors shadow-sm cursor-pointer"
           >
-            {loading ? 'Verificando...' : 'Iniciar Sesión'}
+            Iniciar Sesión
           </button>
         </form>
+
+        <p className="text-center text-[11px] text-slate-400 dark:text-slate-500">
+          Acceso exclusivo para personal médico y de enfermería autorizado.
+        </p>
       </div>
     </div>
   )
