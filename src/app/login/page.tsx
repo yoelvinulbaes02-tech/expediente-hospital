@@ -3,30 +3,6 @@ import { redirect } from 'next/navigation'
 import { AuthError } from 'next-auth'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
-// COMPONENTE DE LA X PARA EL LOGIN
-function NexoXLogin({ className = "h-7 md:h-8 w-auto inline-block -mt-1 mx-0.5 align-middle" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 38 34"
-      className={className}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <defs>
-        <linearGradient id="nexoCyanGradLogin" x1="0" y1="34" x2="38" y2="0" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#007991" />
-          <stop offset="50%" stopColor="#00A2B3" />
-          <stop offset="100%" stopColor="#00C7D9" />
-        </linearGradient>
-      </defs>
-      <path d="M2 3 L12 3 L20 13 L14 19 L2 3 Z" fill="#0D2344" className="dark:fill-slate-200" />
-      <path d="M23 18 L28 12 L37 25 C 37 29 33 32 27 32 L20 32 L23 18 Z" fill="#0D2344" className="dark:fill-slate-200" />
-      <path d="M2 31 C 6 33 11 33 16 32 L36 6 C 36 3 32 2 28 2 L14 18 L2 31 Z" fill="url(#nexoCyanGradLogin)" />
-      <path d="M16 20 L22 14 L26 19 L19 25 Z" fill="#006C7E" opacity="0.6" />
-    </svg>
-  )
-}
-
 export default async function LoginPage({
   searchParams,
 }: {
@@ -60,7 +36,6 @@ export default async function LoginPage({
       </div>
 
       <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 space-y-6">
-        {/* IDENTIDAD EN EL ORDEN EXACTO */}
         <div className="text-center space-y-1">
           <img
             src="/Logo.png"
@@ -68,20 +43,20 @@ export default async function LoginPage({
             className="h-16 md:h-20 w-auto object-contain mx-auto mb-2"
           />
           <div>
-            {/* 1. NEXO CON LA X EXACTA */}
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-none text-[#0D2344] dark:text-white flex items-center justify-center">
-              NE<NexoXLogin />O
+            {/* 1. NEXO CON LA X EXACTA EN CIAN/TURQUESA */}
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-none text-[#0D2344] dark:text-white">
+              NE<span className="text-[#00A8B5] dark:text-[#00C4D6]">X</span>O
             </h1>
 
             {/* 2. MEDICAL TEAM WORKFLOW */}
-            <p className="text-xs md:text-sm font-bold text-[#0D2344] dark:text-slate-300 tracking-wider uppercase mt-1">
+            <p className="text-xs md:text-sm font-extrabold text-[#0D2344] dark:text-slate-300 tracking-wider uppercase mt-1">
               MEDICAL TEAM WORKFLOW
             </p>
 
-            {/* 3. LÍNEA CON EL DISEÑO DE PULSO CARDÍACO (ECG) EN COLOR CIAN */}
-            <div className="w-40 mx-auto my-1.5">
-              <svg viewBox="0 0 100 10" className="w-full h-2.5 text-[#00A8B5]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M0 5 H40 L44 1 L47 9 L50 2 L53 7 L56 5 H100" />
+            {/* 3. LÍNEA LARGA CON EL PULSO ECG */}
+            <div className="w-full max-w-[240px] mx-auto my-1.5">
+              <svg viewBox="0 0 160 12" className="w-full h-2.5 text-[#00A8B5]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M0 6 H65 L69 1 L73 11 L77 2 L81 9 L84 6 H160" />
               </svg>
             </div>
           </div>
