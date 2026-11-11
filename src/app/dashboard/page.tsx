@@ -63,33 +63,23 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <SessionTimeout />
 
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-2.5 flex justify-between items-center gap-3 shadow-sm sticky top-0 z-10 transition-colors duration-300">
-        {/* IDENTIDAD DE MARCA: ISOTIPO + NEXO (COLORES REALES) + ESLOGAN + ECG PULSE + GUARDIA */}
-        <Link href="/dashboard" className="flex items-center gap-3.5 min-w-0 hover:opacity-95 transition-opacity">
-          <img
-            src="/Logo.png"
-            alt="NEXO Logo"
-            className="h-12 md:h-14 w-auto object-contain shrink-0"
-          />
-          <div className="flex flex-col justify-center min-w-0">
-            {/* NOMBRE DE LA APP CON LOS COLORES DEL LOGO (AZUL MARINO Y CIAN) */}
-            <h1 className="text-xl md:text-2xl font-black tracking-tight leading-none text-[#0D2344] dark:text-white">
-              NE<span className="text-[#00A8B5]">X</span>O
-            </h1>
-
-            {/* ESLOGAN MEDICAL TEAM WORKFLOW */}
-            <p className="text-[10px] md:text-xs font-bold text-[#0D2344] dark:text-slate-300 tracking-wide uppercase leading-tight mt-0.5">
+        {/* IDENTIDAD DE MARCA: LOGO NEXO OFICIAL + ESLOGAN ABAJO + GUARDIA ABAJO */}
+        <Link href="/dashboard" className="flex items-center gap-3 min-w-0 hover:opacity-95 transition-opacity">
+          <div className="flex flex-col min-w-0 justify-center">
+            {/* LOGO OFICIAL CON LA X EN MÁXIMA RESOLUCIÓN Y DETALLE 3D */}
+            <img
+              src="/Logo.png"
+              alt="NEXO Logo"
+              className="h-9 md:h-11 w-auto object-contain shrink-0 self-start"
+            />
+            
+            {/* ESLOGAN MEDICAL TEAM WORKFLOW EN CIAN JUSTO DEBAJO */}
+            <p className="text-[10px] md:text-xs font-bold text-cyan-600 dark:text-cyan-400 tracking-wider uppercase leading-tight mt-1">
               Medical Team Workflow
             </p>
 
-            {/* LÍNEA DE PULSO CARDÍACO (ECG) EN COLOR CIAN */}
-            <div className="w-28 md:w-36 my-0.5">
-              <svg viewBox="0 0 100 10" className="w-full h-1.5 md:h-2 text-[#00A8B5]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M0 5 H40 L44 1 L47 9 L50 2 L53 7 L56 5 H100" />
-              </svg>
-            </div>
-
-            {/* MÉDICO DE GUARDIA */}
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate leading-none mt-0.5">
+            {/* INFORMACIÓN DEL MÉDICO DE GUARDIA JUSTO DEBAJO */}
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate leading-tight mt-0.5">
               {esAdmin ? 'Panel de Administración' : `Guardia: ${nombreMedico}`}
             </p>
           </div>

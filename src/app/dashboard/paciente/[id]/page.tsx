@@ -13,6 +13,7 @@ import {
   modificarDiagnosticos,
   transferirAPropio,
   finalizarInterconsulta,
+  transferirAInterconsulta,
 } from './actions-clinicas'
 import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
@@ -340,7 +341,7 @@ export default async function ExpedientePage({
               )
             )}
 
-            {/* PASAR INTERCONSULTA A SALA */}
+            {/* SI ES INTERCONSULTA -> BOTÓN VERDE PARA PASAR A SALA */}
             {!esSoloLectura && esInterconsulta && (
               <details className="relative">
                 <summary className="list-none cursor-pointer bg-emerald-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm">
@@ -367,6 +368,91 @@ export default async function ExpedientePage({
                     </div>
                     <button type="submit" className="w-full bg-emerald-700 text-white text-xs py-1.5 rounded font-bold hover:bg-emerald-800 mt-1 cursor-pointer">
                       Confirmar Ingreso a Sala
+                    </button>
+                  </form>
+                </div>
+              </details>
+            )}
+
+            {/* SI ES PACIENTE PROPIO (SALA) -> BOTÓN PÚRPURA PARA TRASLADAR A INTERCONSULTA */}
+            {!esSoloLectura && !esInterconsulta && permisos.puedeRegistrar && (
+              <details className="relative">
+                <summary className="list-none cursor-pointer bg-purple-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-purple-700 transition-colors shadow-sm">
+                  🔄 Pasar a Interconsulta
+                </summary>
+                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 p-4 rounded-xl border border-purple-300 dark:border-purple-700 shadow-2xl z-30 text-left">
+                  <p className="text-xs font-bold text-purple-900 dark:text-purple-300 mb-1">
+                    Traslado a Interconsulta:
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                    Indique los datos del servicio receptor para mover este paciente a Interconsultas:
+                  </p>
+                  <form action={transferirAInterconsulta} className="space-y-2">
+                    <input type="hidden" name="episodeId" value={episode.id} />
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Servicio / Especialidad Receptora *
+                      </label>
+                      <input
+                        name="consultingDepartment"
+                        required
+                        placeholder="Ej. UCI, Nefrología, Cirugía..."
+                        className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Residente o Médico Receptor:
+                      </label>
+                      <input
+                        name="consultingResident"
+                        placeholder="Ej. Dr. Martínez (R2)"
+                        className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                          Ubicación / Sala *
+                        </label>
+                        <input
+                          name="room"
+                          required
+                          defaultValue={episode.room ?? ''}
+                          placeholder="Ej. UCI, 302"
+                          className="w-full px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                          Cama *
+                        </label>
+                        <input
+                          name="bed"
+                          required
+                          defaultValue={episode.bed ?? ''}
+                          placeholder="Ej. 1 o A"
+                          className="w-full px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Motivo de Interconsulta / Traslado *
+                      </label>
+                      <textarea
+                        name="chiefComplaint"
+                        required
+                        rows={2}
+                        placeholder="Ej. Evaluación por falla renal aguda / requerimiento de diálisis..."
+                        className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-purple-700 text-white text-xs py-2 rounded-lg font-bold hover:bg-purple-800 transition-colors shadow-sm mt-1 cursor-pointer"
+                    >
+                      Confirmar Pase a Interconsulta
                     </button>
                   </form>
                 </div>
