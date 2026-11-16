@@ -1,47 +1,63 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
+import { obtenerContextoResidencia, verificarEscrituraResidencia } from '@/lib/tenant'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
-  const session = await auth()
-  if (!session) throw new Error('No autorizado')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user) throw new Error('No autorizado')
 
-  const handoffId = formData.get('handoffId') as string
-  const episodeId = formData.get('episodeId') as string
-  const nombreNuevoMedico = session.user?.name || ''
+  const handoffId = String(formData.get('handoffId') ?? '')
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const nombreNuevoMedico = ctx.user.fullName || ''
 
-  // 1. Buscamos el turno para la auditoría
   const handoff = await prisma.handoff.findUnique({
-    where: { id: handoffId }
+    where: { id: handoffId },
+    include: { episode: { select: { residencyId: true, patientId: true } } },
   })
 
   if (!handoff) throw new Error('Turno no encontrado')
 
-  // 2. Actualizamos el estado del Handoff a ACEPTADO
+  if (
+    !ctx.esSuperAdmin &&
+    ctx.residency &&
+    handoff.episode.residencyId &&
+    handoff.episode.residencyId !== ctx.residency.id
+  ) {
+    throw new Error('No autorizado')
+  }
+
+  const checkSuscripcion = await verificarEscrituraResidencia(
+    handoff.episode.residencyId ?? ctx.residency?.id
+  )
+  if (!checkSuscripcion.ok) {
+    throw new Error(checkSuscripcion.error)
+  }
+
   await prisma.handoff.update({
     where: { id: handoffId },
-    data: { status: 'ACEPTADO' }
+    data: { status: 'ACEPTADO', aceptadoAt: new Date() },
   })
 
-  // 3. ¡LA MAGIA! Actualizamos el médico tratante del paciente al nuevo doctor
   await prisma.episode.update({
     where: { id: episodeId },
-    data: { attendingDoctor: nombreNuevoMedico }
+    data: {
+      attendingDoctor: nombreNuevoMedico,
+      responsibleId: ctx.user.id,
+      responsibleSince: new Date(),
+    },
   })
 
-  // 4. Guardamos en auditoría doble (el turno y el cambio de médico)
   await logAudit({
-    actorId: session.user?.id as string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actorRole: (session.user as any)?.role,
+    actorId: ctx.user.id,
+    actorRole: String(ctx.user.role),
     action: 'update',
     entity: 'handoff',
     entityId: handoffId,
-    patientId: handoff.episodeId,
+    patientId: handoff.episode.patientId,
     episodeId: handoff.episodeId,
     oldValue: { status: 'PENDIENTE' },
     newValue: { status: 'ACEPTADO', nuevoMedico: nombreNuevoMedico },

@@ -13,24 +13,60 @@ const prisma = new PrismaClient({ adapter })
 
 async function main() {
   const passwordHash = await bcrypt.hash('Demo1234!', 12)
+  const en30Dias = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+
+  const residenciaHospital = await prisma.residency.upsert({
+    where: { slug: 'residencia-principal' },
+    update: {},
+    create: {
+      name: 'Residencia Principal (Hospital)',
+      slug: 'residencia-principal',
+      specialty: 'Nefrología / Medicina Hospitalaria',
+      interfaceMode: 'HOSPITALIZACION',
+      planName: 'Plan Residencia Mensual',
+      monthlyPriceUsd: 49,
+      maxActiveUsers: 50,
+      planStatus: 'ACTIVE',
+      subscriptionEndsAt: en30Dias,
+      billingContactEmail: 'admin@hospital.test',
+    },
+  })
+
+  const residenciaConsultas = await prisma.residency.upsert({
+    where: { slug: 'consulta-externa' },
+    update: {},
+    create: {
+      name: 'Consulta Externa / Consultorio',
+      slug: 'consulta-externa',
+      specialty: 'Consulta Médica Externa',
+      interfaceMode: 'CONSULTAS',
+      planName: 'Plan Consultorio Mensual',
+      monthlyPriceUsd: 39,
+      maxActiveUsers: 15,
+      planStatus: 'ACTIVE',
+      subscriptionEndsAt: en30Dias,
+      billingContactEmail: 'admin.consulta@hospital.test',
+    },
+  })
 
   await prisma.user.createMany({
     data: [
-      // Usuarios de prueba originales
-      { email: 'admin@hospital.test', passwordHash, fullName: 'Admin Demo', role: 'ADMIN' },
-      { email: 'doctor@hospital.test', passwordHash, fullName: 'Dr. Juan Pérez', role: 'DOCTOR' },
-      { email: 'residente@hospital.test', passwordHash, fullName: 'Dra. Ana Gómez', role: 'RESIDENT' },
-      { email: 'enfermeria@hospital.test', passwordHash, fullName: 'Enf. Carlos Ruiz', role: 'NURSE' },
-      { email: 'lab@hospital.test', passwordHash, fullName: 'Lab. María Díaz', role: 'LAB' },
-      { email: 'lectura@hospital.test', passwordHash, fullName: 'Auditor Solo Lectura', role: 'READONLY' },
-      
-      // NUEVO: Usuario con el dominio @pacientes.com para probar Google
-      { email: 'prueba@pacientes.com', passwordHash, fullName: 'Dr. Prueba Google', role: 'DOCTOR' },
+      { email: 'superadmin@nexo.test', passwordHash, fullName: 'Propietario NEXO', role: 'SUPERADMIN' },
+      { email: 'admin@hospital.test', passwordHash, fullName: 'Admin Demo', role: 'ADMIN', residencyId: residenciaHospital.id },
+      { email: 'doctor@hospital.test', passwordHash, fullName: 'Dr. Juan Pérez', role: 'DOCTOR', residencyId: residenciaHospital.id },
+      { email: 'residente@hospital.test', passwordHash, fullName: 'Dra. Ana Gómez', role: 'RESIDENT', residencyId: residenciaHospital.id },
+      { email: 'enfermeria@hospital.test', passwordHash, fullName: 'Enf. Carlos Ruiz', role: 'NURSE', residencyId: residenciaHospital.id },
+      { email: 'lab@hospital.test', passwordHash, fullName: 'Lab. María Díaz', role: 'LAB', residencyId: residenciaHospital.id },
+      { email: 'lectura@hospital.test', passwordHash, fullName: 'Auditor Solo Lectura', role: 'READONLY', residencyId: residenciaHospital.id },
+      { email: 'prueba@pacientes.com', passwordHash, fullName: 'Dr. Prueba Google', role: 'DOCTOR', residencyId: residenciaHospital.id },
+      // Usuarios demo para la interfaz de Consultas
+      { email: 'admin.consulta@hospital.test', passwordHash, fullName: 'Admin Consulta Externa', role: 'ADMIN', residencyId: residenciaConsultas.id },
+      { email: 'consulta@hospital.test', passwordHash, fullName: 'Dra. Laura Méndez (Consulta)', role: 'DOCTOR', residencyId: residenciaConsultas.id },
     ],
     skipDuplicates: true,
   })
 
-  console.log('✅ Seed completado. Contraseña para todos: Demo1234!')
+  console.log('✅ Seed multi-tenant completado. Contraseña para todos: Demo1234!')
 }
 
 main()

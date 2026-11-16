@@ -3,7 +3,8 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
-import { calcularPermisos, ROLES_MEDICOS } from '@/lib/permisos'
+import { calcularPermisos, ROLES_CLINICOS, ROLES_MEDICOS } from '@/lib/permisos'
+import { obtenerContextoResidencia, verificarEscrituraResidencia } from '@/lib/tenant'
 import { revalidatePath } from 'next/cache'
 
 export type ResultadoLote = { entregados: number; omitidos: string[]; error?: string }
@@ -11,12 +12,15 @@ export type ResultadoLote = { entregados: number; omitidos: string[]; error?: st
 const fallo = (error: string): ResultadoLote => ({ entregados: 0, omitidos: [], error })
 
 export async function entregarLote(formData: FormData): Promise<ResultadoLote> {
-  const session = await auth()
-  const user = session?.user
-  if (!user?.id || !user.email) return fallo('Tu sesión venció. Vuelve a iniciar sesión.')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.residency) return fallo('Tu sesión venció. Vuelve a iniciar sesión.')
 
+  const checkSuscripcion = await verificarEscrituraResidencia(ctx.residency.id)
+  if (!checkSuscripcion.ok) return fallo(checkSuscripcion.error)
+
+  const user = ctx.user
   const role = String(user.role)
-  const nombre = user.name ?? user.email
+  const nombre = user.fullName ?? user.email
   const recibidoPor = String(formData.get('recibidoPor') ?? '').trim()
 
   let episodeIds: string[] = []
@@ -35,16 +39,22 @@ export async function entregarLote(formData: FormData): Promise<ResultadoLote> {
     return fallo('No puedes entregarte pacientes a ti mismo.')
   }
 
-  // El receptor debe ser un médico real y activo
+  // El receptor debe ser un médico real, activo y de la misma residencia
   const receptor = await prisma.user.findFirst({
-    where: { email: { equals: recibidoPor, mode: 'insensitive' } },
+    where: {
+      email: { equals: recibidoPor, mode: 'insensitive' },
+      residencyId: ctx.residency.id,
+    },
     select: { email: true, fullName: true, role: true, isActive: true },
   })
-  if (!receptor || !receptor.isActive) return fallo('El médico que recibe no es válido.')
+  if (!receptor || !receptor.isActive) return fallo('El médico que recibe no es válido para esta residencia.')
   if (!ROLES_MEDICOS.includes(receptor.role)) return fallo('El receptor debe ser médico o residente.')
 
   const episodios = await prisma.episode.findMany({
-    where: { id: { in: episodeIds } },
+    where: {
+      id: { in: episodeIds },
+      residencyId: ctx.residency.id,
+    },
     include: {
       patient: { select: { firstName: true, lastName: true } },
       handoffs: { where: { status: 'PENDIENTE' }, select: { id: true } },
@@ -99,4 +109,91 @@ export async function entregarLote(formData: FormData): Promise<ResultadoLote> {
 
   revalidatePath('/dashboard')
   return { entregados, omitidos }
+}
+
+export async function completarTareaDesdeDashboard(
+  taskId: string
+): Promise<{ ok: boolean; error?: string }> {
+  const session = await auth()
+  const user = session?.user
+  if (!user?.id || !user.email) {
+    return { ok: false, error: 'Tu sesión venció. Vuelve a iniciar sesión.' }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const role = String((user as any).role ?? 'READONLY')
+  if (!ROLES_CLINICOS.includes(role)) {
+    return { ok: false, error: 'No tienes permiso para marcar pendientes.' }
+  }
+
+  const usuarioDb = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { residencyId: true, isActive: true },
+  })
+  if (!usuarioDb?.isActive) {
+    return { ok: false, error: 'Tu usuario está inactivo.' }
+  }
+
+  const tarea = await prisma.task.findUnique({
+    where: { id: taskId },
+    include: {
+      episode: {
+        select: { id: true, patientId: true, status: true, residencyId: true },
+      },
+    },
+  })
+
+  if (!tarea) {
+    return { ok: false, error: 'La tarea no existe.' }
+  }
+
+  if (
+    role !== 'SUPERADMIN' &&
+    tarea.episode.residencyId &&
+    usuarioDb.residencyId &&
+    tarea.episode.residencyId !== usuarioDb.residencyId
+  ) {
+    return { ok: false, error: 'No tienes acceso a este expediente.' }
+  }
+
+  const checkSuscripcion = await verificarEscrituraResidencia(
+    tarea.episode.residencyId ?? usuarioDb.residencyId
+  )
+  if (!checkSuscripcion.ok) {
+    return { ok: false, error: checkSuscripcion.error }
+  }
+
+  if (tarea.episode.status !== 'active') {
+    return { ok: false, error: 'El expediente está cerrado.' }
+  }
+
+  const actualizacion = await prisma.task.updateMany({
+    where: { id: taskId, status: 'pendiente' },
+    data: {
+      status: 'hecha',
+      doneBy: user.email,
+      doneAt: new Date(),
+    },
+  })
+
+  if (actualizacion.count === 0) {
+    return { ok: false, error: 'Esta tarea ya fue actualizada por otra persona.' }
+  }
+
+  await logAudit({
+    actorId: user.id,
+    actorRole: role,
+    action: 'update',
+    entity: 'task',
+    entityId: taskId,
+    patientId: tarea.episode.patientId,
+    episodeId: tarea.episodeId,
+    oldValue: { tarea: tarea.title, estado: tarea.status },
+    newValue: { tarea: tarea.title, estado: 'hecha' },
+    reason: 'Tarea marcada como realizada desde vista general',
+  })
+
+  revalidatePath('/dashboard')
+  revalidatePath(`/dashboard/paciente/${tarea.episodeId}`)
+  return { ok: true }
 }

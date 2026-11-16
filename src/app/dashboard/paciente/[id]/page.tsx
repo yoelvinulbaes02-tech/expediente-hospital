@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { obtenerContextoResidencia } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 import { BannerAlergias } from '@/components/BannerAlergias'
 import { ChecklistTareas } from '@/components/ChecklistTareas'
@@ -30,6 +30,7 @@ import { BotonImprimirSignos } from '@/components/BotonImprimirSignos'
 import { TratamientoActual } from '@/components/TratamientoActual'
 
 const ETIQUETA_ROL: Record<string, string> = {
+  SUPERADMIN: 'Propietario Plataforma',
   ADMIN: 'Administrador',
   DOCTOR: 'Médico',
   RESIDENT: 'Residente',
@@ -65,21 +66,21 @@ export default async function ExpedientePage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ error?: string; vista?: string }>
 }) {
-  const session = await auth()
-  if (!session?.user?.id) redirect('/login')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user) redirect('/login')
 
   const { id } = await params
-  const { error } = await searchParams
-  const userId = session.user.id
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const role = String((session.user as any)?.role ?? 'READONLY')
+  const { error, vista } = await searchParams
+  const userId = ctx.user.id
+  const role = String(ctx.user.role)
 
   const episode = await prisma.episode.findUnique({
     where: { id },
     select: {
       id: true,
+      residencyId: true,
       serviceType: true,
       consultingDepartment: true,
       consultingResident: true,
@@ -129,10 +130,36 @@ export default async function ExpedientePage({
 
   if (!episode) return <div className="p-8 text-center text-slate-800">Expediente no encontrado.</div>
 
-  const permisos = calcularPermisos(role, userId, episode)
-  const esSoloLectura = !permisos.activo
+  if (
+    !ctx.esSuperAdmin &&
+    ctx.residency &&
+    episode.residencyId &&
+    episode.residencyId !== ctx.residency.id
+  ) {
+    redirect('/dashboard')
+  }
+
+  const suscripcionBloqueada = ctx.suscripcion?.bloqueada ?? false
+  const permisosBase = calcularPermisos(role, userId, episode)
+  const permisos = suscripcionBloqueada
+    ? {
+        ...permisosBase,
+        puedeRegistrar: false,
+        puedeEditar: false,
+        puedeMarcarTareas: false,
+        puedeDarAlta: false,
+        puedeTomar: false,
+        puedeReasignar: false,
+        puedeEntregar: false,
+      }
+    : permisosBase
+  const esSoloLectura = !permisos.activo || suscripcionBloqueada
   const entregaPendiente = episode.handoffs[0]
   const esInterconsulta = episode.serviceType === 'interconsulta'
+  const volverHref =
+    vista === 'interconsulta' || (!vista && esInterconsulta)
+      ? '/dashboard?vista=interconsulta'
+      : '/dashboard'
 
   // Cálculo de estancia
   const diffTiempo = new Date().getTime() - new Date(episode.admissionDate).getTime()
@@ -217,8 +244,47 @@ export default async function ExpedientePage({
     'w-full px-2 py-2 md:py-1 border rounded text-base md:text-sm text-slate-900'
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-50">
+      {/* BARRA FIJA SUPERIOR CON EL NOMBRE DEL PACIENTE AL HACER SCROLL */}
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs print:hidden">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link
+              href={volverHref}
+              className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1.5 rounded-lg transition-colors shrink-0"
+            >
+              ← {esInterconsulta || vista === 'interconsulta' ? 'Interconsultas' : 'Volver'}
+            </Link>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-sm md:text-base font-extrabold text-slate-900 truncate">
+                  {episode.patient.firstName} {episode.patient.lastName}
+                </p>
+                {esInterconsulta && (
+                  <span className="hidden sm:inline-block bg-purple-100 text-purple-900 border border-purple-200 text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0">
+                    Interconsulta
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-500 truncate">
+                Exp: <strong>{episode.patient.expedienteNumber}</strong> • {episode.patient.age} años • {episode.patient.sex}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-1 rounded-lg text-xs font-bold">
+              {esInterconsulta ? `${episode.room} · Cama ${episode.bed}` : `Hab. ${episode.room} · Cama ${episode.bed}`}
+            </span>
+            <span className="hidden sm:inline-block bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded-lg text-[11px] font-bold">
+              Día {diasEstancia}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
         {error && (
           <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4 print:hidden">
             ⚠️ {error}
@@ -249,8 +315,8 @@ export default async function ExpedientePage({
         {/* CABECERA PRINCIPAL */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
-            <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block font-medium print:hidden">
-              ← Volver a NEXO
+            <Link href={volverHref} className="text-sm text-blue-600 hover:underline mb-2 inline-block font-medium print:hidden">
+              ← {esInterconsulta || vista === 'interconsulta' ? 'Volver a Interconsultas' : 'Volver a NEXO'}
             </Link>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -1119,6 +1185,7 @@ export default async function ExpedientePage({
               ))}
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

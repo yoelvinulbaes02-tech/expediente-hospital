@@ -2,8 +2,16 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { BannerAlergias } from '@/components/BannerAlergias'
-import { entregarLote } from '@/app/dashboard/actions-lote'
+import { completarTareaDesdeDashboard, entregarLote } from '@/app/dashboard/actions-lote'
+
+type TareaPendienteResumen = {
+  id: string
+  title: string
+  category: string
+  dueAt: Date | string | null
+}
 
 type Episodio = {
   id: string | number
@@ -23,6 +31,7 @@ type Episodio = {
   initialWeightUnit?: string | null
   responsibleId: string | null
   responsible: { fullName: string } | null
+  tasks?: TareaPendienteResumen[]
   _count: { tasks: number }
   handoffs: { recibidoPor: string }[]
   patient: {
@@ -31,12 +40,20 @@ type Episodio = {
     age: number | string | null
     sex: string | null
     expedienteNumber: string
+    cedula?: string | null
   }
   allergies: React.ComponentProps<typeof BannerAlergias>['alergias']
 }
 
 type Doctor = { id: string; fullName: string; email: string }
 type Mensaje = { tipo: 'ok' | 'error'; texto: string; detalles: string[] }
+
+const ETIQUETA_CATEGORIA: Record<string, { label: string; color: string }> = {
+  analisis: { label: '🧪 Analítica', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' },
+  estudio: { label: '🩻 Estudio', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' },
+  indicacion: { label: '💊 Indicación', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300' },
+  otro: { label: '📌 General', color: 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200' },
+}
 
 function normalizar(texto?: string | null) {
   return (texto ?? '')
@@ -68,30 +85,81 @@ const fmtFechaCorta = (d: Date | string) => {
   })
 }
 
+const fmtFechaHora = (d: Date | string) => {
+  const f = new Date(d)
+  return f.toLocaleString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 export function ListaPacientes({
   episodes,
   userId,
   miEmail,
   doctores,
+  vistaInicial = 'propio',
+  puedeMarcarTareas = false,
 }: {
   episodes: Episodio[]
   userId: string
   miEmail: string
   doctores: Doctor[]
+  vistaInicial?: 'propio' | 'interconsulta'
+  puedeMarcarTareas?: boolean
 }) {
-  const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta'>('propio')
+  const router = useRouter()
+  const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta'>(vistaInicial)
   const [busqueda, setBusqueda] = useState('')
+  const [soloPendientes, setSoloPendientes] = useState(false)
+  const [pendientesExpandidos, setPendientesExpandidos] = useState<Record<string, boolean>>({})
+  const [marcandoTareaId, setMarcandoTareaId] = useState<string | null>(null)
+  const [tareasCompletadasIds, setTareasCompletadasIds] = useState<string[]>([])
   const [seleccionados, setSeleccionados] = useState<string[]>([])
   const [medicoRecibe, setMedicoRecibe] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [mensaje, setMensaje] = useState<Mensaje | null>(null)
 
+  const cambiarArea = (nuevaArea: 'propio' | 'interconsulta') => {
+    setAreaGuardia(nuevaArea)
+    setSeleccionados([])
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      if (nuevaArea === 'interconsulta') {
+        url.searchParams.set('vista', 'interconsulta')
+      } else {
+        url.searchParams.delete('vista')
+      }
+      window.history.replaceState(null, '', url.pathname + url.search)
+    }
+  }
+
+  const tareasVisiblesDe = (e: Episodio): TareaPendienteResumen[] => {
+    return (e.tasks ?? []).filter((t) => !tareasCompletadasIds.includes(t.id))
+  }
+
   const episodiosDelArea = useMemo(() => {
     return episodes.filter((e) => (e.serviceType ?? 'propio') === areaGuardia)
   }, [episodes, areaGuardia])
 
-  const totalPropios = useMemo(() => episodes.filter((e) => (e.serviceType ?? 'propio') === 'propio').length, [episodes])
-  const totalInterconsultas = useMemo(() => episodes.filter((e) => e.serviceType === 'interconsulta').length, [episodes])
+  const totalPropios = useMemo(
+    () => episodes.filter((e) => (e.serviceType ?? 'propio') === 'propio').length,
+    [episodes]
+  )
+  const totalInterconsultas = useMemo(
+    () => episodes.filter((e) => e.serviceType === 'interconsulta').length,
+    [episodes]
+  )
+
+  const totalConPendientesArea = useMemo(() => {
+    return episodiosDelArea.filter((e) => {
+      const lista = (e.tasks ?? []).filter((t) => !tareasCompletadasIds.includes(t.id))
+      return lista.length > 0
+    }).length
+  }, [episodiosDelArea, tareasCompletadasIds])
 
   const ordenados = useMemo(() => {
     return [...episodiosDelArea].sort(compararUbicacion)
@@ -99,13 +167,20 @@ export function ListaPacientes({
 
   const filtrados = useMemo(() => {
     const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean)
-    if (terminos.length === 0) return ordenados
 
     return ordenados.filter((e) => {
+      if (soloPendientes) {
+        const pendientesActivos = (e.tasks ?? []).filter((t) => !tareasCompletadasIds.includes(t.id))
+        if (pendientesActivos.length === 0) return false
+      }
+
+      if (terminos.length === 0) return true
+
       const palabras = [
         ...normalizar(e.patient.firstName).split(/\s+/),
         ...normalizar(e.patient.lastName).split(/\s+/),
         normalizar(e.patient.expedienteNumber),
+        normalizar(e.patient.cedula),
         normalizar(e.room),
         normalizar(e.bed),
         normalizar(e.primaryDiagnosis),
@@ -114,7 +189,7 @@ export function ListaPacientes({
       ]
       return terminos.every((t) => palabras.some((p) => p.startsWith(t)))
     })
-  }, [busqueda, ordenados])
+  }, [busqueda, ordenados, soloPendientes, tareasCompletadasIds])
 
   const seleccionable = (e: Episodio) => e.responsibleId === userId && e.handoffs.length === 0
   const seleccionables = filtrados.filter(seleccionable)
@@ -133,6 +208,35 @@ export function ListaPacientes({
     )
   }
 
+  const toggleExpandirPendientes = (episodeId: string) => {
+    setPendientesExpandidos((prev) => ({ ...prev, [episodeId]: !prev[episodeId] }))
+  }
+
+  const handleCompletarTarea = async (taskId: string, titulo: string) => {
+    if (!puedeMarcarTareas || marcandoTareaId) return
+    setMarcandoTareaId(taskId)
+    try {
+      const res = await completarTareaDesdeDashboard(taskId)
+      if (!res.ok) {
+        setMensaje({
+          tipo: 'error',
+          texto: res.error ?? 'No se pudo completar el pendiente.',
+          detalles: [],
+        })
+      } else {
+        setTareasCompletadasIds((prev) => [...prev, taskId])
+        setMensaje({
+          tipo: 'ok',
+          texto: `Pendiente marcado como realizado: "${titulo}".`,
+          detalles: [],
+        })
+        router.refresh()
+      }
+    } finally {
+      setMarcandoTareaId(null)
+    }
+  }
+
   return (
     <>
       {/* SELECTOR DE GUARDIA */}
@@ -140,11 +244,8 @@ export function ListaPacientes({
         <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
           <button
             type="button"
-            onClick={() => {
-              setAreaGuardia('propio')
-              setSeleccionados([])
-            }}
-            className={`py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 ${
+            onClick={() => cambiarArea('propio')}
+            className={`py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
               areaGuardia === 'propio'
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -158,11 +259,8 @@ export function ListaPacientes({
 
           <button
             type="button"
-            onClick={() => {
-              setAreaGuardia('interconsulta')
-              setSeleccionados([])
-            }}
-            className={`py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 ${
+            onClick={() => cambiarArea('interconsulta')}
+            className={`py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
               areaGuardia === 'interconsulta'
                 ? 'bg-purple-600 text-white shadow-sm'
                 : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -190,8 +288,30 @@ export function ListaPacientes({
           {areaGuardia === 'propio' ? '🏥 Sala de Hospitalización' : '📋 Pacientes de Interconsulta'}
         </h2>
 
-        <div className="flex items-center gap-3">
-          <div className="relative w-full md:w-72">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => setSoloPendientes((prev) => !prev)}
+            className={`px-3 py-2 rounded-lg font-bold text-xs sm:text-sm border transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              soloPendientes
+                ? 'bg-amber-500 text-white border-amber-600 shadow-sm'
+                : 'bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700 hover:bg-amber-100'
+            }`}
+          >
+            <span>☑</span>
+            <span>{soloPendientes ? 'Viendo solo pendientes' : 'Solo pendientes'}</span>
+            <span
+              className={`px-1.5 py-0.5 rounded-full text-[11px] font-extrabold ${
+                soloPendientes
+                  ? 'bg-amber-700 text-white'
+                  : 'bg-amber-200 text-amber-950'
+              }`}
+            >
+              {totalConPendientesArea}
+            </span>
+          </button>
+
+          <div className="relative flex-1 min-w-44 md:w-64">
             <input
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
@@ -202,7 +322,7 @@ export function ListaPacientes({
               <button
                 type="button"
                 onClick={() => setBusqueda('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs px-2"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs px-2 cursor-pointer"
               >
                 ✕
               </button>
@@ -221,7 +341,7 @@ export function ListaPacientes({
         <div className={`mb-4 px-4 py-3 rounded-lg border text-sm ${mensaje.tipo === 'ok' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
           <div className="flex justify-between gap-3">
             <p className="font-medium">{mensaje.texto}</p>
-            <button type="button" onClick={() => setMensaje(null)} className="text-xs opacity-60 hover:opacity-100">✕</button>
+            <button type="button" onClick={() => setMensaje(null)} className="text-xs opacity-60 hover:opacity-100 cursor-pointer">✕</button>
           </div>
         </div>
       )}
@@ -243,10 +363,13 @@ export function ListaPacientes({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtrados.map((episode) => {
+          const epId = String(episode.id)
           const entregable = seleccionable(episode)
           const entregaPendiente = episode.handoffs[0]
           const meLoEntregaron = !!entregaPendiente && entregaPendiente.recibidoPor.toLowerCase() === miEmail.toLowerCase()
           const esInterconsulta = episode.serviceType === 'interconsulta'
+          const pendientes = tareasVisiblesDe(episode)
+          const pendientesExpandido = soloPendientes || !!pendientesExpandidos[epId]
 
           const diffInterconsulta = new Date().getTime() - new Date(episode.admissionDate).getTime()
           const diaInterconsulta = Math.max(1, Math.floor(diffInterconsulta / (1000 * 60 * 60 * 24)) + 1)
@@ -256,6 +379,10 @@ export function ListaPacientes({
             const diffHosp = new Date().getTime() - new Date(episode.hospitalAdmissionDate).getTime()
             diaHospital = Math.max(1, Math.floor(diffHosp / (1000 * 60 * 60 * 24)) + 1)
           }
+
+          const hrefExpediente = esInterconsulta
+            ? `/dashboard/paciente/${episode.id}?vista=interconsulta`
+            : `/dashboard/paciente/${episode.id}`
 
           return (
             <div
@@ -268,8 +395,8 @@ export function ListaPacientes({
                 <div className="absolute top-4 left-4">
                   <input
                     type="checkbox"
-                    checked={seleccionados.includes(String(episode.id))}
-                    onChange={() => toggleSeleccion(String(episode.id))}
+                    checked={seleccionados.includes(epId)}
+                    onChange={() => toggleSeleccion(epId)}
                     className="w-5 h-5 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   />
                 </div>
@@ -299,66 +426,130 @@ export function ListaPacientes({
                 </div>
 
                 {/* DATOS DE INGRESO Y DÍAS DE INTERCONSULTA */}
-                <div className="bg-slate-50 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 mb-2 space-y-1">
-                  {esInterconsulta ? (
-                    <>
+                {!soloPendientes && (
+                  <div className="bg-slate-50 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 mb-2 space-y-1">
+                    {esInterconsulta ? (
+                      <>
+                        <div className="flex flex-wrap items-center justify-between gap-1">
+                          <span>
+                            📅 <strong>Interconsulta:</strong> {fmtFechaCorta(episode.admissionDate)}
+                          </span>
+                          <span className="font-bold text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.2 rounded">
+                            Día {diaInterconsulta} de interconsulta
+                          </span>
+                        </div>
+                        {episode.hospitalAdmissionDate && (
+                          <p className="text-[11px] text-slate-500">
+                            🏥 <strong>Ingreso al Hospital:</strong> {fmtFechaCorta(episode.hospitalAdmissionDate)} (Día {diaHospital} de estancia hospitalaria)
+                          </p>
+                        )}
+                      </>
+                    ) : (
                       <div className="flex flex-wrap items-center justify-between gap-1">
                         <span>
-                          📅 <strong>Interconsulta:</strong> {fmtFechaCorta(episode.admissionDate)}
+                          📅 <strong>Ingreso a Sala:</strong> {fmtFechaCorta(episode.admissionDate)}
                         </span>
-                        <span className="font-bold text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.2 rounded">
-                          Día {diaInterconsulta} de interconsulta
+                        <span className="font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded">
+                          Día {diaInterconsulta} de internamiento
                         </span>
                       </div>
-                      {episode.hospitalAdmissionDate && (
-                        <p className="text-[11px] text-slate-500">
-                          🏥 <strong>Ingreso al Hospital:</strong> {fmtFechaCorta(episode.hospitalAdmissionDate)} (Día {diaHospital} de estancia hospitalaria)
+                    )}
+
+                    {episode.initialWeight && (
+                      <p className="text-[11px] text-emerald-800 font-semibold">
+                        ⚖️ Peso inicial: {episode.initialWeight} {episode.initialWeightUnit ?? 'kg'}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div className="mb-3 space-y-1 text-xs sm:text-sm">
+                  {!soloPendientes && (
+                    esInterconsulta ? (
+                      <>
+                        <p className="font-semibold text-purple-900 dark:text-purple-300">
+                          Motivo: <span className="font-normal text-slate-700 dark:text-slate-200">{episode.chiefComplaint}</span>
                         </p>
+                        <p className="font-semibold text-slate-600 dark:text-slate-300">
+                          Residente a cargo: <span className="font-bold text-slate-800 dark:text-slate-100">{episode.consultingResident ?? 'No especificado'}</span>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-semibold text-slate-600 dark:text-slate-300">
+                          Diagnóstico: <span className="font-bold text-blue-700 dark:text-blue-300">{episode.primaryDiagnosis || episode.chiefComplaint}</span>
+                        </p>
+                        <p className="font-semibold text-slate-600 dark:text-slate-300">
+                          A cargo: <span className="font-normal">{episode.responsible?.fullName ?? 'Sin asignar'}</span>
+                        </p>
+                      </>
+                    )
+                  )}
+
+                  {/* PENDIENTES CLICABLES SIN ABRIR EL EXPEDIENTE */}
+                  {pendientes.length > 0 && (
+                    <div className="mt-2">
+                      {!soloPendientes && (
+                        <button
+                          type="button"
+                          onClick={() => toggleExpandirPendientes(epId)}
+                          className="inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <span>☑ {pendientes.length} pendiente{pendientes.length === 1 ? '' : 's'}</span>
+                          <span className="text-[10px] opacity-80">
+                            {pendientesExpandido ? '▲ Ocultar' : '▼ Ver / marcar'}
+                          </span>
+                        </button>
                       )}
-                    </>
-                  ) : (
-                    <div className="flex flex-wrap items-center justify-between gap-1">
-                      <span>
-                        📅 <strong>Ingreso a Sala:</strong> {fmtFechaCorta(episode.admissionDate)}
-                      </span>
-                      <span className="font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded">
-                        Día {diaInterconsulta} de internamiento
-                      </span>
+
+                      {pendientesExpandido && (
+                        <div className="mt-2 space-y-1.5 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-2.5">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                            Pendientes por realizar ({pendientes.length})
+                          </p>
+                          <div className="space-y-1.5">
+                            {pendientes.map((t) => {
+                              const cat = ETIQUETA_CATEGORIA[t.category] ?? ETIQUETA_CATEGORIA.otro
+                              const procesando = marcandoTareaId === t.id
+                              return (
+                                <div
+                                  key={t.id}
+                                  className="flex items-start justify-between gap-2 bg-white dark:bg-slate-800 border border-amber-200/80 dark:border-slate-700 rounded-lg px-2.5 py-2"
+                                >
+                                  <div className="min-w-0 flex-1 space-y-0.5">
+                                    <div className="flex flex-wrap items-center gap-1.5">
+                                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${cat.color}`}>
+                                        {cat.label}
+                                      </span>
+                                      {t.dueAt && (
+                                        <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400">
+                                          📅 {fmtFechaHora(t.dueAt)}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 wrap-break-word">
+                                      {t.title}
+                                    </p>
+                                  </div>
+
+                                  {puedeMarcarTareas && (
+                                    <button
+                                      type="button"
+                                      disabled={procesando}
+                                      onClick={() => handleCompletarTarea(t.id, t.title)}
+                                      title="Marcar pendiente como realizado"
+                                      className="shrink-0 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                                    >
+                                      {procesando ? '...' : '✓ Listo'}
+                                    </button>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-
-                  {episode.initialWeight && (
-                    <p className="text-[11px] text-emerald-800 font-semibold">
-                      ⚖️ Peso inicial: {episode.initialWeight} {episode.initialWeightUnit ?? 'kg'}
-                    </p>
-                  )}
-                </div>
-
-                <div className="mb-4 space-y-1 text-xs sm:text-sm">
-                  {esInterconsulta ? (
-                    <>
-                      <p className="font-semibold text-purple-900 dark:text-purple-300">
-                        Motivo: <span className="font-normal text-slate-700 dark:text-slate-200">{episode.chiefComplaint}</span>
-                      </p>
-                      <p className="font-semibold text-slate-600 dark:text-slate-300">
-                        Residente a cargo: <span className="font-bold text-slate-800 dark:text-slate-100">{episode.consultingResident ?? 'No especificado'}</span>
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="font-semibold text-slate-600 dark:text-slate-300">
-                        Diagnóstico: <span className="font-bold text-blue-700 dark:text-blue-300">{episode.primaryDiagnosis || episode.chiefComplaint}</span>
-                      </p>
-                      <p className="font-semibold text-slate-600 dark:text-slate-300">
-                        A cargo: <span className="font-normal">{episode.responsible?.fullName ?? 'Sin asignar'}</span>
-                      </p>
-                    </>
-                  )}
-
-                  {episode._count.tasks > 0 && (
-                    <p className="mt-2 inline-block bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-2 py-0.5 rounded">
-                      ☑ {episode._count.tasks} pendiente{episode._count.tasks === 1 ? '' : 's'}
-                    </p>
                   )}
 
                   {entregaPendiente && (
@@ -372,11 +563,11 @@ export function ListaPacientes({
                   )}
                 </div>
 
-                <BannerAlergias alergias={episode.allergies} />
+                {!soloPendientes && <BannerAlergias alergias={episode.allergies} />}
 
                 <div className="text-right mt-2">
                   <Link
-                    href={`/dashboard/paciente/${episode.id}`}
+                    href={hrefExpediente}
                     className={`inline-block py-1 text-xs sm:text-sm font-bold ${
                       esInterconsulta ? 'text-purple-600 hover:text-purple-800' : 'text-blue-600 hover:text-blue-800'
                     }`}
@@ -391,7 +582,9 @@ export function ListaPacientes({
 
         {filtrados.length === 0 && (
           <div className="col-span-full text-center py-12 text-slate-400 bg-white dark:bg-slate-800 rounded-xl border">
-            No hay {areaGuardia === 'interconsulta' ? 'interconsultas registradas' : 'pacientes de sala'} en este momento.
+            {soloPendientes
+              ? `No hay pacientes con pendientes activos en ${areaGuardia === 'interconsulta' ? 'Interconsultas' : 'Sala'}.`
+              : `No hay ${areaGuardia === 'interconsulta' ? 'interconsultas registradas' : 'pacientes de sala'} en este momento.`}
           </div>
         )}
       </div>

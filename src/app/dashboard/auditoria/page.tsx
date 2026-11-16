@@ -1,4 +1,4 @@
-import { auth } from '@/auth'
+import { obtenerContextoResidencia } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
@@ -9,18 +9,20 @@ export default async function AuditoriaPage({
 }: {
   searchParams: Promise<{ desde?: string; hasta?: string; q?: string }>
 }) {
-  const session = await auth()
-  if (!session?.user) redirect('/login')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user) redirect('/login')
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userRole = (session.user as any)?.role
-  if (userRole !== 'ADMIN') redirect('/dashboard')
+  const userRole = String(ctx.user.role)
+  if (userRole !== 'ADMIN' && userRole !== 'SUPERADMIN') redirect('/dashboard')
 
   const { desde, hasta, q } = await searchParams
 
-  // CONSTRUCCIÓN DEL FILTRO DE BÚSQUEDA HISTÓRICA
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = {}
+
+  if (userRole !== 'SUPERADMIN' && ctx.residency) {
+    where.actor = { residencyId: ctx.residency.id }
+  }
 
   if (desde || hasta) {
     where.serverTs = {}
@@ -43,7 +45,6 @@ export default async function AuditoriaPage({
     ]
   }
 
-  // SI SE USA UN FILTRO DE FECHAS SE AMPLIAN LOS REGISTROS PARA TRAER TODO EL RANGO HISTÓRICO
   const limite = desde || hasta || q ? 1000 : 300
 
   const rawLogs = await prisma.auditLog.findMany({
@@ -57,7 +58,6 @@ export default async function AuditoriaPage({
     },
   })
 
-  // SERIALIZACIÓN SEGURA DE BIGINT A STRING PARA CLIENTE
   const logs = rawLogs.map((log) => ({
     id: String(log.id),
     seq: Number(log.seq),
@@ -79,13 +79,17 @@ export default async function AuditoriaPage({
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-4">
           <div>
-            <Link href="/dashboard" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline mb-1 inline-block">
+            <Link
+              href={userRole === 'SUPERADMIN' ? '/dashboard/plataforma' : '/dashboard'}
+              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline mb-1 inline-block"
+            >
               ← Volver al Dashboard
             </Link>
             <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
               Registro de Auditoría
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400">
+              {ctx.residency ? `${ctx.residency.name} · ` : ''}
               {desde || hasta
                 ? `Mostrando registros por rango de fecha (${logs.length} movimientos encontrados)`
                 : `Historial inmutable de acciones clínicas (últimos ${logs.length} movimientos)`}

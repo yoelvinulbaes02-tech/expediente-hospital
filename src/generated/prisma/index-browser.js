@@ -120,12 +120,46 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.ResidencyScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  specialty: 'specialty',
+  interfaceMode: 'interfaceMode',
+  planName: 'planName',
+  monthlyPriceUsd: 'monthlyPriceUsd',
+  maxActiveUsers: 'maxActiveUsers',
+  planStatus: 'planStatus',
+  subscriptionEndsAt: 'subscriptionEndsAt',
+  billingContactEmail: 'billingContactEmail',
+  lastPaymentNote: 'lastPaymentNote',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionPaymentScalarFieldEnum = {
+  id: 'id',
+  residencyId: 'residencyId',
+  amountUsd: 'amountUsd',
+  periodMonths: 'periodMonths',
+  method: 'method',
+  reference: 'reference',
+  notes: 'notes',
+  status: 'status',
+  requestedBy: 'requestedBy',
+  reviewedBy: 'reviewedBy',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   passwordHash: 'passwordHash',
   fullName: 'fullName',
   role: 'role',
+  residencyId: 'residencyId',
   isActive: 'isActive',
   mustChangePassword: 'mustChangePassword',
   createdAt: 'createdAt',
@@ -154,8 +188,10 @@ exports.Prisma.AuditLogScalarFieldEnum = {
 
 exports.Prisma.PatientScalarFieldEnum = {
   id: 'id',
+  residencyId: 'residencyId',
   expedienteNumber: 'expedienteNumber',
   cedula: 'cedula',
+  phone: 'phone',
   firstName: 'firstName',
   lastName: 'lastName',
   birthDate: 'birthDate',
@@ -170,6 +206,7 @@ exports.Prisma.PatientScalarFieldEnum = {
 
 exports.Prisma.EpisodeScalarFieldEnum = {
   id: 'id',
+  residencyId: 'residencyId',
   patientId: 'patientId',
   serviceType: 'serviceType',
   consultingDepartment: 'consultingDepartment',
@@ -196,6 +233,36 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   updatedAt: 'updatedAt',
   responsibleId: 'responsibleId',
   responsibleSince: 'responsibleSince'
+};
+
+exports.Prisma.ConsultationScalarFieldEnum = {
+  id: 'id',
+  residencyId: 'residencyId',
+  patientId: 'patientId',
+  doctorId: 'doctorId',
+  doctorName: 'doctorName',
+  consultationDate: 'consultationDate',
+  status: 'status',
+  visitType: 'visitType',
+  chiefComplaint: 'chiefComplaint',
+  bloodPressure: 'bloodPressure',
+  heartRate: 'heartRate',
+  temperature: 'temperature',
+  oxygenSat: 'oxygenSat',
+  weight: 'weight',
+  weightUnit: 'weightUnit',
+  heightCm: 'heightCm',
+  historyIllness: 'historyIllness',
+  physicalExam: 'physicalExam',
+  diagnosis: 'diagnosis',
+  treatmentPlan: 'treatmentPlan',
+  labOrders: 'labOrders',
+  nextAppointment: 'nextAppointment',
+  notes: 'notes',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.MedicalHistoryScalarFieldEnum = {
@@ -367,17 +434,30 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
-
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
+exports.InterfaceMode = exports.$Enums.InterfaceMode = {
+  HOSPITALIZACION: 'HOSPITALIZACION',
+  CONSULTAS: 'CONSULTAS'
 };
+
+exports.PlanStatus = exports.$Enums.PlanStatus = {
+  TRIAL: 'TRIAL',
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  SUSPENDED: 'SUSPENDED'
+};
+
 exports.Role = exports.$Enums.Role = {
+  SUPERADMIN: 'SUPERADMIN',
   ADMIN: 'ADMIN',
   DOCTOR: 'DOCTOR',
   RESIDENT: 'RESIDENT',
@@ -392,10 +472,13 @@ exports.HandoffStatus = exports.$Enums.HandoffStatus = {
 };
 
 exports.Prisma.ModelName = {
+  Residency: 'Residency',
+  SubscriptionPayment: 'SubscriptionPayment',
   User: 'User',
   AuditLog: 'AuditLog',
   Patient: 'Patient',
   Episode: 'Episode',
+  Consultation: 'Consultation',
   MedicalHistory: 'MedicalHistory',
   ImportantAlert: 'ImportantAlert',
   GfrRecord: 'GfrRecord',

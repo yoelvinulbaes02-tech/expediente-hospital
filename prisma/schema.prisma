@@ -7,8 +7,9 @@ datasource db {
   provider = "postgresql"
 }
 
-// ─── USUARIOS Y ROLES ───
+// ─── USUARIOS, ROLES Y MULTI-TENANT B2B ───
 enum Role {
+  SUPERADMIN
   ADMIN
   DOCTOR
   RESIDENT
@@ -17,19 +18,79 @@ enum Role {
   READONLY
 }
 
+enum InterfaceMode {
+  HOSPITALIZACION
+  CONSULTAS
+}
+
+enum PlanStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+}
+
+model Residency {
+  id                  String        @id @default(cuid())
+  name                String
+  slug                String        @unique
+  specialty           String        @default("General")
+  interfaceMode       InterfaceMode @default(HOSPITALIZACION)
+  planName            String        @default("Plan Residencia Mensual")
+  monthlyPriceUsd     Int           @default(49)
+  maxActiveUsers      Int           @default(25)
+  planStatus          PlanStatus    @default(ACTIVE)
+  subscriptionEndsAt  DateTime?     @db.Timestamptz
+  billingContactEmail String?
+  lastPaymentNote     String?
+  isActive            Boolean       @default(true)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  users         User[]
+  patients      Patient[]
+  episodes      Episode[]
+  consultations Consultation[]
+  payments      SubscriptionPayment[]
+}
+
+model SubscriptionPayment {
+  id           String    @id @default(cuid())
+  residencyId  String
+  amountUsd    Float
+  periodMonths Int       @default(1)
+  method       String    @default("transferencia")
+  reference    String?
+  notes        String?
+  status       String    @default("PENDIENTE")
+  requestedBy  String
+  reviewedBy   String?
+  reviewedAt   DateTime? @db.Timestamptz
+  createdAt    DateTime  @default(now()) @db.Timestamptz
+
+  residency Residency @relation(fields: [residencyId], references: [id])
+
+  @@index([residencyId, status])
+}
+
 model User {
-  id                 String   @id @default(cuid())
-  email              String   @unique
+  id                 String     @id @default(cuid())
+  email              String     @unique
   passwordHash       String
   fullName           String
-  role               Role     @default(READONLY)
-  isActive           Boolean  @default(true)
-  mustChangePassword Boolean  @default(false)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
- 
+  role               Role       @default(READONLY)
+  residencyId        String?
+  isActive           Boolean    @default(true)
+  mustChangePassword Boolean    @default(false)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  residency          Residency? @relation(fields: [residencyId], references: [id])
   auditEntries       AuditLog[]
-  episodesAtCharge   Episode[] @relation("EpisodeResponsible")
+  episodesAtCharge   Episode[]  @relation("EpisodeResponsible")
+  consultations      Consultation[] @relation("ConsultationDoctor")
+
+  @@index([residencyId])
 }
 
 // ─── AUDITORÍA APPEND-ONLY ───
@@ -58,8 +119,10 @@ model AuditLog {
 // ─── PACIENTES Y EPISODIOS ───
 model Patient {
   id                  String    @id @default(cuid())
-  expedienteNumber    String    @unique
+  residencyId         String?
+  expedienteNumber    String
   cedula              String?
+  phone               String?
   firstName           String
   lastName            String
   birthDate           DateTime?
@@ -71,14 +134,20 @@ model Patient {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  episodes            Episode[]
-  allergies           Allergy[]
-  medicalHistory      MedicalHistory?
-  viralSerologies     ViralSerology[]
+  residency       Residency?      @relation(fields: [residencyId], references: [id])
+  episodes        Episode[]
+  consultations   Consultation[]
+  allergies       Allergy[]
+  medicalHistory  MedicalHistory?
+  viralSerologies ViralSerology[]
+
+  @@unique([residencyId, expedienteNumber])
+  @@index([residencyId])
 }
 
 model Episode {
   id                    String    @id @default(cuid())
+  residencyId           String?
   patientId             String
   serviceType           String    @default("propio")
   consultingDepartment  String?
@@ -98,25 +167,26 @@ model Episode {
   initialWeightUnit     String?   @default("kg")
 
   // TRATAMIENTO ACTUAL DEL PACIENTE
-  currentTreatment      String?   // Esquema de medicamentos, dosis, infusión, etc.
-  treatmentUpdatedBy    String?   // Email de quien registró/modificó
-  treatmentUpdatedAt    DateTime? @db.Timestamptz // Fecha y hora exacta de actualización
+  currentTreatment      String?
+  treatmentUpdatedBy    String?
+  treatmentUpdatedAt    DateTime? @db.Timestamptz
 
   // EGRESO Y PLAN DE DEPARTAMENTO BASE (INTERCONSULTAS)
-  dischargeType         String?   // descargo | egreso | alta_peticion | fallecido | Alta médica | etc.
-  baseDepartmentPlan    String?   // Plan / indicaciones del departamento base en interconsultas
+  dischargeType         String?
+  baseDepartmentPlan    String?
 
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
-  patient               Patient   @relation(fields: [patientId], references: [id])
+  residency             Residency?       @relation(fields: [residencyId], references: [id])
+  patient               Patient          @relation(fields: [patientId], references: [id])
   allergies             Allergy[]
   notes                 Note[]
   vitals                VitalSign[]
   handoffs              Handoff[]
   responsibleId         String?
-  responsibleSince      DateTime? @db.Timestamptz
-  responsible           User?     @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
+  responsibleSince      DateTime?        @db.Timestamptz
+  responsible           User?            @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
   tasks                 Task[]
 
   importantAlerts       ImportantAlert[]
@@ -126,8 +196,48 @@ model Episode {
   viralSerologies       ViralSerology[]
   vascularAccesses      VascularAccess[]
 
+  @@index([residencyId, status])
   @@index([responsibleId])
   @@index([serviceType, status])
+}
+
+// ─── CONSULTA EXTERNA (INTERFAZ DE CONSULTAS) ───
+model Consultation {
+  id               String    @id @default(cuid())
+  residencyId      String
+  patientId        String
+  doctorId         String?
+  doctorName       String?
+  consultationDate DateTime  @default(now()) @db.Timestamptz
+  status           String    @default("PROGRAMADA")
+  visitType        String    @default("Primera vez")
+  chiefComplaint   String
+  bloodPressure    String?
+  heartRate        Int?
+  temperature      Float?
+  oxygenSat        Int?
+  weight           Float?
+  weightUnit       String?   @default("kg")
+  heightCm         Float?
+  historyIllness   String?
+  physicalExam     String?
+  diagnosis        String?
+  treatmentPlan    String?
+  labOrders        String?
+  nextAppointment  DateTime? @db.Timestamptz
+  notes            String?
+  createdBy        String
+  updatedBy        String?
+  createdAt        DateTime  @default(now()) @db.Timestamptz
+  updatedAt        DateTime  @updatedAt
+
+  residency Residency @relation(fields: [residencyId], references: [id])
+  patient   Patient   @relation(fields: [patientId], references: [id])
+  doctor    User?     @relation("ConsultationDoctor", fields: [doctorId], references: [id])
+
+  @@index([residencyId, status])
+  @@index([residencyId, consultationDate])
+  @@index([patientId])
 }
 
 // ─── ANTECEDENTES DEL PACIENTE ───
@@ -252,7 +362,7 @@ model VascularAccess {
 model Allergy {
   id        String   @id @default(cuid())
   patientId String
-  episodeId String
+  episodeId String?
   allergen  String
   type      String   @default("otro")
   reaction  String?
@@ -262,7 +372,9 @@ model Allergy {
   createdBy String
 
   patient   Patient  @relation(fields: [patientId], references: [id])
-  episode   Episode  @relation(fields: [episodeId], references: [id])
+  episode   Episode? @relation(fields: [episodeId], references: [id])
+
+  @@index([patientId])
 }
 
 // ─── NOTAS MÉDICAS DE EVOLUCIÓN ───

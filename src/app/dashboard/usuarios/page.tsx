@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { obtenerContextoResidencia } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { toggleUsuario } from './actions'
@@ -9,35 +9,69 @@ import { BotonEditarUsuario } from '@/components/BotonEditarUsuario'
 import { BotonEliminarUsuario } from '@/components/BotonEliminarUsuario'
 import { FormularioCrearUsuario } from '@/components/FormularioCrearUsuario'
 
-export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const session = await auth()
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!session || (session.user as any)?.role !== 'ADMIN') {
+export default async function UsuariosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user) redirect('/login')
+  if (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
     redirect('/dashboard')
+  }
+  if (!ctx.residency) {
+    redirect('/dashboard/plataforma')
   }
 
   const { q } = await searchParams
   const busqueda = q || ''
 
-  const usuarios = await prisma.user.findMany({
-    where: busqueda ? {
-      OR: [
-        { fullName: { contains: busqueda, mode: 'insensitive' } },
-        { email: { contains: busqueda, mode: 'insensitive' } },
-      ]
-    } : {},
-    orderBy: { createdAt: 'desc' },
-  })
+  const [usuarios, activosCount] = await Promise.all([
+    prisma.user.findMany({
+      where: {
+        residencyId: ctx.residency.id,
+        role: { not: 'SUPERADMIN' },
+        ...(busqueda
+          ? {
+              OR: [
+                { fullName: { contains: busqueda, mode: 'insensitive' } },
+                { email: { contains: busqueda, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.user.count({
+      where: { residencyId: ctx.residency.id, isActive: true },
+    }),
+  ])
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
           <div>
-            <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block">← Volver al Dashboard</Link>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Administración de Usuarios</h1>
+            <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block">
+              ← Volver al Dashboard
+            </Link>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+              Administración de Usuarios
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              {ctx.residency.name} ·{' '}
+              <span className="font-semibold tabular-nums">
+                {activosCount} / {ctx.residency.maxActiveUsers} usuarios activos en tu plan
+              </span>
+            </p>
           </div>
+
+          <Link
+            href="/dashboard/suscripcion"
+            className="px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50"
+          >
+            💳 Plan y Suscripción
+          </Link>
         </div>
 
         <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
@@ -73,7 +107,6 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {/* BOTÓN EDITAR NOMBRE Y ROL */}
                       <BotonEditarUsuario
                         userId={u.id}
                         nombreActual={u.fullName}
@@ -81,13 +114,13 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                         email={u.email}
                       />
 
-                      {u.id !== session.user?.id && (
+                      {u.id !== ctx.user.id && (
                         <>
                           <form action={toggleUsuario}>
                             <input type="hidden" name="userId" value={u.id} />
                             <input type="hidden" name="isActive" value={String(!u.isActive)} />
-                            <button 
-                              type="submit" 
+                            <button
+                              type="submit"
                               className={`text-xs font-medium px-2 py-1 rounded border transition-colors ${u.isActive ? 'text-red-600 border-red-200 hover:bg-red-50' : 'text-green-600 border-green-200 hover:bg-green-50'}`}
                             >
                               {u.isActive ? 'Desactivar' : 'Activar'}

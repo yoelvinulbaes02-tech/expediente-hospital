@@ -1,16 +1,19 @@
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { obtenerContextoResidencia } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ListaArchivo } from '@/components/ListaArchivo'
 
 export default async function ArchivoPage() {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user) redirect('/login')
+  if (!ctx.residency && !ctx.esSuperAdmin) redirect('/dashboard')
 
-  // Solo los episodios cerrados (los 500 más recientes)
   const episodiosCerrados = await prisma.episode.findMany({
-    where: { status: 'closed' },
+    where: {
+      status: 'closed',
+      ...(ctx.residency ? { residencyId: ctx.residency.id } : {}),
+    },
     include: { patient: true },
     orderBy: { updatedAt: 'desc' },
     take: 500,
@@ -34,7 +37,9 @@ export default async function ArchivoPage() {
           <div className="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">H</div>
           <div>
             <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">Archivo de Pacientes</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Pacientes con Alta Médica</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {ctx.residency?.name ?? 'Pacientes con Alta Médica'}
+            </p>
           </div>
         </div>
         <Link href="/dashboard" className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium">

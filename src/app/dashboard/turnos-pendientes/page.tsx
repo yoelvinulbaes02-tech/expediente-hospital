@@ -1,28 +1,31 @@
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { obtenerContextoResidencia } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { aceptarEntregaTurno } from './actions'
 
 export default async function TurnosPendientesPage() {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user) redirect('/login')
 
-  // Obtenemos el nombre del médico logueado
-  const nombreMedico = session.user?.name || ''
+  const nombreMedico = ctx.user.fullName || ''
+  const emailMedico = ctx.user.email || ''
 
-  // Buscamos todos los handoffs que estén en estado PENDIENTE y que sean para este médico
   const handoffs = await prisma.handoff.findMany({
-    where: { 
+    where: {
       status: 'PENDIENTE',
-      recibidoPor: { contains: nombreMedico, mode: 'insensitive' }
+      ...(ctx.residency ? { episode: { residencyId: ctx.residency.id } } : {}),
+      OR: [
+        { recibidoPor: { equals: emailMedico, mode: 'insensitive' } },
+        ...(nombreMedico ? [{ recibidoPor: { contains: nombreMedico, mode: 'insensitive' as const } }] : []),
+      ],
     },
     include: {
       episode: {
-        include: { patient: true }
-      }
+        include: { patient: true },
+      },
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   })
 
   return (
@@ -58,8 +61,7 @@ export default async function TurnosPendientesPage() {
                   <span className="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">
                     PENDIENTE
                   </span>
-                  
-                  {/* BOTÓN DE ACEPTAR */}
+
                   <form action={async () => {
                     'use server'
                     const formData = new FormData()
@@ -71,7 +73,7 @@ export default async function TurnosPendientesPage() {
                       ✅ Aceptar Turno
                     </button>
                   </form>
-                  
+
                   <Link href={`/dashboard/paciente/${handoff.episodeId}/turno`} className="text-sm font-semibold text-blue-600 hover:text-blue-800 mt-1">
                     Ver Reporte SBAR →
                   </Link>

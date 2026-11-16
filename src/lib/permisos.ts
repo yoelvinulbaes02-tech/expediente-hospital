@@ -1,10 +1,11 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { verificarEscrituraResidencia } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 
 // TIPADO COMO readonly string[] PARA PERMITIR VALIDACIONES DE ROLES (INCLUYENDO ADMIN Y STRINGS)
 export const ROLES_MEDICOS: readonly string[] = ['DOCTOR', 'RESIDENT']
-export const ROLES_CLINICOS: readonly string[] = ['ADMIN', 'DOCTOR', 'RESIDENT', 'NURSE', 'LAB']
+export const ROLES_CLINICOS: readonly string[] = ['SUPERADMIN', 'ADMIN', 'DOCTOR', 'RESIDENT', 'NURSE', 'LAB']
 
 export type Permisos = {
   activo: boolean
@@ -28,7 +29,7 @@ export function volverAlExpediente(episodeId: string, error: string): never {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function calcularPermisos(role: string, userId: string, episode: any): Permisos {
   const activo = episode?.status === 'active'
-  const esAdmin = role === 'ADMIN'
+  const esAdmin = role === 'ADMIN' || role === 'SUPERADMIN'
   const esMedico = role === 'DOCTOR' || role === 'RESIDENT'
   const esClinico = esAdmin || esMedico || role === 'NURSE' || role === 'LAB'
   const esResponsable = episode?.responsibleId === userId
@@ -70,18 +71,48 @@ export async function exigirPermiso(
   const email = session.user.email ?? ''
   const nombre = session.user.name || email
 
-  const episode = await prisma.episode.findUnique({
-    where: { id: episodeId },
-    select: { id: true, patientId: true, status: true, responsibleId: true, serviceType: true },
-  })
+  const [usuarioDb, episode] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { residencyId: true, isActive: true },
+    }),
+    prisma.episode.findUnique({
+      where: { id: episodeId },
+      select: {
+        id: true,
+        patientId: true,
+        status: true,
+        responsibleId: true,
+        serviceType: true,
+        residencyId: true,
+      },
+    }),
+  ])
 
+  if (!usuarioDb?.isActive) redirect('/login')
   if (!episode) redirect('/dashboard')
+
+  if (
+    role !== 'SUPERADMIN' &&
+    episode.residencyId &&
+    usuarioDb.residencyId &&
+    episode.residencyId !== usuarioDb.residencyId
+  ) {
+    redirect('/dashboard')
+  }
+
+  const checkSuscripcion = await verificarEscrituraResidencia(
+    episode.residencyId ?? usuarioDb.residencyId
+  )
+  if (!checkSuscripcion.ok) {
+    volverAlExpediente(episodeId, checkSuscripcion.error)
+  }
 
   if (episode.status !== 'active') {
     volverAlExpediente(episodeId, 'El expediente está cerrado (paciente dado de alta).')
   }
 
-  const esAdmin = role === 'ADMIN'
+  const esAdmin = role === 'ADMIN' || role === 'SUPERADMIN'
   const esMedico = role === 'DOCTOR' || role === 'RESIDENT'
   const esClinico = esAdmin || esMedico || role === 'NURSE' || role === 'LAB'
   const esResponsable = episode.responsibleId === userId

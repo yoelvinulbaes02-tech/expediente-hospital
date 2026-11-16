@@ -1,14 +1,19 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
+import { obtenerContextoResidencia, verificarEscrituraResidencia } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function crearPaciente(formData: FormData) {
-  const session = await auth()
-  if (!session) throw new Error('No autorizado')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.residency) throw new Error('No autorizado')
+
+  const checkSuscripcion = await verificarEscrituraResidencia(ctx.residency.id)
+  if (!checkSuscripcion.ok) {
+    throw new Error(checkSuscripcion.error)
+  }
 
   const serviceType = String(formData.get('serviceType') ?? 'propio').trim()
   const deptoRaw = String(formData.get('consultingDepartment') ?? '').trim()
@@ -31,7 +36,7 @@ export async function crearPaciente(formData: FormData) {
   const initialWeightUnit = String(formData.get('initialWeightUnit') ?? 'kg').trim()
 
   const expedienteNumber = String(formData.get('expedienteNumber') ?? '').trim()
-  const cedula = String(formData.get('cedula') ?? '').trim()
+  const cedula = String(formData.get('cedula') ?? '').trim() || null
   const firstName = String(formData.get('firstName') ?? '').trim()
   const lastName = String(formData.get('lastName') ?? '').trim()
   const age = parseInt(String(formData.get('age') ?? '0'), 10)
@@ -46,24 +51,29 @@ export async function crearPaciente(formData: FormData) {
   const secondaryDiagnoses = String(formData.get('secondaryDiagnoses') ?? '').trim()
   const alergiasEstado = String(formData.get('alergiasEstado') ?? 'no_evaluada').trim()
 
-  const existe = await prisma.patient.findUnique({
-    where: { expedienteNumber },
+  const existe = await prisma.patient.findFirst({
+    where: {
+      expedienteNumber,
+      residencyId: ctx.residency.id,
+    },
   })
 
   if (existe) {
-    throw new Error('El número de expediente ya está registrado.')
+    throw new Error('El número de expediente ya está registrado en esta residencia.')
   }
 
   const nuevoPaciente = await prisma.patient.create({
     data: {
+      residencyId: ctx.residency.id,
       expedienteNumber,
-      cedula: cedula || null,
+      cedula,
       firstName,
       lastName,
       age: isNaN(age) ? null : age,
       sex,
       episodes: {
         create: {
+          residencyId: ctx.residency.id,
           serviceType,
           consultingDepartment: consultingDepartment || null,
           consultingResident: consultingResident || null,
@@ -93,7 +103,7 @@ export async function crearPaciente(formData: FormData) {
         episodeId,
         weight: initialWeight,
         weightUnit: initialWeightUnit,
-        recordedBy: session.user?.email || 'desconocido',
+        recordedBy: ctx.user.email,
         createdAt: admissionDate,
       },
     })
@@ -108,14 +118,13 @@ export async function crearPaciente(formData: FormData) {
       severity: 'no_especificada',
       reaction: alergiasEstado === 'sin_alergias' ? 'Niega alergias' : null,
       status: alergiasEstado,
-      createdBy: session.user?.email || 'desconocido',
+      createdBy: ctx.user.email,
     },
   })
 
   await logAudit({
-    actorId: session.user?.id as string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    actorRole: (session.user as any)?.role,
+    actorId: ctx.user.id,
+    actorRole: String(ctx.user.role),
     action: 'create',
     entity: 'patient',
     entityId: nuevoPaciente.id,
@@ -123,14 +132,14 @@ export async function crearPaciente(formData: FormData) {
     episodeId,
     newValue: {
       expedienteNumber,
-      cedula: cedula || null,
+      cedula,
       tipoGuardia: serviceType,
       departamento: consultingDepartment,
       fechaIngreso: admissionDate.toISOString(),
       pesoInicial: initialWeight ? `${initialWeight} ${initialWeightUnit}` : null,
       nombre: `${firstName} ${lastName}`,
     },
-    reason: `Apertura de expediente (${serviceType === 'interconsulta' ? 'Interconsulta' : 'Paciente Propio'}) con Cédula`,
+    reason: `Apertura de expediente (${serviceType === 'interconsulta' ? 'Interconsulta' : 'Paciente Propio'})`,
   })
 
   revalidatePath('/dashboard')

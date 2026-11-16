@@ -2,8 +2,8 @@
 
 import { randomInt } from 'crypto'
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
+import { obtenerContextoResidencia } from '@/lib/tenant'
 import { revalidatePath } from 'next/cache'
 import bcrypt from 'bcryptjs'
 
@@ -27,10 +27,18 @@ type ResultadoReset = {
 }
 
 async function exigirAdmin() {
-  const session = await auth()
-  const user = session?.user
-  if (!user?.id || String(user.role) !== 'ADMIN') throw new Error('No autorizado')
-  return { id: user.id, role: String(user.role) }
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user || !ctx.residency) throw new Error('No autorizado')
+  if (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
+    throw new Error('No autorizado')
+  }
+  return {
+    id: ctx.user.id,
+    role: String(ctx.user.role),
+    residencyId: ctx.residency.id,
+    maxActiveUsers: ctx.residency.maxActiveUsers,
+    suscripcionBloqueada: ctx.suscripcion?.bloqueada ?? false,
+  }
 }
 
 function generarClaveTemporal(largo = 10): string {
@@ -53,6 +61,13 @@ export async function crearUsuario(
 
   const valores = { fullName, email, role }
 
+  if (admin.suscripcionBloqueada) {
+    return {
+      error: 'La suscripción mensual está suspendida. Renueva el plan para crear nuevos usuarios.',
+      valores,
+    }
+  }
+
   if (fullName.length < 3) {
     return { error: 'Escribe el nombre completo', campo: 'fullName', valores }
   }
@@ -66,18 +81,36 @@ export async function crearUsuario(
     return { error: 'Selecciona un rol válido', campo: 'role', valores }
   }
 
+  const activosEnResidencia = await prisma.user.count({
+    where: { residencyId: admin.residencyId, isActive: true },
+  })
+  if (activosEnResidencia >= admin.maxActiveUsers) {
+    return {
+      error: `Tu residencia alcanzó el límite de ${admin.maxActiveUsers} usuarios activos. Amplía tu plan en "Suscripción".`,
+      valores,
+    }
+  }
+
   const existente = await prisma.user.findFirst({
     where: { email: { equals: email, mode: 'insensitive' } },
     select: { id: true },
   })
   if (existente) {
-    return { error: 'Ya existe un usuario con ese correo', campo: 'email', valores }
+    return { error: 'Ya existe un usuario con ese correo en la plataforma', campo: 'email', valores }
   }
 
   const passwordHash = await bcrypt.hash(password, 12)
 
   const nuevo = await prisma.user
-    .create({ data: { fullName, email, passwordHash, role: role as RolValido } })
+    .create({
+      data: {
+        fullName,
+        email,
+        passwordHash,
+        role: role as RolValido,
+        residencyId: admin.residencyId,
+      },
+    })
     .catch((e: unknown) => {
       if ((e as { code?: string })?.code === 'P2002') return null
       throw e
@@ -92,8 +125,8 @@ export async function crearUsuario(
     action: 'create',
     entity: 'user',
     entityId: nuevo.id,
-    newValue: { usuario: fullName, correo: email, rol: role },
-    reason: 'Creación de nuevo usuario',
+    newValue: { usuario: fullName, correo: email, rol: role, residencyId: admin.residencyId },
+    reason: 'Creación de nuevo usuario en la residencia',
   })
 
   revalidatePath('/dashboard/usuarios')
@@ -107,6 +140,19 @@ export async function toggleUsuario(formData: FormData): Promise<void> {
   const nuevoEstado = formData.get('isActive') === 'true'
 
   if (!userId || userId === admin.id) return
+
+  const objetivo = await prisma.user.findFirst({
+    where: { id: userId, residencyId: admin.residencyId, role: { not: 'SUPERADMIN' } },
+    select: { id: true },
+  })
+  if (!objetivo) return
+
+  if (nuevoEstado) {
+    const activosEnResidencia = await prisma.user.count({
+      where: { residencyId: admin.residencyId, isActive: true },
+    })
+    if (activosEnResidencia >= admin.maxActiveUsers) return
+  }
 
   const usuario = await prisma.user.update({
     where: { id: userId },
@@ -131,11 +177,11 @@ export async function toggleUsuario(formData: FormData): Promise<void> {
 export async function resetearPassword(userId: string): Promise<ResultadoReset> {
   const admin = await exigirAdmin()
 
-  const objetivo = await prisma.user.findUnique({
-    where: { id: userId },
+  const objetivo = await prisma.user.findFirst({
+    where: { id: userId, residencyId: admin.residencyId, role: { not: 'SUPERADMIN' } },
     select: { id: true, fullName: true, email: true },
   })
-  if (!objetivo) return { ok: false, error: 'Usuario no encontrado' }
+  if (!objetivo) return { ok: false, error: 'Usuario no encontrado en tu residencia' }
   if (objetivo.id === admin.id) {
     return { ok: false, error: 'Para cambiar tu propia contraseña usa "Mi Perfil"' }
   }
@@ -162,7 +208,6 @@ export async function resetearPassword(userId: string): Promise<ResultadoReset> 
   return { ok: true, password: temporal, nombre: objetivo.fullName, correo: objetivo.email }
 }
 
-// ─── EDITAR NOMBRE Y ROL DEL USUARIO ───
 export async function editarUsuario(
   userId: string,
   fullName: string,
@@ -178,12 +223,12 @@ export async function editarUsuario(
     return { ok: false, error: 'Selecciona un rol válido' }
   }
 
-  const previo = await prisma.user.findUnique({
-    where: { id: userId },
+  const previo = await prisma.user.findFirst({
+    where: { id: userId, residencyId: admin.residencyId, role: { not: 'SUPERADMIN' } },
     select: { id: true, fullName: true, email: true, role: true },
   })
 
-  if (!previo) return { ok: false, error: 'Usuario no encontrado' }
+  if (!previo) return { ok: false, error: 'Usuario no encontrado en tu residencia' }
 
   await prisma.user.update({
     where: { id: userId },
@@ -218,20 +263,21 @@ export async function eliminarUsuario(
     return { ok: false, error: 'No puedes eliminar tu propio usuario administrador.' }
   }
 
-  const objetivo = await prisma.user.findUnique({
-    where: { id: userId },
+  const objetivo = await prisma.user.findFirst({
+    where: { id: userId, residencyId: admin.residencyId, role: { not: 'SUPERADMIN' } },
     select: { id: true, fullName: true, email: true, role: true },
   })
   if (!objetivo) {
-    return { ok: false, error: 'Usuario no encontrado.' }
+    return { ok: false, error: 'Usuario no encontrado en tu residencia.' }
   }
 
-  const [auditCount, episodesCount] = await Promise.all([
+  const [auditCount, episodesCount, consultCount] = await Promise.all([
     prisma.auditLog.count({ where: { actorId: userId } }),
     prisma.episode.count({ where: { responsibleId: userId } }),
+    prisma.consultation.count({ where: { doctorId: userId } }),
   ])
 
-  if (auditCount > 0 || episodesCount > 0) {
+  if (auditCount > 0 || episodesCount > 0 || consultCount > 0) {
     return {
       ok: false,
       error:
