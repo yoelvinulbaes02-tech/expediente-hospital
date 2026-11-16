@@ -24,9 +24,10 @@ type Serologia = {
 }
 
 type Gfr = {
+  id: string
   value: number
   recordedBy: string
-  createdAt: Date
+  createdAt: Date | string
 }
 
 type Tipificacion = {
@@ -44,11 +45,24 @@ const ETIQUETA_ROL: Record<string, string> = {
   READONLY: 'Lectura',
 }
 
+const fmtFecha = (d: Date | string | null) => {
+  if (!d) return ''
+  const f = new Date(d)
+  return f.toLocaleString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 export function BloqueNefrologico({
   episodeId,
   acceso,
   virales,
   tfgActual,
+  historialTfg = [],
   tipificacion,
   nombres,
   roles,
@@ -58,6 +72,7 @@ export function BloqueNefrologico({
   acceso: Acceso | null
   virales: Serologia | null
   tfgActual: Gfr | null
+  historialTfg?: Gfr[]
   tipificacion: Tipificacion
   nombres: Record<string, string>
   roles: Record<string, string>
@@ -143,7 +158,7 @@ export function BloqueNefrologico({
                   <input name="unknownPlacementDate" type="checkbox" className="rounded text-blue-600" />
                   <span>Se desconoce fecha</span>
                 </label>
-                <button className="w-full bg-slate-800 text-white text-xs py-1.5 rounded font-medium hover:bg-slate-900">
+                <button className="w-full bg-slate-800 text-white text-xs py-1.5 rounded font-medium hover:bg-slate-900 cursor-pointer">
                   Guardar
                 </button>
               </form>
@@ -205,7 +220,7 @@ export function BloqueNefrologico({
                   placeholder="Detalle (ej. VHC +)"
                   className="w-full px-2 py-1.5 border rounded text-xs text-slate-900"
                 />
-                <button className="w-full bg-slate-800 text-white text-xs py-1.5 rounded font-medium hover:bg-slate-900">
+                <button className="w-full bg-slate-800 text-white text-xs py-1.5 rounded font-medium hover:bg-slate-900 cursor-pointer">
                   Guardar
                 </button>
               </form>
@@ -260,7 +275,7 @@ export function BloqueNefrologico({
                   <option value="AB+">AB Positivo (AB+)</option>
                   <option value="AB-">AB Negativo (AB-)</option>
                 </select>
-                <button className="w-full bg-rose-700 text-white text-xs py-1.5 rounded font-medium hover:bg-rose-800">
+                <button className="w-full bg-rose-700 text-white text-xs py-1.5 rounded font-medium hover:bg-rose-800 cursor-pointer">
                   Guardar Tipificación
                 </button>
               </form>
@@ -268,7 +283,7 @@ export function BloqueNefrologico({
           )}
         </div>
 
-        {/* 4. TFG */}
+        {/* 4. TFG CON HISTORIAL REGISTRADO Y VISIBLE */}
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
@@ -293,6 +308,28 @@ export function BloqueNefrologico({
             ) : (
               <p className="text-xs text-slate-400 italic">Sin TFG registrada.</p>
             )}
+
+            {/* HISTORIAL DE TODAS LAS TFG REGISTRADAS CON FECHAS */}
+            {historialTfg.length > 1 && (
+              <details className="mt-2 text-xs">
+                <summary className="text-sky-700 font-semibold cursor-pointer hover:underline text-[11px]">
+                  📈 Historial anterior ({historialTfg.length} registros)
+                </summary>
+                <div className="mt-1 space-y-1.5 max-h-36 overflow-y-auto bg-white p-2 rounded border border-slate-200 text-[11px]">
+                  {historialTfg.map((item) => (
+                    <div key={item.id} className="border-b pb-1 last:border-b-0 space-y-0.5">
+                      <div className="flex justify-between items-baseline">
+                        <span className="font-bold text-slate-800">{item.value} mL/min/1.73m²</span>
+                        <span className="text-slate-400 text-[10px]">{fmtFecha(item.createdAt)}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500">
+                        Por: {nombres[item.recordedBy] ?? item.recordedBy}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
           </div>
 
           {puedeRegistrar && (
@@ -308,9 +345,9 @@ export function BloqueNefrologico({
                   step="0.1"
                   required
                   placeholder="Ej. 14.5"
-                  className="flex-1 px-2 py-1.5 border rounded text-xs text-slate-900"
+                  className="flex-1 px-2 py-1.5 border rounded text-xs text-slate-900 bg-white"
                 />
-                <button className="bg-sky-600 text-white text-xs px-2.5 py-1.5 rounded font-medium hover:bg-sky-700">
+                <button className="bg-sky-600 text-white text-xs px-2.5 py-1.5 rounded font-medium hover:bg-sky-700 cursor-pointer">
                   Guardar
                 </button>
               </form>

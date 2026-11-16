@@ -31,6 +31,7 @@ export async function crearPaciente(formData: FormData) {
   const initialWeightUnit = String(formData.get('initialWeightUnit') ?? 'kg').trim()
 
   const expedienteNumber = String(formData.get('expedienteNumber') ?? '').trim()
+  const cedula = String(formData.get('cedula') ?? '').trim()
   const firstName = String(formData.get('firstName') ?? '').trim()
   const lastName = String(formData.get('lastName') ?? '').trim()
   const age = parseInt(String(formData.get('age') ?? '0'), 10)
@@ -56,6 +57,7 @@ export async function crearPaciente(formData: FormData) {
   const nuevoPaciente = await prisma.patient.create({
     data: {
       expedienteNumber,
+      cedula: cedula || null,
       firstName,
       lastName,
       age: isNaN(age) ? null : age,
@@ -121,13 +123,14 @@ export async function crearPaciente(formData: FormData) {
     episodeId,
     newValue: {
       expedienteNumber,
+      cedula: cedula || null,
       tipoGuardia: serviceType,
       departamento: consultingDepartment,
       fechaIngreso: admissionDate.toISOString(),
       pesoInicial: initialWeight ? `${initialWeight} ${initialWeightUnit}` : null,
       nombre: `${firstName} ${lastName}`,
     },
-    reason: `Apertura de expediente (${serviceType === 'interconsulta' ? 'Interconsulta' : 'Paciente Propio'})`,
+    reason: `Apertura de expediente (${serviceType === 'interconsulta' ? 'Interconsulta' : 'Paciente Propio'}) con Cédula`,
   })
 
   revalidatePath('/dashboard')

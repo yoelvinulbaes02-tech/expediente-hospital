@@ -155,6 +155,7 @@ exports.Prisma.AuditLogScalarFieldEnum = {
 exports.Prisma.PatientScalarFieldEnum = {
   id: 'id',
   expedienteNumber: 'expedienteNumber',
+  cedula: 'cedula',
   firstName: 'firstName',
   lastName: 'lastName',
   birthDate: 'birthDate',
@@ -178,6 +179,7 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   admissionType: 'admissionType',
   chiefComplaint: 'chiefComplaint',
   status: 'status',
+  dischargeType: 'dischargeType',
   room: 'room',
   bed: 'bed',
   attendingDoctor: 'attendingDoctor',
@@ -189,6 +191,7 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   currentTreatment: 'currentTreatment',
   treatmentUpdatedBy: 'treatmentUpdatedBy',
   treatmentUpdatedAt: 'treatmentUpdatedAt',
+  baseDepartmentPlan: 'baseDepartmentPlan',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   responsibleId: 'responsibleId',
@@ -213,7 +216,9 @@ exports.Prisma.ImportantAlertScalarFieldEnum = {
   content: 'content',
   createdBy: 'createdBy',
   createdAt: 'createdAt',
-  isActive: 'isActive'
+  isActive: 'isActive',
+  resolvedBy: 'resolvedBy',
+  resolvedAt: 'resolvedAt'
 };
 
 exports.Prisma.GfrRecordScalarFieldEnum = {
@@ -232,7 +237,10 @@ exports.Prisma.LabReportScalarFieldEnum = {
   sampleDate: 'sampleDate',
   result: 'result',
   createdBy: 'createdBy',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  isDeleted: 'isDeleted',
+  deletedBy: 'deletedBy',
+  deletedAt: 'deletedAt'
 };
 
 exports.Prisma.StudyReportScalarFieldEnum = {
