@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { crearUsuario } from '@/app/dashboard/usuarios/actions'
+import { InputPassword } from '@/components/InputPassword'
 
 type Estado = {
   ok?: boolean
@@ -48,9 +49,8 @@ export function FormularioCrearUsuario() {
       </div>
 
       <div>
-        <input
+        <InputPassword
           name="password"
-          type="password"
           placeholder="Contraseña temporal"
           required
           className={`w-full px-3 py-2 border rounded-lg text-slate-900 ${borde('password')}`}

@@ -6,6 +6,7 @@ import { toggleUsuario } from './actions'
 import { SearchInput } from '@/components/SearchInput'
 import { BotonResetClave } from '@/components/BotonResetClave'
 import { BotonEditarUsuario } from '@/components/BotonEditarUsuario'
+import { BotonEliminarUsuario } from '@/components/BotonEliminarUsuario'
 import { FormularioCrearUsuario } from '@/components/FormularioCrearUsuario'
 
 export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
@@ -94,6 +95,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                           </form>
 
                           <BotonResetClave userId={u.id} nombre={u.fullName} />
+                          <BotonEliminarUsuario userId={u.id} nombre={u.fullName} email={u.email} />
                         </>
                       )}
                     </div>

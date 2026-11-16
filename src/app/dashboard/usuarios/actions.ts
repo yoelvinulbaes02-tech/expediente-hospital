@@ -162,7 +162,7 @@ export async function resetearPassword(userId: string): Promise<ResultadoReset> 
   return { ok: true, password: temporal, nombre: objetivo.fullName, correo: objetivo.email }
 }
 
-// ─── NUEVA ACCIÓN: EDITAR NOMBRE Y ROL DEL USUARIO ───
+// ─── EDITAR NOMBRE Y ROL DEL USUARIO ───
 export async function editarUsuario(
   userId: string,
   fullName: string,
@@ -202,6 +202,64 @@ export async function editarUsuario(
     oldValue: { fullName: previo.fullName, role: previo.role },
     newValue: { fullName: nombreLimpio, role },
     reason: `Nombre/rol de usuario modificado por administrador: "${previo.fullName}" -> "${nombreLimpio}"`,
+  })
+
+  revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard')
+  return { ok: true }
+}
+
+export async function eliminarUsuario(
+  userId: string
+): Promise<{ ok: boolean; error?: string }> {
+  const admin = await exigirAdmin()
+
+  if (!userId || userId === admin.id) {
+    return { ok: false, error: 'No puedes eliminar tu propio usuario administrador.' }
+  }
+
+  const objetivo = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, fullName: true, email: true, role: true },
+  })
+  if (!objetivo) {
+    return { ok: false, error: 'Usuario no encontrado.' }
+  }
+
+  const [auditCount, episodesCount] = await Promise.all([
+    prisma.auditLog.count({ where: { actorId: userId } }),
+    prisma.episode.count({ where: { responsibleId: userId } }),
+  ])
+
+  if (auditCount > 0 || episodesCount > 0) {
+    return {
+      ok: false,
+      error:
+        'Este usuario tiene registros clínicos o de auditoría asociados y no puede eliminarse por trazabilidad legal. Usa "Desactivar" para bloquear su acceso.',
+    }
+  }
+
+  try {
+    await prisma.user.delete({ where: { id: userId } })
+  } catch (e: unknown) {
+    if ((e as { code?: string })?.code === 'P2003') {
+      return {
+        ok: false,
+        error:
+          'Este usuario tiene registros asociados y no puede eliminarse. Usa "Desactivar" para bloquear su acceso.',
+      }
+    }
+    throw e
+  }
+
+  await logAudit({
+    actorId: admin.id,
+    actorRole: admin.role,
+    action: 'delete',
+    entity: 'user',
+    entityId: userId,
+    oldValue: { fullName: objetivo.fullName, email: objetivo.email, role: objetivo.role },
+    reason: `Usuario eliminado por administrador: ${objetivo.fullName} (${objetivo.email})`,
   })
 
   revalidatePath('/dashboard/usuarios')

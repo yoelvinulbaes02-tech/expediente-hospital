@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { cambiarPassword } from '@/app/dashboard/perfil/actions'
+import { InputPassword } from '@/components/InputPassword'
 
 type Estado = {
   ok?: boolean
@@ -24,9 +25,8 @@ export function FormularioCambiarPassword() {
     <form action={formAction} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña Actual</label>
-        <input
+        <InputPassword
           name="currentPassword"
-          type="password"
           required
           className={`w-full px-3 py-2 border rounded-lg text-slate-900 ${borde('currentPassword')}`}
         />
@@ -35,9 +35,8 @@ export function FormularioCambiarPassword() {
 
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Contraseña</label>
-        <input
+        <InputPassword
           name="newPassword"
-          type="password"
           required
           minLength={6}
           className={`w-full px-3 py-2 border rounded-lg text-slate-900 ${borde('newPassword')}`}
@@ -47,9 +46,8 @@ export function FormularioCambiarPassword() {
 
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Confirmar Nueva Contraseña</label>
-        <input
+        <InputPassword
           name="confirmPassword"
-          type="password"
           required
           minLength={6}
           className={`w-full px-3 py-2 border rounded-lg text-slate-900 ${borde('confirmPassword')}`}
