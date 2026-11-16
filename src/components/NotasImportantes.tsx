@@ -1,7 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { crearNotaImportante, resolverNotaImportante } from '@/app/dashboard/paciente/[id]/actions-clinicas'
+import {
+  crearNotaImportante,
+  resolverNotaImportante,
+  toggleFijarNotaImportante,
+} from '@/app/dashboard/paciente/[id]/actions-clinicas'
 
 type Alerta = {
   id: string
@@ -9,23 +13,26 @@ type Alerta = {
   createdBy: string
   createdAt: Date | string
   isActive: boolean
+  isPinned?: boolean
+  pinnedAt?: Date | string | null
   resolvedBy?: string | null
   resolvedAt?: Date | string | null
 }
+
+const MAX_FIJAS = 3
 
 const ETIQUETA_ROL: Record<string, string> = {
   ADMIN: 'Admin',
   DOCTOR: 'Médico',
   RESIDENT: 'Residente',
   NURSE: 'Enf.',
-  LAB: 'Lab',
+  LAB: 'Laboratorio',
   READONLY: 'Lectura',
 }
 
-const fmtFechaHora = (d: Date | string | null) => {
+const fmtFecha = (d: Date | string | null | undefined) => {
   if (!d) return ''
-  const f = new Date(d)
-  return f.toLocaleString('es-DO', {
+  return new Date(d).toLocaleString('es-DO', {
     timeZone: 'America/Santo_Domingo',
     day: '2-digit',
     month: '2-digit',
@@ -47,174 +54,256 @@ export function NotasImportantes({
   roles?: Record<string, string>
   puedeRegistrar: boolean
 }) {
-  const [mostrarHistorial, setMostrarHistorial] = useState(false)
-  const [abrirModalNuevo, setAbrirModalNuevo] = useState(false)
+  const [confirmandoId, setConfirmandoId] = useState<string | null>(null)
 
   const activas = alertas.filter((a) => a.isActive)
-  const resueltas = alertas.filter((a) => !a.isActive)
+  const archivadas = alertas
+    .filter((a) => !a.isActive)
+    .sort(
+      (a, b) =>
+        new Date(b.resolvedAt ?? b.createdAt).getTime() -
+        new Date(a.resolvedAt ?? a.createdAt).getTime()
+    )
 
-  return (
-    <div className="bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 p-4 rounded-xl shadow-xs mb-6">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 dark:border-amber-900/50 pb-2 mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">⚠️</span>
-          <h2 className="text-sm font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wide">
-            Avisos / Notas Importantes ({activas.length} fijada{activas.length === 1 ? '' : 's'})
-          </h2>
+  // Hasta 3 notas fijadas por importancia arriba (en orden en que fueron fijadas)
+  const fijadas = activas
+    .filter((a) => a.isPinned)
+    .sort(
+      (a, b) =>
+        new Date(a.pinnedAt ?? a.createdAt).getTime() -
+        new Date(b.pinnedAt ?? b.createdAt).getTime()
+    )
+
+  // Las demás debajo en el orden exacto en que se agregaron
+  const demas = activas
+    .filter((a) => !a.isPinned)
+    .sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )
+
+  const limiteAlcanzado = fijadas.length >= MAX_FIJAS
+
+  const renderTarjeta = (a: Alerta, esFija: boolean, indice: number) => (
+    <div
+      key={a.id}
+      className={`rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs border ${
+        esFija
+          ? 'bg-white border-amber-400 ring-1 ring-amber-200'
+          : 'bg-white/90 border-amber-200'
+      }`}
+    >
+      <div className="text-sm text-slate-800 min-w-0">
+        <div className="flex items-start gap-2">
+          <span
+            className={`inline-flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black rounded px-1.5 py-0.5 border ${
+              esFija
+                ? 'bg-amber-500 text-white border-amber-600'
+                : 'bg-slate-100 text-slate-700 border-slate-300'
+            }`}
+          >
+            {esFija ? `📌 Fija #${indice + 1}` : `#${indice + 1}`}
+          </span>
+          <p className="font-semibold whitespace-pre-line wrap-break-word">{a.content}</p>
         </div>
-
-        <div className="flex items-center gap-3">
-          {resueltas.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setMostrarHistorial(!mostrarHistorial)}
-              className="text-xs font-semibold text-amber-800 dark:text-amber-300 hover:underline cursor-pointer"
-            >
-              {mostrarHistorial ? 'Ocultar historial' : `Ver resueltas (${resueltas.length})`}
-            </button>
-          )}
-
-          {puedeRegistrar && (
-            <button
-              type="button"
-              onClick={() => setAbrirModalNuevo(true)}
-              className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition-colors shadow-2xs cursor-pointer"
-            >
-              + Fijar Nota Importante
-            </button>
-          )}
-        </div>
+        <p className="text-[11px] text-slate-500 mt-1.5">
+          Agregado por <strong className="text-slate-700">{nombres[a.createdBy] ?? a.createdBy}</strong>
+          {roles[a.createdBy] && (
+            <span className="ml-1 bg-slate-100 text-slate-700 text-[10px] font-bold px-1 py-0.5 rounded border border-slate-200">
+              {ETIQUETA_ROL[roles[a.createdBy]] ?? roles[a.createdBy]}
+            </span>
+          )}{' '}
+          · {fmtFecha(a.createdAt)}
+        </p>
       </div>
 
-      {/* LISTA DE NOTAS IMPORTANTES FIJADAS (PERMITE FIJAR 2 O MÁS SIMULTÁNEAMENTE) */}
-      <div className="space-y-2.5">
-        {activas.map((alerta, index) => (
-          <div
-            key={alerta.id}
-            className="bg-white dark:bg-slate-800 p-3.5 rounded-lg border border-amber-200 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
-          >
-            <div className="space-y-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="bg-amber-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded">
-                  #{index + 1}
-                </span>
-                <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 wrap-break-word">
-                  {alerta.content}
-                </p>
-              </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                Fijado por: <strong className="text-slate-600 dark:text-slate-300">{nombres[alerta.createdBy] ?? alerta.createdBy}</strong>
-                {roles[alerta.createdBy] && (
-                  <span className="ml-1 bg-slate-100 dark:bg-slate-700 px-1 py-0.2 rounded text-[10px] font-semibold">
-                    {ETIQUETA_ROL[roles[alerta.createdBy]] ?? roles[alerta.createdBy]}
-                  </span>
-                )}
-                {' '}• {fmtFechaHora(alerta.createdAt)}
-              </p>
-            </div>
-
-            {puedeRegistrar && (
-              <form action={resolverNotaImportante} className="shrink-0">
+      {puedeRegistrar && (
+        <div className="shrink-0 flex flex-wrap items-center gap-1.5">
+          {confirmandoId === a.id ? (
+            <div className="flex items-center gap-2 bg-red-50 border border-red-200 px-2.5 py-1.5 rounded-lg text-xs">
+              <span className="font-bold text-red-800">¿Seguro de retirar?</span>
+              <form
+                action={async (formData) => {
+                  await resolverNotaImportante(formData)
+                  setConfirmandoId(null)
+                }}
+              >
                 <input type="hidden" name="episodeId" value={episodeId} />
-                <input type="hidden" name="alertId" value={alerta.id} />
+                <input type="hidden" name="alertId" value={a.id} />
                 <button
                   type="submit"
-                  className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                  className="bg-red-600 text-white font-bold px-2.5 py-1 rounded hover:bg-red-700 transition-colors cursor-pointer"
                 >
-                  ✓ Retirar / Resolver
+                  Sí, retirar
                 </button>
               </form>
-            )}
-          </div>
-        ))}
-
-        {activas.length === 0 && (
-          <p className="text-xs text-amber-800/80 dark:text-amber-300/80 italic py-1">
-            Sin notas de precaución fijadas actualmente. Puede fijar alertas críticas que el equipo de guardia deba tener presente.
-          </p>
-        )}
-      </div>
-
-      {/* MODAL PARA CREAR NUEVA NOTA IMPORTANTE */}
-      {abrirModalNuevo && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-            <div className="flex justify-between items-center border-b pb-2">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                <span>⚠️</span> Fijar Nota de Precaución Importante
-              </h3>
               <button
                 type="button"
-                onClick={() => setAbrirModalNuevo(false)}
-                className="text-slate-400 hover:text-slate-600 text-lg font-bold leading-none cursor-pointer"
+                onClick={() => setConfirmandoId(null)}
+                className="text-slate-500 hover:text-slate-700 px-1.5 py-1 font-medium cursor-pointer"
               >
-                ✕
+                Cancelar
               </button>
             </div>
-            <form
-              action={async (formData) => {
-                await crearNotaImportante(formData)
-                setAbrirModalNuevo(false)
-              }}
-              className="space-y-3"
-            >
-              <input type="hidden" name="episodeId" value={episodeId} />
-              <textarea
-                name="content"
-                required
-                rows={3}
-                placeholder="Ej. Paciente con difícil acceso venoso / Prohibido tomar TA en brazo izquierdo / Diálisis programada a las 2:00 PM..."
-                className="w-full px-3 py-2 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500"
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setAbrirModalNuevo(false)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 cursor-pointer"
-                >
-                  Cancelar
-                </button>
+          ) : (
+            <>
+              <form action={toggleFijarNotaImportante}>
+                <input type="hidden" name="episodeId" value={episodeId} />
+                <input type="hidden" name="alertId" value={a.id} />
                 <button
                   type="submit"
-                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-1.5 rounded-lg shadow-sm cursor-pointer"
+                  disabled={!esFija && limiteAlcanzado}
+                  title={
+                    esFija
+                      ? 'Quitar de notas fijadas'
+                      : limiteAlcanzado
+                        ? 'Ya hay 3 notas fijadas. Desfija una primero.'
+                        : 'Fijar arriba por importancia'
+                  }
+                  className={`text-xs px-2 py-1 rounded border font-semibold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    esFija
+                      ? 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
+                      : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-amber-50 hover:text-amber-800 hover:border-amber-300'
+                  }`}
                 >
-                  Fijar en Expediente
+                  {esFija ? 'Desfijar' : '📌 Fijar'}
                 </button>
+              </form>
+
+              <button
+                type="button"
+                onClick={() => setConfirmandoId(a.id)}
+                title="Retirar este aviso"
+                className="text-xs text-slate-500 hover:text-red-600 px-2 py-1 rounded hover:bg-slate-50 transition-colors font-medium flex items-center gap-1 cursor-pointer"
+              >
+                ✕ Retirar
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+
+  return (
+    <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 shadow-sm mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-2 mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">📌</span>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-amber-900">
+            Notas Importantes y Avisos Clínicos
+          </h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-amber-200 text-amber-950 font-bold px-2.5 py-0.5 rounded-full">
+            {fijadas.length}/{MAX_FIJAS} fijadas
+          </span>
+          {activas.length > 0 && (
+            <span className="text-xs bg-white text-amber-900 border border-amber-300 font-bold px-2.5 py-0.5 rounded-full">
+              {activas.length} total
+            </span>
+          )}
+        </div>
+      </div>
+
+      {activas.length === 0 ? (
+        <p className="text-xs text-amber-700 italic py-1">No hay avisos activos en este momento.</p>
+      ) : (
+        <div className="space-y-4 mb-3">
+          {fijadas.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900">
+                ⭐ Fijadas por Importancia (máx. {MAX_FIJAS})
+              </p>
+              <div className="space-y-2">
+                {fijadas.map((a, idx) => renderTarjeta(a, true, idx))}
               </div>
-            </form>
-          </div>
+            </div>
+          )}
+
+          {demas.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                📝 Notas Adicionales (en orden de ingreso)
+              </p>
+              <div className="space-y-2">
+                {demas.map((a, idx) => renderTarjeta(a, false, idx))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* HISTORIAL: MUESTRA QUIÉN CANCELÓ / RESOLVIÓ LA NOTA CON FECHA Y HORA */}
-      {mostrarHistorial && resueltas.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-amber-200 dark:border-amber-900/50 space-y-2">
-          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            Historial de Notas Retiradas / Resueltas
-          </p>
-          {resueltas.map((alerta) => (
-            <div
-              key={alerta.id}
-              className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 space-y-1"
+      {/* FORMULARIO PARA AGREGAR NUEVA NOTA (CON OPCIÓN DE FIJAR SI HAY CUPO) */}
+      {puedeRegistrar && (
+        <form action={crearNotaImportante} className="mt-2 pt-2.5 border-t border-amber-200 space-y-2">
+          <input type="hidden" name="episodeId" value={episodeId} />
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              name="content"
+              required
+              placeholder="Escribir nota importante o aviso clínico..."
+              className="flex-1 px-3 py-2 border border-amber-300 rounded-lg text-base md:text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+            <button
+              type="submit"
+              className="bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-amber-700 transition-colors shrink-0 cursor-pointer"
             >
-              <p className="line-through text-slate-500">{alerta.content}</p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-400">
-                <span>Fijado por: {nombres[alerta.createdBy] ?? alerta.createdBy}</span>
-                {alerta.resolvedBy && (
-                  <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                    ✓ Resuelto / Retirado por: <strong>{nombres[alerta.resolvedBy] ?? alerta.resolvedBy}</strong>
-                    {roles[alerta.resolvedBy] && (
-                      <span className="ml-1 px-1 py-0.2 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 rounded font-semibold">
-                        {ETIQUETA_ROL[roles[alerta.resolvedBy]] ?? roles[alerta.resolvedBy]}
+              + Agregar Nota
+            </button>
+          </div>
+          <label className="inline-flex items-center gap-2 text-xs text-amber-950 font-medium cursor-pointer select-none">
+            <input
+              type="checkbox"
+              name="isPinned"
+              disabled={limiteAlcanzado}
+              className="rounded border-amber-400 text-amber-600 focus:ring-amber-500 disabled:opacity-40"
+            />
+            <span className={limiteAlcanzado ? 'opacity-60' : ''}>
+              {limiteAlcanzado
+                ? `Ya hay ${MAX_FIJAS}/${MAX_FIJAS} notas fijadas (se agregará debajo en orden de llegada)`
+                : '📌 Fijar arriba por importancia (hasta 3 notas fijadas)'}
+            </span>
+          </label>
+        </form>
+      )}
+
+      {/* HISTORIAL DE AVISOS ARCHIVADOS / RETIRADOS */}
+      {archivadas.length > 0 && (
+        <details className="mt-3 pt-2 border-t border-amber-200/60">
+          <summary className="text-[11px] font-bold text-amber-800 hover:text-amber-900 cursor-pointer select-none">
+            📁 Ver avisos archivados / retirados ({archivadas.length})
+          </summary>
+          <div className="space-y-1.5 mt-2">
+            {archivadas.map((r) => (
+              <div key={r.id} className="bg-white/80 rounded-lg p-2.5 text-xs text-slate-600 border border-amber-200/60">
+                <p className="line-through text-slate-500 font-medium">{r.content}</p>
+                <div className="text-[10px] text-slate-500 mt-1 space-y-0.5">
+                  <p>
+                    Publicado por <strong>{nombres[r.createdBy] ?? r.createdBy}</strong>
+                    {roles[r.createdBy] && (
+                      <span className="ml-1 bg-slate-100 text-slate-600 px-1 rounded border border-slate-200 font-semibold">
+                        {ETIQUETA_ROL[roles[r.createdBy]] ?? roles[r.createdBy]}
                       </span>
-                    )}
-                    {alerta.resolvedAt && ` el ${fmtFechaHora(alerta.resolvedAt)}`}
-                  </span>
-                )}
+                    )}{' '}
+                    · {fmtFecha(r.createdAt)}
+                  </p>
+                  {r.resolvedBy && (
+                    <p className="text-red-700 font-medium">
+                      Retirado por <strong>{nombres[r.resolvedBy] ?? r.resolvedBy}</strong>
+                      {roles[r.resolvedBy] && (
+                        <span className="ml-1 bg-red-50 text-red-700 px-1 rounded border border-red-200 font-semibold">
+                          {ETIQUETA_ROL[roles[r.resolvedBy]] ?? roles[r.resolvedBy]}
+                        </span>
+                      )}
+                      {r.resolvedAt ? ` · ${fmtFecha(r.resolvedAt)}` : ''}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </details>
       )}
     </div>
   )

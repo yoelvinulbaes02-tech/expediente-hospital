@@ -1,6 +1,7 @@
 import { auth, signIn } from '@/auth'
 import { redirect } from 'next/navigation'
 import { AuthError } from 'next-auth'
+import Image from 'next/image'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { InputPassword } from '@/components/InputPassword'
 
@@ -38,9 +39,13 @@ export default async function LoginPage({
 
       <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 space-y-6">
         <div className="text-center space-y-1">
-          <img
+          <Image
             src="/Logo.png"
             alt="NEXO Isotipo"
+            width={160}
+            height={80}
+            priority
+            referrerPolicy="no-referrer"
             className="h-16 md:h-20 w-auto object-contain mx-auto mb-2"
           />
           <div>
@@ -55,7 +60,7 @@ export default async function LoginPage({
             </p>
 
             {/* 3. LÍNEA LARGA CON EL PULSO ECG */}
-            <div className="w-full max-w-[240px] mx-auto my-1.5">
+            <div className="w-full max-w-60 mx-auto my-1.5">
               <svg viewBox="0 0 160 12" className="w-full h-2.5 text-[#00A8B5]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M0 6 H65 L69 1 L73 11 L77 2 L81 9 L84 6 H160" />
               </svg>

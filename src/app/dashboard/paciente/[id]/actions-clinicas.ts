@@ -52,7 +52,7 @@ export async function guardarAntecedentes(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// ─── 2. NOTAS IMPORTANTES ───
+// ─── 2. NOTAS IMPORTANTES (AVISOS) ───
 export async function crearNotaImportante(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
@@ -60,12 +60,24 @@ export async function crearNotaImportante(formData: FormData): Promise<void> {
   const content = String(formData.get('content') ?? '').trim()
   if (!content) volverAlExpediente(episodeId, 'Escribe el aviso importante')
 
+  const quiereFijar = formData.get('isPinned') === 'on' || formData.get('isPinned') === 'true'
+  let fijar = false
+  if (quiereFijar) {
+    const fijadasActuales = await prisma.importantAlert.count({
+      where: { episodeId, isActive: true, isPinned: true },
+    })
+    if (fijadasActuales < 3) {
+      fijar = true
+    }
+  }
+
   const alerta = await prisma.importantAlert.create({
     data: {
       episodeId,
       content,
       createdBy: email,
-      isActive: true,
+      isPinned: fijar,
+      pinnedAt: fijar ? new Date() : null,
     },
   })
 
@@ -77,26 +89,42 @@ export async function crearNotaImportante(formData: FormData): Promise<void> {
     entityId: alerta.id,
     patientId: episode.patientId,
     episodeId,
-    newValue: { aviso: content },
-    reason: 'Aviso importante fijado en expediente',
+    newValue: { aviso: content, fijada: fijar },
+    reason: fijar ? 'Nota importante creada y fijada en expediente' : 'Nota importante agregada en expediente',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-export async function resolverNotaImportante(formData: FormData): Promise<void> {
+export async function toggleFijarNotaImportante(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const alertId = String(formData.get('alertId') ?? '')
-  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+  const { userId, role, episode } = await exigirPermiso(episodeId, 'registrar')
 
-  const ahora = new Date()
+  const actual = await prisma.importantAlert.findFirst({
+    where: { id: alertId, episodeId, isActive: true },
+  })
+  if (!actual) return
+
+  const nuevoEstado = !actual.isPinned
+
+  if (nuevoEstado) {
+    const fijadasActuales = await prisma.importantAlert.count({
+      where: { episodeId, isActive: true, isPinned: true },
+    })
+    if (fijadasActuales >= 3) {
+      volverAlExpediente(
+        episodeId,
+        'Solo se permiten hasta 3 notas importantes fijadas al mismo tiempo. Desfija una primero.'
+      )
+    }
+  }
 
   await prisma.importantAlert.update({
     where: { id: alertId },
     data: {
-      isActive: false,
-      resolvedBy: email,
-      resolvedAt: ahora,
+      isPinned: nuevoEstado,
+      pinnedAt: nuevoEstado ? new Date() : null,
     },
   })
 
@@ -108,8 +136,39 @@ export async function resolverNotaImportante(formData: FormData): Promise<void> 
     entityId: alertId,
     patientId: episode.patientId,
     episodeId,
-    newValue: { isActive: false, resueltoPor: email, fechaResolucion: ahora.toISOString() },
-    reason: 'Aviso importante retirado/resuelto por personal clínico',
+    oldValue: { isPinned: actual.isPinned },
+    newValue: { isPinned: nuevoEstado },
+    reason: nuevoEstado ? 'Nota importante fijada por importancia' : 'Nota importante desfijada',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+export async function resolverNotaImportante(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const alertId = String(formData.get('alertId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  await prisma.importantAlert.update({
+    where: { id: alertId },
+    data: {
+      isActive: false,
+      isPinned: false,
+      resolvedBy: email,
+      resolvedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'important_alert',
+    entityId: alertId,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: { isActive: false, resolvedBy: email },
+    reason: 'Aviso importante retirado/resuelto',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
@@ -150,7 +209,7 @@ export async function registrarTFG(formData: FormData): Promise<void> {
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// ─── 4. REPORTES DE LABORATORIO Y CULTIVOS ───
+// ─── 4. REPORTES DE LABORATORIO ───
 export async function guardarReporteLaboratorio(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
@@ -161,10 +220,10 @@ export async function guardarReporteLaboratorio(formData: FormData): Promise<voi
   const fechaStr = String(formData.get('sampleDate') ?? '').trim()
   const result = String(formData.get('result') ?? '').trim()
 
-  const nombreFinal = testName === 'OTRO' ? customTest : testName
+  const nombreFinal = testName === 'OTRO' || testName === 'OTRO_CULTIVO' ? customTest : testName
 
-  if (!nombreFinal) volverAlExpediente(episodeId, 'Selecciona o escribe el nombre de la analítica o cultivo')
-  if (!result) volverAlExpediente(episodeId, 'Escribe el resultado de la analítica o cultivo')
+  if (!nombreFinal) volverAlExpediente(episodeId, 'Selecciona o escribe el nombre de la analítica')
+  if (!result) volverAlExpediente(episodeId, 'Escribe el resultado de la analítica')
 
   const sampleDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
 
@@ -188,37 +247,46 @@ export async function guardarReporteLaboratorio(formData: FormData): Promise<voi
     patientId: episode.patientId,
     episodeId,
     newValue: { analitica: nombreFinal, categoria: category, resultado: result },
-    reason: 'Reporte de laboratorio o cultivo registrado',
+    reason: 'Reporte de laboratorio registrado',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// EDITAR ANALÍTICA O CULTIVO
 export async function editarReporteLaboratorio(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const reportId = String(formData.get('reportId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
 
   const testName = String(formData.get('testName') ?? '').trim()
-  const category = String(formData.get('category') ?? 'Laboratorio').trim()
+  const customTest = String(formData.get('customTest') ?? '').trim()
+  const category = String(formData.get('category') ?? 'OTRAS ANALÍTICAS').trim()
   const fechaStr = String(formData.get('sampleDate') ?? '').trim()
   const result = String(formData.get('result') ?? '').trim()
 
-  if (!testName || !result) volverAlExpediente(episodeId, 'Debe indicar nombre y resultado')
+  const nombreFinal = testName === 'OTRO' || testName === 'OTRO_CULTIVO' ? customTest : testName
+  if (!reportId || !nombreFinal || !result) {
+    volverAlExpediente(episodeId, 'Completa el nombre y resultado de la analítica')
+  }
 
-  const previo = await prisma.labReport.findUnique({ where: { id: reportId } })
-  if (!previo) volverAlExpediente(episodeId, 'Analítica no encontrada')
+  const previo = await prisma.labReport.findFirst({
+    where: { id: reportId, episodeId, isDeleted: false },
+  })
+  if (!previo) {
+    volverAlExpediente(episodeId, 'El reporte de laboratorio no existe o fue eliminado')
+  }
 
   const sampleDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : previo.sampleDate
 
   await prisma.labReport.update({
     where: { id: reportId },
     data: {
-      testName,
       category,
-      result,
+      testName: nombreFinal,
       sampleDate,
+      result,
+      updatedBy: email,
+      updatedAt: new Date(),
     },
   })
 
@@ -230,31 +298,43 @@ export async function editarReporteLaboratorio(formData: FormData): Promise<void
     entityId: reportId,
     patientId: episode.patientId,
     episodeId,
-    oldValue: previo,
-    newValue: { testName, category, result, sampleDate, editadoPor: email },
-    reason: 'Edición / corrección de reporte de analítica o cultivo',
+    oldValue: {
+      analitica: previo.testName,
+      categoria: previo.category,
+      resultado: previo.result,
+      fechaMuestra: previo.sampleDate?.toISOString() ?? null,
+    },
+    newValue: {
+      analitica: nombreFinal,
+      categoria: category,
+      resultado: result,
+      fechaMuestra: sampleDate?.toISOString() ?? null,
+      updatedBy: email,
+    },
+    reason: 'Reporte de laboratorio editado',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
-// BORRAR ANALÍTICA (BORRADO SEGURO CON AUDITORÍA)
 export async function eliminarReporteLaboratorio(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const reportId = String(formData.get('reportId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
 
-  const previo = await prisma.labReport.findUnique({ where: { id: reportId } })
-  if (!previo) volverAlExpediente(episodeId, 'Analítica no encontrada')
+  if (!reportId) return
 
-  const ahora = new Date()
+  const previo = await prisma.labReport.findFirst({
+    where: { id: reportId, episodeId, isDeleted: false },
+  })
+  if (!previo) return
 
   await prisma.labReport.update({
     where: { id: reportId },
     data: {
       isDeleted: true,
       deletedBy: email,
-      deletedAt: ahora,
+      deletedAt: new Date(),
     },
   })
 
@@ -266,8 +346,13 @@ export async function eliminarReporteLaboratorio(formData: FormData): Promise<vo
     entityId: reportId,
     patientId: episode.patientId,
     episodeId,
-    oldValue: { testName: previo.testName, result: previo.result },
-    reason: `Reporte de laboratorio o cultivo eliminado por ${email}`,
+    oldValue: {
+      analitica: previo.testName,
+      categoria: previo.category,
+      resultado: previo.result,
+    },
+    newValue: { isDeleted: true, deletedBy: email },
+    reason: `Reporte de laboratorio eliminado (${previo.testName})`,
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
@@ -477,16 +562,16 @@ export async function cambiarUbicacion(formData: FormData): Promise<void> {
   revalidatePath('/dashboard')
 }
 
-// ─── 10. MODIFICAR NOMBRE, CÉDULA Y DATOS DEL PACIENTE ───
+// ─── 10. MODIFICAR NOMBRE Y DATOS DEL PACIENTE ───
 export async function modificarDatosPaciente(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
   const { userId, role, episode } = await exigirPermiso(episodeId, 'registrar')
 
-  const cedula = String(formData.get('cedula') ?? '').trim()
   const firstName = String(formData.get('firstName') ?? '').trim()
   const lastName = String(formData.get('lastName') ?? '').trim()
   const age = parseInt(String(formData.get('age') ?? '0'), 10)
   const sex = String(formData.get('sex') ?? '').trim()
+  const cedula = String(formData.get('cedula') ?? '').trim() || null
 
   if (firstName.length < 2 || lastName.length < 2) {
     volverAlExpediente(episodeId, 'Escriba un nombre y apellido válidos')
@@ -494,17 +579,17 @@ export async function modificarDatosPaciente(formData: FormData): Promise<void> 
 
   const previo = await prisma.patient.findUnique({
     where: { id: episode.patientId },
-    select: { cedula: true, firstName: true, lastName: true, age: true, sex: true },
+    select: { firstName: true, lastName: true, age: true, sex: true, cedula: true },
   })
 
   await prisma.patient.update({
     where: { id: episode.patientId },
     data: {
-      cedula: cedula || null,
       firstName,
       lastName,
       age: isNaN(age) ? null : age,
       sex,
+      cedula,
     },
   })
 
@@ -517,8 +602,8 @@ export async function modificarDatosPaciente(formData: FormData): Promise<void> 
     patientId: episode.patientId,
     episodeId,
     oldValue: previo,
-    newValue: { cedula, firstName, lastName, age, sex },
-    reason: 'Modificación de datos demográficos del paciente (con Cédula)',
+    newValue: { firstName, lastName, age, sex, cedula },
+    reason: 'Modificación de datos demográficos del paciente',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
@@ -618,25 +703,21 @@ export async function transferirAPropio(formData: FormData): Promise<void> {
   revalidatePath('/dashboard')
 }
 
-// ─── 13. FINALIZAR / ALTA DE INTERCONSULTA ───
+// ─── 13. FINALIZAR / DAR DE ALTA A INTERCONSULTA ───
+const ETIQUETA_EGRESO_INTERCONSULTA: Record<string, string> = {
+  descargo: 'Descargo por especialidad / cierre de interconsulta',
+  egreso: 'Egreso hospitalario',
+  alta_peticion: 'Alta a petición',
+  fallecido: 'Fallecido',
+}
+
 export async function finalizarInterconsulta(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, email } = await exigirPermiso(episodeId, 'alta')
+  const { userId, role, email } = await exigirPermiso(episodeId, 'registrar')
 
-  const dischargeType = String(formData.get('dischargeType') ?? 'egreso').trim()
+  const dischargeType = String(formData.get('dischargeType') ?? 'descargo').trim() || 'descargo'
   const conclusion = String(formData.get('conclusion') ?? '').trim()
-
-  if (!conclusion) {
-    volverAlExpediente(episodeId, 'Escriba la conclusión o recomendaciones de cierre de la interconsulta')
-  }
-
-  const NOMBRES_ALTA: Record<string, string> = {
-    descargo: 'Descargo (Sin criterio de seguimiento activo por el servicio)',
-    egreso: 'Egreso / Mejoría clínica',
-    alta_peticion: 'Alta a petición',
-    fallecido: 'Fallecido',
-  }
-  const tipoTexto = NOMBRES_ALTA[dischargeType] ?? dischargeType
+  if (!conclusion) volverAlExpediente(episodeId, 'Escriba la conclusión o nota de alta de la interconsulta')
 
   const episodePrevio = await prisma.episode.findUnique({
     where: { id: episodeId },
@@ -644,10 +725,12 @@ export async function finalizarInterconsulta(formData: FormData): Promise<void> 
   })
   if (!episodePrevio) redirect('/dashboard')
 
+  const tipoTexto = ETIQUETA_EGRESO_INTERCONSULTA[dischargeType] ?? dischargeType
+
   await prisma.note.create({
     data: {
       episodeId,
-      content: `*** CIERRE / ALTA DE INTERCONSULTA ***\nTipo de alta: ${tipoTexto}\nConclusión y recomendaciones:\n${conclusion}`,
+      content: `*** ALTA / CIERRE DE INTERCONSULTA (${tipoTexto}) ***\nConclusión médica y recomendaciones al servicio tratante:\n${conclusion}`,
       status: 'firmada',
       createdBy: email,
     },
@@ -655,26 +738,55 @@ export async function finalizarInterconsulta(formData: FormData): Promise<void> 
 
   await prisma.episode.update({
     where: { id: episodeId },
-    data: {
-      status: 'closed',
-      dischargeType,
-    },
+    data: { status: 'closed', dischargeType },
   })
 
   await logAudit({
     actorId: userId,
     actorRole: role,
-    action: 'discharge',
+    action: 'update',
     entity: 'episode',
     entityId: episodeId,
     patientId: episodePrevio.patientId,
     episodeId,
-    newValue: { status: 'closed', dischargeType, tipoTexto, conclusion },
-    reason: `Cierre de interconsulta: ${tipoTexto}`,
+    newValue: { status: 'closed', dischargeType, altaInterconsulta: conclusion },
+    reason: `Interconsulta finalizada (${tipoTexto})`,
   })
 
   revalidatePath('/dashboard')
   redirect('/dashboard')
+}
+
+export async function guardarPlanDepartamentoBase(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const baseDepartmentPlan = String(formData.get('baseDepartmentPlan') ?? '').trim()
+
+  const previo = await prisma.episode.findUnique({
+    where: { id: episodeId },
+    select: { baseDepartmentPlan: true },
+  })
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: { baseDepartmentPlan: baseDepartmentPlan || null },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: { planDepartamentoBase: previo?.baseDepartmentPlan ?? null },
+    newValue: { planDepartamentoBase: baseDepartmentPlan || null },
+    reason: 'Actualización de plan del departamento base en interconsulta',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
 }
 
 // ─── 14. TRATAMIENTO MÉDICO ACTUAL ───
@@ -717,7 +829,7 @@ export async function guardarTratamiento(formData: FormData): Promise<void> {
 // ─── 15. PASAR DE PROPIO (SALA) A INTERCONSULTA ───
 export async function transferirAInterconsulta(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+  const { userId, role, email } = await exigirPermiso(episodeId, 'registrar')
 
   const consultingDepartment = String(formData.get('consultingDepartment') ?? '').trim()
   const consultingResident = String(formData.get('consultingResident') ?? '').trim()
@@ -771,31 +883,4 @@ export async function transferirAInterconsulta(formData: FormData): Promise<void
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
   revalidatePath('/dashboard')
-}
-
-// ─── 16. PLAN DEL DEPARTAMENTO BASE ───
-export async function guardarPlanDepartamentoBase(formData: FormData): Promise<void> {
-  const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
-
-  const plan = String(formData.get('baseDepartmentPlan') ?? '').trim()
-
-  await prisma.episode.update({
-    where: { id: episodeId },
-    data: { baseDepartmentPlan: plan || null },
-  })
-
-  await logAudit({
-    actorId: userId,
-    actorRole: role,
-    action: 'update',
-    entity: 'episode',
-    entityId: episodeId,
-    patientId: episode.patientId,
-    episodeId,
-    newValue: { planDepartamentoBase: plan },
-    reason: 'Actualización del plan del departamento base de interconsulta',
-  })
-
-  revalidatePath(`/dashboard/paciente/${episodeId}`)
 }

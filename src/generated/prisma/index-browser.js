@@ -179,7 +179,6 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   admissionType: 'admissionType',
   chiefComplaint: 'chiefComplaint',
   status: 'status',
-  dischargeType: 'dischargeType',
   room: 'room',
   bed: 'bed',
   attendingDoctor: 'attendingDoctor',
@@ -191,6 +190,7 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   currentTreatment: 'currentTreatment',
   treatmentUpdatedBy: 'treatmentUpdatedBy',
   treatmentUpdatedAt: 'treatmentUpdatedAt',
+  dischargeType: 'dischargeType',
   baseDepartmentPlan: 'baseDepartmentPlan',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -217,6 +217,8 @@ exports.Prisma.ImportantAlertScalarFieldEnum = {
   createdBy: 'createdBy',
   createdAt: 'createdAt',
   isActive: 'isActive',
+  isPinned: 'isPinned',
+  pinnedAt: 'pinnedAt',
   resolvedBy: 'resolvedBy',
   resolvedAt: 'resolvedAt'
 };
@@ -238,6 +240,8 @@ exports.Prisma.LabReportScalarFieldEnum = {
   result: 'result',
   createdBy: 'createdBy',
   createdAt: 'createdAt',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt',
   isDeleted: 'isDeleted',
   deletedBy: 'deletedBy',
   deletedAt: 'deletedAt'

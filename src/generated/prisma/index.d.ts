@@ -6228,7 +6228,6 @@ export namespace Prisma {
     admissionType: string | null
     chiefComplaint: string | null
     status: string | null
-    dischargeType: string | null
     room: string | null
     bed: string | null
     attendingDoctor: string | null
@@ -6240,6 +6239,7 @@ export namespace Prisma {
     currentTreatment: string | null
     treatmentUpdatedBy: string | null
     treatmentUpdatedAt: Date | null
+    dischargeType: string | null
     baseDepartmentPlan: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6258,7 +6258,6 @@ export namespace Prisma {
     admissionType: string | null
     chiefComplaint: string | null
     status: string | null
-    dischargeType: string | null
     room: string | null
     bed: string | null
     attendingDoctor: string | null
@@ -6270,6 +6269,7 @@ export namespace Prisma {
     currentTreatment: string | null
     treatmentUpdatedBy: string | null
     treatmentUpdatedAt: Date | null
+    dischargeType: string | null
     baseDepartmentPlan: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6288,7 +6288,6 @@ export namespace Prisma {
     admissionType: number
     chiefComplaint: number
     status: number
-    dischargeType: number
     room: number
     bed: number
     attendingDoctor: number
@@ -6300,6 +6299,7 @@ export namespace Prisma {
     currentTreatment: number
     treatmentUpdatedBy: number
     treatmentUpdatedAt: number
+    dischargeType: number
     baseDepartmentPlan: number
     createdAt: number
     updatedAt: number
@@ -6328,7 +6328,6 @@ export namespace Prisma {
     admissionType?: true
     chiefComplaint?: true
     status?: true
-    dischargeType?: true
     room?: true
     bed?: true
     attendingDoctor?: true
@@ -6340,6 +6339,7 @@ export namespace Prisma {
     currentTreatment?: true
     treatmentUpdatedBy?: true
     treatmentUpdatedAt?: true
+    dischargeType?: true
     baseDepartmentPlan?: true
     createdAt?: true
     updatedAt?: true
@@ -6358,7 +6358,6 @@ export namespace Prisma {
     admissionType?: true
     chiefComplaint?: true
     status?: true
-    dischargeType?: true
     room?: true
     bed?: true
     attendingDoctor?: true
@@ -6370,6 +6369,7 @@ export namespace Prisma {
     currentTreatment?: true
     treatmentUpdatedBy?: true
     treatmentUpdatedAt?: true
+    dischargeType?: true
     baseDepartmentPlan?: true
     createdAt?: true
     updatedAt?: true
@@ -6388,7 +6388,6 @@ export namespace Prisma {
     admissionType?: true
     chiefComplaint?: true
     status?: true
-    dischargeType?: true
     room?: true
     bed?: true
     attendingDoctor?: true
@@ -6400,6 +6399,7 @@ export namespace Prisma {
     currentTreatment?: true
     treatmentUpdatedBy?: true
     treatmentUpdatedAt?: true
+    dischargeType?: true
     baseDepartmentPlan?: true
     createdAt?: true
     updatedAt?: true
@@ -6505,7 +6505,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint: string | null
     status: string
-    dischargeType: string | null
     room: string | null
     bed: string | null
     attendingDoctor: string | null
@@ -6517,6 +6516,7 @@ export namespace Prisma {
     currentTreatment: string | null
     treatmentUpdatedBy: string | null
     treatmentUpdatedAt: Date | null
+    dischargeType: string | null
     baseDepartmentPlan: string | null
     createdAt: Date
     updatedAt: Date
@@ -6554,7 +6554,6 @@ export namespace Prisma {
     admissionType?: boolean
     chiefComplaint?: boolean
     status?: boolean
-    dischargeType?: boolean
     room?: boolean
     bed?: boolean
     attendingDoctor?: boolean
@@ -6566,6 +6565,7 @@ export namespace Prisma {
     currentTreatment?: boolean
     treatmentUpdatedBy?: boolean
     treatmentUpdatedAt?: boolean
+    dischargeType?: boolean
     baseDepartmentPlan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6598,7 +6598,6 @@ export namespace Prisma {
     admissionType?: boolean
     chiefComplaint?: boolean
     status?: boolean
-    dischargeType?: boolean
     room?: boolean
     bed?: boolean
     attendingDoctor?: boolean
@@ -6610,6 +6609,7 @@ export namespace Prisma {
     currentTreatment?: boolean
     treatmentUpdatedBy?: boolean
     treatmentUpdatedAt?: boolean
+    dischargeType?: boolean
     baseDepartmentPlan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6630,7 +6630,6 @@ export namespace Prisma {
     admissionType?: boolean
     chiefComplaint?: boolean
     status?: boolean
-    dischargeType?: boolean
     room?: boolean
     bed?: boolean
     attendingDoctor?: boolean
@@ -6642,6 +6641,7 @@ export namespace Prisma {
     currentTreatment?: boolean
     treatmentUpdatedBy?: boolean
     treatmentUpdatedAt?: boolean
+    dischargeType?: boolean
     baseDepartmentPlan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6662,7 +6662,6 @@ export namespace Prisma {
     admissionType?: boolean
     chiefComplaint?: boolean
     status?: boolean
-    dischargeType?: boolean
     room?: boolean
     bed?: boolean
     attendingDoctor?: boolean
@@ -6674,6 +6673,7 @@ export namespace Prisma {
     currentTreatment?: boolean
     treatmentUpdatedBy?: boolean
     treatmentUpdatedAt?: boolean
+    dischargeType?: boolean
     baseDepartmentPlan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6681,7 +6681,7 @@ export namespace Prisma {
     responsibleSince?: boolean
   }
 
-  export type EpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "serviceType" | "consultingDepartment" | "consultingResident" | "hospitalAdmissionDate" | "admissionDate" | "admissionType" | "chiefComplaint" | "status" | "dischargeType" | "room" | "bed" | "attendingDoctor" | "admittingDoctor" | "primaryDiagnosis" | "secondaryDiagnoses" | "initialWeight" | "initialWeightUnit" | "currentTreatment" | "treatmentUpdatedBy" | "treatmentUpdatedAt" | "baseDepartmentPlan" | "createdAt" | "updatedAt" | "responsibleId" | "responsibleSince", ExtArgs["result"]["episode"]>
+  export type EpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "serviceType" | "consultingDepartment" | "consultingResident" | "hospitalAdmissionDate" | "admissionDate" | "admissionType" | "chiefComplaint" | "status" | "room" | "bed" | "attendingDoctor" | "admittingDoctor" | "primaryDiagnosis" | "secondaryDiagnoses" | "initialWeight" | "initialWeightUnit" | "currentTreatment" | "treatmentUpdatedBy" | "treatmentUpdatedAt" | "dischargeType" | "baseDepartmentPlan" | "createdAt" | "updatedAt" | "responsibleId" | "responsibleSince", ExtArgs["result"]["episode"]>
   export type EpisodeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     patient?: boolean | PatientDefaultArgs<ExtArgs>
     allergies?: boolean | Episode$allergiesArgs<ExtArgs>
@@ -6735,7 +6735,6 @@ export namespace Prisma {
       admissionType: string
       chiefComplaint: string | null
       status: string
-      dischargeType: string | null
       room: string | null
       bed: string | null
       attendingDoctor: string | null
@@ -6747,6 +6746,7 @@ export namespace Prisma {
       currentTreatment: string | null
       treatmentUpdatedBy: string | null
       treatmentUpdatedAt: Date | null
+      dischargeType: string | null
       baseDepartmentPlan: string | null
       createdAt: Date
       updatedAt: Date
@@ -7198,7 +7198,6 @@ export namespace Prisma {
     readonly admissionType: FieldRef<"Episode", 'String'>
     readonly chiefComplaint: FieldRef<"Episode", 'String'>
     readonly status: FieldRef<"Episode", 'String'>
-    readonly dischargeType: FieldRef<"Episode", 'String'>
     readonly room: FieldRef<"Episode", 'String'>
     readonly bed: FieldRef<"Episode", 'String'>
     readonly attendingDoctor: FieldRef<"Episode", 'String'>
@@ -7210,6 +7209,7 @@ export namespace Prisma {
     readonly currentTreatment: FieldRef<"Episode", 'String'>
     readonly treatmentUpdatedBy: FieldRef<"Episode", 'String'>
     readonly treatmentUpdatedAt: FieldRef<"Episode", 'DateTime'>
+    readonly dischargeType: FieldRef<"Episode", 'String'>
     readonly baseDepartmentPlan: FieldRef<"Episode", 'String'>
     readonly createdAt: FieldRef<"Episode", 'DateTime'>
     readonly updatedAt: FieldRef<"Episode", 'DateTime'>
@@ -9049,6 +9049,8 @@ export namespace Prisma {
     createdBy: string | null
     createdAt: Date | null
     isActive: boolean | null
+    isPinned: boolean | null
+    pinnedAt: Date | null
     resolvedBy: string | null
     resolvedAt: Date | null
   }
@@ -9060,6 +9062,8 @@ export namespace Prisma {
     createdBy: string | null
     createdAt: Date | null
     isActive: boolean | null
+    isPinned: boolean | null
+    pinnedAt: Date | null
     resolvedBy: string | null
     resolvedAt: Date | null
   }
@@ -9071,6 +9075,8 @@ export namespace Prisma {
     createdBy: number
     createdAt: number
     isActive: number
+    isPinned: number
+    pinnedAt: number
     resolvedBy: number
     resolvedAt: number
     _all: number
@@ -9084,6 +9090,8 @@ export namespace Prisma {
     createdBy?: true
     createdAt?: true
     isActive?: true
+    isPinned?: true
+    pinnedAt?: true
     resolvedBy?: true
     resolvedAt?: true
   }
@@ -9095,6 +9103,8 @@ export namespace Prisma {
     createdBy?: true
     createdAt?: true
     isActive?: true
+    isPinned?: true
+    pinnedAt?: true
     resolvedBy?: true
     resolvedAt?: true
   }
@@ -9106,6 +9116,8 @@ export namespace Prisma {
     createdBy?: true
     createdAt?: true
     isActive?: true
+    isPinned?: true
+    pinnedAt?: true
     resolvedBy?: true
     resolvedAt?: true
     _all?: true
@@ -9190,6 +9202,8 @@ export namespace Prisma {
     createdBy: string
     createdAt: Date
     isActive: boolean
+    isPinned: boolean
+    pinnedAt: Date | null
     resolvedBy: string | null
     resolvedAt: Date | null
     _count: ImportantAlertCountAggregateOutputType | null
@@ -9218,6 +9232,8 @@ export namespace Prisma {
     createdBy?: boolean
     createdAt?: boolean
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: boolean
     resolvedBy?: boolean
     resolvedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -9230,6 +9246,8 @@ export namespace Prisma {
     createdBy?: boolean
     createdAt?: boolean
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: boolean
     resolvedBy?: boolean
     resolvedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -9242,6 +9260,8 @@ export namespace Prisma {
     createdBy?: boolean
     createdAt?: boolean
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: boolean
     resolvedBy?: boolean
     resolvedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -9254,11 +9274,13 @@ export namespace Prisma {
     createdBy?: boolean
     createdAt?: boolean
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: boolean
     resolvedBy?: boolean
     resolvedAt?: boolean
   }
 
-  export type ImportantAlertOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "content" | "createdBy" | "createdAt" | "isActive" | "resolvedBy" | "resolvedAt", ExtArgs["result"]["importantAlert"]>
+  export type ImportantAlertOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "content" | "createdBy" | "createdAt" | "isActive" | "isPinned" | "pinnedAt" | "resolvedBy" | "resolvedAt", ExtArgs["result"]["importantAlert"]>
   export type ImportantAlertInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -9281,6 +9303,8 @@ export namespace Prisma {
       createdBy: string
       createdAt: Date
       isActive: boolean
+      isPinned: boolean
+      pinnedAt: Date | null
       resolvedBy: string | null
       resolvedAt: Date | null
     }, ExtArgs["result"]["importantAlert"]>
@@ -9713,6 +9737,8 @@ export namespace Prisma {
     readonly createdBy: FieldRef<"ImportantAlert", 'String'>
     readonly createdAt: FieldRef<"ImportantAlert", 'DateTime'>
     readonly isActive: FieldRef<"ImportantAlert", 'Boolean'>
+    readonly isPinned: FieldRef<"ImportantAlert", 'Boolean'>
+    readonly pinnedAt: FieldRef<"ImportantAlert", 'DateTime'>
     readonly resolvedBy: FieldRef<"ImportantAlert", 'String'>
     readonly resolvedAt: FieldRef<"ImportantAlert", 'DateTime'>
   }
@@ -11250,6 +11276,8 @@ export namespace Prisma {
     result: string | null
     createdBy: string | null
     createdAt: Date | null
+    updatedBy: string | null
+    updatedAt: Date | null
     isDeleted: boolean | null
     deletedBy: string | null
     deletedAt: Date | null
@@ -11264,6 +11292,8 @@ export namespace Prisma {
     result: string | null
     createdBy: string | null
     createdAt: Date | null
+    updatedBy: string | null
+    updatedAt: Date | null
     isDeleted: boolean | null
     deletedBy: string | null
     deletedAt: Date | null
@@ -11278,6 +11308,8 @@ export namespace Prisma {
     result: number
     createdBy: number
     createdAt: number
+    updatedBy: number
+    updatedAt: number
     isDeleted: number
     deletedBy: number
     deletedAt: number
@@ -11294,6 +11326,8 @@ export namespace Prisma {
     result?: true
     createdBy?: true
     createdAt?: true
+    updatedBy?: true
+    updatedAt?: true
     isDeleted?: true
     deletedBy?: true
     deletedAt?: true
@@ -11308,6 +11342,8 @@ export namespace Prisma {
     result?: true
     createdBy?: true
     createdAt?: true
+    updatedBy?: true
+    updatedAt?: true
     isDeleted?: true
     deletedBy?: true
     deletedAt?: true
@@ -11322,6 +11358,8 @@ export namespace Prisma {
     result?: true
     createdBy?: true
     createdAt?: true
+    updatedBy?: true
+    updatedAt?: true
     isDeleted?: true
     deletedBy?: true
     deletedAt?: true
@@ -11409,6 +11447,8 @@ export namespace Prisma {
     result: string
     createdBy: string
     createdAt: Date
+    updatedBy: string | null
+    updatedAt: Date | null
     isDeleted: boolean
     deletedBy: string | null
     deletedAt: Date | null
@@ -11440,6 +11480,8 @@ export namespace Prisma {
     result?: boolean
     createdBy?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     isDeleted?: boolean
     deletedBy?: boolean
     deletedAt?: boolean
@@ -11455,6 +11497,8 @@ export namespace Prisma {
     result?: boolean
     createdBy?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     isDeleted?: boolean
     deletedBy?: boolean
     deletedAt?: boolean
@@ -11470,6 +11514,8 @@ export namespace Prisma {
     result?: boolean
     createdBy?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     isDeleted?: boolean
     deletedBy?: boolean
     deletedAt?: boolean
@@ -11485,12 +11531,14 @@ export namespace Prisma {
     result?: boolean
     createdBy?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     isDeleted?: boolean
     deletedBy?: boolean
     deletedAt?: boolean
   }
 
-  export type LabReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "category" | "testName" | "sampleDate" | "result" | "createdBy" | "createdAt" | "isDeleted" | "deletedBy" | "deletedAt", ExtArgs["result"]["labReport"]>
+  export type LabReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "category" | "testName" | "sampleDate" | "result" | "createdBy" | "createdAt" | "updatedBy" | "updatedAt" | "isDeleted" | "deletedBy" | "deletedAt", ExtArgs["result"]["labReport"]>
   export type LabReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -11515,6 +11563,8 @@ export namespace Prisma {
       result: string
       createdBy: string
       createdAt: Date
+      updatedBy: string | null
+      updatedAt: Date | null
       isDeleted: boolean
       deletedBy: string | null
       deletedAt: Date | null
@@ -11950,6 +12000,8 @@ export namespace Prisma {
     readonly result: FieldRef<"LabReport", 'String'>
     readonly createdBy: FieldRef<"LabReport", 'String'>
     readonly createdAt: FieldRef<"LabReport", 'DateTime'>
+    readonly updatedBy: FieldRef<"LabReport", 'String'>
+    readonly updatedAt: FieldRef<"LabReport", 'DateTime'>
     readonly isDeleted: FieldRef<"LabReport", 'Boolean'>
     readonly deletedBy: FieldRef<"LabReport", 'String'>
     readonly deletedAt: FieldRef<"LabReport", 'DateTime'>
@@ -21577,7 +21629,6 @@ export namespace Prisma {
     admissionType: 'admissionType',
     chiefComplaint: 'chiefComplaint',
     status: 'status',
-    dischargeType: 'dischargeType',
     room: 'room',
     bed: 'bed',
     attendingDoctor: 'attendingDoctor',
@@ -21589,6 +21640,7 @@ export namespace Prisma {
     currentTreatment: 'currentTreatment',
     treatmentUpdatedBy: 'treatmentUpdatedBy',
     treatmentUpdatedAt: 'treatmentUpdatedAt',
+    dischargeType: 'dischargeType',
     baseDepartmentPlan: 'baseDepartmentPlan',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
@@ -21621,6 +21673,8 @@ export namespace Prisma {
     createdBy: 'createdBy',
     createdAt: 'createdAt',
     isActive: 'isActive',
+    isPinned: 'isPinned',
+    pinnedAt: 'pinnedAt',
     resolvedBy: 'resolvedBy',
     resolvedAt: 'resolvedAt'
   };
@@ -21648,6 +21702,8 @@ export namespace Prisma {
     result: 'result',
     createdBy: 'createdBy',
     createdAt: 'createdAt',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt',
     isDeleted: 'isDeleted',
     deletedBy: 'deletedBy',
     deletedAt: 'deletedAt'
@@ -22268,7 +22324,6 @@ export namespace Prisma {
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
     status?: StringFilter<"Episode"> | string
-    dischargeType?: StringNullableFilter<"Episode"> | string | null
     room?: StringNullableFilter<"Episode"> | string | null
     bed?: StringNullableFilter<"Episode"> | string | null
     attendingDoctor?: StringNullableFilter<"Episode"> | string | null
@@ -22280,6 +22335,7 @@ export namespace Prisma {
     currentTreatment?: StringNullableFilter<"Episode"> | string | null
     treatmentUpdatedBy?: StringNullableFilter<"Episode"> | string | null
     treatmentUpdatedAt?: DateTimeNullableFilter<"Episode"> | Date | string | null
+    dischargeType?: StringNullableFilter<"Episode"> | string | null
     baseDepartmentPlan?: StringNullableFilter<"Episode"> | string | null
     createdAt?: DateTimeFilter<"Episode"> | Date | string
     updatedAt?: DateTimeFilter<"Episode"> | Date | string
@@ -22311,7 +22367,6 @@ export namespace Prisma {
     admissionType?: SortOrder
     chiefComplaint?: SortOrderInput | SortOrder
     status?: SortOrder
-    dischargeType?: SortOrderInput | SortOrder
     room?: SortOrderInput | SortOrder
     bed?: SortOrderInput | SortOrder
     attendingDoctor?: SortOrderInput | SortOrder
@@ -22323,6 +22378,7 @@ export namespace Prisma {
     currentTreatment?: SortOrderInput | SortOrder
     treatmentUpdatedBy?: SortOrderInput | SortOrder
     treatmentUpdatedAt?: SortOrderInput | SortOrder
+    dischargeType?: SortOrderInput | SortOrder
     baseDepartmentPlan?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -22357,7 +22413,6 @@ export namespace Prisma {
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
     status?: StringFilter<"Episode"> | string
-    dischargeType?: StringNullableFilter<"Episode"> | string | null
     room?: StringNullableFilter<"Episode"> | string | null
     bed?: StringNullableFilter<"Episode"> | string | null
     attendingDoctor?: StringNullableFilter<"Episode"> | string | null
@@ -22369,6 +22424,7 @@ export namespace Prisma {
     currentTreatment?: StringNullableFilter<"Episode"> | string | null
     treatmentUpdatedBy?: StringNullableFilter<"Episode"> | string | null
     treatmentUpdatedAt?: DateTimeNullableFilter<"Episode"> | Date | string | null
+    dischargeType?: StringNullableFilter<"Episode"> | string | null
     baseDepartmentPlan?: StringNullableFilter<"Episode"> | string | null
     createdAt?: DateTimeFilter<"Episode"> | Date | string
     updatedAt?: DateTimeFilter<"Episode"> | Date | string
@@ -22400,7 +22456,6 @@ export namespace Prisma {
     admissionType?: SortOrder
     chiefComplaint?: SortOrderInput | SortOrder
     status?: SortOrder
-    dischargeType?: SortOrderInput | SortOrder
     room?: SortOrderInput | SortOrder
     bed?: SortOrderInput | SortOrder
     attendingDoctor?: SortOrderInput | SortOrder
@@ -22412,6 +22467,7 @@ export namespace Prisma {
     currentTreatment?: SortOrderInput | SortOrder
     treatmentUpdatedBy?: SortOrderInput | SortOrder
     treatmentUpdatedAt?: SortOrderInput | SortOrder
+    dischargeType?: SortOrderInput | SortOrder
     baseDepartmentPlan?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -22438,7 +22494,6 @@ export namespace Prisma {
     admissionType?: StringWithAggregatesFilter<"Episode"> | string
     chiefComplaint?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     status?: StringWithAggregatesFilter<"Episode"> | string
-    dischargeType?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     room?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     bed?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     attendingDoctor?: StringNullableWithAggregatesFilter<"Episode"> | string | null
@@ -22450,6 +22505,7 @@ export namespace Prisma {
     currentTreatment?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     treatmentUpdatedBy?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     treatmentUpdatedAt?: DateTimeNullableWithAggregatesFilter<"Episode"> | Date | string | null
+    dischargeType?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     baseDepartmentPlan?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Episode"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Episode"> | Date | string
@@ -22542,6 +22598,8 @@ export namespace Prisma {
     createdBy?: StringFilter<"ImportantAlert"> | string
     createdAt?: DateTimeFilter<"ImportantAlert"> | Date | string
     isActive?: BoolFilter<"ImportantAlert"> | boolean
+    isPinned?: BoolFilter<"ImportantAlert"> | boolean
+    pinnedAt?: DateTimeNullableFilter<"ImportantAlert"> | Date | string | null
     resolvedBy?: StringNullableFilter<"ImportantAlert"> | string | null
     resolvedAt?: DateTimeNullableFilter<"ImportantAlert"> | Date | string | null
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
@@ -22554,6 +22612,8 @@ export namespace Prisma {
     createdBy?: SortOrder
     createdAt?: SortOrder
     isActive?: SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrderInput | SortOrder
     resolvedBy?: SortOrderInput | SortOrder
     resolvedAt?: SortOrderInput | SortOrder
     episode?: EpisodeOrderByWithRelationInput
@@ -22569,6 +22629,8 @@ export namespace Prisma {
     createdBy?: StringFilter<"ImportantAlert"> | string
     createdAt?: DateTimeFilter<"ImportantAlert"> | Date | string
     isActive?: BoolFilter<"ImportantAlert"> | boolean
+    isPinned?: BoolFilter<"ImportantAlert"> | boolean
+    pinnedAt?: DateTimeNullableFilter<"ImportantAlert"> | Date | string | null
     resolvedBy?: StringNullableFilter<"ImportantAlert"> | string | null
     resolvedAt?: DateTimeNullableFilter<"ImportantAlert"> | Date | string | null
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
@@ -22581,6 +22643,8 @@ export namespace Prisma {
     createdBy?: SortOrder
     createdAt?: SortOrder
     isActive?: SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrderInput | SortOrder
     resolvedBy?: SortOrderInput | SortOrder
     resolvedAt?: SortOrderInput | SortOrder
     _count?: ImportantAlertCountOrderByAggregateInput
@@ -22598,6 +22662,8 @@ export namespace Prisma {
     createdBy?: StringWithAggregatesFilter<"ImportantAlert"> | string
     createdAt?: DateTimeWithAggregatesFilter<"ImportantAlert"> | Date | string
     isActive?: BoolWithAggregatesFilter<"ImportantAlert"> | boolean
+    isPinned?: BoolWithAggregatesFilter<"ImportantAlert"> | boolean
+    pinnedAt?: DateTimeNullableWithAggregatesFilter<"ImportantAlert"> | Date | string | null
     resolvedBy?: StringNullableWithAggregatesFilter<"ImportantAlert"> | string | null
     resolvedAt?: DateTimeNullableWithAggregatesFilter<"ImportantAlert"> | Date | string | null
   }
@@ -22671,6 +22737,8 @@ export namespace Prisma {
     result?: StringFilter<"LabReport"> | string
     createdBy?: StringFilter<"LabReport"> | string
     createdAt?: DateTimeFilter<"LabReport"> | Date | string
+    updatedBy?: StringNullableFilter<"LabReport"> | string | null
+    updatedAt?: DateTimeNullableFilter<"LabReport"> | Date | string | null
     isDeleted?: BoolFilter<"LabReport"> | boolean
     deletedBy?: StringNullableFilter<"LabReport"> | string | null
     deletedAt?: DateTimeNullableFilter<"LabReport"> | Date | string | null
@@ -22686,6 +22754,8 @@ export namespace Prisma {
     result?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
     isDeleted?: SortOrder
     deletedBy?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
@@ -22704,6 +22774,8 @@ export namespace Prisma {
     result?: StringFilter<"LabReport"> | string
     createdBy?: StringFilter<"LabReport"> | string
     createdAt?: DateTimeFilter<"LabReport"> | Date | string
+    updatedBy?: StringNullableFilter<"LabReport"> | string | null
+    updatedAt?: DateTimeNullableFilter<"LabReport"> | Date | string | null
     isDeleted?: BoolFilter<"LabReport"> | boolean
     deletedBy?: StringNullableFilter<"LabReport"> | string | null
     deletedAt?: DateTimeNullableFilter<"LabReport"> | Date | string | null
@@ -22719,6 +22791,8 @@ export namespace Prisma {
     result?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
     isDeleted?: SortOrder
     deletedBy?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
@@ -22739,6 +22813,8 @@ export namespace Prisma {
     result?: StringWithAggregatesFilter<"LabReport"> | string
     createdBy?: StringWithAggregatesFilter<"LabReport"> | string
     createdAt?: DateTimeWithAggregatesFilter<"LabReport"> | Date | string
+    updatedBy?: StringNullableWithAggregatesFilter<"LabReport"> | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"LabReport"> | Date | string | null
     isDeleted?: BoolWithAggregatesFilter<"LabReport"> | boolean
     deletedBy?: StringNullableWithAggregatesFilter<"LabReport"> | string | null
     deletedAt?: DateTimeNullableWithAggregatesFilter<"LabReport"> | Date | string | null
@@ -23766,7 +23842,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -23778,6 +23853,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23808,7 +23884,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -23820,6 +23895,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23848,7 +23924,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23860,6 +23935,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23890,7 +23966,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23902,6 +23977,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23931,7 +24007,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -23943,6 +24018,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23960,7 +24036,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23972,6 +24047,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23989,7 +24065,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -24001,6 +24076,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24097,6 +24173,8 @@ export namespace Prisma {
     createdBy: string
     createdAt?: Date | string
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
     resolvedBy?: string | null
     resolvedAt?: Date | string | null
     episode: EpisodeCreateNestedOneWithoutImportantAlertsInput
@@ -24109,6 +24187,8 @@ export namespace Prisma {
     createdBy: string
     createdAt?: Date | string
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
     resolvedBy?: string | null
     resolvedAt?: Date | string | null
   }
@@ -24119,6 +24199,8 @@ export namespace Prisma {
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     episode?: EpisodeUpdateOneRequiredWithoutImportantAlertsNestedInput
@@ -24131,6 +24213,8 @@ export namespace Prisma {
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -24142,6 +24226,8 @@ export namespace Prisma {
     createdBy: string
     createdAt?: Date | string
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
     resolvedBy?: string | null
     resolvedAt?: Date | string | null
   }
@@ -24152,6 +24238,8 @@ export namespace Prisma {
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -24163,6 +24251,8 @@ export namespace Prisma {
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -24230,6 +24320,8 @@ export namespace Prisma {
     result: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     isDeleted?: boolean
     deletedBy?: string | null
     deletedAt?: Date | string | null
@@ -24245,6 +24337,8 @@ export namespace Prisma {
     result: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     isDeleted?: boolean
     deletedBy?: string | null
     deletedAt?: Date | string | null
@@ -24258,6 +24352,8 @@ export namespace Prisma {
     result?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -24273,6 +24369,8 @@ export namespace Prisma {
     result?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -24287,6 +24385,8 @@ export namespace Prisma {
     result: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     isDeleted?: boolean
     deletedBy?: string | null
     deletedAt?: Date | string | null
@@ -24300,6 +24400,8 @@ export namespace Prisma {
     result?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -24314,6 +24416,8 @@ export namespace Prisma {
     result?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25628,7 +25732,6 @@ export namespace Prisma {
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
     status?: SortOrder
-    dischargeType?: SortOrder
     room?: SortOrder
     bed?: SortOrder
     attendingDoctor?: SortOrder
@@ -25640,6 +25743,7 @@ export namespace Prisma {
     currentTreatment?: SortOrder
     treatmentUpdatedBy?: SortOrder
     treatmentUpdatedAt?: SortOrder
+    dischargeType?: SortOrder
     baseDepartmentPlan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -25662,7 +25766,6 @@ export namespace Prisma {
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
     status?: SortOrder
-    dischargeType?: SortOrder
     room?: SortOrder
     bed?: SortOrder
     attendingDoctor?: SortOrder
@@ -25674,6 +25777,7 @@ export namespace Prisma {
     currentTreatment?: SortOrder
     treatmentUpdatedBy?: SortOrder
     treatmentUpdatedAt?: SortOrder
+    dischargeType?: SortOrder
     baseDepartmentPlan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -25692,7 +25796,6 @@ export namespace Prisma {
     admissionType?: SortOrder
     chiefComplaint?: SortOrder
     status?: SortOrder
-    dischargeType?: SortOrder
     room?: SortOrder
     bed?: SortOrder
     attendingDoctor?: SortOrder
@@ -25704,6 +25807,7 @@ export namespace Prisma {
     currentTreatment?: SortOrder
     treatmentUpdatedBy?: SortOrder
     treatmentUpdatedAt?: SortOrder
+    dischargeType?: SortOrder
     baseDepartmentPlan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -25779,6 +25883,8 @@ export namespace Prisma {
     createdBy?: SortOrder
     createdAt?: SortOrder
     isActive?: SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrder
     resolvedBy?: SortOrder
     resolvedAt?: SortOrder
   }
@@ -25790,6 +25896,8 @@ export namespace Prisma {
     createdBy?: SortOrder
     createdAt?: SortOrder
     isActive?: SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrder
     resolvedBy?: SortOrder
     resolvedAt?: SortOrder
   }
@@ -25801,6 +25909,8 @@ export namespace Prisma {
     createdBy?: SortOrder
     createdAt?: SortOrder
     isActive?: SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrder
     resolvedBy?: SortOrder
     resolvedAt?: SortOrder
   }
@@ -25873,6 +25983,8 @@ export namespace Prisma {
     result?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     isDeleted?: SortOrder
     deletedBy?: SortOrder
     deletedAt?: SortOrder
@@ -25887,6 +25999,8 @@ export namespace Prisma {
     result?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     isDeleted?: SortOrder
     deletedBy?: SortOrder
     deletedAt?: SortOrder
@@ -25901,6 +26015,8 @@ export namespace Prisma {
     result?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     isDeleted?: SortOrder
     deletedBy?: SortOrder
     deletedAt?: SortOrder
@@ -27627,7 +27743,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -27639,6 +27754,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -27668,7 +27784,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -27680,6 +27795,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -27776,7 +27892,6 @@ export namespace Prisma {
     admissionType?: StringFilter<"Episode"> | string
     chiefComplaint?: StringNullableFilter<"Episode"> | string | null
     status?: StringFilter<"Episode"> | string
-    dischargeType?: StringNullableFilter<"Episode"> | string | null
     room?: StringNullableFilter<"Episode"> | string | null
     bed?: StringNullableFilter<"Episode"> | string | null
     attendingDoctor?: StringNullableFilter<"Episode"> | string | null
@@ -27788,6 +27903,7 @@ export namespace Prisma {
     currentTreatment?: StringNullableFilter<"Episode"> | string | null
     treatmentUpdatedBy?: StringNullableFilter<"Episode"> | string | null
     treatmentUpdatedAt?: DateTimeNullableFilter<"Episode"> | Date | string | null
+    dischargeType?: StringNullableFilter<"Episode"> | string | null
     baseDepartmentPlan?: StringNullableFilter<"Episode"> | string | null
     createdAt?: DateTimeFilter<"Episode"> | Date | string
     updatedAt?: DateTimeFilter<"Episode"> | Date | string
@@ -27873,7 +27989,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -27885,6 +28000,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -27913,7 +28029,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -27925,6 +28040,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -28414,6 +28530,8 @@ export namespace Prisma {
     createdBy: string
     createdAt?: Date | string
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
     resolvedBy?: string | null
     resolvedAt?: Date | string | null
   }
@@ -28424,6 +28542,8 @@ export namespace Prisma {
     createdBy: string
     createdAt?: Date | string
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
     resolvedBy?: string | null
     resolvedAt?: Date | string | null
   }
@@ -28470,6 +28590,8 @@ export namespace Prisma {
     result: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     isDeleted?: boolean
     deletedBy?: string | null
     deletedAt?: Date | string | null
@@ -28483,6 +28605,8 @@ export namespace Prisma {
     result: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     isDeleted?: boolean
     deletedBy?: string | null
     deletedAt?: Date | string | null
@@ -28852,6 +28976,8 @@ export namespace Prisma {
     createdBy?: StringFilter<"ImportantAlert"> | string
     createdAt?: DateTimeFilter<"ImportantAlert"> | Date | string
     isActive?: BoolFilter<"ImportantAlert"> | boolean
+    isPinned?: BoolFilter<"ImportantAlert"> | boolean
+    pinnedAt?: DateTimeNullableFilter<"ImportantAlert"> | Date | string | null
     resolvedBy?: StringNullableFilter<"ImportantAlert"> | string | null
     resolvedAt?: DateTimeNullableFilter<"ImportantAlert"> | Date | string | null
   }
@@ -28911,6 +29037,8 @@ export namespace Prisma {
     result?: StringFilter<"LabReport"> | string
     createdBy?: StringFilter<"LabReport"> | string
     createdAt?: DateTimeFilter<"LabReport"> | Date | string
+    updatedBy?: StringNullableFilter<"LabReport"> | string | null
+    updatedAt?: DateTimeNullableFilter<"LabReport"> | Date | string | null
     isDeleted?: BoolFilter<"LabReport"> | boolean
     deletedBy?: StringNullableFilter<"LabReport"> | string | null
     deletedAt?: DateTimeNullableFilter<"LabReport"> | Date | string | null
@@ -29096,7 +29224,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29108,6 +29235,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29137,7 +29265,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29149,6 +29276,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29192,7 +29320,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29204,6 +29331,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29233,7 +29361,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29245,6 +29372,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29272,7 +29400,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29284,6 +29411,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29313,7 +29441,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29325,6 +29452,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29368,7 +29496,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29380,6 +29507,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29409,7 +29537,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29421,6 +29548,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29448,7 +29576,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29460,6 +29587,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29489,7 +29617,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29501,6 +29628,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29544,7 +29672,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29556,6 +29683,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29585,7 +29713,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29597,6 +29724,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29624,7 +29752,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29636,6 +29763,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29665,7 +29793,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29677,6 +29804,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29720,7 +29848,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29732,6 +29859,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29761,7 +29889,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29773,6 +29900,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29843,7 +29971,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29855,6 +29982,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29884,7 +30012,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -29896,6 +30023,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29988,7 +30116,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30000,6 +30127,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30029,7 +30157,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30041,6 +30168,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30068,7 +30196,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30080,6 +30207,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30109,7 +30237,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30121,6 +30248,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30164,7 +30292,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30176,6 +30303,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30205,7 +30333,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30217,6 +30344,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30287,7 +30415,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30299,6 +30426,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30328,7 +30456,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30340,6 +30467,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30432,7 +30560,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30444,6 +30571,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30473,7 +30601,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30485,6 +30612,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30512,7 +30640,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30524,6 +30651,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30553,7 +30681,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30565,6 +30692,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30608,7 +30736,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30620,6 +30747,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30649,7 +30777,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30661,6 +30788,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30688,7 +30816,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30700,6 +30827,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30729,7 +30857,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30741,6 +30868,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30784,7 +30912,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30796,6 +30923,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30825,7 +30953,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30837,6 +30964,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30864,7 +30992,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30876,6 +31003,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30905,7 +31033,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -30917,6 +31044,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30960,7 +31088,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30972,6 +31099,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31001,7 +31129,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31013,6 +31140,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31040,7 +31168,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -31052,6 +31179,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31081,7 +31209,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -31093,6 +31220,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31136,7 +31264,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31148,6 +31275,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31177,7 +31305,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31189,6 +31316,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31236,7 +31364,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -31248,6 +31375,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31321,7 +31449,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31333,6 +31460,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31362,7 +31490,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31374,6 +31501,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31402,7 +31530,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31414,6 +31541,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31430,7 +31558,6 @@ export namespace Prisma {
     admissionType: string
     chiefComplaint?: string | null
     status?: string
-    dischargeType?: string | null
     room?: string | null
     bed?: string | null
     attendingDoctor?: string | null
@@ -31442,6 +31569,7 @@ export namespace Prisma {
     currentTreatment?: string | null
     treatmentUpdatedBy?: string | null
     treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
     baseDepartmentPlan?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31480,7 +31608,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31492,6 +31619,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31520,7 +31648,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31532,6 +31659,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31560,7 +31688,6 @@ export namespace Prisma {
     admissionType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     room?: NullableStringFieldUpdateOperationsInput | string | null
     bed?: NullableStringFieldUpdateOperationsInput | string | null
     attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31572,6 +31699,7 @@ export namespace Prisma {
     currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
     baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31714,6 +31842,8 @@ export namespace Prisma {
     createdBy: string
     createdAt?: Date | string
     isActive?: boolean
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
     resolvedBy?: string | null
     resolvedAt?: Date | string | null
   }
@@ -31733,6 +31863,8 @@ export namespace Prisma {
     result: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     isDeleted?: boolean
     deletedBy?: string | null
     deletedAt?: Date | string | null
@@ -31973,6 +32105,8 @@ export namespace Prisma {
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -31983,6 +32117,8 @@ export namespace Prisma {
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -31993,6 +32129,8 @@ export namespace Prisma {
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -32026,6 +32164,8 @@ export namespace Prisma {
     result?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32039,6 +32179,8 @@ export namespace Prisma {
     result?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32052,6 +32194,8 @@ export namespace Prisma {
     result?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

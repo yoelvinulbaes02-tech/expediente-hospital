@@ -85,7 +85,6 @@ export default async function ExpedientePage({
       consultingResident: true,
       hospitalAdmissionDate: true,
       status: true,
-      dischargeType: true,
       responsibleId: true,
       admissionDate: true,
       admissionType: true,
@@ -99,6 +98,7 @@ export default async function ExpedientePage({
       currentTreatment: true,
       treatmentUpdatedBy: true,
       treatmentUpdatedAt: true,
+      dischargeType: true,
       baseDepartmentPlan: true,
       room: true,
       bed: true,
@@ -111,14 +111,17 @@ export default async function ExpedientePage({
       responsible: { select: { fullName: true } },
       notes: { orderBy: { createdAt: 'desc' } },
       vitals: { orderBy: { createdAt: 'desc' }, take: 30 },
-      // CHECKLIST: EL ÚLTIMO AGREGADO SIEMPRE QUEDA ARRIBA
       tasks: { orderBy: { createdAt: 'desc' } },
       handoffs: { where: { status: 'PENDIENTE' }, take: 1 },
-      importantAlerts: { orderBy: { createdAt: 'desc' } },
+      importantAlerts: { orderBy: { createdAt: 'asc' } },
       gfrRecords: { orderBy: { createdAt: 'desc' } },
-      // ANALÍTICAS: EXCLUYE BORRADAS Y ORDENA POR FECHA MÁS RECIENTE
-      labReports: { where: { isDeleted: false }, orderBy: { sampleDate: 'desc' } },
-      studyReports: { orderBy: { studyDate: 'desc' } },
+      labReports: {
+        where: { isDeleted: false },
+        orderBy: [{ sampleDate: 'desc' }, { createdAt: 'desc' }],
+      },
+      studyReports: {
+        orderBy: [{ studyDate: 'desc' }, { createdAt: 'desc' }],
+      },
       viralSerologies: { orderBy: { updatedAt: 'desc' }, take: 1 },
       vascularAccesses: { where: { isActive: true }, take: 1 },
     },
@@ -141,7 +144,7 @@ export default async function ExpedientePage({
     diasHospital = Math.max(1, Math.floor(diffHosp / (1000 * 60 * 60 * 24)) + 1)
   }
 
-  // Recolectar emails de firmas (incluyendo quién resolvió notas importantes)
+  // Recolectar emails de firmas
   const emails = new Set<string>()
   episode.notes.forEach((n) => emails.add(n.createdBy))
   episode.vitals.forEach((v) => {
@@ -152,7 +155,10 @@ export default async function ExpedientePage({
     emails.add(a.createdBy)
     if (a.resolvedBy) emails.add(a.resolvedBy)
   })
-  episode.labReports.forEach((l) => emails.add(l.createdBy))
+  episode.labReports.forEach((l) => {
+    emails.add(l.createdBy)
+    if (l.updatedBy) emails.add(l.updatedBy)
+  })
   episode.studyReports.forEach((s) => emails.add(s.createdBy))
   episode.tasks.forEach((t) => {
     emails.add(t.createdBy)
@@ -220,23 +226,27 @@ export default async function ExpedientePage({
         )}
 
         {esSoloLectura && (
-          <div className="bg-amber-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between print:hidden">
-            <div className="flex items-center gap-2">
+          <div className="bg-amber-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-6 flex flex-wrap items-center justify-between gap-2 print:hidden">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xl">🔒</span>
-              <div>
-                <strong>Expediente Cerrado:</strong> {esInterconsulta ? 'Esta interconsulta ha sido finalizada y dada de alta.' : 'Este paciente ha sido dado de alta.'}
-                {episode.dischargeType && (
-                  <span className="ml-2 font-bold uppercase bg-white px-2 py-0.5 rounded text-xs border border-amber-300">
-                    Tipo: {episode.dischargeType.replace('_', ' ')}
-                  </span>
-                )}
-              </div>
+              <strong>Expediente Cerrado:</strong>{' '}
+              <span>{esInterconsulta ? 'Esta interconsulta ha sido finalizada y dada de alta.' : 'Este paciente ha sido dado de alta.'}</span>
+              {episode.dischargeType && (
+                <span className="bg-amber-200 text-amber-950 px-2 py-0.5 rounded text-xs font-bold uppercase">
+                  {({
+                    descargo: 'Descargo',
+                    egreso: 'Egreso',
+                    alta_peticion: 'Alta a petición',
+                    fallecido: 'Fallecido',
+                  } as Record<string, string>)[episode.dischargeType] ?? episode.dischargeType}
+                </span>
+              )}
             </div>
             <Link href="/dashboard/archivo" className="text-sm font-bold underline hover:text-amber-900">Volver al Archivo</Link>
           </div>
         )}
 
-        {/* CABECERA PRINCIPAL CON CÉDULA VISIBLE Y FORMULARIO CON CÉDULA */}
+        {/* CABECERA PRINCIPAL */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
             <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block font-medium print:hidden">
@@ -248,7 +258,7 @@ export default async function ExpedientePage({
                 {episode.patient.firstName} {episode.patient.lastName}
               </h1>
 
-              {/* MODIFICAR DATOS DEL PACIENTE (INCLUYE CÉDULA) */}
+              {/* MODIFICAR DATOS DEL PACIENTE */}
               {permisos.puedeRegistrar && (
                 <details className="relative inline-block print:hidden">
                   <summary className="list-none cursor-pointer text-xs bg-white text-slate-600 px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-50 font-medium">
@@ -256,19 +266,10 @@ export default async function ExpedientePage({
                   </summary>
                   <div className="absolute left-0 mt-2 w-72 bg-white p-4 rounded-xl border border-slate-300 shadow-xl z-30 text-left">
                     <p className="text-xs font-bold text-slate-800 mb-2 border-b pb-1">
-                      Modificar Nombre, Cédula y Datos:
+                      Modificar Nombre y Datos:
                     </p>
                     <form action={modificarDatosPaciente} className="space-y-2">
                       <input type="hidden" name="episodeId" value={episode.id} />
-                      <div>
-                        <label className="block text-[11px] font-semibold text-slate-500">Cédula:</label>
-                        <input
-                          name="cedula"
-                          defaultValue={episode.patient.cedula ?? ''}
-                          placeholder="Ej. 001-1234567-8"
-                          className="w-full px-2 py-1 border rounded text-xs text-slate-900"
-                        />
-                      </div>
                       <div>
                         <label className="block text-[11px] font-semibold text-slate-500">Nombres:</label>
                         <input name="firstName" defaultValue={episode.patient.firstName} required className="w-full px-2 py-1 border rounded text-xs text-slate-900" />
@@ -290,6 +291,15 @@ export default async function ExpedientePage({
                           </select>
                         </div>
                       </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500">Cédula / ID (Opcional):</label>
+                        <input
+                          name="cedula"
+                          defaultValue={episode.patient.cedula ?? ''}
+                          placeholder="Ej. 001-1234567-8"
+                          className="w-full px-2 py-1 border rounded text-xs text-slate-900"
+                        />
+                      </div>
                       <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1.5 rounded-lg font-bold hover:bg-slate-900 mt-1 cursor-pointer">
                         Guardar Corrección
                       </button>
@@ -309,8 +319,8 @@ export default async function ExpedientePage({
               Exp: <strong>{episode.patient.expedienteNumber}</strong>
               {episode.patient.cedula && (
                 <> • Cédula: <strong>{episode.patient.cedula}</strong></>
-              )}
-              {' '}• {episode.patient.age} años • {episode.patient.sex}
+              )}{' '}
+              • {episode.patient.age} años • {episode.patient.sex}
             </p>
 
             <div className="mt-2 inline-flex flex-wrap items-center gap-2 bg-slate-200/70 border border-slate-300 px-3 py-1 rounded-lg text-xs text-slate-800">
@@ -323,7 +333,7 @@ export default async function ExpedientePage({
             </div>
           </div>
 
-          {/* ACCIONES SUPERIORES: ALTA CON SELECTOR DE TIPOS */}
+          {/* ACCIONES SUPERIORES */}
           <div className="flex flex-wrap items-center gap-2 print:hidden">
             {!esSoloLectura && (
               <Link href={`/dashboard/paciente/${episode.id}/turno`} className="bg-indigo-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">
@@ -331,7 +341,7 @@ export default async function ExpedientePage({
               </Link>
             )}
 
-            {/* BOTÓN ALTA INTERCONSULTA (CON SELECTOR DE TIPOS: DESCARGO, EGRESO, ALTA PETICIÓN, FALLECIDO) */}
+            {/* BOTÓN ALTA O FINALIZAR INTERCONSULTA */}
             {!esSoloLectura && (
               esInterconsulta ? (
                 permisos.puedeDarAlta && (
@@ -339,44 +349,38 @@ export default async function ExpedientePage({
                     <summary className="list-none cursor-pointer bg-red-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm">
                       🚪 Finalizar Interconsulta (Dar de Alta)
                     </summary>
-                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 p-4 rounded-xl border border-red-200 dark:border-red-800 shadow-2xl z-30 text-left space-y-2">
-                      <p className="text-xs font-bold text-red-900 dark:text-red-200">
-                        Cierre de Interconsulta:
+                    <div className="absolute right-0 mt-2 w-80 bg-white p-4 rounded-xl border border-red-200 shadow-xl z-30 text-left">
+                      <p className="text-xs font-bold text-red-900 mb-1">Cierre de Interconsulta:</p>
+                      <p className="text-[11px] text-slate-500 mb-2">
+                        Escriba la conclusión médica y recomendaciones finales para cerrar la interconsulta:
                       </p>
-                      <form action={finalizarInterconsulta} className="space-y-2.5">
+                      <form action={finalizarInterconsulta} className="space-y-2">
                         <input type="hidden" name="episodeId" value={episode.id} />
                         <div>
-                          <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                            Tipo de Cierre / Alta *
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            Tipo de Cierre / Egreso *
                           </label>
                           <select
                             name="dischargeType"
                             required
-                            className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-semibold outline-none focus:ring-2 focus:ring-red-500"
+                            defaultValue="descargo"
+                            className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white text-slate-900"
                           >
-                            <option value="descargo">📋 Descargo (Sin criterio de seguimiento activo)</option>
-                            <option value="egreso">✅ Egreso / Mejoría clínica</option>
-                            <option value="alta_peticion">⚠️ Alta a petición</option>
-                            <option value="fallecido">🖤 Fallecido</option>
+                            <option value="descargo">Descargo (Cierre de interconsulta)</option>
+                            <option value="egreso">Egreso hospitalario</option>
+                            <option value="alta_peticion">Alta a petición</option>
+                            <option value="fallecido">Fallecido</option>
                           </select>
                         </div>
-                        <div>
-                          <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                            Conclusión y Recomendaciones *
-                          </label>
-                          <textarea
-                            name="conclusion"
-                            required
-                            rows={3}
-                            placeholder="Ej. Paciente compensado. Se suspende seguimiento por la especialidad. Mantener diuresis horaria..."
-                            className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-red-500"
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          className="w-full bg-red-600 text-white text-xs py-2 rounded-lg font-bold hover:bg-red-700 cursor-pointer shadow-sm"
-                        >
-                          Confirmar Cierre de Interconsulta
+                        <textarea
+                          name="conclusion"
+                          required
+                          rows={3}
+                          placeholder="Ej. Paciente compensado. Se suspende seguimiento por el servicio..."
+                          className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
+                        />
+                        <button type="submit" className="w-full bg-red-600 text-white text-xs py-1.5 rounded font-bold hover:bg-red-700 cursor-pointer">
+                          Confirmar y Finalizar Interconsulta
                         </button>
                       </form>
                     </div>
@@ -424,7 +428,7 @@ export default async function ExpedientePage({
               </details>
             )}
 
-            {/* SI ES PACIENTE PROPIO (SALA) -> TRASLADAR A INTERCONSULTA */}
+            {/* SI ES PACIENTE PROPIO (SALA) -> BOTÓN PÚRPURA PARA TRASLADAR A INTERCONSULTA */}
             {!esSoloLectura && !esInterconsulta && permisos.puedeRegistrar && (
               <details className="relative">
                 <summary className="list-none cursor-pointer bg-purple-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold hover:bg-purple-700 transition-colors shadow-sm">
@@ -433,6 +437,9 @@ export default async function ExpedientePage({
                 <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 p-4 rounded-xl border border-purple-300 dark:border-purple-700 shadow-2xl z-30 text-left">
                   <p className="text-xs font-bold text-purple-900 dark:text-purple-300 mb-1">
                     Traslado a Interconsulta:
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                    Indique los datos del servicio receptor para mover este paciente a Interconsultas:
                   </p>
                   <form action={transferirAInterconsulta} className="space-y-2">
                     <input type="hidden" name="episodeId" value={episode.id} />
@@ -491,7 +498,7 @@ export default async function ExpedientePage({
                         name="chiefComplaint"
                         required
                         rows={2}
-                        placeholder="Ej. Evaluación por falla renal aguda..."
+                        placeholder="Ej. Evaluación por falla renal aguda / requerimiento de diálisis..."
                         className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-purple-500"
                       />
                     </div>
@@ -635,6 +642,57 @@ export default async function ExpedientePage({
           puedeRegistrar={permisos.puedeRegistrar}
         />
 
+        {/* PLAN DEL DEPARTAMENTO BASE (SOLO INTERCONSULTAS) */}
+        {esInterconsulta && (
+          <div className="bg-purple-50/70 border border-purple-200 rounded-xl p-5 shadow-sm mb-6 print:hidden">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-purple-200 pb-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🗂️</span>
+                <h2 className="text-sm font-bold uppercase tracking-wider text-purple-900">
+                  Plan del Departamento Base ({episode.consultingDepartment || 'Servicio tratante'})
+                </h2>
+              </div>
+              {permisos.puedeRegistrar && (
+                <details className="relative">
+                  <summary className="list-none cursor-pointer text-xs bg-white text-purple-800 px-3 py-1 rounded-lg border border-purple-300 hover:bg-purple-100 font-bold">
+                    ✏️ {episode.baseDepartmentPlan ? 'Editar Plan Base' : '+ Registrar Plan Base'}
+                  </summary>
+                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white p-4 rounded-xl border border-purple-300 shadow-2xl z-30 text-left">
+                    <p className="text-xs font-bold text-purple-900 mb-2">
+                      Indicaciones / Plan del Departamento Base:
+                    </p>
+                    <form action={guardarPlanDepartamentoBase} className="space-y-2">
+                      <input type="hidden" name="episodeId" value={episode.id} />
+                      <textarea
+                        name="baseDepartmentPlan"
+                        rows={4}
+                        defaultValue={episode.baseDepartmentPlan ?? ''}
+                        placeholder="Ej. Plan quirúrgico pendiente, cobertura antibiótica actual, meta de reposición..."
+                        className="w-full px-2.5 py-2 border rounded-lg text-xs text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none"
+                      />
+                      <button
+                        type="submit"
+                        className="w-full bg-purple-700 text-white text-xs py-2 rounded-lg font-bold hover:bg-purple-800 cursor-pointer"
+                      >
+                        Guardar Plan del Departamento Base
+                      </button>
+                    </form>
+                  </div>
+                </details>
+              )}
+            </div>
+            {episode.baseDepartmentPlan ? (
+              <p className="text-sm text-slate-800 whitespace-pre-line bg-white border border-purple-200/70 rounded-lg p-3 leading-relaxed">
+                {episode.baseDepartmentPlan}
+              </p>
+            ) : (
+              <p className="text-xs text-purple-700 italic">
+                No se ha registrado aún el plan del departamento base.
+              </p>
+            )}
+          </div>
+        )}
+
         {/* 1. NOTAS IMPORTANTES */}
         <div className="print:hidden">
           <NotasImportantes
@@ -653,6 +711,7 @@ export default async function ExpedientePage({
             acceso={episode.vascularAccesses[0] ?? null}
             virales={episode.viralSerologies[0] ?? null}
             tfgActual={episode.gfrRecords[0] ?? null}
+            historialTfg={episode.gfrRecords}
             tipificacion={{
               bloodType: episode.patient.bloodType,
               recordedBy: episode.patient.bloodTypeRecordedBy,
@@ -721,49 +780,6 @@ export default async function ExpedientePage({
                 )}
               </div>
             </div>
-
-            {/* ACÁPITE: PLAN DEL DEPARTAMENTO BASE (SOLO EN INTERCONSULTAS) */}
-            {esInterconsulta && (
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-purple-200 space-y-2">
-                <div className="flex justify-between items-center border-b border-purple-100 pb-2">
-                  <h3 className="text-xs font-bold text-purple-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>📌</span> Plan del Servicio Base ({episode.consultingDepartment})
-                  </h3>
-                  {permisos.puedeRegistrar && (
-                    <details className="relative">
-                      <summary className="list-none cursor-pointer text-[11px] font-bold text-purple-700 hover:underline">
-                        {episode.baseDepartmentPlan ? '✏️ Modificar' : '+ Agregar Plan'}
-                      </summary>
-                      <div className="absolute right-0 mt-1 w-80 bg-white p-4 rounded-xl border border-purple-300 shadow-xl z-30 text-left">
-                        <p className="text-xs font-bold text-purple-900 mb-1">Plan del Departamento Base:</p>
-                        <form action={guardarPlanDepartamentoBase} className="space-y-2">
-                          <input type="hidden" name="episodeId" value={episode.id} />
-                          <textarea
-                            name="baseDepartmentPlan"
-                            rows={3}
-                            defaultValue={episode.baseDepartmentPlan ?? ''}
-                            placeholder="Ej. Cirugía programa laparotomía mañana / UCI mantiene sedoanalgesia..."
-                            className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-900"
-                          />
-                          <button type="submit" className="w-full bg-purple-700 hover:bg-purple-800 text-white text-xs py-1.5 rounded-lg font-bold">
-                            Guardar Plan Base
-                          </button>
-                        </form>
-                      </div>
-                    </details>
-                  )}
-                </div>
-                {episode.baseDepartmentPlan ? (
-                  <p className="text-xs text-slate-700 whitespace-pre-line leading-relaxed bg-purple-50/60 p-2.5 rounded-lg border border-purple-100">
-                    {episode.baseDepartmentPlan}
-                  </p>
-                ) : (
-                  <p className="text-[11px] text-slate-400 italic">
-                    Sin plan del departamento base registrado.
-                  </p>
-                )}
-              </div>
-            )}
 
             {/* 3. ANTECEDENTES */}
             <SeccionAntecedentes
@@ -909,7 +925,6 @@ export default async function ExpedientePage({
 
           {/* Columna Derecha */}
           <div className="lg:col-span-2 space-y-6">
-            {/* CHECKLIST: EL ÚLTIMO AGREGADO SIEMPRE QUEDA ARRIBA */}
             <div className="print:hidden">
               <ChecklistTareas
                 episodeId={episode.id}

@@ -59,7 +59,7 @@ model AuditLog {
 model Patient {
   id                  String    @id @default(cuid())
   expedienteNumber    String    @unique
-  cedula              String? // Cédula de identidad
+  cedula              String?
   firstName           String
   lastName            String
   birthDate           DateTime?
@@ -80,15 +80,14 @@ model Patient {
 model Episode {
   id                    String    @id @default(cuid())
   patientId             String
-  serviceType           String    @default("propio") // "propio" | "interconsulta"
+  serviceType           String    @default("propio")
   consultingDepartment  String?
   consultingResident    String?
   hospitalAdmissionDate DateTime? @db.Timestamptz
   admissionDate         DateTime  @default(now()) @db.Timestamptz
   admissionType         String
   chiefComplaint        String?
-  status                String    @default("active") // "active" | "closed"
-  dischargeType         String? // "descargo" | "fallecido" | "alta_peticion" | "egreso"
+  status                String    @default("active")
   room                  String?
   bed                   String?
   attendingDoctor       String?
@@ -98,13 +97,14 @@ model Episode {
   initialWeight         Float?
   initialWeightUnit     String?   @default("kg")
 
-  // TRATAMIENTO ACTUAL
-  currentTreatment   String?
-  treatmentUpdatedBy String?
-  treatmentUpdatedAt DateTime? @db.Timestamptz
+  // TRATAMIENTO ACTUAL DEL PACIENTE
+  currentTreatment   String? // Esquema de medicamentos, dosis, infusión, etc.
+  treatmentUpdatedBy String? // Email de quien registró/modificó
+  treatmentUpdatedAt DateTime? @db.Timestamptz // Fecha y hora exacta de actualización
 
-  // PLAN DEL DEPARTAMENTO BASE (INTERCONSULTAS)
-  baseDepartmentPlan String?
+  // EGRESO Y PLAN DE DEPARTAMENTO BASE (INTERCONSULTAS)
+  dischargeType      String? // descargo | egreso | alta_peticion | fallecido | Alta médica | etc.
+  baseDepartmentPlan String? // Plan / indicaciones del departamento base en interconsultas
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -153,7 +153,9 @@ model ImportantAlert {
   createdBy  String
   createdAt  DateTime  @default(now()) @db.Timestamptz
   isActive   Boolean   @default(true)
-  resolvedBy String? // Quién canceló / resolvió la nota
+  isPinned   Boolean   @default(false)
+  pinnedAt   DateTime? @db.Timestamptz
+  resolvedBy String?
   resolvedAt DateTime? @db.Timestamptz
 
   episode Episode @relation(fields: [episodeId], references: [id])
@@ -174,24 +176,25 @@ model GfrRecord {
   @@index([episodeId])
 }
 
-// ─── REPORTES DE LABORATORIO Y CULTIVOS ───
+// ─── REPORTES DE LABORATORIO ───
 model LabReport {
   id         String    @id @default(cuid())
   episodeId  String
-  category   String // "Hematología", "Química", "Cultivos", etc.
+  category   String
   testName   String
   sampleDate DateTime? @db.Timestamptz
   result     String
   createdBy  String
   createdAt  DateTime  @default(now()) @db.Timestamptz
-
-  // BORRADO AUDITABLE (SOFT DELETE)
-  isDeleted Boolean   @default(false)
-  deletedBy String?
-  deletedAt DateTime? @db.Timestamptz
+  updatedBy  String?
+  updatedAt  DateTime? @db.Timestamptz
+  isDeleted  Boolean   @default(false)
+  deletedBy  String?
+  deletedAt  DateTime? @db.Timestamptz
 
   episode Episode @relation(fields: [episodeId], references: [id])
 
+  @@index([episodeId])
   @@index([episodeId, isDeleted])
 }
 
