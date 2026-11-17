@@ -11,7 +11,7 @@ type PayPalButtonsInstance = {
 
 type PayPalNamespace = {
   Buttons: (options: {
-    style?: Record<string, string>
+    style?: Record<string, string | number>
     createOrder: () => Promise<string>
     onApprove: (data: { orderID: string }) => Promise<void>
     onCancel?: () => void
@@ -70,61 +70,77 @@ export function PagoHibridoSuscripcion({
     const renderizarBotones = () => {
       if (cancelado || !contenedorPayPalRef.current) return
       const win = window as unknown as { paypal?: PayPalNamespace }
-      if (!win.paypal?.Buttons) return
+      if (!win.paypal?.Buttons) {
+        setEstadoPago({
+          tipo: 'error',
+          texto:
+            'PayPal no pudo inicializar los botones. Verifica que PAYPAL_CLIENT_ID en .env.local sea el copiado con ❐ (sin errores de letra) y reinicia npm run dev.',
+        })
+        return
+      }
 
       contenedorPayPalRef.current.innerHTML = ''
-      instanciaBotones = win.paypal.Buttons({
-        style: {
-          layout: 'vertical',
-          color: 'blue',
-          shape: 'rect',
-          label: 'pay',
-          height: '42',
-        },
-        createOrder: async () => {
-          setEstadoPago(null)
-          const res = await fetch('/api/paypal/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ periodMonths: periodMonthsRef.current }),
-          })
-          const json = (await res.json()) as { orderID?: string; error?: string }
-          if (!res.ok || !json.orderID) {
-            throw new Error(json.error || 'No se pudo iniciar el pago con PayPal.')
-          }
-          return json.orderID
-        },
-        onApprove: async (data) => {
-          setEstadoPago({ tipo: 'info', texto: 'Verificando pago y activando tu residencia...' })
-          const res = await fetch('/api/paypal/capture-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderID: data.orderID }),
-          })
-          const json = (await res.json()) as { ok?: boolean; error?: string; periodMonths?: number }
-          if (!res.ok || !json.ok) {
-            setEstadoPago({
-              tipo: 'error',
-              texto: json.error || 'El pago fue aprobado pero falló la activación automática.',
+      try {
+        instanciaBotones = win.paypal.Buttons({
+          style: {
+            layout: 'vertical',
+            color: 'blue',
+            shape: 'rect',
+            label: 'pay',
+            height: 45,
+          },
+          createOrder: async () => {
+            setEstadoPago(null)
+            const res = await fetch('/api/paypal/create-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ periodMonths: periodMonthsRef.current }),
             })
-            return
-          }
-          setEstadoPago({
-            tipo: 'ok',
-            texto: `Pago confirmado al instante. Suscripción renovada por ${json.periodMonths ?? periodMonthsRef.current} mes(es).`,
-          })
-          router.refresh()
-        },
-        onCancel: () => {
-          setEstadoPago({ tipo: 'info', texto: 'Pago cancelado. No se realizó ningún cargo.' })
-        },
-        onError: (err) => {
-          const msg = err instanceof Error ? err.message : 'Ocurrió un error al procesar el pago con PayPal.'
-          setEstadoPago({ tipo: 'error', texto: msg })
-        },
-      })
+            const json = (await res.json()) as { orderID?: string; error?: string }
+            if (!res.ok || !json.orderID) {
+              throw new Error(json.error || 'No se pudo iniciar el pago con PayPal.')
+            }
+            return json.orderID
+          },
+          onApprove: async (data) => {
+            setEstadoPago({ tipo: 'info', texto: 'Verificando pago y activando tu residencia...' })
+            const res = await fetch('/api/paypal/capture-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderID: data.orderID }),
+            })
+            const json = (await res.json()) as { ok?: boolean; error?: string; periodMonths?: number }
+            if (!res.ok || !json.ok) {
+              setEstadoPago({
+                tipo: 'error',
+                texto: json.error || 'El pago fue aprobado pero falló la activación automática.',
+              })
+              return
+            }
+            setEstadoPago({
+              tipo: 'ok',
+              texto: `Pago confirmado al instante. Suscripción renovada por ${json.periodMonths ?? periodMonthsRef.current} mes(es).`,
+            })
+            router.refresh()
+          },
+          onCancel: () => {
+            setEstadoPago({ tipo: 'info', texto: 'Pago cancelado. No se realizó ningún cargo.' })
+          },
+          onError: (err) => {
+            const msg = err instanceof Error ? err.message : 'Ocurrió un error al procesar el pago con PayPal.'
+            setEstadoPago({ tipo: 'error', texto: msg })
+          },
+        })
 
-      void instanciaBotones.render(contenedorPayPalRef.current)
+        instanciaBotones.render(contenedorPayPalRef.current).catch((err: unknown) => {
+          if (cancelado) return
+          const msg = err instanceof Error ? err.message : 'No se pudieron mostrar los botones de PayPal.'
+          setEstadoPago({ tipo: 'error', texto: `Error PayPal: ${msg}` })
+        })
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Error inicializando botones de PayPal.'
+        setEstadoPago({ tipo: 'error', texto: `Error PayPal: ${msg}` })
+      }
     }
 
     const win = window as unknown as { paypal?: PayPalNamespace }
@@ -140,7 +156,24 @@ export function PagoHibridoSuscripcion({
     }
 
     const scriptId = 'nexo-paypal-sdk'
+    const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null
+    if (existingScript && existingScript.dataset.clientId !== paypalClientId) {
+      existingScript.remove()
+    }
+
     let script = document.getElementById(scriptId) as HTMLScriptElement | null
+    if (script && script.dataset.sdkLoaded === 'true') {
+      queueMicrotask(() => {
+        if (cancelado) return
+        setSdkEstado('ready')
+        renderizarBotones()
+      })
+      return () => {
+        cancelado = true
+        void instanciaBotones?.close?.()
+      }
+    }
+
     queueMicrotask(() => {
       if (!cancelado) setSdkEstado('loading')
     })
@@ -148,14 +181,16 @@ export function PagoHibridoSuscripcion({
     if (!script) {
       script = document.createElement('script')
       script.id = scriptId
+      script.dataset.clientId = paypalClientId
       script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(
         paypalClientId
-      )}&currency=USD&intent=capture&locale=es_DO`
+      )}&currency=USD&intent=capture`
       script.async = true
       document.body.appendChild(script)
     }
 
     const onLoad = () => {
+      if (script) script.dataset.sdkLoaded = 'true'
       if (cancelado) return
       setSdkEstado('ready')
       renderizarBotones()
