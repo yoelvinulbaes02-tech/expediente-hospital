@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import { obtenerContextoResidencia } from '@/lib/tenant'
+import { obtenerPayPalClientId } from '@/lib/paypal'
+import { PagoHibridoSuscripcion } from '@/components/PagoHibridoSuscripcion'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { solicitarPagoMensual } from './actions'
 
 const ETIQUETA_PLAN: Record<string, { texto: string; clase: string }> = {
   ACTIVE: { texto: 'Activa', clase: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
@@ -47,6 +48,16 @@ export default async function SuscripcionPage({
   ])
 
   const metaPlan = ETIQUETA_PLAN[ctx.suscripcion.estadoEfectivo] ?? ETIQUETA_PLAN.ACTIVE
+  const interfaceModeStr = String(ctx.residency.interfaceMode)
+  const paypalClientId = obtenerPayPalClientId()
+  const paypalEnv = (process.env.PAYPAL_ENV ?? 'sandbox').trim().toLowerCase() === 'live' ? 'live' : 'sandbox'
+  const datosBanco = {
+    bankName: (process.env.BILLING_BANK_NAME ?? '').trim(),
+    bankAccount: (process.env.BILLING_BANK_ACCOUNT ?? '').trim(),
+    bankHolder: (process.env.BILLING_BANK_HOLDER ?? '').trim(),
+    bankId: (process.env.BILLING_BANK_ID ?? '').trim(),
+    whatsapp: (process.env.BILLING_WHATSAPP ?? '').trim(),
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8">
@@ -70,7 +81,7 @@ export default async function SuscripcionPage({
 
         {ok && (
           <div className="px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium">
-            Pago reportado correctamente. En cuanto sea validado por el administrador de la plataforma, tu suscripción se extenderá automáticamente.
+            Comprobante de transferencia enviado correctamente. En cuanto sea validado por el administrador de la plataforma, tu suscripción se extenderá.
           </div>
         )}
 
@@ -88,7 +99,12 @@ export default async function SuscripcionPage({
               {ctx.residency.name}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Interfaz: {ctx.residency.interfaceMode === 'CONSULTAS' ? 'Consultas Externas' : 'Hospitalización'}
+              Interfaz:{' '}
+              {interfaceModeStr === 'CONSULTAS'
+                ? 'Consultas Externas'
+                : interfaceModeStr === 'MEDICINA_INTERNA'
+                  ? 'Medicina Interna'
+                  : 'Hospitalización / Nefrología'}
             </p>
           </div>
 
@@ -125,80 +141,14 @@ export default async function SuscripcionPage({
           </div>
         </div>
 
-        {/* REPORTAR / SOLICITAR RENOVACIÓN MENSUAL */}
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Renovar o Reportar Pago Mensual
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Registra el pago institucional de tu residencia (transferencia bancaria, tarjeta o pago administrativo) para mantener activo el acceso de todo tu equipo.
-          </p>
-
-          <form action={solicitarPagoMensual} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Período a renovar
-              </label>
-              <select
-                name="periodMonths"
-                defaultValue="1"
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-              >
-                <option value="1">1 mes (${ctx.residency.monthlyPriceUsd} USD)</option>
-                <option value="3">3 meses (${ctx.residency.monthlyPriceUsd * 3} USD)</option>
-                <option value="6">6 meses (${ctx.residency.monthlyPriceUsd * 6} USD)</option>
-                <option value="12">12 meses (${ctx.residency.monthlyPriceUsd * 12} USD)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Método de pago
-              </label>
-              <select
-                name="method"
-                defaultValue="transferencia"
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-              >
-                <option value="transferencia">Transferencia bancaria</option>
-                <option value="tarjeta">Tarjeta / Enlace de pago</option>
-                <option value="institucional">Facturación institucional / Hospital</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Número de referencia o comprobante *
-              </label>
-              <input
-                name="reference"
-                required
-                placeholder="Ej. TRF-884920 o último 4 dígitos"
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Nota adicional (opcional)
-              </label>
-              <input
-                name="notes"
-                placeholder="Ej. Pago correspondiente al mes en curso"
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-              />
-            </div>
-
-            <div className="md:col-span-2 flex justify-end">
-              <button
-                type="submit"
-                className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold cursor-pointer"
-              >
-                Enviar comprobante de renovación
-              </button>
-            </div>
-          </form>
-        </div>
+        {/* PAGO HÍBRIDO: PAYPAL / TARJETA AUTOMÁTICO O TRANSFERENCIA BANCARIA */}
+        <PagoHibridoSuscripcion
+          monthlyPriceUsd={ctx.residency.monthlyPriceUsd}
+          residencyName={ctx.residency.name}
+          paypalClientId={paypalClientId}
+          paypalEnv={paypalEnv}
+          datosBanco={datosBanco}
+        />
 
         {/* HISTORIAL DE PAGOS */}
         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-x-auto">
