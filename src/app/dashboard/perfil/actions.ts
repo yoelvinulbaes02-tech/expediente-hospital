@@ -23,15 +23,8 @@ export async function cambiarPassword(
   if (!currentPassword) {
     return { error: 'Escribe tu contraseña actual', campo: 'currentPassword' }
   }
-  if (
-    newPassword.length < 8 ||
-    !/[a-zA-Z]/.test(newPassword) ||
-    !/\d/.test(newPassword)
-  ) {
-    return {
-      error: 'La nueva contraseña debe tener al menos 8 caracteres, incluyendo letras y números',
-      campo: 'newPassword',
-    }
+  if (newPassword.length < 6) {
+    return { error: 'La nueva contraseña debe tener al menos 6 caracteres', campo: 'newPassword' }
   }
   if (newPassword !== confirmPassword) {
     return { error: 'Las contraseñas nuevas no coinciden', campo: 'confirmPassword' }
@@ -40,9 +33,7 @@ export async function cambiarPassword(
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
   })
-  if (!user || !user.isActive) {
-    return { error: 'Usuario no encontrado o desactivado' }
-  }
+  if (!user) return { error: 'Usuario no encontrado' }
 
   // Verificar la contraseña actual
   const valid = await bcrypt.compare(currentPassword, user.passwordHash)
@@ -66,15 +57,14 @@ export async function cambiarPassword(
 
   // Guardar en auditoría
   await logAudit({
-    actorId: user.id,
-    actorRole: String(user.role),
+    actorId: session.user.id,
+    actorRole: session.user.role,
     action: 'update',
     entity: 'user',
     entityId: user.id,
     reason: 'Cambio de contraseña por el usuario',
   })
 
-  revalidatePath('/dashboard')
   revalidatePath('/dashboard/perfil')
   return { ok: true }
 }

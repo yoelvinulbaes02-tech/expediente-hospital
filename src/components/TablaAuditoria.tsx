@@ -88,22 +88,16 @@ export function TablaAuditoria({
       'Hash de Seguridad',
     ]
 
-    const sanitizarCsv = (valor: string | number) => {
-      const s = String(valor ?? '')
-      const seguro = /^[=+\-@\t\r]/.test(s) ? `'${s}` : s
-      return `"${seguro.replace(/"/g, '""')}"`
-    }
-
     const filas = logs.map((log) => [
       log.seq,
-      sanitizarCsv(fmtFechaHora(log.serverTs)),
-      sanitizarCsv(log.actorName),
-      sanitizarCsv(log.actorRole),
-      sanitizarCsv(log.action),
-      sanitizarCsv(log.entity),
-      sanitizarCsv(log.patientId ?? '—'),
-      sanitizarCsv(log.reason ?? 'Sin detalle'),
-      sanitizarCsv(log.entryHash),
+      `"${fmtFechaHora(log.serverTs)}"`,
+      `"${log.actorName.replace(/"/g, '""')}"`,
+      `"${log.actorRole}"`,
+      `"${log.action}"`,
+      `"${log.entity}"`,
+      `"${log.patientId ?? '—'}"`,
+      `"${(log.reason ?? 'Sin detalle').replace(/"/g, '""')}"`,
+      `"${log.entryHash}"`,
     ])
 
     // \uFEFF PERMITE QUE EXCEL ABRA CORRECTAMENTE CARACTERES EN ESPAÑOL (TILDES, Ñ)

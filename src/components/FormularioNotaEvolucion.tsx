@@ -16,7 +16,6 @@ export function FormularioNotaEvolucion({
   const limpiarBorrador = () => {
     if (typeof window !== 'undefined') {
       try {
-        sessionStorage.removeItem(`draft_${episodeId}_evolucion`)
         localStorage.removeItem(`draft_${episodeId}_evolucion`)
       } catch {}
     }

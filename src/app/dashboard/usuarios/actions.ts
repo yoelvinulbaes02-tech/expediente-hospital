@@ -29,7 +29,6 @@ type ResultadoReset = {
 async function exigirAdmin() {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user || !ctx.residency) throw new Error('No autorizado')
-  if (ctx.user.mustChangePassword) throw new Error('Debes cambiar tu contraseña temporal antes de continuar.')
   if (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
     throw new Error('No autorizado')
   }
@@ -75,16 +74,8 @@ export async function crearUsuario(
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: 'Escribe un correo válido', campo: 'email', valores }
   }
-  if (
-    password.length < 8 ||
-    !/[a-zA-Z]/.test(password) ||
-    !/\d/.test(password)
-  ) {
-    return {
-      error: 'La contraseña temporal debe tener al menos 8 caracteres, incluyendo letras y números',
-      campo: 'password',
-      valores,
-    }
+  if (password.length < 6) {
+    return { error: 'La contraseña temporal debe tener al menos 6 caracteres', campo: 'password', valores }
   }
   if (!ROLES_VALIDOS.includes(role as RolValido)) {
     return { error: 'Selecciona un rol válido', campo: 'role', valores }
@@ -118,7 +109,6 @@ export async function crearUsuario(
         passwordHash,
         role: role as RolValido,
         residencyId: admin.residencyId,
-        mustChangePassword: true,
       },
     })
     .catch((e: unknown) => {

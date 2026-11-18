@@ -35,7 +35,7 @@ export function TextareaConDeshacer({
 
     const timer = setTimeout(() => {
       try {
-        const guardado = sessionStorage.getItem(storageKey)
+        const guardado = localStorage.getItem(storageKey)
         if (guardado && guardado !== defaultValue) {
           setValor(guardado)
           setHistorial([defaultValue, guardado])
@@ -66,9 +66,9 @@ export function TextareaConDeshacer({
       if (storageKey && typeof window !== 'undefined') {
         try {
           if (nuevoValor) {
-            sessionStorage.setItem(storageKey, nuevoValor)
+            localStorage.setItem(storageKey, nuevoValor)
           } else {
-            sessionStorage.removeItem(storageKey)
+            localStorage.removeItem(storageKey)
           }
         } catch {
           // Ignorar error de cuota o permisos
@@ -91,7 +91,7 @@ export function TextareaConDeshacer({
       setIndiceHistorial(nuevoIndice)
       if (storageKey && typeof window !== 'undefined') {
         try {
-          sessionStorage.setItem(storageKey, textoAnterior)
+          localStorage.setItem(storageKey, textoAnterior)
         } catch {}
       }
     }
@@ -105,7 +105,7 @@ export function TextareaConDeshacer({
       setIndiceHistorial(nuevoIndice)
       if (storageKey && typeof window !== 'undefined') {
         try {
-          sessionStorage.setItem(storageKey, textoSiguiente)
+          localStorage.setItem(storageKey, textoSiguiente)
         } catch {}
       }
     }
@@ -119,7 +119,7 @@ export function TextareaConDeshacer({
       setUltimoBorrado(null)
       if (storageKey && typeof window !== 'undefined') {
         try {
-          sessionStorage.setItem(storageKey, ultimoBorrado)
+          localStorage.setItem(storageKey, ultimoBorrado)
         } catch {}
       }
     }

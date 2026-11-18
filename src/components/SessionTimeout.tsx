@@ -1,140 +1,85 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { signOut } from 'next-auth/react'
-
-const WARNING_TIME_MS = 14 * 60 * 1000 // 14 minutos de inactividad
-const COUNTDOWN_SECONDS = 60 // 1 minuto de aviso antes de cerrar (15 min total)
-
-function limpiarBorradoresClinicos() {
-  if (typeof window === 'undefined') return
-  try {
-    for (const store of [window.sessionStorage, window.localStorage]) {
-      const keysToRemove: string[] = []
-      for (let i = 0; i < store.length; i++) {
-        const k = store.key(i)
-        if (k && k.startsWith('draft_')) {
-          keysToRemove.push(k)
-        }
-      }
-      for (const k of keysToRemove) {
-        store.removeItem(k)
-      }
-    }
-  } catch {
-    // Ignorar restricciones de almacenamiento
-  }
-}
 
 export function SessionTimeout() {
   const [showWarning, setShowWarning] = useState(false)
-  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS)
-
-  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const warningVisibleRef = useRef(false)
-  const lastActivityRef = useRef(0)
-
-  const clearAllTimers = useCallback(() => {
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current)
-      inactivityTimerRef.current = null
-    }
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current)
-      countdownTimerRef.current = null
-    }
+  const [countdown, setCountdown] = useState(60) // Aviso 1 minuto antes
+  
+  const logout = useCallback(() => {
+    signOut({ callbackUrl: '/login' })
   }, [])
 
-  const logout = useCallback(() => {
-    clearAllTimers()
-    limpiarBorradoresClinicos()
-    signOut({ callbackUrl: '/login' })
-  }, [clearAllTimers])
-
-  const startInactivityTimer = useCallback(() => {
-    clearAllTimers()
-    inactivityTimerRef.current = setTimeout(() => {
-      warningVisibleRef.current = true
-      setShowWarning(true)
-      setCountdown(COUNTDOWN_SECONDS)
-
-      let secondsLeft = COUNTDOWN_SECONDS
-      countdownTimerRef.current = setInterval(() => {
-        secondsLeft -= 1
-        setCountdown(secondsLeft)
-        if (secondsLeft <= 0) {
-          logout()
-        }
-      }, 1000)
-    }, WARNING_TIME_MS)
-  }, [clearAllTimers, logout])
-
-  const handleStayActive = useCallback(() => {
-    warningVisibleRef.current = false
+  // Reinicia el temporizador cuando hay actividad del usuario
+  const resetTimer = useCallback(() => {
     setShowWarning(false)
-    setCountdown(COUNTDOWN_SECONDS)
-    lastActivityRef.current = Date.now()
-    startInactivityTimer()
-  }, [startInactivityTimer])
+    setCountdown(60)
+  }, [])
 
   useEffect(() => {
-    const onUserActivity = () => {
-      // Si el aviso ya está visible, exige confirmación explícita en el modal
-      if (warningVisibleRef.current) return
-      const now = Date.now()
-      if (now - lastActivityRef.current < 1000) return
-      lastActivityRef.current = now
-      startInactivityTimer()
+    // Tiempo de inactividad: 14 minutos (840,000 ms)
+    // A los 14 min, mostramos el aviso. A los 15, cerramos sesión.
+    const WARNING_TIME = 14 * 60 * 1000
+    let inactivityTimer: NodeJS.Timeout
+    let countdownTimer: NodeJS.Timeout
+
+    const startTimer = () => {
+      clearTimeout(inactivityTimer)
+      inactivityTimer = setTimeout(() => {
+        setShowWarning(true)
+        
+        // Iniciar cuenta regresiva de 1 minuto
+        let secondsLeft = 60
+        countdownTimer = setInterval(() => {
+          secondsLeft -= 1
+          setCountdown(secondsLeft)
+          if (secondsLeft <= 0) {
+            clearInterval(countdownTimer)
+            logout()
+          }
+        }, 1000)
+      }, WARNING_TIME)
     }
 
-    const events: Array<keyof WindowEventMap> = [
-      'mousemove',
-      'keydown',
-      'click',
-      'scroll',
-      'touchstart',
-    ]
-    for (const ev of events) {
-      window.addEventListener(ev, onUserActivity, { passive: true })
-    }
+    // Escuchar eventos para reiniciar el temporizador
+    window.addEventListener('mousemove', resetTimer)
+    window.addEventListener('keydown', resetTimer)
+    window.addEventListener('click', resetTimer)
+    window.addEventListener('scroll', resetTimer)
 
-    startInactivityTimer()
+    startTimer()
 
     return () => {
-      clearAllTimers()
-      for (const ev of events) {
-        window.removeEventListener(ev, onUserActivity)
-      }
+      clearTimeout(inactivityTimer)
+      clearInterval(countdownTimer)
+      window.removeEventListener('mousemove', resetTimer)
+      window.removeEventListener('keydown', resetTimer)
+      window.removeEventListener('click', resetTimer)
+      window.removeEventListener('scroll', resetTimer)
     }
-  }, [startInactivityTimer, clearAllTimers])
+  }, [logout, resetTimer])
 
   if (!showWarning) return null
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-2xl max-w-md w-full text-center border border-red-200 dark:border-red-800">
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-2xl max-w-md w-full text-center border border-red-200">
         <div className="text-4xl mb-4">⚠️</div>
-        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
-          Sesión por expirar
-        </h2>
+        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Sesión por expirar</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-4">
-          Por seguridad hospitalaria, cerraremos tu sesión automáticamente en{' '}
-          <strong className="text-red-600 text-lg tabular-nums">{countdown}</strong> segundos por
-          inactividad.
+          Por seguridad, cerraremos tu sesión automáticamente en <strong className="text-red-600 text-lg">{countdown}</strong> segundos por inactividad.
         </p>
         <div className="flex gap-2 justify-center">
-          <button
-            type="button"
-            onClick={handleStayActive}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+          <button 
+            onClick={resetTimer}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
             Mantener sesión activa
           </button>
-          <button
-            type="button"
+          <button 
             onClick={logout}
-            className="bg-slate-200 text-slate-700 px-6 py-2 rounded-lg font-medium hover:bg-slate-300 transition-colors cursor-pointer"
+            className="bg-slate-200 text-slate-700 px-6 py-2 rounded-lg font-medium hover:bg-slate-300 transition-colors"
           >
             Cerrar Sesión
           </button>

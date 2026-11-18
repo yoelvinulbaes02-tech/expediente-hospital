@@ -6,44 +6,21 @@ import { obtenerContextoResidencia } from '@/lib/tenant'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-const METODOS_MANUALES_VALIDOS = ['transferencia', 'deposito', 'cheque']
-
 export async function solicitarPagoMensual(formData: FormData): Promise<void> {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user || !ctx.residency) redirect('/login')
-  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
   if (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
     redirect('/dashboard')
   }
 
   const periodMonthsRaw = parseInt(String(formData.get('periodMonths') ?? '1'), 10)
   const periodMonths = [1, 3, 6, 12].includes(periodMonthsRaw) ? periodMonthsRaw : 1
-  const methodRaw = String(formData.get('method') ?? 'transferencia').trim().toLowerCase()
-  const method = METODOS_MANUALES_VALIDOS.includes(methodRaw) ? methodRaw : 'transferencia'
+  const method = String(formData.get('method') ?? 'transferencia').trim() || 'transferencia'
   const reference = String(formData.get('reference') ?? '').trim()
-  const notesRaw = String(formData.get('notes') ?? '').trim()
-  const notes = notesRaw ? notesRaw.slice(0, 500) : null
+  const notes = String(formData.get('notes') ?? '').trim() || null
 
-  if (!reference || reference.length < 3 || reference.length > 100) {
-    redirect(
-      '/dashboard/suscripcion?error=' +
-        encodeURIComponent('Indica un número de referencia válido (entre 3 y 100 caracteres).')
-    )
-  }
-
-  const duplicadoPendiente = await prisma.subscriptionPayment.findFirst({
-    where: {
-      residencyId: ctx.residency.id,
-      status: 'PENDIENTE',
-      reference: { equals: reference, mode: 'insensitive' },
-    },
-    select: { id: true },
-  })
-  if (duplicadoPendiente) {
-    redirect(
-      '/dashboard/suscripcion?error=' +
-        encodeURIComponent('Ya existe un comprobante pendiente de revisión con esa misma referencia.')
-    )
+  if (!reference) {
+    redirect('/dashboard/suscripcion?error=' + encodeURIComponent('Indica el número de referencia o comprobante de pago.'))
   }
 
   const amountUsd = ctx.residency.monthlyPriceUsd * periodMonths

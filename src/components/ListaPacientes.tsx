@@ -32,12 +32,6 @@ type Episodio = {
   responsibleId: string | null
   responsible: { fullName: string } | null
   tasks?: TareaPendienteResumen[]
-  internalMedicineProfile?: {
-    clinicalStatus: string
-    codeStatus: string
-    isolationType: string
-    oxygenSupport: string
-  } | null
   _count: { tasks: number }
   handoffs: { recibidoPor: string }[]
   patient: {
@@ -109,7 +103,6 @@ export function ListaPacientes({
   doctores,
   vistaInicial = 'propio',
   puedeMarcarTareas = false,
-  interfaceMode = 'HOSPITALIZACION',
 }: {
   episodes: Episodio[]
   userId: string
@@ -117,9 +110,7 @@ export function ListaPacientes({
   doctores: Doctor[]
   vistaInicial?: 'propio' | 'interconsulta'
   puedeMarcarTareas?: boolean
-  interfaceMode?: 'HOSPITALIZACION' | 'MEDICINA_INTERNA'
 }) {
-  const esMedicinaInterna = interfaceMode === 'MEDICINA_INTERNA'
   const router = useRouter()
   const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta'>(vistaInicial)
   const [busqueda, setBusqueda] = useState('')
@@ -294,13 +285,7 @@ export function ListaPacientes({
 
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          {esMedicinaInterna
-            ? areaGuardia === 'propio'
-              ? '🩺 Sala de Medicina Interna'
-              : '📋 Interconsultas a Medicina Interna'
-            : areaGuardia === 'propio'
-              ? '🏥 Sala de Hospitalización'
-              : '📋 Pacientes de Interconsulta'}
+          {areaGuardia === 'propio' ? '🏥 Sala de Hospitalización' : '📋 Pacientes de Interconsulta'}
         </h2>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -499,39 +484,6 @@ export function ListaPacientes({
                         </p>
                       </>
                     )
-                  )}
-
-                  {!soloPendientes && esMedicinaInterna && episode.internalMedicineProfile && (
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                          episode.internalMedicineProfile.clinicalStatus === 'Crítico'
-                            ? 'bg-red-100 text-red-800 border-red-200'
-                            : episode.internalMedicineProfile.clinicalStatus === 'Delicado'
-                              ? 'bg-amber-100 text-amber-900 border-amber-200'
-                              : episode.internalMedicineProfile.clinicalStatus === 'Cuidado Intermedio'
-                                ? 'bg-orange-100 text-orange-900 border-orange-200'
-                                : 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                        }`}
-                      >
-                        {episode.internalMedicineProfile.clinicalStatus}
-                      </span>
-                      {episode.internalMedicineProfile.isolationType !== 'Sin aislamiento' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-red-50 text-red-700 border-red-200">
-                          ⚠️ Aislamiento: {episode.internalMedicineProfile.isolationType}
-                        </span>
-                      )}
-                      {episode.internalMedicineProfile.oxygenSupport !== 'Aire ambiente' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-sky-50 text-sky-800 border-sky-200">
-                          🫁 {episode.internalMedicineProfile.oxygenSupport}
-                        </span>
-                      )}
-                      {episode.internalMedicineProfile.codeStatus !== 'Full Code' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-purple-100 text-purple-900 border-purple-200">
-                          {episode.internalMedicineProfile.codeStatus}
-                        </span>
-                      )}
-                    </div>
                   )}
 
                   {/* PENDIENTES CLICABLES SIN ABRIR EL EXPEDIENTE */}

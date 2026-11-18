@@ -48,7 +48,7 @@ export default function NuevoPacientePage() {
           <button
             type="button"
             onClick={() => setTipoGuardia('propio')}
-            className={`py-3 px-4 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+            className={`py-3 px-4 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
               tipoGuardia === 'propio'
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-slate-600 hover:bg-slate-100'
@@ -59,7 +59,7 @@ export default function NuevoPacientePage() {
           <button
             type="button"
             onClick={() => setTipoGuardia('interconsulta')}
-            className={`py-3 px-4 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+            className={`py-3 px-4 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
               tipoGuardia === 'interconsulta'
                 ? 'bg-purple-600 text-white shadow-sm'
                 : 'text-slate-600 hover:bg-slate-100'
@@ -72,13 +72,17 @@ export default function NuevoPacientePage() {
         <form action={crearPaciente} className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
           <input type="hidden" name="serviceType" value={tipoGuardia} />
 
-          {/* SECCIÓN 1: Identificación y Peso Inicial */}
+          {/* SECCIÓN 1: Identificación con Cédula y Peso Inicial */}
           <div>
             <h2 className="text-lg font-semibold text-slate-700 mb-4 border-b pb-2">1. Identificación del Paciente</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Número de Expediente (Único) *</label>
                 <input name="expedienteNumber" required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 placeholder:text-slate-400" placeholder="Ej. EXP-2026-0003" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Cédula de Identidad (Opcional)</label>
+                <input name="cedula" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 placeholder:text-slate-400" placeholder="Ej. 001-1234567-8" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Edad *</label>
@@ -98,14 +102,6 @@ export default function NuevoPacientePage() {
                   <option value="Masculino">Masculino</option>
                   <option value="Femenino">Femenino</option>
                 </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Cédula / ID (Opcional)</label>
-                <input
-                  name="cedula"
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 placeholder:text-slate-400"
-                  placeholder="Ej. 001-1234567-8"
-                />
               </div>
 
               <div>

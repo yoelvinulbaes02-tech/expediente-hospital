@@ -19,7 +19,7 @@ export async function cerrarExpediente(formData: FormData): Promise<void> {
   const [cerrado, tareas] = await prisma.$transaction([
     prisma.episode.updateMany({
       where: { id: episodeId, status: 'active' },
-      data: { status: 'closed', dischargeType },
+      data: { status: 'closed' },
     }),
     prisma.task.updateMany({
       where: { episodeId, status: 'pendiente' },

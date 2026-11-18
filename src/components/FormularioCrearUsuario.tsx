@@ -51,8 +51,7 @@ export function FormularioCrearUsuario() {
       <div>
         <InputPassword
           name="password"
-          minLength={8}
-          placeholder="Contraseña temporal (mín. 8 caracteres, letras y números)"
+          placeholder="Contraseña temporal"
           required
           className={`w-full px-3 py-2 border rounded-lg text-slate-900 ${borde('password')}`}
         />

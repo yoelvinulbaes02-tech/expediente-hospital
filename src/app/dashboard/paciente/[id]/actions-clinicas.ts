@@ -149,12 +149,6 @@ export async function resolverNotaImportante(formData: FormData): Promise<void> 
   const alertId = String(formData.get('alertId') ?? '')
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
 
-  const actual = await prisma.importantAlert.findFirst({
-    where: { id: alertId, episodeId },
-    select: { id: true },
-  })
-  if (!actual) return
-
   await prisma.importantAlert.update({
     where: { id: alertId },
     data: {
@@ -232,9 +226,6 @@ export async function guardarReporteLaboratorio(formData: FormData): Promise<voi
   if (!result) volverAlExpediente(episodeId, 'Escribe el resultado de la analítica')
 
   const sampleDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
-  if (Number.isNaN(sampleDate.getTime())) {
-    volverAlExpediente(episodeId, 'La fecha de la muestra no es válida')
-  }
 
   const reporte = await prisma.labReport.create({
     data: {
@@ -286,9 +277,6 @@ export async function editarReporteLaboratorio(formData: FormData): Promise<void
   }
 
   const sampleDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : previo.sampleDate
-  if (sampleDate && Number.isNaN(sampleDate.getTime())) {
-    volverAlExpediente(episodeId, 'La fecha de la muestra no es válida')
-  }
 
   await prisma.labReport.update({
     where: { id: reportId },
@@ -384,9 +372,6 @@ export async function guardarReporteEstudio(formData: FormData): Promise<void> {
   if (!result) volverAlExpediente(episodeId, 'Escribe el resultado o conclusión del estudio')
 
   const studyDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
-  if (Number.isNaN(studyDate.getTime())) {
-    volverAlExpediente(episodeId, 'La fecha del estudio no es válida')
-  }
 
   const estudio = await prisma.studyReport.create({
     data: {
@@ -474,9 +459,6 @@ export async function guardarAccesoVascular(formData: FormData): Promise<void> {
   const notes = String(formData.get('notes') ?? '').trim()
 
   const placementDate = unknownDate ? null : fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
-  if (placementDate && Number.isNaN(placementDate.getTime())) {
-    volverAlExpediente(episodeId, 'La fecha de colocación no es válida')
-  }
 
   await prisma.vascularAccess.updateMany({
     where: { episodeId, isActive: true },
@@ -731,7 +713,7 @@ const ETIQUETA_EGRESO_INTERCONSULTA: Record<string, string> = {
 
 export async function finalizarInterconsulta(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, email } = await exigirPermiso(episodeId, 'alta')
+  const { userId, role, email } = await exigirPermiso(episodeId, 'registrar')
 
   const dischargeType = String(formData.get('dischargeType') ?? 'descargo').trim() || 'descargo'
   const conclusion = String(formData.get('conclusion') ?? '').trim()
@@ -897,81 +879,6 @@ export async function transferirAInterconsulta(formData: FormData): Promise<void
     episodeId,
     newValue: { serviceType: 'interconsulta', consultingDepartment, consultingResident, room, bed, chiefComplaint },
     reason: 'Paciente transferido de Paciente Propio de Sala a Interconsulta',
-  })
-
-  revalidatePath(`/dashboard/paciente/${episodeId}`)
-  revalidatePath('/dashboard')
-}
-
-// ─── 16. PERFIL CLÍNICO DE MEDICINA INTERNA ───
-export async function guardarPerfilMedicinaInterna(formData: FormData): Promise<void> {
-  const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
-
-  const clinicalStatus = String(formData.get('clinicalStatus') ?? 'Estable').trim() || 'Estable'
-  const codeStatus = String(formData.get('codeStatus') ?? 'Full Code').trim() || 'Full Code'
-  const isolationType = String(formData.get('isolationType') ?? 'Sin aislamiento').trim() || 'Sin aislamiento'
-  const oxygenSupport = String(formData.get('oxygenSupport') ?? 'Aire ambiente').trim() || 'Aire ambiente'
-  const dietType = String(formData.get('dietType') ?? 'Dieta corriente').trim() || 'Dieta corriente'
-  const thromboprophylaxis =
-    String(formData.get('thromboprophylaxis') ?? 'Pendiente evaluar').trim() || 'Pendiente evaluar'
-  const ulcerProphylaxis =
-    String(formData.get('ulcerProphylaxis') ?? 'No indicada').trim() || 'No indicada'
-  const invasiveDevices = String(formData.get('invasiveDevices') ?? '').trim() || null
-  const fluidBalance24h = String(formData.get('fluidBalance24h') ?? '').trim() || null
-  const dischargeGoal = String(formData.get('dischargeGoal') ?? '').trim() || null
-
-  await prisma.internalMedicineProfile.upsert({
-    where: { episodeId },
-    update: {
-      clinicalStatus,
-      codeStatus,
-      isolationType,
-      oxygenSupport,
-      dietType,
-      thromboprophylaxis,
-      ulcerProphylaxis,
-      invasiveDevices,
-      fluidBalance24h,
-      dischargeGoal,
-      updatedBy: email,
-    },
-    create: {
-      episodeId,
-      clinicalStatus,
-      codeStatus,
-      isolationType,
-      oxygenSupport,
-      dietType,
-      thromboprophylaxis,
-      ulcerProphylaxis,
-      invasiveDevices,
-      fluidBalance24h,
-      dischargeGoal,
-      updatedBy: email,
-    },
-  })
-
-  await logAudit({
-    actorId: userId,
-    actorRole: role,
-    action: 'update',
-    entity: 'internal_medicine_profile',
-    patientId: episode.patientId,
-    episodeId,
-    newValue: {
-      clinicalStatus,
-      codeStatus,
-      isolationType,
-      oxygenSupport,
-      dietType,
-      thromboprophylaxis,
-      ulcerProphylaxis,
-      invasiveDevices,
-      fluidBalance24h,
-      dischargeGoal,
-    },
-    reason: 'Actualización de seguimiento clínico de Medicina Interna',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

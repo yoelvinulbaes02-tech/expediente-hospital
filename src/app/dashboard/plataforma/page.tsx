@@ -27,7 +27,6 @@ export default async function PlataformaPage({
 }) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
-  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
   if (ctx.user.role !== 'SUPERADMIN') redirect('/dashboard')
 
   const { ok, error } = await searchParams
@@ -238,8 +237,7 @@ export default async function PlataformaPage({
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
               >
                 <option value="CONSULTAS">Interfaz de Consultas (Ambulatorio)</option>
-                <option value="HOSPITALIZACION">Interfaz de Hospitalización / Nefrología</option>
-                <option value="MEDICINA_INTERNA">Interfaz de Medicina Interna (Hospitalización)</option>
+                <option value="HOSPITALIZACION">Interfaz de Hospitalización (Sala + Interconsulta)</option>
               </select>
             </div>
 
@@ -339,8 +337,7 @@ export default async function PlataformaPage({
               <InputPassword
                 name="adminPassword"
                 required
-                minLength={8}
-                placeholder="Mín. 8 caracteres (letras y números)"
+                placeholder="Mínimo 6 caracteres"
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
               />
             </div>
@@ -400,8 +397,7 @@ export default async function PlataformaPage({
                         defaultValue={r.interfaceMode}
                         className="px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
                       >
-                        <option value="HOSPITALIZACION">Hospitalización / Nefrología</option>
-                        <option value="MEDICINA_INTERNA">Medicina Interna</option>
+                        <option value="HOSPITALIZACION">Hospitalización</option>
                         <option value="CONSULTAS">Consultas</option>
                       </select>
                       <select

@@ -66,18 +66,15 @@ export async function exigirPermiso(
   if (!session?.user?.id) redirect('/login')
 
   const userId = session.user.id
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const role = String((session.user as any)?.role ?? 'READONLY')
+  const email = session.user.email ?? ''
+  const nombre = session.user.name || email
 
   const [usuarioDb, episode] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        role: true,
-        email: true,
-        fullName: true,
-        residencyId: true,
-        isActive: true,
-        mustChangePassword: true,
-      },
+      select: { residencyId: true, isActive: true },
     }),
     prisma.episode.findUnique({
       where: { id: episodeId },
@@ -93,17 +90,15 @@ export async function exigirPermiso(
   ])
 
   if (!usuarioDb?.isActive) redirect('/login')
-  if (usuarioDb.mustChangePassword) redirect('/dashboard/perfil?force=true')
   if (!episode) redirect('/dashboard')
 
-  const role = String(usuarioDb.role)
-  const email = usuarioDb.email
-  const nombre = usuarioDb.fullName || email
-
-  if (role !== 'SUPERADMIN') {
-    if (!usuarioDb.residencyId || !episode.residencyId || episode.residencyId !== usuarioDb.residencyId) {
-      redirect('/dashboard')
-    }
+  if (
+    role !== 'SUPERADMIN' &&
+    episode.residencyId &&
+    usuarioDb.residencyId &&
+    episode.residencyId !== usuarioDb.residencyId
+  ) {
+    redirect('/dashboard')
   }
 
   const checkSuscripcion = await verificarEscrituraResidencia(

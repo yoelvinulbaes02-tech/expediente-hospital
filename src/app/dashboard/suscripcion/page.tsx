@@ -27,7 +27,6 @@ export default async function SuscripcionPage({
 }) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
-  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
   if (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
     redirect('/dashboard')
   }

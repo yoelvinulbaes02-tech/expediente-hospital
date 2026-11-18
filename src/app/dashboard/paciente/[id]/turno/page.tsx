@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { obtenerContextoResidencia } from '@/lib/tenant'
+import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { guardarEntregaTurno, aceptarEntregaTurno } from '../actions-turno'
@@ -15,15 +15,14 @@ export default async function EntregaTurnoPage({
   params: Promise<{ id: string }>
   searchParams: Promise<{ error?: string }>
 }) {
-  const ctx = await obtenerContextoResidencia()
-  if (!ctx?.user) redirect('/login')
-  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
+  const session = await auth()
+  if (!session?.user?.id) redirect('/login')
 
   const { id } = await params
   const { error } = await searchParams
-  const userId = ctx.user.id
-  const role = String(ctx.user.role)
-  const miEmail = ctx.user.email.toLowerCase()
+  const userId = session.user.id
+  const role = String(session.user.role)
+  const miEmail = (session.user.email ?? '').toLowerCase()
 
   const episode = await prisma.episode.findUnique({
     where: { id },
@@ -40,17 +39,7 @@ export default async function EntregaTurnoPage({
 
   if (!episode) return <div className="p-8 text-center text-slate-800">Expediente no encontrado.</div>
 
-  if (!ctx.esSuperAdmin) {
-    if (!ctx.residency || !episode.residencyId || episode.residencyId !== ctx.residency.id) {
-      redirect('/dashboard')
-    }
-  }
-
-  const suscripcionBloqueada = ctx.suscripcion?.bloqueada ?? false
-  const permisosBase = calcularPermisos(role, userId, episode)
-  const permisos = suscripcionBloqueada
-    ? { ...permisosBase, puedeEditar: false, puedeEntregar: false }
-    : permisosBase
+  const permisos = calcularPermisos(role, userId, episode)
   const pendiente = episode.handoffs.find((h) => h.status === 'PENDIENTE')
   const soyReceptor = !!pendiente && pendiente.recibidoPor.toLowerCase() === miEmail
 
@@ -64,25 +53,17 @@ export default async function EntregaTurnoPage({
     if (t.doneBy) emails.add(t.doneBy)
   })
   const usuarios = await prisma.user.findMany({
-    where: {
-      email: { in: Array.from(emails) },
-      ...(episode.residencyId ? { residencyId: episode.residencyId } : {}),
-    },
+    where: { email: { in: Array.from(emails) } },
     select: { email: true, fullName: true },
   })
   const nombres: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.fullName]))
   const nombreDe = (email: string) => nombres[email] ?? email
 
-  // Médicos disponibles para recibir (solo de la misma residencia)
+  // Médicos disponibles para recibir (solo si yo puedo entregar)
   const puedeEntregar = permisos.puedeEditar && !pendiente
-  const doctores = puedeEntregar && episode.residencyId
+  const doctores = puedeEntregar
     ? await prisma.user.findMany({
-        where: {
-          residencyId: episode.residencyId,
-          isActive: true,
-          role: { in: ['DOCTOR', 'RESIDENT'] },
-          id: { not: userId },
-        },
+        where: { isActive: true, role: { in: ['DOCTOR', 'RESIDENT'] }, id: { not: userId } },
         select: { id: true, fullName: true, email: true },
         orderBy: { fullName: 'asc' },
       })
@@ -266,7 +247,7 @@ export default async function EntregaTurnoPage({
               <input type="hidden" name="episodeId" value={episode.id} />
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Entregado por:</label>
-                <input disabled value={ctx.user.fullName || ''} className="w-full px-3 py-2 border rounded-lg bg-slate-200 text-slate-600" />
+                <input disabled value={session.user.name || ''} className="w-full px-3 py-2 border rounded-lg bg-slate-200 text-slate-600" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Recibido por (médico que recibe):</label>

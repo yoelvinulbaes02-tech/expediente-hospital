@@ -38,10 +38,9 @@ export function FormularioCambiarPassword() {
         <InputPassword
           name="newPassword"
           required
-          minLength={8}
+          minLength={6}
           className={`w-full px-3 py-2 border rounded-lg text-slate-900 ${borde('newPassword')}`}
         />
-        <p className="mt-1 text-xs text-slate-500">Mínimo 8 caracteres, incluyendo letras y números.</p>
         {errorDe('newPassword')}
       </div>
 
@@ -50,7 +49,7 @@ export function FormularioCambiarPassword() {
         <InputPassword
           name="confirmPassword"
           required
-          minLength={8}
+          minLength={6}
           className={`w-full px-3 py-2 border rounded-lg text-slate-900 ${borde('confirmPassword')}`}
         />
         {errorDe('confirmPassword')}

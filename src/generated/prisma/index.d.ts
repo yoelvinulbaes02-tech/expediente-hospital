@@ -49,11 +49,6 @@ export type Episode = $Result.DefaultSelection<Prisma.$EpisodePayload>
  */
 export type Consultation = $Result.DefaultSelection<Prisma.$ConsultationPayload>
 /**
- * Model InternalMedicineProfile
- * 
- */
-export type InternalMedicineProfile = $Result.DefaultSelection<Prisma.$InternalMedicineProfilePayload>
-/**
  * Model MedicalHistory
  * 
  */
@@ -133,8 +128,7 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 export const InterfaceMode: {
   HOSPITALIZACION: 'HOSPITALIZACION',
-  CONSULTAS: 'CONSULTAS',
-  MEDICINA_INTERNA: 'MEDICINA_INTERNA'
+  CONSULTAS: 'CONSULTAS'
 };
 
 export type InterfaceMode = (typeof InterfaceMode)[keyof typeof InterfaceMode]
@@ -365,16 +359,6 @@ export class PrismaClient<
     * ```
     */
   get consultation(): Prisma.ConsultationDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.internalMedicineProfile`: Exposes CRUD operations for the **InternalMedicineProfile** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more InternalMedicineProfiles
-    * const internalMedicineProfiles = await prisma.internalMedicineProfile.findMany()
-    * ```
-    */
-  get internalMedicineProfile(): Prisma.InternalMedicineProfileDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.medicalHistory`: Exposes CRUD operations for the **MedicalHistory** model.
@@ -949,7 +933,6 @@ export namespace Prisma {
     Patient: 'Patient',
     Episode: 'Episode',
     Consultation: 'Consultation',
-    InternalMedicineProfile: 'InternalMedicineProfile',
     MedicalHistory: 'MedicalHistory',
     ImportantAlert: 'ImportantAlert',
     GfrRecord: 'GfrRecord',
@@ -977,7 +960,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "residency" | "subscriptionPayment" | "user" | "auditLog" | "patient" | "episode" | "consultation" | "internalMedicineProfile" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
+      modelProps: "residency" | "subscriptionPayment" | "user" | "auditLog" | "patient" | "episode" | "consultation" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1496,80 +1479,6 @@ export namespace Prisma {
           count: {
             args: Prisma.ConsultationCountArgs<ExtArgs>
             result: $Utils.Optional<ConsultationCountAggregateOutputType> | number
-          }
-        }
-      }
-      InternalMedicineProfile: {
-        payload: Prisma.$InternalMedicineProfilePayload<ExtArgs>
-        fields: Prisma.InternalMedicineProfileFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.InternalMedicineProfileFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.InternalMedicineProfileFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>
-          }
-          findFirst: {
-            args: Prisma.InternalMedicineProfileFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.InternalMedicineProfileFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>
-          }
-          findMany: {
-            args: Prisma.InternalMedicineProfileFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>[]
-          }
-          create: {
-            args: Prisma.InternalMedicineProfileCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>
-          }
-          createMany: {
-            args: Prisma.InternalMedicineProfileCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.InternalMedicineProfileCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>[]
-          }
-          delete: {
-            args: Prisma.InternalMedicineProfileDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>
-          }
-          update: {
-            args: Prisma.InternalMedicineProfileUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>
-          }
-          deleteMany: {
-            args: Prisma.InternalMedicineProfileDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.InternalMedicineProfileUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.InternalMedicineProfileUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>[]
-          }
-          upsert: {
-            args: Prisma.InternalMedicineProfileUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InternalMedicineProfilePayload>
-          }
-          aggregate: {
-            args: Prisma.InternalMedicineProfileAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateInternalMedicineProfile>
-          }
-          groupBy: {
-            args: Prisma.InternalMedicineProfileGroupByArgs<ExtArgs>
-            result: $Utils.Optional<InternalMedicineProfileGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.InternalMedicineProfileCountArgs<ExtArgs>
-            result: $Utils.Optional<InternalMedicineProfileCountAggregateOutputType> | number
           }
         }
       }
@@ -2591,7 +2500,6 @@ export namespace Prisma {
     patient?: PatientOmit
     episode?: EpisodeOmit
     consultation?: ConsultationOmit
-    internalMedicineProfile?: InternalMedicineProfileOmit
     medicalHistory?: MedicalHistoryOmit
     importantAlert?: ImportantAlertOmit
     gfrRecord?: GfrRecordOmit
@@ -9786,7 +9694,6 @@ export namespace Prisma {
     studyReports?: boolean | Episode$studyReportsArgs<ExtArgs>
     viralSerologies?: boolean | Episode$viralSerologiesArgs<ExtArgs>
     vascularAccesses?: boolean | Episode$vascularAccessesArgs<ExtArgs>
-    internalMedicineProfile?: boolean | Episode$internalMedicineProfileArgs<ExtArgs>
     _count?: boolean | EpisodeCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["episode"]>
 
@@ -9905,7 +9812,6 @@ export namespace Prisma {
     studyReports?: boolean | Episode$studyReportsArgs<ExtArgs>
     viralSerologies?: boolean | Episode$viralSerologiesArgs<ExtArgs>
     vascularAccesses?: boolean | Episode$vascularAccessesArgs<ExtArgs>
-    internalMedicineProfile?: boolean | Episode$internalMedicineProfileArgs<ExtArgs>
     _count?: boolean | EpisodeCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type EpisodeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9936,7 +9842,6 @@ export namespace Prisma {
       studyReports: Prisma.$StudyReportPayload<ExtArgs>[]
       viralSerologies: Prisma.$ViralSerologyPayload<ExtArgs>[]
       vascularAccesses: Prisma.$VascularAccessPayload<ExtArgs>[]
-      internalMedicineProfile: Prisma.$InternalMedicineProfilePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -10375,7 +10280,6 @@ export namespace Prisma {
     studyReports<T extends Episode$studyReportsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$studyReportsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudyReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     viralSerologies<T extends Episode$viralSerologiesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$viralSerologiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ViralSerologyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     vascularAccesses<T extends Episode$vascularAccessesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$vascularAccessesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VascularAccessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    internalMedicineProfile<T extends Episode$internalMedicineProfileArgs<ExtArgs> = {}>(args?: Subset<T, Episode$internalMedicineProfileArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11133,25 +11037,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: VascularAccessScalarFieldEnum | VascularAccessScalarFieldEnum[]
-  }
-
-  /**
-   * Episode.internalMedicineProfile
-   */
-  export type Episode$internalMedicineProfileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    where?: InternalMedicineProfileWhereInput
   }
 
   /**
@@ -12604,1186 +12489,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ConsultationInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model InternalMedicineProfile
-   */
-
-  export type AggregateInternalMedicineProfile = {
-    _count: InternalMedicineProfileCountAggregateOutputType | null
-    _min: InternalMedicineProfileMinAggregateOutputType | null
-    _max: InternalMedicineProfileMaxAggregateOutputType | null
-  }
-
-  export type InternalMedicineProfileMinAggregateOutputType = {
-    id: string | null
-    episodeId: string | null
-    clinicalStatus: string | null
-    codeStatus: string | null
-    isolationType: string | null
-    oxygenSupport: string | null
-    dietType: string | null
-    thromboprophylaxis: string | null
-    ulcerProphylaxis: string | null
-    invasiveDevices: string | null
-    fluidBalance24h: string | null
-    dischargeGoal: string | null
-    updatedBy: string | null
-    updatedAt: Date | null
-  }
-
-  export type InternalMedicineProfileMaxAggregateOutputType = {
-    id: string | null
-    episodeId: string | null
-    clinicalStatus: string | null
-    codeStatus: string | null
-    isolationType: string | null
-    oxygenSupport: string | null
-    dietType: string | null
-    thromboprophylaxis: string | null
-    ulcerProphylaxis: string | null
-    invasiveDevices: string | null
-    fluidBalance24h: string | null
-    dischargeGoal: string | null
-    updatedBy: string | null
-    updatedAt: Date | null
-  }
-
-  export type InternalMedicineProfileCountAggregateOutputType = {
-    id: number
-    episodeId: number
-    clinicalStatus: number
-    codeStatus: number
-    isolationType: number
-    oxygenSupport: number
-    dietType: number
-    thromboprophylaxis: number
-    ulcerProphylaxis: number
-    invasiveDevices: number
-    fluidBalance24h: number
-    dischargeGoal: number
-    updatedBy: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type InternalMedicineProfileMinAggregateInputType = {
-    id?: true
-    episodeId?: true
-    clinicalStatus?: true
-    codeStatus?: true
-    isolationType?: true
-    oxygenSupport?: true
-    dietType?: true
-    thromboprophylaxis?: true
-    ulcerProphylaxis?: true
-    invasiveDevices?: true
-    fluidBalance24h?: true
-    dischargeGoal?: true
-    updatedBy?: true
-    updatedAt?: true
-  }
-
-  export type InternalMedicineProfileMaxAggregateInputType = {
-    id?: true
-    episodeId?: true
-    clinicalStatus?: true
-    codeStatus?: true
-    isolationType?: true
-    oxygenSupport?: true
-    dietType?: true
-    thromboprophylaxis?: true
-    ulcerProphylaxis?: true
-    invasiveDevices?: true
-    fluidBalance24h?: true
-    dischargeGoal?: true
-    updatedBy?: true
-    updatedAt?: true
-  }
-
-  export type InternalMedicineProfileCountAggregateInputType = {
-    id?: true
-    episodeId?: true
-    clinicalStatus?: true
-    codeStatus?: true
-    isolationType?: true
-    oxygenSupport?: true
-    dietType?: true
-    thromboprophylaxis?: true
-    ulcerProphylaxis?: true
-    invasiveDevices?: true
-    fluidBalance24h?: true
-    dischargeGoal?: true
-    updatedBy?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type InternalMedicineProfileAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which InternalMedicineProfile to aggregate.
-     */
-    where?: InternalMedicineProfileWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of InternalMedicineProfiles to fetch.
-     */
-    orderBy?: InternalMedicineProfileOrderByWithRelationInput | InternalMedicineProfileOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: InternalMedicineProfileWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` InternalMedicineProfiles from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` InternalMedicineProfiles.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned InternalMedicineProfiles
-    **/
-    _count?: true | InternalMedicineProfileCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: InternalMedicineProfileMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: InternalMedicineProfileMaxAggregateInputType
-  }
-
-  export type GetInternalMedicineProfileAggregateType<T extends InternalMedicineProfileAggregateArgs> = {
-        [P in keyof T & keyof AggregateInternalMedicineProfile]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateInternalMedicineProfile[P]>
-      : GetScalarType<T[P], AggregateInternalMedicineProfile[P]>
-  }
-
-
-
-
-  export type InternalMedicineProfileGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: InternalMedicineProfileWhereInput
-    orderBy?: InternalMedicineProfileOrderByWithAggregationInput | InternalMedicineProfileOrderByWithAggregationInput[]
-    by: InternalMedicineProfileScalarFieldEnum[] | InternalMedicineProfileScalarFieldEnum
-    having?: InternalMedicineProfileScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: InternalMedicineProfileCountAggregateInputType | true
-    _min?: InternalMedicineProfileMinAggregateInputType
-    _max?: InternalMedicineProfileMaxAggregateInputType
-  }
-
-  export type InternalMedicineProfileGroupByOutputType = {
-    id: string
-    episodeId: string
-    clinicalStatus: string
-    codeStatus: string
-    isolationType: string
-    oxygenSupport: string
-    dietType: string
-    thromboprophylaxis: string
-    ulcerProphylaxis: string
-    invasiveDevices: string | null
-    fluidBalance24h: string | null
-    dischargeGoal: string | null
-    updatedBy: string
-    updatedAt: Date
-    _count: InternalMedicineProfileCountAggregateOutputType | null
-    _min: InternalMedicineProfileMinAggregateOutputType | null
-    _max: InternalMedicineProfileMaxAggregateOutputType | null
-  }
-
-  type GetInternalMedicineProfileGroupByPayload<T extends InternalMedicineProfileGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<InternalMedicineProfileGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof InternalMedicineProfileGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], InternalMedicineProfileGroupByOutputType[P]>
-            : GetScalarType<T[P], InternalMedicineProfileGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type InternalMedicineProfileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    episodeId?: boolean
-    clinicalStatus?: boolean
-    codeStatus?: boolean
-    isolationType?: boolean
-    oxygenSupport?: boolean
-    dietType?: boolean
-    thromboprophylaxis?: boolean
-    ulcerProphylaxis?: boolean
-    invasiveDevices?: boolean
-    fluidBalance24h?: boolean
-    dischargeGoal?: boolean
-    updatedBy?: boolean
-    updatedAt?: boolean
-    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["internalMedicineProfile"]>
-
-  export type InternalMedicineProfileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    episodeId?: boolean
-    clinicalStatus?: boolean
-    codeStatus?: boolean
-    isolationType?: boolean
-    oxygenSupport?: boolean
-    dietType?: boolean
-    thromboprophylaxis?: boolean
-    ulcerProphylaxis?: boolean
-    invasiveDevices?: boolean
-    fluidBalance24h?: boolean
-    dischargeGoal?: boolean
-    updatedBy?: boolean
-    updatedAt?: boolean
-    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["internalMedicineProfile"]>
-
-  export type InternalMedicineProfileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    episodeId?: boolean
-    clinicalStatus?: boolean
-    codeStatus?: boolean
-    isolationType?: boolean
-    oxygenSupport?: boolean
-    dietType?: boolean
-    thromboprophylaxis?: boolean
-    ulcerProphylaxis?: boolean
-    invasiveDevices?: boolean
-    fluidBalance24h?: boolean
-    dischargeGoal?: boolean
-    updatedBy?: boolean
-    updatedAt?: boolean
-    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["internalMedicineProfile"]>
-
-  export type InternalMedicineProfileSelectScalar = {
-    id?: boolean
-    episodeId?: boolean
-    clinicalStatus?: boolean
-    codeStatus?: boolean
-    isolationType?: boolean
-    oxygenSupport?: boolean
-    dietType?: boolean
-    thromboprophylaxis?: boolean
-    ulcerProphylaxis?: boolean
-    invasiveDevices?: boolean
-    fluidBalance24h?: boolean
-    dischargeGoal?: boolean
-    updatedBy?: boolean
-    updatedAt?: boolean
-  }
-
-  export type InternalMedicineProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "clinicalStatus" | "codeStatus" | "isolationType" | "oxygenSupport" | "dietType" | "thromboprophylaxis" | "ulcerProphylaxis" | "invasiveDevices" | "fluidBalance24h" | "dischargeGoal" | "updatedBy" | "updatedAt", ExtArgs["result"]["internalMedicineProfile"]>
-  export type InternalMedicineProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
-  }
-  export type InternalMedicineProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
-  }
-  export type InternalMedicineProfileIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
-  }
-
-  export type $InternalMedicineProfilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "InternalMedicineProfile"
-    objects: {
-      episode: Prisma.$EpisodePayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      episodeId: string
-      clinicalStatus: string
-      codeStatus: string
-      isolationType: string
-      oxygenSupport: string
-      dietType: string
-      thromboprophylaxis: string
-      ulcerProphylaxis: string
-      invasiveDevices: string | null
-      fluidBalance24h: string | null
-      dischargeGoal: string | null
-      updatedBy: string
-      updatedAt: Date
-    }, ExtArgs["result"]["internalMedicineProfile"]>
-    composites: {}
-  }
-
-  type InternalMedicineProfileGetPayload<S extends boolean | null | undefined | InternalMedicineProfileDefaultArgs> = $Result.GetResult<Prisma.$InternalMedicineProfilePayload, S>
-
-  type InternalMedicineProfileCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<InternalMedicineProfileFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: InternalMedicineProfileCountAggregateInputType | true
-    }
-
-  export interface InternalMedicineProfileDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InternalMedicineProfile'], meta: { name: 'InternalMedicineProfile' } }
-    /**
-     * Find zero or one InternalMedicineProfile that matches the filter.
-     * @param {InternalMedicineProfileFindUniqueArgs} args - Arguments to find a InternalMedicineProfile
-     * @example
-     * // Get one InternalMedicineProfile
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends InternalMedicineProfileFindUniqueArgs>(args: SelectSubset<T, InternalMedicineProfileFindUniqueArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one InternalMedicineProfile that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {InternalMedicineProfileFindUniqueOrThrowArgs} args - Arguments to find a InternalMedicineProfile
-     * @example
-     * // Get one InternalMedicineProfile
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends InternalMedicineProfileFindUniqueOrThrowArgs>(args: SelectSubset<T, InternalMedicineProfileFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first InternalMedicineProfile that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {InternalMedicineProfileFindFirstArgs} args - Arguments to find a InternalMedicineProfile
-     * @example
-     * // Get one InternalMedicineProfile
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends InternalMedicineProfileFindFirstArgs>(args?: SelectSubset<T, InternalMedicineProfileFindFirstArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first InternalMedicineProfile that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {InternalMedicineProfileFindFirstOrThrowArgs} args - Arguments to find a InternalMedicineProfile
-     * @example
-     * // Get one InternalMedicineProfile
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends InternalMedicineProfileFindFirstOrThrowArgs>(args?: SelectSubset<T, InternalMedicineProfileFindFirstOrThrowArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more InternalMedicineProfiles that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {InternalMedicineProfileFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all InternalMedicineProfiles
-     * const internalMedicineProfiles = await prisma.internalMedicineProfile.findMany()
-     * 
-     * // Get first 10 InternalMedicineProfiles
-     * const internalMedicineProfiles = await prisma.internalMedicineProfile.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const internalMedicineProfileWithIdOnly = await prisma.internalMedicineProfile.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends InternalMedicineProfileFindManyArgs>(args?: SelectSubset<T, InternalMedicineProfileFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a InternalMedicineProfile.
-     * @param {InternalMedicineProfileCreateArgs} args - Arguments to create a InternalMedicineProfile.
-     * @example
-     * // Create one InternalMedicineProfile
-     * const InternalMedicineProfile = await prisma.internalMedicineProfile.create({
-     *   data: {
-     *     // ... data to create a InternalMedicineProfile
-     *   }
-     * })
-     * 
-     */
-    create<T extends InternalMedicineProfileCreateArgs>(args: SelectSubset<T, InternalMedicineProfileCreateArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many InternalMedicineProfiles.
-     * @param {InternalMedicineProfileCreateManyArgs} args - Arguments to create many InternalMedicineProfiles.
-     * @example
-     * // Create many InternalMedicineProfiles
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends InternalMedicineProfileCreateManyArgs>(args?: SelectSubset<T, InternalMedicineProfileCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many InternalMedicineProfiles and returns the data saved in the database.
-     * @param {InternalMedicineProfileCreateManyAndReturnArgs} args - Arguments to create many InternalMedicineProfiles.
-     * @example
-     * // Create many InternalMedicineProfiles
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many InternalMedicineProfiles and only return the `id`
-     * const internalMedicineProfileWithIdOnly = await prisma.internalMedicineProfile.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends InternalMedicineProfileCreateManyAndReturnArgs>(args?: SelectSubset<T, InternalMedicineProfileCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a InternalMedicineProfile.
-     * @param {InternalMedicineProfileDeleteArgs} args - Arguments to delete one InternalMedicineProfile.
-     * @example
-     * // Delete one InternalMedicineProfile
-     * const InternalMedicineProfile = await prisma.internalMedicineProfile.delete({
-     *   where: {
-     *     // ... filter to delete one InternalMedicineProfile
-     *   }
-     * })
-     * 
-     */
-    delete<T extends InternalMedicineProfileDeleteArgs>(args: SelectSubset<T, InternalMedicineProfileDeleteArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one InternalMedicineProfile.
-     * @param {InternalMedicineProfileUpdateArgs} args - Arguments to update one InternalMedicineProfile.
-     * @example
-     * // Update one InternalMedicineProfile
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends InternalMedicineProfileUpdateArgs>(args: SelectSubset<T, InternalMedicineProfileUpdateArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more InternalMedicineProfiles.
-     * @param {InternalMedicineProfileDeleteManyArgs} args - Arguments to filter InternalMedicineProfiles to delete.
-     * @example
-     * // Delete a few InternalMedicineProfiles
-     * const { count } = await prisma.internalMedicineProfile.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends InternalMedicineProfileDeleteManyArgs>(args?: SelectSubset<T, InternalMedicineProfileDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more InternalMedicineProfiles.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {InternalMedicineProfileUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many InternalMedicineProfiles
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends InternalMedicineProfileUpdateManyArgs>(args: SelectSubset<T, InternalMedicineProfileUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more InternalMedicineProfiles and returns the data updated in the database.
-     * @param {InternalMedicineProfileUpdateManyAndReturnArgs} args - Arguments to update many InternalMedicineProfiles.
-     * @example
-     * // Update many InternalMedicineProfiles
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more InternalMedicineProfiles and only return the `id`
-     * const internalMedicineProfileWithIdOnly = await prisma.internalMedicineProfile.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends InternalMedicineProfileUpdateManyAndReturnArgs>(args: SelectSubset<T, InternalMedicineProfileUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one InternalMedicineProfile.
-     * @param {InternalMedicineProfileUpsertArgs} args - Arguments to update or create a InternalMedicineProfile.
-     * @example
-     * // Update or create a InternalMedicineProfile
-     * const internalMedicineProfile = await prisma.internalMedicineProfile.upsert({
-     *   create: {
-     *     // ... data to create a InternalMedicineProfile
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the InternalMedicineProfile we want to update
-     *   }
-     * })
-     */
-    upsert<T extends InternalMedicineProfileUpsertArgs>(args: SelectSubset<T, InternalMedicineProfileUpsertArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of InternalMedicineProfiles.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {InternalMedicineProfileCountArgs} args - Arguments to filter InternalMedicineProfiles to count.
-     * @example
-     * // Count the number of InternalMedicineProfiles
-     * const count = await prisma.internalMedicineProfile.count({
-     *   where: {
-     *     // ... the filter for the InternalMedicineProfiles we want to count
-     *   }
-     * })
-    **/
-    count<T extends InternalMedicineProfileCountArgs>(
-      args?: Subset<T, InternalMedicineProfileCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], InternalMedicineProfileCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a InternalMedicineProfile.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {InternalMedicineProfileAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends InternalMedicineProfileAggregateArgs>(args: Subset<T, InternalMedicineProfileAggregateArgs>): Prisma.PrismaPromise<GetInternalMedicineProfileAggregateType<T>>
-
-    /**
-     * Group by InternalMedicineProfile.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {InternalMedicineProfileGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends InternalMedicineProfileGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: InternalMedicineProfileGroupByArgs['orderBy'] }
-        : { orderBy?: InternalMedicineProfileGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, InternalMedicineProfileGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInternalMedicineProfileGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the InternalMedicineProfile model
-   */
-  readonly fields: InternalMedicineProfileFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for InternalMedicineProfile.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__InternalMedicineProfileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    episode<T extends EpisodeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDefaultArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the InternalMedicineProfile model
-   */
-  interface InternalMedicineProfileFieldRefs {
-    readonly id: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly episodeId: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly clinicalStatus: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly codeStatus: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly isolationType: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly oxygenSupport: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly dietType: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly thromboprophylaxis: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly ulcerProphylaxis: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly invasiveDevices: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly fluidBalance24h: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly dischargeGoal: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly updatedBy: FieldRef<"InternalMedicineProfile", 'String'>
-    readonly updatedAt: FieldRef<"InternalMedicineProfile", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * InternalMedicineProfile findUnique
-   */
-  export type InternalMedicineProfileFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * Filter, which InternalMedicineProfile to fetch.
-     */
-    where: InternalMedicineProfileWhereUniqueInput
-  }
-
-  /**
-   * InternalMedicineProfile findUniqueOrThrow
-   */
-  export type InternalMedicineProfileFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * Filter, which InternalMedicineProfile to fetch.
-     */
-    where: InternalMedicineProfileWhereUniqueInput
-  }
-
-  /**
-   * InternalMedicineProfile findFirst
-   */
-  export type InternalMedicineProfileFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * Filter, which InternalMedicineProfile to fetch.
-     */
-    where?: InternalMedicineProfileWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of InternalMedicineProfiles to fetch.
-     */
-    orderBy?: InternalMedicineProfileOrderByWithRelationInput | InternalMedicineProfileOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for InternalMedicineProfiles.
-     */
-    cursor?: InternalMedicineProfileWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` InternalMedicineProfiles from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` InternalMedicineProfiles.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of InternalMedicineProfiles.
-     */
-    distinct?: InternalMedicineProfileScalarFieldEnum | InternalMedicineProfileScalarFieldEnum[]
-  }
-
-  /**
-   * InternalMedicineProfile findFirstOrThrow
-   */
-  export type InternalMedicineProfileFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * Filter, which InternalMedicineProfile to fetch.
-     */
-    where?: InternalMedicineProfileWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of InternalMedicineProfiles to fetch.
-     */
-    orderBy?: InternalMedicineProfileOrderByWithRelationInput | InternalMedicineProfileOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for InternalMedicineProfiles.
-     */
-    cursor?: InternalMedicineProfileWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` InternalMedicineProfiles from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` InternalMedicineProfiles.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of InternalMedicineProfiles.
-     */
-    distinct?: InternalMedicineProfileScalarFieldEnum | InternalMedicineProfileScalarFieldEnum[]
-  }
-
-  /**
-   * InternalMedicineProfile findMany
-   */
-  export type InternalMedicineProfileFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * Filter, which InternalMedicineProfiles to fetch.
-     */
-    where?: InternalMedicineProfileWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of InternalMedicineProfiles to fetch.
-     */
-    orderBy?: InternalMedicineProfileOrderByWithRelationInput | InternalMedicineProfileOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing InternalMedicineProfiles.
-     */
-    cursor?: InternalMedicineProfileWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` InternalMedicineProfiles from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` InternalMedicineProfiles.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of InternalMedicineProfiles.
-     */
-    distinct?: InternalMedicineProfileScalarFieldEnum | InternalMedicineProfileScalarFieldEnum[]
-  }
-
-  /**
-   * InternalMedicineProfile create
-   */
-  export type InternalMedicineProfileCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * The data needed to create a InternalMedicineProfile.
-     */
-    data: XOR<InternalMedicineProfileCreateInput, InternalMedicineProfileUncheckedCreateInput>
-  }
-
-  /**
-   * InternalMedicineProfile createMany
-   */
-  export type InternalMedicineProfileCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many InternalMedicineProfiles.
-     */
-    data: InternalMedicineProfileCreateManyInput | InternalMedicineProfileCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * InternalMedicineProfile createManyAndReturn
-   */
-  export type InternalMedicineProfileCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * The data used to create many InternalMedicineProfiles.
-     */
-    data: InternalMedicineProfileCreateManyInput | InternalMedicineProfileCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * InternalMedicineProfile update
-   */
-  export type InternalMedicineProfileUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * The data needed to update a InternalMedicineProfile.
-     */
-    data: XOR<InternalMedicineProfileUpdateInput, InternalMedicineProfileUncheckedUpdateInput>
-    /**
-     * Choose, which InternalMedicineProfile to update.
-     */
-    where: InternalMedicineProfileWhereUniqueInput
-  }
-
-  /**
-   * InternalMedicineProfile updateMany
-   */
-  export type InternalMedicineProfileUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update InternalMedicineProfiles.
-     */
-    data: XOR<InternalMedicineProfileUpdateManyMutationInput, InternalMedicineProfileUncheckedUpdateManyInput>
-    /**
-     * Filter which InternalMedicineProfiles to update
-     */
-    where?: InternalMedicineProfileWhereInput
-    /**
-     * Limit how many InternalMedicineProfiles to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * InternalMedicineProfile updateManyAndReturn
-   */
-  export type InternalMedicineProfileUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * The data used to update InternalMedicineProfiles.
-     */
-    data: XOR<InternalMedicineProfileUpdateManyMutationInput, InternalMedicineProfileUncheckedUpdateManyInput>
-    /**
-     * Filter which InternalMedicineProfiles to update
-     */
-    where?: InternalMedicineProfileWhereInput
-    /**
-     * Limit how many InternalMedicineProfiles to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * InternalMedicineProfile upsert
-   */
-  export type InternalMedicineProfileUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * The filter to search for the InternalMedicineProfile to update in case it exists.
-     */
-    where: InternalMedicineProfileWhereUniqueInput
-    /**
-     * In case the InternalMedicineProfile found by the `where` argument doesn't exist, create a new InternalMedicineProfile with this data.
-     */
-    create: XOR<InternalMedicineProfileCreateInput, InternalMedicineProfileUncheckedCreateInput>
-    /**
-     * In case the InternalMedicineProfile was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<InternalMedicineProfileUpdateInput, InternalMedicineProfileUncheckedUpdateInput>
-  }
-
-  /**
-   * InternalMedicineProfile delete
-   */
-  export type InternalMedicineProfileDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
-    /**
-     * Filter which InternalMedicineProfile to delete.
-     */
-    where: InternalMedicineProfileWhereUniqueInput
-  }
-
-  /**
-   * InternalMedicineProfile deleteMany
-   */
-  export type InternalMedicineProfileDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which InternalMedicineProfiles to delete
-     */
-    where?: InternalMedicineProfileWhereInput
-    /**
-     * Limit how many InternalMedicineProfiles to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * InternalMedicineProfile without action
-   */
-  export type InternalMedicineProfileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InternalMedicineProfile
-     */
-    select?: InternalMedicineProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InternalMedicineProfile
-     */
-    omit?: InternalMedicineProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InternalMedicineProfileInclude<ExtArgs> | null
   }
 
 
@@ -27616,26 +26321,6 @@ export namespace Prisma {
   export type ConsultationScalarFieldEnum = (typeof ConsultationScalarFieldEnum)[keyof typeof ConsultationScalarFieldEnum]
 
 
-  export const InternalMedicineProfileScalarFieldEnum: {
-    id: 'id',
-    episodeId: 'episodeId',
-    clinicalStatus: 'clinicalStatus',
-    codeStatus: 'codeStatus',
-    isolationType: 'isolationType',
-    oxygenSupport: 'oxygenSupport',
-    dietType: 'dietType',
-    thromboprophylaxis: 'thromboprophylaxis',
-    ulcerProphylaxis: 'ulcerProphylaxis',
-    invasiveDevices: 'invasiveDevices',
-    fluidBalance24h: 'fluidBalance24h',
-    dischargeGoal: 'dischargeGoal',
-    updatedBy: 'updatedBy',
-    updatedAt: 'updatedAt'
-  };
-
-  export type InternalMedicineProfileScalarFieldEnum = (typeof InternalMedicineProfileScalarFieldEnum)[keyof typeof InternalMedicineProfileScalarFieldEnum]
-
-
   export const MedicalHistoryScalarFieldEnum: {
     id: 'id',
     patientId: 'patientId',
@@ -28608,7 +27293,6 @@ export namespace Prisma {
     studyReports?: StudyReportListRelationFilter
     viralSerologies?: ViralSerologyListRelationFilter
     vascularAccesses?: VascularAccessListRelationFilter
-    internalMedicineProfile?: XOR<InternalMedicineProfileNullableScalarRelationFilter, InternalMedicineProfileWhereInput> | null
   }
 
   export type EpisodeOrderByWithRelationInput = {
@@ -28654,7 +27338,6 @@ export namespace Prisma {
     studyReports?: StudyReportOrderByRelationAggregateInput
     viralSerologies?: ViralSerologyOrderByRelationAggregateInput
     vascularAccesses?: VascularAccessOrderByRelationAggregateInput
-    internalMedicineProfile?: InternalMedicineProfileOrderByWithRelationInput
   }
 
   export type EpisodeWhereUniqueInput = Prisma.AtLeast<{
@@ -28703,7 +27386,6 @@ export namespace Prisma {
     studyReports?: StudyReportListRelationFilter
     viralSerologies?: ViralSerologyListRelationFilter
     vascularAccesses?: VascularAccessListRelationFilter
-    internalMedicineProfile?: XOR<InternalMedicineProfileNullableScalarRelationFilter, InternalMedicineProfileWhereInput> | null
   }, "id">
 
   export type EpisodeOrderByWithAggregationInput = {
@@ -28947,106 +27629,6 @@ export namespace Prisma {
     updatedBy?: StringNullableWithAggregatesFilter<"Consultation"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Consultation"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Consultation"> | Date | string
-  }
-
-  export type InternalMedicineProfileWhereInput = {
-    AND?: InternalMedicineProfileWhereInput | InternalMedicineProfileWhereInput[]
-    OR?: InternalMedicineProfileWhereInput[]
-    NOT?: InternalMedicineProfileWhereInput | InternalMedicineProfileWhereInput[]
-    id?: StringFilter<"InternalMedicineProfile"> | string
-    episodeId?: StringFilter<"InternalMedicineProfile"> | string
-    clinicalStatus?: StringFilter<"InternalMedicineProfile"> | string
-    codeStatus?: StringFilter<"InternalMedicineProfile"> | string
-    isolationType?: StringFilter<"InternalMedicineProfile"> | string
-    oxygenSupport?: StringFilter<"InternalMedicineProfile"> | string
-    dietType?: StringFilter<"InternalMedicineProfile"> | string
-    thromboprophylaxis?: StringFilter<"InternalMedicineProfile"> | string
-    ulcerProphylaxis?: StringFilter<"InternalMedicineProfile"> | string
-    invasiveDevices?: StringNullableFilter<"InternalMedicineProfile"> | string | null
-    fluidBalance24h?: StringNullableFilter<"InternalMedicineProfile"> | string | null
-    dischargeGoal?: StringNullableFilter<"InternalMedicineProfile"> | string | null
-    updatedBy?: StringFilter<"InternalMedicineProfile"> | string
-    updatedAt?: DateTimeFilter<"InternalMedicineProfile"> | Date | string
-    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
-  }
-
-  export type InternalMedicineProfileOrderByWithRelationInput = {
-    id?: SortOrder
-    episodeId?: SortOrder
-    clinicalStatus?: SortOrder
-    codeStatus?: SortOrder
-    isolationType?: SortOrder
-    oxygenSupport?: SortOrder
-    dietType?: SortOrder
-    thromboprophylaxis?: SortOrder
-    ulcerProphylaxis?: SortOrder
-    invasiveDevices?: SortOrderInput | SortOrder
-    fluidBalance24h?: SortOrderInput | SortOrder
-    dischargeGoal?: SortOrderInput | SortOrder
-    updatedBy?: SortOrder
-    updatedAt?: SortOrder
-    episode?: EpisodeOrderByWithRelationInput
-  }
-
-  export type InternalMedicineProfileWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    episodeId?: string
-    AND?: InternalMedicineProfileWhereInput | InternalMedicineProfileWhereInput[]
-    OR?: InternalMedicineProfileWhereInput[]
-    NOT?: InternalMedicineProfileWhereInput | InternalMedicineProfileWhereInput[]
-    clinicalStatus?: StringFilter<"InternalMedicineProfile"> | string
-    codeStatus?: StringFilter<"InternalMedicineProfile"> | string
-    isolationType?: StringFilter<"InternalMedicineProfile"> | string
-    oxygenSupport?: StringFilter<"InternalMedicineProfile"> | string
-    dietType?: StringFilter<"InternalMedicineProfile"> | string
-    thromboprophylaxis?: StringFilter<"InternalMedicineProfile"> | string
-    ulcerProphylaxis?: StringFilter<"InternalMedicineProfile"> | string
-    invasiveDevices?: StringNullableFilter<"InternalMedicineProfile"> | string | null
-    fluidBalance24h?: StringNullableFilter<"InternalMedicineProfile"> | string | null
-    dischargeGoal?: StringNullableFilter<"InternalMedicineProfile"> | string | null
-    updatedBy?: StringFilter<"InternalMedicineProfile"> | string
-    updatedAt?: DateTimeFilter<"InternalMedicineProfile"> | Date | string
-    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
-  }, "id" | "episodeId">
-
-  export type InternalMedicineProfileOrderByWithAggregationInput = {
-    id?: SortOrder
-    episodeId?: SortOrder
-    clinicalStatus?: SortOrder
-    codeStatus?: SortOrder
-    isolationType?: SortOrder
-    oxygenSupport?: SortOrder
-    dietType?: SortOrder
-    thromboprophylaxis?: SortOrder
-    ulcerProphylaxis?: SortOrder
-    invasiveDevices?: SortOrderInput | SortOrder
-    fluidBalance24h?: SortOrderInput | SortOrder
-    dischargeGoal?: SortOrderInput | SortOrder
-    updatedBy?: SortOrder
-    updatedAt?: SortOrder
-    _count?: InternalMedicineProfileCountOrderByAggregateInput
-    _max?: InternalMedicineProfileMaxOrderByAggregateInput
-    _min?: InternalMedicineProfileMinOrderByAggregateInput
-  }
-
-  export type InternalMedicineProfileScalarWhereWithAggregatesInput = {
-    AND?: InternalMedicineProfileScalarWhereWithAggregatesInput | InternalMedicineProfileScalarWhereWithAggregatesInput[]
-    OR?: InternalMedicineProfileScalarWhereWithAggregatesInput[]
-    NOT?: InternalMedicineProfileScalarWhereWithAggregatesInput | InternalMedicineProfileScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    episodeId?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    clinicalStatus?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    codeStatus?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    isolationType?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    oxygenSupport?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    dietType?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    thromboprophylaxis?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    ulcerProphylaxis?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    invasiveDevices?: StringNullableWithAggregatesFilter<"InternalMedicineProfile"> | string | null
-    fluidBalance24h?: StringNullableWithAggregatesFilter<"InternalMedicineProfile"> | string | null
-    dischargeGoal?: StringNullableWithAggregatesFilter<"InternalMedicineProfile"> | string | null
-    updatedBy?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
-    updatedAt?: DateTimeWithAggregatesFilter<"InternalMedicineProfile"> | Date | string
   }
 
   export type MedicalHistoryWhereInput = {
@@ -30685,7 +29267,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateInput = {
@@ -30728,7 +29309,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUpdateInput = {
@@ -30771,7 +29351,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateInput = {
@@ -30814,7 +29393,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateManyInput = {
@@ -31111,124 +29689,6 @@ export namespace Prisma {
     createdBy?: StringFieldUpdateOperationsInput | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type InternalMedicineProfileCreateInput = {
-    id?: string
-    clinicalStatus?: string
-    codeStatus?: string
-    isolationType?: string
-    oxygenSupport?: string
-    dietType?: string
-    thromboprophylaxis?: string
-    ulcerProphylaxis?: string
-    invasiveDevices?: string | null
-    fluidBalance24h?: string | null
-    dischargeGoal?: string | null
-    updatedBy: string
-    updatedAt?: Date | string
-    episode: EpisodeCreateNestedOneWithoutInternalMedicineProfileInput
-  }
-
-  export type InternalMedicineProfileUncheckedCreateInput = {
-    id?: string
-    episodeId: string
-    clinicalStatus?: string
-    codeStatus?: string
-    isolationType?: string
-    oxygenSupport?: string
-    dietType?: string
-    thromboprophylaxis?: string
-    ulcerProphylaxis?: string
-    invasiveDevices?: string | null
-    fluidBalance24h?: string | null
-    dischargeGoal?: string | null
-    updatedBy: string
-    updatedAt?: Date | string
-  }
-
-  export type InternalMedicineProfileUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clinicalStatus?: StringFieldUpdateOperationsInput | string
-    codeStatus?: StringFieldUpdateOperationsInput | string
-    isolationType?: StringFieldUpdateOperationsInput | string
-    oxygenSupport?: StringFieldUpdateOperationsInput | string
-    dietType?: StringFieldUpdateOperationsInput | string
-    thromboprophylaxis?: StringFieldUpdateOperationsInput | string
-    ulcerProphylaxis?: StringFieldUpdateOperationsInput | string
-    invasiveDevices?: NullableStringFieldUpdateOperationsInput | string | null
-    fluidBalance24h?: NullableStringFieldUpdateOperationsInput | string | null
-    dischargeGoal?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedBy?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    episode?: EpisodeUpdateOneRequiredWithoutInternalMedicineProfileNestedInput
-  }
-
-  export type InternalMedicineProfileUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    episodeId?: StringFieldUpdateOperationsInput | string
-    clinicalStatus?: StringFieldUpdateOperationsInput | string
-    codeStatus?: StringFieldUpdateOperationsInput | string
-    isolationType?: StringFieldUpdateOperationsInput | string
-    oxygenSupport?: StringFieldUpdateOperationsInput | string
-    dietType?: StringFieldUpdateOperationsInput | string
-    thromboprophylaxis?: StringFieldUpdateOperationsInput | string
-    ulcerProphylaxis?: StringFieldUpdateOperationsInput | string
-    invasiveDevices?: NullableStringFieldUpdateOperationsInput | string | null
-    fluidBalance24h?: NullableStringFieldUpdateOperationsInput | string | null
-    dischargeGoal?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedBy?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type InternalMedicineProfileCreateManyInput = {
-    id?: string
-    episodeId: string
-    clinicalStatus?: string
-    codeStatus?: string
-    isolationType?: string
-    oxygenSupport?: string
-    dietType?: string
-    thromboprophylaxis?: string
-    ulcerProphylaxis?: string
-    invasiveDevices?: string | null
-    fluidBalance24h?: string | null
-    dischargeGoal?: string | null
-    updatedBy: string
-    updatedAt?: Date | string
-  }
-
-  export type InternalMedicineProfileUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clinicalStatus?: StringFieldUpdateOperationsInput | string
-    codeStatus?: StringFieldUpdateOperationsInput | string
-    isolationType?: StringFieldUpdateOperationsInput | string
-    oxygenSupport?: StringFieldUpdateOperationsInput | string
-    dietType?: StringFieldUpdateOperationsInput | string
-    thromboprophylaxis?: StringFieldUpdateOperationsInput | string
-    ulcerProphylaxis?: StringFieldUpdateOperationsInput | string
-    invasiveDevices?: NullableStringFieldUpdateOperationsInput | string | null
-    fluidBalance24h?: NullableStringFieldUpdateOperationsInput | string | null
-    dischargeGoal?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedBy?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type InternalMedicineProfileUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    episodeId?: StringFieldUpdateOperationsInput | string
-    clinicalStatus?: StringFieldUpdateOperationsInput | string
-    codeStatus?: StringFieldUpdateOperationsInput | string
-    isolationType?: StringFieldUpdateOperationsInput | string
-    oxygenSupport?: StringFieldUpdateOperationsInput | string
-    dietType?: StringFieldUpdateOperationsInput | string
-    thromboprophylaxis?: StringFieldUpdateOperationsInput | string
-    ulcerProphylaxis?: StringFieldUpdateOperationsInput | string
-    invasiveDevices?: NullableStringFieldUpdateOperationsInput | string | null
-    fluidBalance24h?: NullableStringFieldUpdateOperationsInput | string | null
-    dischargeGoal?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -33104,11 +31564,6 @@ export namespace Prisma {
     none?: VascularAccessWhereInput
   }
 
-  export type InternalMedicineProfileNullableScalarRelationFilter = {
-    is?: InternalMedicineProfileWhereInput | null
-    isNot?: InternalMedicineProfileWhereInput | null
-  }
-
   export type NoteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -33368,62 +31823,6 @@ export namespace Prisma {
     heightCm?: SortOrder
   }
 
-  export type EpisodeScalarRelationFilter = {
-    is?: EpisodeWhereInput
-    isNot?: EpisodeWhereInput
-  }
-
-  export type InternalMedicineProfileCountOrderByAggregateInput = {
-    id?: SortOrder
-    episodeId?: SortOrder
-    clinicalStatus?: SortOrder
-    codeStatus?: SortOrder
-    isolationType?: SortOrder
-    oxygenSupport?: SortOrder
-    dietType?: SortOrder
-    thromboprophylaxis?: SortOrder
-    ulcerProphylaxis?: SortOrder
-    invasiveDevices?: SortOrder
-    fluidBalance24h?: SortOrder
-    dischargeGoal?: SortOrder
-    updatedBy?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type InternalMedicineProfileMaxOrderByAggregateInput = {
-    id?: SortOrder
-    episodeId?: SortOrder
-    clinicalStatus?: SortOrder
-    codeStatus?: SortOrder
-    isolationType?: SortOrder
-    oxygenSupport?: SortOrder
-    dietType?: SortOrder
-    thromboprophylaxis?: SortOrder
-    ulcerProphylaxis?: SortOrder
-    invasiveDevices?: SortOrder
-    fluidBalance24h?: SortOrder
-    dischargeGoal?: SortOrder
-    updatedBy?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type InternalMedicineProfileMinOrderByAggregateInput = {
-    id?: SortOrder
-    episodeId?: SortOrder
-    clinicalStatus?: SortOrder
-    codeStatus?: SortOrder
-    isolationType?: SortOrder
-    oxygenSupport?: SortOrder
-    dietType?: SortOrder
-    thromboprophylaxis?: SortOrder
-    ulcerProphylaxis?: SortOrder
-    invasiveDevices?: SortOrder
-    fluidBalance24h?: SortOrder
-    dischargeGoal?: SortOrder
-    updatedBy?: SortOrder
-    updatedAt?: SortOrder
-  }
-
   export type MedicalHistoryCountOrderByAggregateInput = {
     id?: SortOrder
     patientId?: SortOrder
@@ -33458,6 +31857,11 @@ export namespace Prisma {
     medications?: SortOrder
     updatedAt?: SortOrder
     updatedBy?: SortOrder
+  }
+
+  export type EpisodeScalarRelationFilter = {
+    is?: EpisodeWhereInput
+    isNot?: EpisodeWhereInput
   }
 
   export type ImportantAlertCountOrderByAggregateInput = {
@@ -34697,12 +33101,6 @@ export namespace Prisma {
     connect?: VascularAccessWhereUniqueInput | VascularAccessWhereUniqueInput[]
   }
 
-  export type InternalMedicineProfileCreateNestedOneWithoutEpisodeInput = {
-    create?: XOR<InternalMedicineProfileCreateWithoutEpisodeInput, InternalMedicineProfileUncheckedCreateWithoutEpisodeInput>
-    connectOrCreate?: InternalMedicineProfileCreateOrConnectWithoutEpisodeInput
-    connect?: InternalMedicineProfileWhereUniqueInput
-  }
-
   export type AllergyUncheckedCreateNestedManyWithoutEpisodeInput = {
     create?: XOR<AllergyCreateWithoutEpisodeInput, AllergyUncheckedCreateWithoutEpisodeInput> | AllergyCreateWithoutEpisodeInput[] | AllergyUncheckedCreateWithoutEpisodeInput[]
     connectOrCreate?: AllergyCreateOrConnectWithoutEpisodeInput | AllergyCreateOrConnectWithoutEpisodeInput[]
@@ -34778,12 +33176,6 @@ export namespace Prisma {
     connectOrCreate?: VascularAccessCreateOrConnectWithoutEpisodeInput | VascularAccessCreateOrConnectWithoutEpisodeInput[]
     createMany?: VascularAccessCreateManyEpisodeInputEnvelope
     connect?: VascularAccessWhereUniqueInput | VascularAccessWhereUniqueInput[]
-  }
-
-  export type InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput = {
-    create?: XOR<InternalMedicineProfileCreateWithoutEpisodeInput, InternalMedicineProfileUncheckedCreateWithoutEpisodeInput>
-    connectOrCreate?: InternalMedicineProfileCreateOrConnectWithoutEpisodeInput
-    connect?: InternalMedicineProfileWhereUniqueInput
   }
 
   export type NullableFloatFieldUpdateOperationsInput = {
@@ -34976,16 +33368,6 @@ export namespace Prisma {
     deleteMany?: VascularAccessScalarWhereInput | VascularAccessScalarWhereInput[]
   }
 
-  export type InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput = {
-    create?: XOR<InternalMedicineProfileCreateWithoutEpisodeInput, InternalMedicineProfileUncheckedCreateWithoutEpisodeInput>
-    connectOrCreate?: InternalMedicineProfileCreateOrConnectWithoutEpisodeInput
-    upsert?: InternalMedicineProfileUpsertWithoutEpisodeInput
-    disconnect?: InternalMedicineProfileWhereInput | boolean
-    delete?: InternalMedicineProfileWhereInput | boolean
-    connect?: InternalMedicineProfileWhereUniqueInput
-    update?: XOR<XOR<InternalMedicineProfileUpdateToOneWithWhereWithoutEpisodeInput, InternalMedicineProfileUpdateWithoutEpisodeInput>, InternalMedicineProfileUncheckedUpdateWithoutEpisodeInput>
-  }
-
   export type AllergyUncheckedUpdateManyWithoutEpisodeNestedInput = {
     create?: XOR<AllergyCreateWithoutEpisodeInput, AllergyUncheckedCreateWithoutEpisodeInput> | AllergyCreateWithoutEpisodeInput[] | AllergyUncheckedCreateWithoutEpisodeInput[]
     connectOrCreate?: AllergyCreateOrConnectWithoutEpisodeInput | AllergyCreateOrConnectWithoutEpisodeInput[]
@@ -35140,16 +33522,6 @@ export namespace Prisma {
     deleteMany?: VascularAccessScalarWhereInput | VascularAccessScalarWhereInput[]
   }
 
-  export type InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput = {
-    create?: XOR<InternalMedicineProfileCreateWithoutEpisodeInput, InternalMedicineProfileUncheckedCreateWithoutEpisodeInput>
-    connectOrCreate?: InternalMedicineProfileCreateOrConnectWithoutEpisodeInput
-    upsert?: InternalMedicineProfileUpsertWithoutEpisodeInput
-    disconnect?: InternalMedicineProfileWhereInput | boolean
-    delete?: InternalMedicineProfileWhereInput | boolean
-    connect?: InternalMedicineProfileWhereUniqueInput
-    update?: XOR<XOR<InternalMedicineProfileUpdateToOneWithWhereWithoutEpisodeInput, InternalMedicineProfileUpdateWithoutEpisodeInput>, InternalMedicineProfileUncheckedUpdateWithoutEpisodeInput>
-  }
-
   export type ResidencyCreateNestedOneWithoutConsultationsInput = {
     create?: XOR<ResidencyCreateWithoutConsultationsInput, ResidencyUncheckedCreateWithoutConsultationsInput>
     connectOrCreate?: ResidencyCreateOrConnectWithoutConsultationsInput
@@ -35192,20 +33564,6 @@ export namespace Prisma {
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutConsultationsInput, UserUpdateWithoutConsultationsInput>, UserUncheckedUpdateWithoutConsultationsInput>
-  }
-
-  export type EpisodeCreateNestedOneWithoutInternalMedicineProfileInput = {
-    create?: XOR<EpisodeCreateWithoutInternalMedicineProfileInput, EpisodeUncheckedCreateWithoutInternalMedicineProfileInput>
-    connectOrCreate?: EpisodeCreateOrConnectWithoutInternalMedicineProfileInput
-    connect?: EpisodeWhereUniqueInput
-  }
-
-  export type EpisodeUpdateOneRequiredWithoutInternalMedicineProfileNestedInput = {
-    create?: XOR<EpisodeCreateWithoutInternalMedicineProfileInput, EpisodeUncheckedCreateWithoutInternalMedicineProfileInput>
-    connectOrCreate?: EpisodeCreateOrConnectWithoutInternalMedicineProfileInput
-    upsert?: EpisodeUpsertWithoutInternalMedicineProfileInput
-    connect?: EpisodeWhereUniqueInput
-    update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutInternalMedicineProfileInput, EpisodeUpdateWithoutInternalMedicineProfileInput>, EpisodeUncheckedUpdateWithoutInternalMedicineProfileInput>
   }
 
   export type PatientCreateNestedOneWithoutMedicalHistoryInput = {
@@ -35894,7 +34252,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutResidencyInput = {
@@ -35936,7 +34293,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutResidencyInput = {
@@ -36497,7 +34853,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutResponsibleInput = {
@@ -36539,7 +34894,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutResponsibleInput = {
@@ -36910,7 +35264,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutPatientInput = {
@@ -36952,7 +35305,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutPatientInput = {
@@ -37808,43 +36160,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type InternalMedicineProfileCreateWithoutEpisodeInput = {
-    id?: string
-    clinicalStatus?: string
-    codeStatus?: string
-    isolationType?: string
-    oxygenSupport?: string
-    dietType?: string
-    thromboprophylaxis?: string
-    ulcerProphylaxis?: string
-    invasiveDevices?: string | null
-    fluidBalance24h?: string | null
-    dischargeGoal?: string | null
-    updatedBy: string
-    updatedAt?: Date | string
-  }
-
-  export type InternalMedicineProfileUncheckedCreateWithoutEpisodeInput = {
-    id?: string
-    clinicalStatus?: string
-    codeStatus?: string
-    isolationType?: string
-    oxygenSupport?: string
-    dietType?: string
-    thromboprophylaxis?: string
-    ulcerProphylaxis?: string
-    invasiveDevices?: string | null
-    fluidBalance24h?: string | null
-    dischargeGoal?: string | null
-    updatedBy: string
-    updatedAt?: Date | string
-  }
-
-  export type InternalMedicineProfileCreateOrConnectWithoutEpisodeInput = {
-    where: InternalMedicineProfileWhereUniqueInput
-    create: XOR<InternalMedicineProfileCreateWithoutEpisodeInput, InternalMedicineProfileUncheckedCreateWithoutEpisodeInput>
-  }
-
   export type ResidencyUpsertWithoutEpisodesInput = {
     update: XOR<ResidencyUpdateWithoutEpisodesInput, ResidencyUncheckedUpdateWithoutEpisodesInput>
     create: XOR<ResidencyCreateWithoutEpisodesInput, ResidencyUncheckedCreateWithoutEpisodesInput>
@@ -38318,49 +36633,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"VascularAccess"> | Date | string
   }
 
-  export type InternalMedicineProfileUpsertWithoutEpisodeInput = {
-    update: XOR<InternalMedicineProfileUpdateWithoutEpisodeInput, InternalMedicineProfileUncheckedUpdateWithoutEpisodeInput>
-    create: XOR<InternalMedicineProfileCreateWithoutEpisodeInput, InternalMedicineProfileUncheckedCreateWithoutEpisodeInput>
-    where?: InternalMedicineProfileWhereInput
-  }
-
-  export type InternalMedicineProfileUpdateToOneWithWhereWithoutEpisodeInput = {
-    where?: InternalMedicineProfileWhereInput
-    data: XOR<InternalMedicineProfileUpdateWithoutEpisodeInput, InternalMedicineProfileUncheckedUpdateWithoutEpisodeInput>
-  }
-
-  export type InternalMedicineProfileUpdateWithoutEpisodeInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clinicalStatus?: StringFieldUpdateOperationsInput | string
-    codeStatus?: StringFieldUpdateOperationsInput | string
-    isolationType?: StringFieldUpdateOperationsInput | string
-    oxygenSupport?: StringFieldUpdateOperationsInput | string
-    dietType?: StringFieldUpdateOperationsInput | string
-    thromboprophylaxis?: StringFieldUpdateOperationsInput | string
-    ulcerProphylaxis?: StringFieldUpdateOperationsInput | string
-    invasiveDevices?: NullableStringFieldUpdateOperationsInput | string | null
-    fluidBalance24h?: NullableStringFieldUpdateOperationsInput | string | null
-    dischargeGoal?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedBy?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type InternalMedicineProfileUncheckedUpdateWithoutEpisodeInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clinicalStatus?: StringFieldUpdateOperationsInput | string
-    codeStatus?: StringFieldUpdateOperationsInput | string
-    isolationType?: StringFieldUpdateOperationsInput | string
-    oxygenSupport?: StringFieldUpdateOperationsInput | string
-    dietType?: StringFieldUpdateOperationsInput | string
-    thromboprophylaxis?: StringFieldUpdateOperationsInput | string
-    ulcerProphylaxis?: StringFieldUpdateOperationsInput | string
-    invasiveDevices?: NullableStringFieldUpdateOperationsInput | string | null
-    fluidBalance24h?: NullableStringFieldUpdateOperationsInput | string | null
-    dischargeGoal?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedBy?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type ResidencyCreateWithoutConsultationsInput = {
     id?: string
     name: string
@@ -38645,190 +36917,6 @@ export namespace Prisma {
     episodesAtCharge?: EpisodeUncheckedUpdateManyWithoutResponsibleNestedInput
   }
 
-  export type EpisodeCreateWithoutInternalMedicineProfileInput = {
-    id?: string
-    serviceType?: string
-    consultingDepartment?: string | null
-    consultingResident?: string | null
-    hospitalAdmissionDate?: Date | string | null
-    admissionDate?: Date | string
-    admissionType: string
-    chiefComplaint?: string | null
-    status?: string
-    room?: string | null
-    bed?: string | null
-    attendingDoctor?: string | null
-    admittingDoctor?: string | null
-    primaryDiagnosis?: string | null
-    secondaryDiagnoses?: string | null
-    initialWeight?: number | null
-    initialWeightUnit?: string | null
-    currentTreatment?: string | null
-    treatmentUpdatedBy?: string | null
-    treatmentUpdatedAt?: Date | string | null
-    dischargeType?: string | null
-    baseDepartmentPlan?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    responsibleSince?: Date | string | null
-    residency?: ResidencyCreateNestedOneWithoutEpisodesInput
-    patient: PatientCreateNestedOneWithoutEpisodesInput
-    allergies?: AllergyCreateNestedManyWithoutEpisodeInput
-    notes?: NoteCreateNestedManyWithoutEpisodeInput
-    vitals?: VitalSignCreateNestedManyWithoutEpisodeInput
-    handoffs?: HandoffCreateNestedManyWithoutEpisodeInput
-    responsible?: UserCreateNestedOneWithoutEpisodesAtChargeInput
-    tasks?: TaskCreateNestedManyWithoutEpisodeInput
-    importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
-    gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
-    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
-    studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
-    viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
-    vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-  }
-
-  export type EpisodeUncheckedCreateWithoutInternalMedicineProfileInput = {
-    id?: string
-    residencyId?: string | null
-    patientId: string
-    serviceType?: string
-    consultingDepartment?: string | null
-    consultingResident?: string | null
-    hospitalAdmissionDate?: Date | string | null
-    admissionDate?: Date | string
-    admissionType: string
-    chiefComplaint?: string | null
-    status?: string
-    room?: string | null
-    bed?: string | null
-    attendingDoctor?: string | null
-    admittingDoctor?: string | null
-    primaryDiagnosis?: string | null
-    secondaryDiagnoses?: string | null
-    initialWeight?: number | null
-    initialWeightUnit?: string | null
-    currentTreatment?: string | null
-    treatmentUpdatedBy?: string | null
-    treatmentUpdatedAt?: Date | string | null
-    dischargeType?: string | null
-    baseDepartmentPlan?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    responsibleId?: string | null
-    responsibleSince?: Date | string | null
-    allergies?: AllergyUncheckedCreateNestedManyWithoutEpisodeInput
-    notes?: NoteUncheckedCreateNestedManyWithoutEpisodeInput
-    vitals?: VitalSignUncheckedCreateNestedManyWithoutEpisodeInput
-    handoffs?: HandoffUncheckedCreateNestedManyWithoutEpisodeInput
-    tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
-    importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
-    gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
-    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
-    studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
-    viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
-    vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-  }
-
-  export type EpisodeCreateOrConnectWithoutInternalMedicineProfileInput = {
-    where: EpisodeWhereUniqueInput
-    create: XOR<EpisodeCreateWithoutInternalMedicineProfileInput, EpisodeUncheckedCreateWithoutInternalMedicineProfileInput>
-  }
-
-  export type EpisodeUpsertWithoutInternalMedicineProfileInput = {
-    update: XOR<EpisodeUpdateWithoutInternalMedicineProfileInput, EpisodeUncheckedUpdateWithoutInternalMedicineProfileInput>
-    create: XOR<EpisodeCreateWithoutInternalMedicineProfileInput, EpisodeUncheckedCreateWithoutInternalMedicineProfileInput>
-    where?: EpisodeWhereInput
-  }
-
-  export type EpisodeUpdateToOneWithWhereWithoutInternalMedicineProfileInput = {
-    where?: EpisodeWhereInput
-    data: XOR<EpisodeUpdateWithoutInternalMedicineProfileInput, EpisodeUncheckedUpdateWithoutInternalMedicineProfileInput>
-  }
-
-  export type EpisodeUpdateWithoutInternalMedicineProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    serviceType?: StringFieldUpdateOperationsInput | string
-    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
-    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
-    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    admissionType?: StringFieldUpdateOperationsInput | string
-    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: StringFieldUpdateOperationsInput | string
-    room?: NullableStringFieldUpdateOperationsInput | string | null
-    bed?: NullableStringFieldUpdateOperationsInput | string | null
-    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
-    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
-    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
-    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
-    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
-    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
-    currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
-    treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
-    baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    residency?: ResidencyUpdateOneWithoutEpisodesNestedInput
-    patient?: PatientUpdateOneRequiredWithoutEpisodesNestedInput
-    allergies?: AllergyUpdateManyWithoutEpisodeNestedInput
-    notes?: NoteUpdateManyWithoutEpisodeNestedInput
-    vitals?: VitalSignUpdateManyWithoutEpisodeNestedInput
-    handoffs?: HandoffUpdateManyWithoutEpisodeNestedInput
-    responsible?: UserUpdateOneWithoutEpisodesAtChargeNestedInput
-    tasks?: TaskUpdateManyWithoutEpisodeNestedInput
-    importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
-    gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
-    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
-    studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
-    viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
-    vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-  }
-
-  export type EpisodeUncheckedUpdateWithoutInternalMedicineProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    residencyId?: NullableStringFieldUpdateOperationsInput | string | null
-    patientId?: StringFieldUpdateOperationsInput | string
-    serviceType?: StringFieldUpdateOperationsInput | string
-    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
-    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
-    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    admissionType?: StringFieldUpdateOperationsInput | string
-    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: StringFieldUpdateOperationsInput | string
-    room?: NullableStringFieldUpdateOperationsInput | string | null
-    bed?: NullableStringFieldUpdateOperationsInput | string | null
-    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
-    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
-    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
-    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
-    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
-    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
-    currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
-    treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
-    baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
-    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    allergies?: AllergyUncheckedUpdateManyWithoutEpisodeNestedInput
-    notes?: NoteUncheckedUpdateManyWithoutEpisodeNestedInput
-    vitals?: VitalSignUncheckedUpdateManyWithoutEpisodeNestedInput
-    handoffs?: HandoffUncheckedUpdateManyWithoutEpisodeNestedInput
-    tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
-    importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
-    gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
-    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
-    studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
-    viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
-    vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-  }
-
   export type PatientCreateWithoutMedicalHistoryInput = {
     id?: string
     expedienteNumber: string
@@ -38972,7 +37060,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutImportantAlertsInput = {
@@ -39014,7 +37101,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutImportantAlertsInput = {
@@ -39072,7 +37158,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutImportantAlertsInput = {
@@ -39114,7 +37199,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutGfrRecordsInput = {
@@ -39156,7 +37240,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutGfrRecordsInput = {
@@ -39198,7 +37281,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutGfrRecordsInput = {
@@ -39256,7 +37338,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutGfrRecordsInput = {
@@ -39298,7 +37379,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutLabReportsInput = {
@@ -39340,7 +37420,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutLabReportsInput = {
@@ -39382,7 +37461,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutLabReportsInput = {
@@ -39440,7 +37518,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutLabReportsInput = {
@@ -39482,7 +37559,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutStudyReportsInput = {
@@ -39524,7 +37600,6 @@ export namespace Prisma {
     labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutStudyReportsInput = {
@@ -39566,7 +37641,6 @@ export namespace Prisma {
     labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutStudyReportsInput = {
@@ -39624,7 +37698,6 @@ export namespace Prisma {
     labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutStudyReportsInput = {
@@ -39666,7 +37739,6 @@ export namespace Prisma {
     labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type PatientCreateWithoutViralSerologiesInput = {
@@ -39757,7 +37829,6 @@ export namespace Prisma {
     labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutViralSerologiesInput = {
@@ -39799,7 +37870,6 @@ export namespace Prisma {
     labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutViralSerologiesInput = {
@@ -39912,7 +37982,6 @@ export namespace Prisma {
     labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutViralSerologiesInput = {
@@ -39954,7 +38023,6 @@ export namespace Prisma {
     labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutVascularAccessesInput = {
@@ -39996,7 +38064,6 @@ export namespace Prisma {
     labReports?: LabReportCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutVascularAccessesInput = {
@@ -40038,7 +38105,6 @@ export namespace Prisma {
     labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutVascularAccessesInput = {
@@ -40096,7 +38162,6 @@ export namespace Prisma {
     labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutVascularAccessesInput = {
@@ -40138,7 +38203,6 @@ export namespace Prisma {
     labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type PatientCreateWithoutAllergiesInput = {
@@ -40229,7 +38293,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutAllergiesInput = {
@@ -40271,7 +38334,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutAllergiesInput = {
@@ -40384,7 +38446,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutAllergiesInput = {
@@ -40426,7 +38487,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutNotesInput = {
@@ -40468,7 +38528,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutNotesInput = {
@@ -40510,7 +38569,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutNotesInput = {
@@ -40568,7 +38626,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutNotesInput = {
@@ -40610,7 +38667,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutVitalsInput = {
@@ -40652,7 +38708,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutVitalsInput = {
@@ -40694,7 +38749,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutVitalsInput = {
@@ -40752,7 +38806,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutVitalsInput = {
@@ -40794,7 +38847,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutHandoffsInput = {
@@ -40836,7 +38888,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutHandoffsInput = {
@@ -40878,7 +38929,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutHandoffsInput = {
@@ -40936,7 +38986,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutHandoffsInput = {
@@ -40978,7 +39027,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutTasksInput = {
@@ -41020,7 +39068,6 @@ export namespace Prisma {
     studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutTasksInput = {
@@ -41062,7 +39109,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutTasksInput = {
@@ -41120,7 +39166,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutTasksInput = {
@@ -41162,7 +39207,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type UserCreateManyResidencyInput = {
@@ -41409,7 +39453,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutResidencyInput = {
@@ -41451,7 +39494,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutResidencyInput = {
@@ -41787,7 +39829,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutResponsibleInput = {
@@ -41829,7 +39870,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutResponsibleInput = {
@@ -42068,7 +40108,6 @@ export namespace Prisma {
     studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutPatientInput = {
@@ -42110,7 +40149,6 @@ export namespace Prisma {
     studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
-    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutPatientInput = {
