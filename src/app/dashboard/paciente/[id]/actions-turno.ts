@@ -1,9 +1,9 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
 import { exigirPermiso, ROLES_MEDICOS } from '@/lib/permisos'
+import { obtenerContextoResidencia, verificarEscrituraResidencia } from '@/lib/tenant'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -27,14 +27,17 @@ export async function guardarEntregaTurno(formData: FormData): Promise<void> {
     volverConError(episodeId, 'No puedes entregarte el turno a ti mismo')
   }
 
-  // El receptor debe ser un médico real y activo (buscamos por CORREO)
+  // El receptor debe ser un médico real, activo y de la misma residencia
   const receptor = await prisma.user.findFirst({
-    where: { email: { equals: recibidoPor, mode: 'insensitive' } },
+    where: {
+      email: { equals: recibidoPor, mode: 'insensitive' },
+      ...(episode.residencyId ? { residencyId: episode.residencyId } : {}),
+    },
     select: { email: true, fullName: true, role: true, isActive: true },
   })
 
   if (!receptor) {
-    volverConError(episodeId, 'El correo del receptor no existe en el sistema')
+    volverConError(episodeId, 'El receptor no existe en esta residencia')
   }
   if (!receptor.isActive) {
     volverConError(episodeId, 'El receptor está inactivo')
@@ -82,14 +85,14 @@ export async function guardarEntregaTurno(formData: FormData): Promise<void> {
   redirect(`/dashboard/paciente/${episodeId}/turno`)
 }
 export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
-  const session = await auth()
-  const user = session?.user
-  if (!user?.id || !user.email) redirect('/login')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user) redirect('/login')
+  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
 
-  const userId = user.id
-  const userEmail = user.email
-  const nombre = user.name ?? userEmail
-  const role = String(user.role)
+  const userId = ctx.user.id
+  const userEmail = ctx.user.email
+  const nombre = ctx.user.fullName || userEmail
+  const role = String(ctx.user.role)
 
   const handoffId = String(formData.get('handoffId') ?? '')
 
@@ -97,13 +100,30 @@ export async function aceptarEntregaTurno(formData: FormData): Promise<void> {
     where: { id: handoffId },
     include: {
       episode: {
-        select: { patientId: true, status: true, attendingDoctor: true },
+        select: { patientId: true, status: true, attendingDoctor: true, residencyId: true },
       },
     },
   })
   if (!handoff) redirect('/dashboard')
 
+  if (!ctx.esSuperAdmin) {
+    if (
+      !ctx.residency ||
+      !handoff.episode.residencyId ||
+      handoff.episode.residencyId !== ctx.residency.id
+    ) {
+      redirect('/dashboard')
+    }
+  }
+
   const episodeId = handoff.episodeId
+
+  const checkSuscripcion = await verificarEscrituraResidencia(
+    handoff.episode.residencyId ?? ctx.residency?.id
+  )
+  if (!checkSuscripcion.ok) {
+    volverConError(episodeId, checkSuscripcion.error)
+  }
 
   // Solo el receptor designado puede aceptar
   if (handoff.recibidoPor.toLowerCase() !== userEmail.toLowerCase()) {

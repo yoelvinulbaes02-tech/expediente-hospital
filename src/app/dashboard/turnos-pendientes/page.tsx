@@ -7,6 +7,7 @@ import { aceptarEntregaTurno } from './actions'
 export default async function TurnosPendientesPage() {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
+  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
 
   const nombreMedico = ctx.user.fullName || ''
   const emailMedico = ctx.user.email || ''
@@ -15,10 +16,7 @@ export default async function TurnosPendientesPage() {
     where: {
       status: 'PENDIENTE',
       ...(ctx.residency ? { episode: { residencyId: ctx.residency.id } } : {}),
-      OR: [
-        { recibidoPor: { equals: emailMedico, mode: 'insensitive' } },
-        ...(nombreMedico ? [{ recibidoPor: { contains: nombreMedico, mode: 'insensitive' as const } }] : []),
-      ],
+      recibidoPor: { equals: emailMedico, mode: 'insensitive' },
     },
     include: {
       episode: {

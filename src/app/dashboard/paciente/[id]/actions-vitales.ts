@@ -94,10 +94,10 @@ export async function modificarSignosVitales(formData: FormData): Promise<void> 
   const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
   const weightUnit = String(formData.get('weightUnit') ?? 'kg').trim()
 
-  const previo = await prisma.vitalSign.findUnique({
-    where: { id: vitalId },
+  const previo = await prisma.vitalSign.findFirst({
+    where: { id: vitalId, episodeId },
   })
-  if (!previo) volverAlExpediente(episodeId, 'Registro de signos no encontrado')
+  if (!previo) volverAlExpediente(episodeId, 'Registro de signos no encontrado en este expediente')
 
   const valores: Record<string, number | null> = {}
 
@@ -108,10 +108,23 @@ export async function modificarSignosVitales(formData: FormData): Promise<void> 
       continue
     }
     const n = Number(texto)
-    if (!Number.isFinite(n) || n < c.min || n > c.max) {
-      volverAlExpediente(episodeId, `${c.etiqueta} inválido`)
+    if (!Number.isFinite(n)) {
+      volverAlExpediente(episodeId, `${c.etiqueta}: escribe un número válido`)
+    }
+    if (c.entero && !Number.isInteger(n)) {
+      volverAlExpediente(episodeId, `${c.etiqueta}: escribe un número entero`)
+    }
+    if (n < c.min || n > c.max) {
+      volverAlExpediente(episodeId, `${c.etiqueta} fuera del rango válido (${c.min} a ${c.max})`)
     }
     valores[c.campo] = n
+  }
+
+  if ((valores.systolic === null) !== (valores.diastolic === null)) {
+    volverAlExpediente(episodeId, 'Escribe la presión sistólica y la diastólica juntas')
+  }
+  if (valores.systolic !== null && valores.diastolic !== null && valores.diastolic >= valores.systolic) {
+    volverAlExpediente(episodeId, 'La presión diastólica debe ser menor que la sistólica')
   }
 
   await prisma.vitalSign.update({

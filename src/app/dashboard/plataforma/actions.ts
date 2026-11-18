@@ -13,6 +13,9 @@ async function exigirSuperAdmin() {
   if (!ctx?.user || ctx.user.role !== 'SUPERADMIN') {
     redirect('/dashboard')
   }
+  if (ctx.user.mustChangePassword) {
+    redirect('/dashboard/perfil?force=true')
+  }
   return ctx.user
 }
 
@@ -25,14 +28,19 @@ function crearSlug(texto: string): string {
     .replace(/(^-|-$)/g, '')
 }
 
+function parseInterfaceMode(raw: string): InterfaceMode {
+  if (raw === 'HOSPITALIZACION') return 'HOSPITALIZACION'
+  if (raw === 'MEDICINA_INTERNA') return 'MEDICINA_INTERNA'
+  return 'CONSULTAS'
+}
+
 export async function crearResidenciaConAdmin(formData: FormData): Promise<void> {
   const superAdmin = await exigirSuperAdmin()
 
   const name = String(formData.get('name') ?? '').trim()
   const specialty = String(formData.get('specialty') ?? '').trim() || 'General'
   const interfaceModeRaw = String(formData.get('interfaceMode') ?? 'CONSULTAS').trim()
-  const interfaceMode: InterfaceMode =
-    interfaceModeRaw === 'HOSPITALIZACION' ? 'HOSPITALIZACION' : 'CONSULTAS'
+  const interfaceMode = parseInterfaceMode(interfaceModeRaw)
   const planName = String(formData.get('planName') ?? 'Plan Residencia Mensual').trim()
   const monthlyPriceUsd = Math.max(0, parseInt(String(formData.get('monthlyPriceUsd') ?? '49'), 10) || 49)
   const maxActiveUsers = Math.max(1, parseInt(String(formData.get('maxActiveUsers') ?? '25'), 10) || 25)
@@ -45,8 +53,16 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
   const adminEmail = String(formData.get('adminEmail') ?? '').trim().toLowerCase()
   const adminPassword = String(formData.get('adminPassword') ?? '')
 
-  if (name.length < 3 || adminName.length < 3 || !adminEmail.includes('@') || adminPassword.length < 6) {
-    redirect('/dashboard/plataforma?error=' + encodeURIComponent('Completa todos los campos (contraseña mínima de 6 caracteres).'))
+  const passwordValida =
+    adminPassword.length >= 8 && /[a-zA-Z]/.test(adminPassword) && /\d/.test(adminPassword)
+
+  if (name.length < 3 || adminName.length < 3 || !adminEmail.includes('@') || !passwordValida) {
+    redirect(
+      '/dashboard/plataforma?error=' +
+        encodeURIComponent(
+          'Completa todos los campos (contraseña mínima de 8 caracteres con letras y números).'
+        )
+    )
   }
 
   const existeCorreo = await prisma.user.findFirst({
@@ -125,8 +141,7 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
   const monthlyPriceUsd = Math.max(0, parseInt(String(formData.get('monthlyPriceUsd') ?? '49'), 10) || 0)
   const maxActiveUsers = Math.max(1, parseInt(String(formData.get('maxActiveUsers') ?? '25'), 10) || 1)
 
-  const interfaceMode: InterfaceMode =
-    interfaceModeRaw === 'CONSULTAS' ? 'CONSULTAS' : 'HOSPITALIZACION'
+  const interfaceMode = parseInterfaceMode(interfaceModeRaw)
   const planStatus: PlanStatus = (
     ['TRIAL', 'ACTIVE', 'PAST_DUE', 'SUSPENDED'].includes(planStatusRaw) ? planStatusRaw : 'ACTIVE'
   ) as PlanStatus

@@ -265,6 +265,23 @@ exports.Prisma.ConsultationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.InternalMedicineProfileScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  clinicalStatus: 'clinicalStatus',
+  codeStatus: 'codeStatus',
+  isolationType: 'isolationType',
+  oxygenSupport: 'oxygenSupport',
+  dietType: 'dietType',
+  thromboprophylaxis: 'thromboprophylaxis',
+  ulcerProphylaxis: 'ulcerProphylaxis',
+  invasiveDevices: 'invasiveDevices',
+  fluidBalance24h: 'fluidBalance24h',
+  dischargeGoal: 'dischargeGoal',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.MedicalHistoryScalarFieldEnum = {
   id: 'id',
   patientId: 'patientId',
@@ -446,7 +463,8 @@ exports.Prisma.JsonNullValueFilter = {
 };
 exports.InterfaceMode = exports.$Enums.InterfaceMode = {
   HOSPITALIZACION: 'HOSPITALIZACION',
-  CONSULTAS: 'CONSULTAS'
+  CONSULTAS: 'CONSULTAS',
+  MEDICINA_INTERNA: 'MEDICINA_INTERNA'
 };
 
 exports.PlanStatus = exports.$Enums.PlanStatus = {
@@ -479,6 +497,7 @@ exports.Prisma.ModelName = {
   Patient: 'Patient',
   Episode: 'Episode',
   Consultation: 'Consultation',
+  InternalMedicineProfile: 'InternalMedicineProfile',
   MedicalHistory: 'MedicalHistory',
   ImportantAlert: 'ImportantAlert',
   GfrRecord: 'GfrRecord',

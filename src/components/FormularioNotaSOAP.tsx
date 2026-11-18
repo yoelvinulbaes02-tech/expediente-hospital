@@ -19,10 +19,10 @@ export function FormularioNotaSOAP({
   const limpiarBorradores = () => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.removeItem(`draft_${episodeId}_s`)
-        localStorage.removeItem(`draft_${episodeId}_o`)
-        localStorage.removeItem(`draft_${episodeId}_a`)
-        localStorage.removeItem(`draft_${episodeId}_p`)
+        for (const key of ['s', 'o', 'a', 'p']) {
+          sessionStorage.removeItem(`draft_${episodeId}_${key}`)
+          localStorage.removeItem(`draft_${episodeId}_${key}`)
+        }
       } catch {}
     }
   }

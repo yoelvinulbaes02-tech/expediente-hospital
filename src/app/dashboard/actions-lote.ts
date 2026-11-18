@@ -116,22 +116,30 @@ export async function completarTareaDesdeDashboard(
 ): Promise<{ ok: boolean; error?: string }> {
   const session = await auth()
   const user = session?.user
-  if (!user?.id || !user.email) {
+  if (!user?.id) {
     return { ok: false, error: 'Tu sesión venció. Vuelve a iniciar sesión.' }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const role = String((user as any).role ?? 'READONLY')
-  if (!ROLES_CLINICOS.includes(role)) {
-    return { ok: false, error: 'No tienes permiso para marcar pendientes.' }
   }
 
   const usuarioDb = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { residencyId: true, isActive: true },
+    select: {
+      role: true,
+      email: true,
+      residencyId: true,
+      isActive: true,
+      mustChangePassword: true,
+    },
   })
   if (!usuarioDb?.isActive) {
     return { ok: false, error: 'Tu usuario está inactivo.' }
+  }
+  if (usuarioDb.mustChangePassword) {
+    return { ok: false, error: 'Debes cambiar tu contraseña temporal antes de continuar.' }
+  }
+
+  const role = String(usuarioDb.role)
+  if (!ROLES_CLINICOS.includes(role)) {
+    return { ok: false, error: 'No tienes permiso para marcar pendientes.' }
   }
 
   const tarea = await prisma.task.findUnique({
@@ -147,13 +155,14 @@ export async function completarTareaDesdeDashboard(
     return { ok: false, error: 'La tarea no existe.' }
   }
 
-  if (
-    role !== 'SUPERADMIN' &&
-    tarea.episode.residencyId &&
-    usuarioDb.residencyId &&
-    tarea.episode.residencyId !== usuarioDb.residencyId
-  ) {
-    return { ok: false, error: 'No tienes acceso a este expediente.' }
+  if (role !== 'SUPERADMIN') {
+    if (
+      !usuarioDb.residencyId ||
+      !tarea.episode.residencyId ||
+      tarea.episode.residencyId !== usuarioDb.residencyId
+    ) {
+      return { ok: false, error: 'No tienes acceso a este expediente.' }
+    }
   }
 
   const checkSuscripcion = await verificarEscrituraResidencia(

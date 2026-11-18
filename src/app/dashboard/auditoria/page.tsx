@@ -11,6 +11,7 @@ export default async function AuditoriaPage({
 }) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
+  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
 
   const userRole = String(ctx.user.role)
   if (userRole !== 'ADMIN' && userRole !== 'SUPERADMIN') redirect('/dashboard')
@@ -25,12 +26,17 @@ export default async function AuditoriaPage({
   }
 
   if (desde || hasta) {
-    where.serverTs = {}
+    const filtroFecha: { gte?: Date; lte?: Date } = {}
     if (desde) {
-      where.serverTs.gte = new Date(`${desde}T00:00:00-04:00`)
+      const d = new Date(`${desde}T00:00:00-04:00`)
+      if (!Number.isNaN(d.getTime())) filtroFecha.gte = d
     }
     if (hasta) {
-      where.serverTs.lte = new Date(`${hasta}T23:59:59-04:00`)
+      const h = new Date(`${hasta}T23:59:59-04:00`)
+      if (!Number.isNaN(h.getTime())) filtroFecha.lte = h
+    }
+    if (filtroFecha.gte || filtroFecha.lte) {
+      where.serverTs = filtroFecha
     }
   }
 
