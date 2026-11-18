@@ -22,6 +22,7 @@ import { calcularPermisos } from '@/lib/permisos'
 // Componentes clínicos
 import { NotasImportantes } from '@/components/NotasImportantes'
 import { BloqueNefrologico } from '@/components/BloqueNefrologico'
+import { BloqueMedicinaInterna } from '@/components/BloqueMedicinaInterna'
 import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
 import { ReportesLaboratorio } from '@/components/ReportesLaboratorio'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
@@ -70,6 +71,7 @@ export default async function ExpedientePage({
 }) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
+  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
 
   const { id } = await params
   const { error, vista } = await searchParams
@@ -130,13 +132,10 @@ export default async function ExpedientePage({
 
   if (!episode) return <div className="p-8 text-center text-slate-800">Expediente no encontrado.</div>
 
-  if (
-    !ctx.esSuperAdmin &&
-    ctx.residency &&
-    episode.residencyId &&
-    episode.residencyId !== ctx.residency.id
-  ) {
-    redirect('/dashboard')
+  if (!ctx.esSuperAdmin) {
+    if (!ctx.residency || !episode.residencyId || episode.residencyId !== ctx.residency.id) {
+      redirect('/dashboard')
+    }
   }
 
   const suscripcionBloqueada = ctx.suscripcion?.bloqueada ?? false
@@ -156,6 +155,13 @@ export default async function ExpedientePage({
   const esSoloLectura = !permisos.activo || suscripcionBloqueada
   const entregaPendiente = episode.handoffs[0]
   const esInterconsulta = episode.serviceType === 'interconsulta'
+  const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
+  const internalMedicineProfile = esModoMedicinaInterna
+    ? await prisma.internalMedicineProfile
+        .findUnique({ where: { episodeId: episode.id } })
+        .catch(() => null)
+    : null
+  const soloDiuresisInterconsulta = esInterconsulta && !esModoMedicinaInterna
   const volverHref =
     vista === 'interconsulta' || (!vista && esInterconsulta)
       ? '/dashboard?vista=interconsulta'
@@ -203,6 +209,9 @@ export default async function ExpedientePage({
   episode.vascularAccesses.forEach((va) => emails.add(va.createdBy))
   episode.viralSerologies.forEach((vs) => emails.add(vs.recordedBy))
   episode.gfrRecords.forEach((gfr) => emails.add(gfr.recordedBy))
+  if (internalMedicineProfile?.updatedBy) {
+    emails.add(internalMedicineProfile.updatedBy)
+  }
 
   if (entregaPendiente) {
     emails.add(entregaPendiente.entregadoPor)
@@ -210,7 +219,10 @@ export default async function ExpedientePage({
   }
 
   const usuarios = await prisma.user.findMany({
-    where: { email: { in: Array.from(emails) } },
+    where: {
+      email: { in: Array.from(emails) },
+      ...(episode.residencyId ? { residencyId: episode.residencyId } : {}),
+    },
     select: { email: true, fullName: true, role: true },
   })
   const nombres: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.fullName]))
@@ -770,23 +782,38 @@ export default async function ExpedientePage({
           />
         </div>
 
-        {/* 2. ACCESO VASCULAR, VIRALES, TIPIFICACIÓN Y TFG */}
+        {/* 2. BLOQUE CLÍNICO DE ESPECIALIDAD (MEDICINA INTERNA O NEFROLOGÍA) */}
         <div className="print:hidden">
-          <BloqueNefrologico
-            episodeId={episode.id}
-            acceso={episode.vascularAccesses[0] ?? null}
-            virales={episode.viralSerologies[0] ?? null}
-            tfgActual={episode.gfrRecords[0] ?? null}
-            historialTfg={episode.gfrRecords}
-            tipificacion={{
-              bloodType: episode.patient.bloodType,
-              recordedBy: episode.patient.bloodTypeRecordedBy,
-              updatedAt: episode.patient.bloodTypeUpdatedAt,
-            }}
-            nombres={nombres}
-            roles={roles}
-            puedeRegistrar={permisos.puedeRegistrar}
-          />
+          {esModoMedicinaInterna ? (
+            <BloqueMedicinaInterna
+              episodeId={episode.id}
+              perfil={internalMedicineProfile}
+              tipificacion={{
+                bloodType: episode.patient.bloodType,
+                recordedBy: episode.patient.bloodTypeRecordedBy,
+                updatedAt: episode.patient.bloodTypeUpdatedAt,
+              }}
+              nombres={nombres}
+              roles={roles}
+              puedeRegistrar={permisos.puedeRegistrar}
+            />
+          ) : (
+            <BloqueNefrologico
+              episodeId={episode.id}
+              acceso={episode.vascularAccesses[0] ?? null}
+              virales={episode.viralSerologies[0] ?? null}
+              tfgActual={episode.gfrRecords[0] ?? null}
+              historialTfg={episode.gfrRecords}
+              tipificacion={{
+                bloodType: episode.patient.bloodType,
+                recordedBy: episode.patient.bloodTypeRecordedBy,
+                updatedAt: episode.patient.bloodTypeUpdatedAt,
+              }}
+              nombres={nombres}
+              roles={roles}
+              puedeRegistrar={permisos.puedeRegistrar}
+            />
+          )}
         </div>
 
         <div className="print:hidden">
@@ -858,7 +885,7 @@ export default async function ExpedientePage({
 
             {/* FORMULARIO DE SIGNOS VITALES */}
             {permisos.puedeRegistrar && (
-              esInterconsulta ? (
+              soloDiuresisInterconsulta ? (
                 <div className="bg-white p-5 rounded-xl shadow-sm border border-purple-200">
                   <div className="flex items-center gap-2 border-b pb-2 mb-4">
                     <span className="text-lg">💧</span>
@@ -1027,7 +1054,7 @@ export default async function ExpedientePage({
             {/* Tendencia */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:hidden">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
-                {esInterconsulta ? 'Control y Tendencia de Diuresis' : 'Tendencia de Signos Vitales, Peso y Diuresis'}
+                {soloDiuresisInterconsulta ? 'Control y Tendencia de Diuresis' : 'Tendencia de Signos Vitales, Peso y Diuresis'}
               </h2>
               <GraficasSignos registros={registrosGrafica} />
             </div>
@@ -1036,7 +1063,7 @@ export default async function ExpedientePage({
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto print:border-none print:shadow-none print:p-0">
               <div className="flex justify-between items-center border-b pb-2 mb-4">
                 <h2 className="text-lg font-bold text-slate-800">
-                  {esInterconsulta ? 'Historial de Diuresis' : 'Últimos Signos Vitales'}
+                  {soloDiuresisInterconsulta ? 'Historial de Diuresis' : 'Últimos Signos Vitales'}
                 </h2>
                 <BotonImprimirSignos />
               </div>
@@ -1045,10 +1072,10 @@ export default async function ExpedientePage({
                 <thead className="bg-slate-100 text-slate-600">
                   <tr>
                     <th className="px-3 py-2 whitespace-nowrap">Fecha / Hora</th>
-                    {!esInterconsulta && <th className="px-3 py-2">TA</th>}
-                    {!esInterconsulta && <th className="px-3 py-2">FC</th>}
-                    {!esInterconsulta && <th className="px-3 py-2">Temp</th>}
-                    {!esInterconsulta && <th className="px-3 py-2">SpO2</th>}
+                    {!soloDiuresisInterconsulta && <th className="px-3 py-2">TA</th>}
+                    {!soloDiuresisInterconsulta && <th className="px-3 py-2">FC</th>}
+                    {!soloDiuresisInterconsulta && <th className="px-3 py-2">Temp</th>}
+                    {!soloDiuresisInterconsulta && <th className="px-3 py-2">SpO2</th>}
                     <th className="px-3 py-2">Peso</th>
                     <th className="px-3 py-2 font-bold text-sky-800">Diuresis</th>
                     <th className="px-3 py-2">Registró</th>
@@ -1059,14 +1086,14 @@ export default async function ExpedientePage({
                   {episode.vitals.map((v) => (
                     <tr key={v.id} className="border-b hover:bg-slate-50">
                       <td className="px-3 py-2 text-slate-500 whitespace-nowrap">{fechaCorta(v.createdAt)}</td>
-                      {!esInterconsulta && (
+                      {!soloDiuresisInterconsulta && (
                         <td className={`px-3 py-2 font-medium ${esAnormal('sys', v.systolic) ? 'text-red-600 bg-red-50' : 'text-slate-800'}`}>
                           {v.systolic ? `${v.systolic}/${v.diastolic}` : '—'}
                         </td>
                       )}
-                      {!esInterconsulta && <td className="px-3 py-2 text-slate-800">{v.heartRate ?? '—'}</td>}
-                      {!esInterconsulta && <td className="px-3 py-2 text-slate-800">{v.temperature ?? '—'}</td>}
-                      {!esInterconsulta && <td className="px-3 py-2 text-slate-800">{v.oxygenSat ?? '—'}</td>}
+                      {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.heartRate ?? '—'}</td>}
+                      {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.temperature ?? '—'}</td>}
+                      {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.oxygenSat ?? '—'}</td>}
                       <td className="px-3 py-2 font-bold text-emerald-700">
                         {v.weight ? `${v.weight} ${v.weightUnit ?? 'kg'}` : '—'}
                       </td>
@@ -1138,7 +1165,7 @@ export default async function ExpedientePage({
                     </tr>
                   ))}
                   {episode.vitals.length === 0 && (
-                    <tr><td colSpan={esInterconsulta ? 5 : 9} className="text-center py-4 text-slate-400">No hay registros aún.</td></tr>
+                    <tr><td colSpan={soloDiuresisInterconsulta ? 5 : 9} className="text-center py-4 text-slate-400">No hay registros aún.</td></tr>
                   )}
                 </tbody>
               </table>

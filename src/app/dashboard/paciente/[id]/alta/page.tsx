@@ -1,14 +1,21 @@
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { obtenerContextoResidencia } from '@/lib/tenant'
+import { ROLES_MEDICOS } from '@/lib/permisos'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { cerrarExpediente } from '../actions-alta'
 
 export default async function AltaPage({ params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const ctx = await obtenerContextoResidencia()
+  if (!ctx?.user) redirect('/login')
+  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
 
-  const { id } = await params;
+  const role = String(ctx.user.role)
+  if (!ROLES_MEDICOS.includes(role) && role !== 'ADMIN' && role !== 'SUPERADMIN') {
+    redirect('/dashboard')
+  }
+
+  const { id } = await params
 
   const episode = await prisma.episode.findUnique({
     where: { id: id },
@@ -16,6 +23,17 @@ export default async function AltaPage({ params }: { params: Promise<{ id: strin
   })
 
   if (!episode) return <div className="p-8 text-center">Expediente no encontrado.</div>
+
+  if (!ctx.esSuperAdmin) {
+    if (!ctx.residency || !episode.residencyId || episode.residencyId !== ctx.residency.id) {
+      redirect('/dashboard')
+    }
+  }
+
+  if (ctx.suscripcion?.bloqueada) {
+    redirect(`/dashboard/paciente/${episode.id}?error=${encodeURIComponent('Suscripción suspendida: solo lectura.')}`)
+  }
+
   if (episode.status === 'closed') return <div className="p-8 text-center text-red-600 font-bold">Este expediente ya está cerrado.</div>
 
   return (

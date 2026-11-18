@@ -1,7 +1,6 @@
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { signOut } from '@/auth'
 import { redirect } from 'next/navigation'
-import { SessionTimeout } from '@/components/SessionTimeout'
 import { prisma } from '@/lib/prisma'
 import { ListaPacientes } from '@/components/ListaPacientes'
 import { ConsultasDashboard } from '@/components/ConsultasDashboard'
@@ -46,7 +45,7 @@ export default async function DashboardPage({
   const puedeRegistrar = ROLES_CLINICOS.includes(userRole) && !suscripcionBloqueada
   const esModoConsultas = ctx.interfaceMode === 'CONSULTAS'
 
-  const [episodes, doctores, turnosPendientes, consultas, pacientesClinica] = await Promise.all([
+  const [episodesBase, doctores, turnosPendientes, consultas, pacientesClinica] = await Promise.all([
     esModoConsultas
       ? Promise.resolve([])
       : prisma.episode.findMany({
@@ -86,12 +85,7 @@ export default async function DashboardPage({
           where: {
             status: 'PENDIENTE',
             episode: { residencyId: residency.id },
-            OR: [
-              { recibidoPor: { equals: emailMedico, mode: 'insensitive' } },
-              ...(nombreMedico
-                ? [{ recibidoPor: { contains: nombreMedico, mode: 'insensitive' as const } }]
-                : []),
-            ],
+            recibidoPor: { equals: emailMedico, mode: 'insensitive' },
           },
         }),
 
@@ -135,6 +129,46 @@ export default async function DashboardPage({
       : Promise.resolve([]),
   ])
 
+  let perfilesMI = new Map<
+    string,
+    {
+      clinicalStatus: string
+      codeStatus: string
+      isolationType: string
+      oxygenSupport: string
+    }
+  >()
+  if (ctx.interfaceMode === 'MEDICINA_INTERNA' && episodesBase.length > 0) {
+    const listaPerfiles = await prisma.internalMedicineProfile
+      .findMany({
+        where: { episodeId: { in: episodesBase.map((e) => e.id) } },
+        select: {
+          episodeId: true,
+          clinicalStatus: true,
+          codeStatus: true,
+          isolationType: true,
+          oxygenSupport: true,
+        },
+      })
+      .catch(() => [])
+    perfilesMI = new Map(
+      listaPerfiles.map((p) => [
+        p.episodeId,
+        {
+          clinicalStatus: p.clinicalStatus,
+          codeStatus: p.codeStatus,
+          isolationType: p.isolationType,
+          oxygenSupport: p.oxygenSupport,
+        },
+      ])
+    )
+  }
+
+  const episodes = episodesBase.map((ep) => ({
+    ...ep,
+    internalMedicineProfile: perfilesMI.get(ep.id) ?? null,
+  }))
+
   const textoBadge = turnosPendientes > 9 ? '+9' : String(turnosPendientes)
 
   const consultasSerializadas = consultas.map((c) => ({
@@ -155,8 +189,6 @@ export default async function DashboardPage({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      <SessionTimeout />
-
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-2.5 flex justify-between items-center gap-4 shadow-sm sticky top-0 z-10 transition-colors duration-300">
         {/* IDENTIDAD DE MARCA: ICONO + ORDEN EXACTO */}
         <Link href="/dashboard" className="flex items-center gap-3.5 min-w-0 hover:opacity-95 transition-opacity">
@@ -342,6 +374,9 @@ export default async function DashboardPage({
             doctores={doctores}
             vistaInicial={vistaInicial}
             puedeMarcarTareas={puedeRegistrar}
+            interfaceMode={
+              ctx.interfaceMode === 'MEDICINA_INTERNA' ? 'MEDICINA_INTERNA' : 'HOSPITALIZACION'
+            }
           />
         )}
       </main>

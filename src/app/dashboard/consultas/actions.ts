@@ -11,6 +11,9 @@ const ESTADOS_VALIDOS = ['PROGRAMADA', 'EN_SALA', 'EN_CONSULTA', 'COMPLETADA', '
 async function exigirAccesoConsulta(consultationId?: string) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) throw new Error('Sesión expirada')
+  if (ctx.user.mustChangePassword) {
+    throw new Error('Debes cambiar tu contraseña temporal antes de continuar.')
+  }
   if (!ROLES_CLINICOS.includes(ctx.user.role)) {
     throw new Error('No tienes permisos clínicos para modificar consultas.')
   }
@@ -21,7 +24,7 @@ async function exigirAccesoConsulta(consultationId?: string) {
       select: { id: true, residencyId: true, patientId: true, status: true },
     })
     if (!consulta) throw new Error('Consulta no encontrada')
-    if (!ctx.esSuperAdmin && ctx.residency && consulta.residencyId !== ctx.residency.id) {
+    if (!ctx.esSuperAdmin && (!ctx.residency || consulta.residencyId !== ctx.residency.id)) {
       throw new Error('No tienes acceso a esta residencia')
     }
     const check = await verificarEscrituraResidencia(consulta.residencyId)
@@ -61,6 +64,9 @@ export async function crearConsulta(formData: FormData): Promise<{
     const consultationDate = consultationDateStr
       ? new Date(`${consultationDateStr}:00-04:00`)
       : new Date()
+    if (Number.isNaN(consultationDate.getTime())) {
+      return { ok: false, error: 'La fecha de la consulta no es válida.' }
+    }
 
     let doctorId: string | null = null
     let doctorName: string | null = null
@@ -269,6 +275,9 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
     const nextAppointment = nextAppointmentStr
       ? new Date(`${nextAppointmentStr}T09:00:00-04:00`)
       : null
+    if (nextAppointment && Number.isNaN(nextAppointment.getTime())) {
+      return { ok: false, error: 'La fecha de próxima cita no es válida.' }
+    }
 
     if (accion === 'finalizar' && !diagnosis) {
       return { ok: false, error: 'Indica el diagnóstico o impresión clínica antes de finalizar la consulta.' }

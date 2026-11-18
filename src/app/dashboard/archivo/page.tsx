@@ -7,6 +7,7 @@ import { ListaArchivo } from '@/components/ListaArchivo'
 export default async function ArchivoPage() {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
+  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
   if (!ctx.residency && !ctx.esSuperAdmin) redirect('/dashboard')
 
   const episodiosCerrados = await prisma.episode.findMany({

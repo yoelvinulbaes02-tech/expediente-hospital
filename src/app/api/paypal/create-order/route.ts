@@ -10,6 +10,12 @@ export async function POST(req: NextRequest) {
     if (!ctx?.user || !ctx.residency) {
       return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
     }
+    if (ctx.user.mustChangePassword) {
+      return NextResponse.json(
+        { error: 'Debes cambiar tu contraseña temporal antes de realizar pagos.' },
+        { status: 403 }
+      )
+    }
     if (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
       return NextResponse.json(
         { error: 'Solo el administrador de la residencia puede realizar pagos.' },
@@ -44,7 +50,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ orderID: orden.id })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Error creando la orden de PayPal.'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    console.error('Error en /api/paypal/create-order:', err)
+    return NextResponse.json(
+      { error: 'No se pudo iniciar la orden de PayPal. Intenta nuevamente.' },
+      { status: 500 }
+    )
   }
 }

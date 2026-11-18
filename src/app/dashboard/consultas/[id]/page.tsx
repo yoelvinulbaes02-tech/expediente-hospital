@@ -30,6 +30,7 @@ export default async function ConsultaDetallePage({
 }) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
+  if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
 
   const { id } = await params
 
@@ -55,8 +56,10 @@ export default async function ConsultaDetallePage({
     return <div className="p-8 text-center text-slate-800">Consulta no encontrada.</div>
   }
 
-  if (!ctx.esSuperAdmin && ctx.residency && consulta.residencyId !== ctx.residency.id) {
-    redirect('/dashboard')
+  if (!ctx.esSuperAdmin) {
+    if (!ctx.residency || consulta.residencyId !== ctx.residency.id) {
+      redirect('/dashboard')
+    }
   }
 
   const puedeEditar =

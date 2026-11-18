@@ -13,6 +13,12 @@ export async function POST(req: NextRequest) {
     if (!ctx?.user || !ctx.residency) {
       return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
     }
+    if (ctx.user.mustChangePassword) {
+      return NextResponse.json(
+        { error: 'Debes cambiar tu contraseña temporal antes de confirmar pagos.' },
+        { status: 403 }
+      )
+    }
     if (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
       return NextResponse.json(
         { error: 'Solo el administrador de la residencia puede confirmar pagos.' },
@@ -29,8 +35,8 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json().catch(() => ({}))) as { orderID?: unknown }
     const orderID = String(body.orderID ?? '').trim()
-    if (!orderID) {
-      return NextResponse.json({ error: 'Falta el orderID de PayPal.' }, { status: 400 })
+    if (!orderID || orderID.length > 64) {
+      return NextResponse.json({ error: 'orderID de PayPal inválido.' }, { status: 400 })
     }
 
     // Evitar doble acreditación si ya fue procesada esta orden
@@ -61,14 +67,21 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if ((pagoCapture.amount?.currency_code ?? '').toUpperCase() !== 'USD') {
+      return NextResponse.json(
+        { error: 'La moneda capturada en PayPal no corresponde a USD.' },
+        { status: 400 }
+      )
+    }
+
     const customParts = (pagoCapture.custom_id ?? '').split('|')
-    const customResidencyId = customParts[0] || ctx.residency.id
-    const periodParsed = parseInt(customParts[1] ?? '1', 10)
+    const customResidencyId = customParts[0]?.trim()
+    const periodParsed = parseInt(customParts[1] ?? '', 10)
     const periodMonths = PERIODOS_VALIDOS.includes(periodParsed) ? periodParsed : 1
 
-    if (customResidencyId !== ctx.residency.id) {
+    if (!customResidencyId || customResidencyId !== ctx.residency.id) {
       return NextResponse.json(
-        { error: 'Esta orden de pago pertenece a otra residencia.' },
+        { error: 'Esta orden de pago no corresponde a esta residencia.' },
         { status: 403 }
       )
     }
@@ -83,44 +96,63 @@ export async function POST(req: NextRequest) {
     }
 
     const captureRef = pagoCapture.id || orderID
-    const yaCapturado = await prisma.subscriptionPayment.findFirst({
-      where: { residencyId: ctx.residency.id, reference: captureRef, status: 'APROBADO' },
-    })
-    if (yaCapturado) {
-      return NextResponse.json({ ok: true, alreadyProcessed: true })
-    }
+    const residencyId = ctx.residency.id
+    const userEmail = ctx.user.email
 
-    const base =
-      ctx.residency.subscriptionEndsAt && ctx.residency.subscriptionEndsAt.getTime() > Date.now()
-        ? ctx.residency.subscriptionEndsAt.getTime()
-        : Date.now()
-    const nuevaFecha = new Date(base + periodMonths * 30 * 24 * 60 * 60 * 1000)
+    const resultado = await prisma.$transaction(async (tx) => {
+      if (typeof (tx as { $executeRawUnsafe?: unknown }).$executeRawUnsafe === 'function') {
+        await tx.$executeRawUnsafe('SELECT pg_advisory_xact_lock(hashtext($1))', orderID)
+      }
 
-    await prisma.$transaction([
-      prisma.subscriptionPayment.create({
+      const duplicado = await tx.subscriptionPayment.findFirst({
+        where: {
+          residencyId,
+          status: 'APROBADO',
+          OR: [{ reference: captureRef }, { reference: orderID }, { notes: { contains: orderID } }],
+        },
+      })
+      if (duplicado) {
+        return { alreadyProcessed: true as const, nuevaFecha: null }
+      }
+
+      const resActual = await tx.residency.findUnique({ where: { id: residencyId } })
+      const base =
+        resActual?.subscriptionEndsAt && resActual.subscriptionEndsAt.getTime() > Date.now()
+          ? resActual.subscriptionEndsAt.getTime()
+          : Date.now()
+      const nuevaFecha = new Date(base + periodMonths * 30 * 24 * 60 * 60 * 1000)
+
+      await tx.subscriptionPayment.create({
         data: {
-          residencyId: ctx.residency.id,
+          residencyId,
           amountUsd: montoCobrado,
           periodMonths,
           method: 'paypal',
           reference: captureRef,
           notes: `Pago en línea PayPal (Orden ${orderID})`,
           status: 'APROBADO',
-          requestedBy: ctx.user.email,
+          requestedBy: userEmail,
           reviewedBy: 'paypal-automatico',
           reviewedAt: new Date(),
         },
-      }),
-      prisma.residency.update({
-        where: { id: ctx.residency.id },
+      })
+
+      await tx.residency.update({
+        where: { id: residencyId },
         data: {
           planStatus: 'ACTIVE',
           isActive: true,
           subscriptionEndsAt: nuevaFecha,
           lastPaymentNote: `PayPal automático ${captureRef} (+${periodMonths} mes/es)`,
         },
-      }),
-    ])
+      })
+
+      return { alreadyProcessed: false as const, nuevaFecha }
+    })
+
+    if (resultado.alreadyProcessed || !resultado.nuevaFecha) {
+      return NextResponse.json({ ok: true, alreadyProcessed: true })
+    }
 
     await logAudit({
       actorId: ctx.user.id,
@@ -129,12 +161,12 @@ export async function POST(req: NextRequest) {
       entity: 'subscription_payment',
       entityId: captureRef,
       newValue: {
-        residencyId: ctx.residency.id,
+        residencyId,
         orderID,
         captureRef,
         amountUsd: montoCobrado,
         periodMonths,
-        subscriptionEndsAt: nuevaFecha.toISOString(),
+        subscriptionEndsAt: resultado.nuevaFecha.toISOString(),
       },
       reason: 'Renovación automática de suscripción vía PayPal',
     })
@@ -145,11 +177,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      subscriptionEndsAt: nuevaFecha.toISOString(),
+      subscriptionEndsAt: resultado.nuevaFecha.toISOString(),
       periodMonths,
     })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Error confirmando el pago con PayPal.'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    console.error('Error en /api/paypal/capture-order:', err)
+    return NextResponse.json(
+      { error: 'No se pudo confirmar el pago con PayPal. Si se realizó el cargo, contacta a soporte.' },
+      { status: 500 }
+    )
   }
 }
