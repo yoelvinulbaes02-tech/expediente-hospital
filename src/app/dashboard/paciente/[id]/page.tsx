@@ -5,7 +5,7 @@ import { BannerAlergias } from '@/components/BannerAlergias'
 import { ChecklistTareas } from '@/components/ChecklistTareas'
 import Link from 'next/link'
 import { agregarAlergia, marcarSinAlergias } from './actions'
-import { guardarNota } from './actions-notas'
+import { guardarNota, editarNota } from './actions-notas'
 import { guardarSignosVitales, modificarSignosVitales } from './actions-vitales'
 import {
   cambiarUbicacion,
@@ -27,6 +27,7 @@ import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
 import { ReportesLaboratorio } from '@/components/ReportesLaboratorio'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
 import { FormularioNotaEvolucion } from '@/components/FormularioNotaEvolucion'
+import { ListaEvoluciones } from '@/components/ListaEvoluciones'
 import { BotonImprimirSignos } from '@/components/BotonImprimirSignos'
 import { TratamientoActual } from '@/components/TratamientoActual'
 
@@ -47,6 +48,17 @@ const fechaCorta = (d: Date) =>
     month: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
+  })
+
+const fechaHoraNota = (d: Date) =>
+  new Date(d).toLocaleString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   })
 
 const fechaHoraCompleta = (d: Date) => {
@@ -179,7 +191,10 @@ export default async function ExpedientePage({
 
   // Recolectar emails de firmas
   const emails = new Set<string>()
-  episode.notes.forEach((n) => emails.add(n.createdBy))
+  episode.notes.forEach((n) => {
+    emails.add(n.createdBy)
+    if (n.updatedBy) emails.add(n.updatedBy)
+  })
   episode.vitals.forEach((v) => {
     emails.add(v.recordedBy)
     if (v.updatedBy) emails.add(v.updatedBy)
@@ -1179,38 +1194,28 @@ export default async function ExpedientePage({
             )}
 
             {/* Historial de Notas */}
-            <div className="space-y-4 print:hidden">
-              <h2 className="text-lg font-bold text-slate-800">Historial de Evoluciones</h2>
-              {episode.notes.length === 0 && <p className="text-slate-500 text-sm">No hay evoluciones registradas.</p>}
-              {episode.notes.map((nota) => (
-                <div key={nota.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                  <div className="flex flex-wrap justify-between items-center gap-2 border-b pb-2 mb-3">
-                    <p className="text-sm font-bold text-blue-700">
-                      Firmado por: {nombres[nota.createdBy] ?? nota.createdBy}
-                      {roles[nota.createdBy] && (
-                        <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">
-                          {ETIQUETA_ROL[roles[nota.createdBy]] ?? roles[nota.createdBy]}
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-xs text-slate-500">{nota.createdAt.toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}</p>
-                  </div>
-                  
-                  {nota.content ? (
-                    <p className="text-sm text-slate-800 whitespace-pre-line leading-relaxed">
-                      {nota.content}
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
-                      <div><span className="font-bold text-slate-900">S:</span> {nota.subjective}</div>
-                      <div><span className="font-bold text-slate-900">O:</span> {nota.objective}</div>
-                      <div><span className="font-bold text-slate-900">A:</span> {nota.assessment}</div>
-                      <div><span className="font-bold text-slate-900">P:</span> {nota.plan}</div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <ListaEvoluciones
+              episodeId={episode.id}
+              notas={episode.notes.map((nota) => ({
+                id: nota.id,
+                content: nota.content,
+                subjective: nota.subjective,
+                objective: nota.objective,
+                assessment: nota.assessment,
+                plan: nota.plan,
+                createdBy: nota.createdBy,
+                createdAtFormatted: fechaHoraNota(nota.createdAt),
+                updatedBy: nota.updatedBy ?? null,
+                updatedAtFormatted: nota.updatedAt ? fechaHoraNota(nota.updatedAt) : null,
+                puedeEditar:
+                  permisos.puedeRegistrar &&
+                  nota.createdBy.trim().toLowerCase() === ctx.user.email.trim().toLowerCase(),
+              }))}
+              nombres={nombres}
+              roles={roles}
+              etiquetasRol={ETIQUETA_ROL}
+              action={editarNota}
+            />
           </div>
         </div>
         </div>

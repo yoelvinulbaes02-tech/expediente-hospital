@@ -21,6 +21,7 @@ enum Role {
 enum InterfaceMode {
   HOSPITALIZACION
   CONSULTAS
+  MEDICINA_INTERNA
 }
 
 enum PlanStatus {
@@ -193,8 +194,9 @@ model Episode {
   gfrRecords            GfrRecord[]
   labReports            LabReport[]
   studyReports          StudyReport[]
-  viralSerologies       ViralSerology[]
-  vascularAccesses      VascularAccess[]
+  viralSerologies         ViralSerology[]
+  vascularAccesses        VascularAccess[]
+  internalMedicineProfile InternalMedicineProfile?
 
   @@index([residencyId, status])
   @@index([responsibleId])
@@ -238,6 +240,26 @@ model Consultation {
   @@index([residencyId, status])
   @@index([residencyId, consultationDate])
   @@index([patientId])
+}
+
+// ─── PERFIL CLÍNICO DE MEDICINA INTERNA ───
+model InternalMedicineProfile {
+  id                 String   @id @default(cuid())
+  episodeId          String   @unique
+  clinicalStatus     String   @default("Estable")
+  codeStatus         String   @default("Full Code")
+  isolationType      String   @default("Sin aislamiento")
+  oxygenSupport      String   @default("Aire ambiente")
+  dietType           String   @default("Dieta corriente")
+  thromboprophylaxis String   @default("Pendiente evaluar")
+  ulcerProphylaxis   String   @default("No indicada")
+  invasiveDevices    String?
+  fluidBalance24h    String?
+  dischargeGoal      String?
+  updatedBy          String
+  updatedAt          DateTime @updatedAt
+
+  episode Episode @relation(fields: [episodeId], references: [id])
 }
 
 // ─── ANTECEDENTES DEL PACIENTE ───
@@ -379,18 +401,20 @@ model Allergy {
 
 // ─── NOTAS MÉDICAS DE EVOLUCIÓN ───
 model Note {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   episodeId  String
   content    String?
   subjective String?
   objective  String?
   assessment String?
   plan       String?
-  status     String   @default("firmada")
+  status     String    @default("firmada")
   createdBy  String
-  createdAt  DateTime @default(now()) @db.Timestamptz
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+  updatedBy  String?
+  updatedAt  DateTime? @db.Timestamptz
 
-  episode    Episode  @relation(fields: [episodeId], references: [id])
+  episode    Episode   @relation(fields: [episodeId], references: [id])
 }
 
 // ─── SIGNOS VITALES ───

@@ -401,16 +401,18 @@ model Allergy {
 
 // ─── NOTAS MÉDICAS DE EVOLUCIÓN ───
 model Note {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   episodeId  String
   content    String?
   subjective String?
   objective  String?
   assessment String?
   plan       String?
-  status     String   @default("firmada")
+  status     String    @default("firmada")
   createdBy  String
-  createdAt  DateTime @default(now()) @db.Timestamptz
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+  updatedBy  String?
+  updatedAt  DateTime? @db.Timestamptz
 
   episode Episode @relation(fields: [episodeId], references: [id])
 }

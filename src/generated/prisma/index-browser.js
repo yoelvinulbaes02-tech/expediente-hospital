@@ -388,7 +388,9 @@ exports.Prisma.NoteScalarFieldEnum = {
   plan: 'plan',
   status: 'status',
   createdBy: 'createdBy',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.VitalSignScalarFieldEnum = {

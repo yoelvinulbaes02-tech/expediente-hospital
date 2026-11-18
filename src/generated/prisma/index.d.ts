@@ -22797,6 +22797,8 @@ export namespace Prisma {
     status: string | null
     createdBy: string | null
     createdAt: Date | null
+    updatedBy: string | null
+    updatedAt: Date | null
   }
 
   export type NoteMaxAggregateOutputType = {
@@ -22810,6 +22812,8 @@ export namespace Prisma {
     status: string | null
     createdBy: string | null
     createdAt: Date | null
+    updatedBy: string | null
+    updatedAt: Date | null
   }
 
   export type NoteCountAggregateOutputType = {
@@ -22823,6 +22827,8 @@ export namespace Prisma {
     status: number
     createdBy: number
     createdAt: number
+    updatedBy: number
+    updatedAt: number
     _all: number
   }
 
@@ -22838,6 +22844,8 @@ export namespace Prisma {
     status?: true
     createdBy?: true
     createdAt?: true
+    updatedBy?: true
+    updatedAt?: true
   }
 
   export type NoteMaxAggregateInputType = {
@@ -22851,6 +22859,8 @@ export namespace Prisma {
     status?: true
     createdBy?: true
     createdAt?: true
+    updatedBy?: true
+    updatedAt?: true
   }
 
   export type NoteCountAggregateInputType = {
@@ -22864,6 +22874,8 @@ export namespace Prisma {
     status?: true
     createdBy?: true
     createdAt?: true
+    updatedBy?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -22950,6 +22962,8 @@ export namespace Prisma {
     status: string
     createdBy: string
     createdAt: Date
+    updatedBy: string | null
+    updatedAt: Date | null
     _count: NoteCountAggregateOutputType | null
     _min: NoteMinAggregateOutputType | null
     _max: NoteMaxAggregateOutputType | null
@@ -22980,6 +22994,8 @@ export namespace Prisma {
     status?: boolean
     createdBy?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["note"]>
 
@@ -22994,6 +23010,8 @@ export namespace Prisma {
     status?: boolean
     createdBy?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["note"]>
 
@@ -23008,6 +23026,8 @@ export namespace Prisma {
     status?: boolean
     createdBy?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["note"]>
 
@@ -23022,9 +23042,11 @@ export namespace Prisma {
     status?: boolean
     createdBy?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
   }
 
-  export type NoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "content" | "subjective" | "objective" | "assessment" | "plan" | "status" | "createdBy" | "createdAt", ExtArgs["result"]["note"]>
+  export type NoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "content" | "subjective" | "objective" | "assessment" | "plan" | "status" | "createdBy" | "createdAt" | "updatedBy" | "updatedAt", ExtArgs["result"]["note"]>
   export type NoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -23051,6 +23073,8 @@ export namespace Prisma {
       status: string
       createdBy: string
       createdAt: Date
+      updatedBy: string | null
+      updatedAt: Date | null
     }, ExtArgs["result"]["note"]>
     composites: {}
   }
@@ -23485,6 +23509,8 @@ export namespace Prisma {
     readonly status: FieldRef<"Note", 'String'>
     readonly createdBy: FieldRef<"Note", 'String'>
     readonly createdAt: FieldRef<"Note", 'DateTime'>
+    readonly updatedBy: FieldRef<"Note", 'String'>
+    readonly updatedAt: FieldRef<"Note", 'DateTime'>
   }
     
 
@@ -27766,7 +27792,9 @@ export namespace Prisma {
     plan: 'plan',
     status: 'status',
     createdBy: 'createdBy',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt'
   };
 
   export type NoteScalarFieldEnum = (typeof NoteScalarFieldEnum)[keyof typeof NoteScalarFieldEnum]
@@ -29671,6 +29699,8 @@ export namespace Prisma {
     status?: StringFilter<"Note"> | string
     createdBy?: StringFilter<"Note"> | string
     createdAt?: DateTimeFilter<"Note"> | Date | string
+    updatedBy?: StringNullableFilter<"Note"> | string | null
+    updatedAt?: DateTimeNullableFilter<"Note"> | Date | string | null
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
   }
 
@@ -29685,6 +29715,8 @@ export namespace Prisma {
     status?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
     episode?: EpisodeOrderByWithRelationInput
   }
 
@@ -29702,6 +29734,8 @@ export namespace Prisma {
     status?: StringFilter<"Note"> | string
     createdBy?: StringFilter<"Note"> | string
     createdAt?: DateTimeFilter<"Note"> | Date | string
+    updatedBy?: StringNullableFilter<"Note"> | string | null
+    updatedAt?: DateTimeNullableFilter<"Note"> | Date | string | null
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
   }, "id">
 
@@ -29716,6 +29750,8 @@ export namespace Prisma {
     status?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
     _count?: NoteCountOrderByAggregateInput
     _max?: NoteMaxOrderByAggregateInput
     _min?: NoteMinOrderByAggregateInput
@@ -29735,6 +29771,8 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"Note"> | string
     createdBy?: StringWithAggregatesFilter<"Note"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Note"> | Date | string
+    updatedBy?: StringNullableWithAggregatesFilter<"Note"> | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"Note"> | Date | string | null
   }
 
   export type VitalSignWhereInput = {
@@ -31904,6 +31942,8 @@ export namespace Prisma {
     status?: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
     episode: EpisodeCreateNestedOneWithoutNotesInput
   }
 
@@ -31918,6 +31958,8 @@ export namespace Prisma {
     status?: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
   }
 
   export type NoteUpdateInput = {
@@ -31930,6 +31972,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     episode?: EpisodeUpdateOneRequiredWithoutNotesNestedInput
   }
 
@@ -31944,6 +31988,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NoteCreateManyInput = {
@@ -31957,6 +32003,8 @@ export namespace Prisma {
     status?: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
   }
 
   export type NoteUpdateManyMutationInput = {
@@ -31969,6 +32017,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NoteUncheckedUpdateManyInput = {
@@ -31982,6 +32032,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type VitalSignCreateInput = {
@@ -33736,6 +33788,8 @@ export namespace Prisma {
     status?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type NoteMaxOrderByAggregateInput = {
@@ -33749,6 +33803,8 @@ export namespace Prisma {
     status?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type NoteMinOrderByAggregateInput = {
@@ -33762,6 +33818,8 @@ export namespace Prisma {
     status?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type VitalSignCountOrderByAggregateInput = {
@@ -37445,6 +37503,8 @@ export namespace Prisma {
     status?: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
   }
 
   export type NoteUncheckedCreateWithoutEpisodeInput = {
@@ -37457,6 +37517,8 @@ export namespace Prisma {
     status?: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
   }
 
   export type NoteCreateOrConnectWithoutEpisodeInput = {
@@ -38001,6 +38063,8 @@ export namespace Prisma {
     status?: StringFilter<"Note"> | string
     createdBy?: StringFilter<"Note"> | string
     createdAt?: DateTimeFilter<"Note"> | Date | string
+    updatedBy?: StringNullableFilter<"Note"> | string | null
+    updatedAt?: DateTimeNullableFilter<"Note"> | Date | string | null
   }
 
   export type VitalSignUpsertWithWhereUniqueWithoutEpisodeInput = {
@@ -42315,6 +42379,8 @@ export namespace Prisma {
     status?: string
     createdBy: string
     createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
   }
 
   export type VitalSignCreateManyEpisodeInput = {
@@ -42470,6 +42536,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NoteUncheckedUpdateWithoutEpisodeInput = {
@@ -42482,6 +42550,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NoteUncheckedUpdateManyWithoutEpisodeInput = {
@@ -42494,6 +42564,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type VitalSignUpdateWithoutEpisodeInput = {

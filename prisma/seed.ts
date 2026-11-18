@@ -1,4 +1,4 @@
-﻿import { PrismaClient } from '../src/generated/prisma'
+import { PrismaClient } from '../src/generated/prisma'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import bcrypt from 'bcryptjs'
 import * as dotenv from 'dotenv'
@@ -49,6 +49,23 @@ async function main() {
     },
   })
 
+  const residenciaMedicinaInterna = await prisma.residency.upsert({
+    where: { slug: 'medicina-interna' },
+    update: {},
+    create: {
+      name: 'Residencia de Medicina Interna',
+      slug: 'medicina-interna',
+      specialty: 'Medicina Interna',
+      interfaceMode: 'MEDICINA_INTERNA',
+      planName: 'Plan Residencia Mensual',
+      monthlyPriceUsd: 49,
+      maxActiveUsers: 40,
+      planStatus: 'ACTIVE',
+      subscriptionEndsAt: en30Dias,
+      billingContactEmail: 'admin.mi@hospital.test',
+    },
+  })
+
   await prisma.user.createMany({
     data: [
       { email: 'superadmin@nexo.test', passwordHash, fullName: 'Propietario NEXO', role: 'SUPERADMIN' },
@@ -62,6 +79,9 @@ async function main() {
       // Usuarios demo para la interfaz de Consultas
       { email: 'admin.consulta@hospital.test', passwordHash, fullName: 'Admin Consulta Externa', role: 'ADMIN', residencyId: residenciaConsultas.id },
       { email: 'consulta@hospital.test', passwordHash, fullName: 'Dra. Laura Méndez (Consulta)', role: 'DOCTOR', residencyId: residenciaConsultas.id },
+      // Usuarios demo para la interfaz de Medicina Interna
+      { email: 'admin.mi@hospital.test', passwordHash, fullName: 'Admin Medicina Interna', role: 'ADMIN', residencyId: residenciaMedicinaInterna.id },
+      { email: 'mi@hospital.test', passwordHash, fullName: 'Dr. Roberto Castillo (Med. Interna)', role: 'DOCTOR', residencyId: residenciaMedicinaInterna.id },
     ],
     skipDuplicates: true,
   })
