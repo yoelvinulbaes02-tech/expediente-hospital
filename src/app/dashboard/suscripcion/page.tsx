@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { obtenerContextoResidencia } from '@/lib/tenant'
-import { obtenerPayPalClientId } from '@/lib/paypal'
+import { estaPayPalConfigurado, obtenerPayPalClientId } from '@/lib/paypal'
 import { PagoHibridoSuscripcion } from '@/components/PagoHibridoSuscripcion'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -23,7 +23,7 @@ const fmtFecha = (d: Date) =>
 export default async function SuscripcionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ok?: string; error?: string }>
+  searchParams: Promise<{ error?: string }>
 }) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
@@ -35,7 +35,7 @@ export default async function SuscripcionPage({
     redirect('/dashboard/plataforma')
   }
 
-  const { ok, error } = await searchParams
+  const { error } = await searchParams
 
   const [usuariosActivos, pagos] = await Promise.all([
     prisma.user.count({
@@ -51,14 +51,8 @@ export default async function SuscripcionPage({
   const metaPlan = ETIQUETA_PLAN[ctx.suscripcion.estadoEfectivo] ?? ETIQUETA_PLAN.ACTIVE
   const interfaceModeStr = String(ctx.residency.interfaceMode)
   const paypalClientId = obtenerPayPalClientId()
+  const paypalConfigurado = estaPayPalConfigurado()
   const paypalEnv = (process.env.PAYPAL_ENV ?? 'sandbox').trim().toLowerCase() === 'live' ? 'live' : 'sandbox'
-  const datosBanco = {
-    bankName: (process.env.BILLING_BANK_NAME ?? '').trim(),
-    bankAccount: (process.env.BILLING_BANK_ACCOUNT ?? '').trim(),
-    bankHolder: (process.env.BILLING_BANK_HOLDER ?? '').trim(),
-    bankId: (process.env.BILLING_BANK_ID ?? '').trim(),
-    whatsapp: (process.env.BILLING_WHATSAPP ?? '').trim(),
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8">
@@ -79,12 +73,6 @@ export default async function SuscripcionPage({
             {metaPlan.texto}
           </span>
         </div>
-
-        {ok && (
-          <div className="px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium">
-            Comprobante de transferencia enviado correctamente. En cuanto sea validado por el administrador de la plataforma, tu suscripción se extenderá.
-          </div>
-        )}
 
         {error && (
           <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm font-medium">
@@ -142,13 +130,13 @@ export default async function SuscripcionPage({
           </div>
         </div>
 
-        {/* PAGO HÍBRIDO: PAYPAL / TARJETA AUTOMÁTICO O TRANSFERENCIA BANCARIA */}
+        {/* PAGO EN LÍNEA: PAYPAL Y TARJETA DE CRÉDITO / DÉBITO */}
         <PagoHibridoSuscripcion
           monthlyPriceUsd={ctx.residency.monthlyPriceUsd}
           residencyName={ctx.residency.name}
           paypalClientId={paypalClientId}
+          paypalConfigurado={paypalConfigurado}
           paypalEnv={paypalEnv}
-          datosBanco={datosBanco}
         />
 
         {/* HISTORIAL DE PAGOS */}

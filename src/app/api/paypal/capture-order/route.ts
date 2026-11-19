@@ -74,7 +74,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const customParts = (pagoCapture.custom_id ?? '').split('|')
+    const rawCustomId = (
+      pagoCapture.custom_id ??
+      captura.purchase_units?.[0]?.custom_id ??
+      ''
+    ).trim()
+    const customParts = rawCustomId.split('|')
     const customResidencyId = customParts[0]?.trim()
     const periodParsed = parseInt(customParts[1] ?? '', 10)
     const periodMonths = PERIODOS_VALIDOS.includes(periodParsed) ? periodParsed : 1
@@ -96,6 +101,7 @@ export async function POST(req: NextRequest) {
     }
 
     const captureRef = pagoCapture.id || orderID
+    const metodoPago = captura.payment_source?.card ? 'tarjeta (PayPal)' : 'paypal'
     const residencyId = ctx.residency.id
     const userEmail = ctx.user.email
 
@@ -127,9 +133,9 @@ export async function POST(req: NextRequest) {
           residencyId,
           amountUsd: montoCobrado,
           periodMonths,
-          method: 'paypal',
+          method: metodoPago,
           reference: captureRef,
-          notes: `Pago en línea PayPal (Orden ${orderID})`,
+          notes: `Pago en línea ${metodoPago} (Orden ${orderID})`,
           status: 'APROBADO',
           requestedBy: userEmail,
           reviewedBy: 'paypal-automatico',
@@ -143,7 +149,7 @@ export async function POST(req: NextRequest) {
           planStatus: 'ACTIVE',
           isActive: true,
           subscriptionEndsAt: nuevaFecha,
-          lastPaymentNote: `PayPal automático ${captureRef} (+${periodMonths} mes/es)`,
+          lastPaymentNote: `${metodoPago} ${captureRef} (+${periodMonths} mes/es)`,
         },
       })
 
@@ -151,7 +157,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (resultado.alreadyProcessed || !resultado.nuevaFecha) {
-      return NextResponse.json({ ok: true, alreadyProcessed: true })
+      return NextResponse.json({ ok: true, alreadyProcessed: true, captureRef })
     }
 
     await logAudit({
@@ -164,11 +170,12 @@ export async function POST(req: NextRequest) {
         residencyId,
         orderID,
         captureRef,
+        method: metodoPago,
         amountUsd: montoCobrado,
         periodMonths,
         subscriptionEndsAt: resultado.nuevaFecha.toISOString(),
       },
-      reason: 'Renovación automática de suscripción vía PayPal',
+      reason: 'Renovación automática de suscripción vía PayPal / Tarjeta',
     })
 
     revalidatePath('/dashboard')
@@ -177,6 +184,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
+      captureRef,
+      amountUsd: montoCobrado,
       subscriptionEndsAt: resultado.nuevaFecha.toISOString(),
       periodMonths,
     })

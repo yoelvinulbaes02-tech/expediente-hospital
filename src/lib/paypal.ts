@@ -84,9 +84,15 @@ export async function crearOrdenPayPal({
     cache: 'no-store',
   })
 
-  const json = (await res.json()) as { id?: string; message?: string }
+  const json = (await res.json()) as {
+    id?: string
+    message?: string
+    details?: Array<{ issue?: string; description?: string }>
+  }
   if (!res.ok || !json.id) {
-    throw new Error(json.message || `No se pudo crear la orden en PayPal (${res.status}).`)
+    const detalle = json.details?.[0]?.description || json.message || `HTTP ${res.status}`
+    console.error('PayPal createOrder error:', json)
+    throw new Error(`No se pudo crear la orden en PayPal: ${detalle}`)
   }
 
   return { id: json.id }
@@ -95,8 +101,18 @@ export async function crearOrdenPayPal({
 export type RespuestaCapturaPayPal = {
   id: string
   status: string
+  payment_source?: {
+    card?: {
+      last_digits?: string
+      brand?: string
+    }
+    paypal?: {
+      email_address?: string
+    }
+  }
   purchase_units?: Array<{
     reference_id?: string
+    custom_id?: string
     payments?: {
       captures?: Array<{
         id: string
@@ -123,9 +139,14 @@ export async function capturarOrdenPayPal(orderId: string): Promise<RespuestaCap
     }
   )
 
-  const json = (await res.json()) as RespuestaCapturaPayPal & { message?: string }
+  const json = (await res.json()) as RespuestaCapturaPayPal & {
+    message?: string
+    details?: Array<{ issue?: string; description?: string }>
+  }
   if (!res.ok) {
-    throw new Error(json.message || `PayPal rechazó la captura del pago (${res.status}).`)
+    const detalle = json.details?.[0]?.description || json.message || `HTTP ${res.status}`
+    console.error('PayPal captureOrder error:', json)
+    throw new Error(`PayPal rechazó la captura del pago: ${detalle}`)
   }
 
   return json
