@@ -107,7 +107,8 @@ export async function exigirPermiso(
   }
 
   const checkSuscripcion = await verificarEscrituraResidencia(
-    episode.residencyId ?? usuarioDb.residencyId
+    episode.residencyId ?? usuarioDb.residencyId,
+    userId
   )
   if (!checkSuscripcion.ok) {
     volverAlExpediente(episodeId, checkSuscripcion.error)

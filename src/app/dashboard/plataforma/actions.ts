@@ -6,7 +6,7 @@ import { logAudit } from '@/lib/audit'
 import { obtenerContextoResidencia } from '@/lib/tenant'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import type { InterfaceMode, PlanStatus } from '@/generated/prisma'
+import type { BillingMode, InterfaceMode, PlanStatus } from '@/generated/prisma'
 
 async function exigirSuperAdmin() {
   const ctx = await obtenerContextoResidencia()
@@ -34,19 +34,33 @@ function parseInterfaceMode(raw: string): InterfaceMode {
   return 'CONSULTAS'
 }
 
+function parseBillingMode(raw: string): BillingMode {
+  return raw === 'INDIVIDUAL' ? 'INDIVIDUAL' : 'RESIDENCY'
+}
+
+function parsePlanStatus(raw: string): PlanStatus {
+  if (['TRIAL', 'ACTIVE', 'PAST_DUE', 'SUSPENDED'].includes(raw)) {
+    return raw as PlanStatus
+  }
+  return 'ACTIVE'
+}
+
 export async function crearResidenciaConAdmin(formData: FormData): Promise<void> {
   const superAdmin = await exigirSuperAdmin()
 
   const name = String(formData.get('name') ?? '').trim()
   const specialty = String(formData.get('specialty') ?? '').trim() || 'General'
-  const interfaceModeRaw = String(formData.get('interfaceMode') ?? 'CONSULTAS').trim()
-  const interfaceMode = parseInterfaceMode(interfaceModeRaw)
+  const interfaceMode = parseInterfaceMode(String(formData.get('interfaceMode') ?? 'CONSULTAS').trim())
+  const billingMode = parseBillingMode(String(formData.get('billingMode') ?? 'RESIDENCY').trim())
   const planName = String(formData.get('planName') ?? 'Plan Residencia Mensual').trim()
   const monthlyPriceUsd = Math.max(0, parseInt(String(formData.get('monthlyPriceUsd') ?? '49'), 10) || 49)
+  const individualPriceUsd = Math.max(
+    0,
+    parseInt(String(formData.get('individualPriceUsd') ?? '15'), 10) || 15
+  )
   const maxActiveUsers = Math.max(1, parseInt(String(formData.get('maxActiveUsers') ?? '25'), 10) || 25)
   const planStatusRaw = String(formData.get('planStatus') ?? 'ACTIVE').trim()
-  const planStatus: PlanStatus =
-    planStatusRaw === 'TRIAL' ? 'TRIAL' : 'ACTIVE'
+  const planStatus: PlanStatus = planStatusRaw === 'TRIAL' ? 'TRIAL' : 'ACTIVE'
   const diasVigencia = Math.max(1, parseInt(String(formData.get('diasVigencia') ?? '30'), 10) || 30)
 
   const adminName = String(formData.get('adminName') ?? '').trim()
@@ -70,7 +84,10 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
     select: { id: true },
   })
   if (existeCorreo) {
-    redirect('/dashboard/plataforma?error=' + encodeURIComponent('Ya existe un usuario registrado con ese correo electrónico.'))
+    redirect(
+      '/dashboard/plataforma?error=' +
+        encodeURIComponent('Ya existe un usuario registrado con ese correo electrónico.')
+    )
   }
 
   const slugBase = crearSlug(name) || `residencia-${Date.now()}`
@@ -87,8 +104,10 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
         slug,
         specialty,
         interfaceMode,
+        billingMode,
         planName,
         monthlyPriceUsd,
+        individualPriceUsd,
         maxActiveUsers,
         planStatus,
         subscriptionEndsAt,
@@ -105,6 +124,8 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
         role: 'ADMIN',
         residencyId: res.id,
         mustChangePassword: true,
+        planStatus,
+        subscriptionEndsAt: billingMode === 'INDIVIDUAL' ? subscriptionEndsAt : null,
       },
     })
 
@@ -120,8 +141,10 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
     newValue: {
       name,
       interfaceMode,
+      billingMode,
       specialty,
       monthlyPriceUsd,
+      individualPriceUsd,
       maxActiveUsers,
       adminEmail,
     },
@@ -129,22 +152,32 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
   })
 
   revalidatePath('/dashboard/plataforma')
-  redirect('/dashboard/plataforma?ok=' + encodeURIComponent(`Residencia "${name}" creada con administrador ${adminEmail}.`))
+  redirect(
+    '/dashboard/plataforma?ok=' +
+      encodeURIComponent(`Residencia "${name}" creada con administrador ${adminEmail}.`)
+  )
 }
 
 export async function actualizarResidencia(formData: FormData): Promise<void> {
   const superAdmin = await exigirSuperAdmin()
 
   const residencyId = String(formData.get('residencyId') ?? '')
-  const interfaceModeRaw = String(formData.get('interfaceMode') ?? 'HOSPITALIZACION')
-  const planStatusRaw = String(formData.get('planStatus') ?? 'ACTIVE')
-  const monthlyPriceUsd = Math.max(0, parseInt(String(formData.get('monthlyPriceUsd') ?? '49'), 10) || 0)
-  const maxActiveUsers = Math.max(1, parseInt(String(formData.get('maxActiveUsers') ?? '25'), 10) || 1)
+  const interfaceMode = parseInterfaceMode(String(formData.get('interfaceMode') ?? 'HOSPITALIZACION'))
+  const billingMode = parseBillingMode(String(formData.get('billingMode') ?? 'RESIDENCY'))
+  const planStatus = parsePlanStatus(String(formData.get('planStatus') ?? 'ACTIVE'))
 
-  const interfaceMode = parseInterfaceMode(interfaceModeRaw)
-  const planStatus: PlanStatus = (
-    ['TRIAL', 'ACTIVE', 'PAST_DUE', 'SUSPENDED'].includes(planStatusRaw) ? planStatusRaw : 'ACTIVE'
-  ) as PlanStatus
+  const monthlyPriceParsed = parseInt(String(formData.get('monthlyPriceUsd') ?? '49'), 10)
+  const monthlyPriceUsd = Number.isFinite(monthlyPriceParsed) ? Math.max(0, monthlyPriceParsed) : 49
+
+  const individualPriceParsed = parseInt(String(formData.get('individualPriceUsd') ?? '15'), 10)
+  const individualPriceUsd = Number.isFinite(individualPriceParsed)
+    ? Math.max(0, individualPriceParsed)
+    : 15
+
+  const maxUsersParsed = parseInt(String(formData.get('maxActiveUsers') ?? '25'), 10)
+  const maxActiveUsers = Number.isFinite(maxUsersParsed) ? Math.max(1, maxUsersParsed) : 25
+
+  const redirectTo = String(formData.get('redirectTo') ?? '').trim()
 
   if (!residencyId) return
 
@@ -152,8 +185,10 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
     where: { id: residencyId },
     data: {
       interfaceMode,
+      billingMode,
       planStatus,
       monthlyPriceUsd,
+      individualPriceUsd,
       maxActiveUsers,
       isActive: planStatus !== 'SUSPENDED',
     },
@@ -165,12 +200,28 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
     action: 'update',
     entity: 'residency',
     entityId: residencyId,
-    newValue: { interfaceMode, planStatus, monthlyPriceUsd, maxActiveUsers },
+    newValue: {
+      interfaceMode,
+      billingMode,
+      planStatus,
+      monthlyPriceUsd,
+      individualPriceUsd,
+      maxActiveUsers,
+    },
     reason: 'Configuración de residencia actualizada desde plataforma',
   })
 
   revalidatePath('/dashboard/plataforma')
+  revalidatePath(`/dashboard/plataforma/residencia/${residencyId}`)
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/usuarios')
   revalidatePath('/dashboard')
+
+  if (redirectTo.startsWith('/dashboard/plataforma')) {
+    redirect(
+      `${redirectTo}?ok=${encodeURIComponent('Configuración de cobro y plan de la residencia actualizada.')}`
+    )
+  }
 }
 
 export async function extenderSuscripcion(formData: FormData): Promise<void> {
@@ -203,11 +254,305 @@ export async function extenderSuscripcion(formData: FormData): Promise<void> {
     entity: 'residency',
     entityId: residencyId,
     newValue: { diasAgregados: dias, subscriptionEndsAt: nuevaFecha.toISOString() },
-    reason: `Suscripción extendida por ${dias} días`,
+    reason: `Suscripción grupal extendida por ${dias} días`,
   })
 
   revalidatePath('/dashboard/plataforma')
+  revalidatePath(`/dashboard/plataforma/residencia/${residencyId}`)
   revalidatePath('/dashboard/suscripcion')
+}
+
+export async function cambiarModalidadCobroResidencia(formData: FormData): Promise<void> {
+  const superAdmin = await exigirSuperAdmin()
+  const residencyId = String(formData.get('residencyId') ?? '').trim()
+  const billingMode = parseBillingMode(String(formData.get('billingMode') ?? 'RESIDENCY'))
+  if (!residencyId) return
+
+  const actual = await prisma.residency.findUnique({
+    where: { id: residencyId },
+    select: { id: true, name: true, billingMode: true },
+  })
+  if (!actual) return
+
+  await prisma.residency.update({
+    where: { id: residencyId },
+    data: { billingMode },
+  })
+
+  await logAudit({
+    actorId: superAdmin.id,
+    actorRole: 'SUPERADMIN',
+    action: 'update',
+    entity: 'residency',
+    entityId: residencyId,
+    oldValue: { billingMode: actual.billingMode },
+    newValue: { billingMode },
+    reason: `Modalidad de cobro cambiada a ${billingMode === 'INDIVIDUAL' ? 'Individual por usuario' : 'Grupal por residencia'}`,
+  })
+
+  revalidatePath('/dashboard/plataforma')
+  revalidatePath(`/dashboard/plataforma/residencia/${residencyId}`)
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard/perfil')
+  revalidatePath('/dashboard')
+
+  redirect(
+    `/dashboard/plataforma/residencia/${residencyId}?ok=${encodeURIComponent(
+      billingMode === 'INDIVIDUAL'
+        ? `Cobro Individual ACTIVADO para ${actual.name}. Cada usuario verá ahora el botón "💳 Mi Suscripción".`
+        : `Cobro Grupal ACTIVADO para ${actual.name}.`
+    )}`
+  )
+}
+
+export async function actualizarPrecioUsuario(formData: FormData): Promise<void> {
+  const superAdmin = await exigirSuperAdmin()
+  const residencyId = String(formData.get('residencyId') ?? '').trim()
+  const userId = String(formData.get('userId') ?? '').trim()
+  const limpiar = String(formData.get('limpiar') ?? '') === 'true'
+  const precioRaw = String(formData.get('individualPriceUsd') ?? '').trim()
+
+  if (!residencyId || !userId) return
+
+  const usuario = await prisma.user.findFirst({
+    where: {
+      id: userId,
+      residencyId,
+      role: { not: 'SUPERADMIN' },
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      individualPriceUsd: true,
+    },
+  })
+  if (!usuario) return
+
+  let nuevoPrecio: number | null = null
+  if (!limpiar && precioRaw !== '') {
+    const parsed = parseInt(precioRaw, 10)
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      redirect(
+        `/dashboard/plataforma/residencia/${residencyId}?error=${encodeURIComponent(
+          'Ingresa un precio válido en USD (0 o mayor).'
+        )}`
+      )
+    }
+    nuevoPrecio = parsed
+  }
+
+  await prisma.user.update({
+    where: { id: usuario.id },
+    data: { individualPriceUsd: nuevoPrecio },
+  })
+
+  await logAudit({
+    actorId: superAdmin.id,
+    actorRole: 'SUPERADMIN',
+    action: 'update',
+    entity: 'user_subscription_price',
+    entityId: usuario.id,
+    oldValue: { residencyId, individualPriceUsd: usuario.individualPriceUsd },
+    newValue: { residencyId, individualPriceUsd: nuevoPrecio },
+    reason:
+      nuevoPrecio === null
+        ? `Tarifa individual de ${usuario.fullName} restaurada a la tarifa base de la residencia`
+        : `Tarifa individual personalizada de ${usuario.fullName} fijada en $${nuevoPrecio} USD/mes`,
+  })
+
+  revalidatePath(`/dashboard/plataforma/residencia/${residencyId}`)
+  revalidatePath('/dashboard/plataforma')
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard/perfil')
+
+  redirect(
+    `/dashboard/plataforma/residencia/${residencyId}?ok=${encodeURIComponent(
+      nuevoPrecio === null
+        ? `${usuario.fullName} ahora usa la tarifa base de la residencia.`
+        : `Tarifa individual de ${usuario.fullName} actualizada a $${nuevoPrecio} USD/mes.`
+    )}`
+  )
+}
+
+export async function actualizarSuscripcionUsuario(formData: FormData): Promise<void> {
+  const superAdmin = await exigirSuperAdmin()
+  const residencyId = String(formData.get('residencyId') ?? '').trim()
+  const userId = String(formData.get('userId') ?? '').trim()
+  const accion = String(formData.get('accion') ?? 'estado').trim()
+
+  if (!residencyId || !userId) return
+
+  // Aislamiento estricto: solo modifica si el usuario pertenece exactamente a esa residencia
+  const usuario = await prisma.user.findFirst({
+    where: {
+      id: userId,
+      residencyId,
+      role: { not: 'SUPERADMIN' },
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      planStatus: true,
+      subscriptionEndsAt: true,
+    },
+  })
+  if (!usuario) return
+
+  let nuevoEstado: PlanStatus = usuario.planStatus
+  let nuevaFecha: Date | null = usuario.subscriptionEndsAt
+  let nota = ''
+
+  if (accion === 'extender_30' || accion === 'extender_7') {
+    const dias = accion === 'extender_30' ? 30 : 7
+    const base =
+      usuario.subscriptionEndsAt && usuario.subscriptionEndsAt.getTime() > Date.now()
+        ? usuario.subscriptionEndsAt.getTime()
+        : Date.now()
+    nuevaFecha = new Date(base + dias * 24 * 60 * 60 * 1000)
+    nuevoEstado = 'ACTIVE'
+    nota = `Extensión manual SuperAdmin (+${dias} días)`
+  } else if (accion === 'sin_vencimiento') {
+    nuevoEstado = 'ACTIVE'
+    nuevaFecha = null
+    nota = 'Activado sin fecha límite por SuperAdmin'
+  } else if (accion === 'iniciar_cobro') {
+    nuevoEstado = 'PAST_DUE'
+    nuevaFecha = new Date()
+    nota = 'Inicio de período de gracia individual (5 días)'
+  } else if (accion === 'suspender') {
+    nuevoEstado = 'SUSPENDED'
+    nota = 'Suscripción individual suspendida por SuperAdmin'
+  } else {
+    nuevoEstado = parsePlanStatus(String(formData.get('planStatus') ?? 'ACTIVE'))
+    nota = `Estado cambiado manualmente a ${nuevoEstado}`
+  }
+
+  await prisma.user.update({
+    where: { id: usuario.id },
+    data: {
+      planStatus: nuevoEstado,
+      subscriptionEndsAt: nuevaFecha,
+      lastPaymentNote: nota,
+    },
+  })
+
+  await logAudit({
+    actorId: superAdmin.id,
+    actorRole: 'SUPERADMIN',
+    action: 'update',
+    entity: 'user_subscription',
+    entityId: usuario.id,
+    oldValue: {
+      residencyId,
+      email: usuario.email,
+      planStatus: usuario.planStatus,
+      subscriptionEndsAt: usuario.subscriptionEndsAt?.toISOString() ?? null,
+    },
+    newValue: {
+      residencyId,
+      email: usuario.email,
+      planStatus: nuevoEstado,
+      subscriptionEndsAt: nuevaFecha?.toISOString() ?? null,
+      accion,
+    },
+    reason: `Control individual SuperAdmin (${usuario.fullName}): ${nota}`,
+  })
+
+  revalidatePath(`/dashboard/plataforma/residencia/${residencyId}`)
+  revalidatePath('/dashboard/plataforma')
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard')
+
+  redirect(
+    `/dashboard/plataforma/residencia/${residencyId}?ok=${encodeURIComponent(
+      `Suscripción de ${usuario.fullName} actualizada.`
+    )}`
+  )
+}
+
+export async function aplicarVigenciaATodosUsuarios(formData: FormData): Promise<void> {
+  const superAdmin = await exigirSuperAdmin()
+  const residencyId = String(formData.get('residencyId') ?? '').trim()
+  const accion = String(formData.get('accion') ?? '').trim()
+
+  if (!residencyId) return
+
+  const usuarios = await prisma.user.findMany({
+    where: {
+      residencyId,
+      isActive: true,
+      role: { not: 'SUPERADMIN' },
+    },
+    select: { id: true, subscriptionEndsAt: true },
+  })
+
+  if (usuarios.length === 0) {
+    redirect(`/dashboard/plataforma/residencia/${residencyId}`)
+  }
+
+  const ahora = Date.now()
+  let mensaje = ''
+
+  if (accion === 'extender_30_todos') {
+    await prisma.$transaction(
+      usuarios.map((u) => {
+        const base =
+          u.subscriptionEndsAt && u.subscriptionEndsAt.getTime() > ahora
+            ? u.subscriptionEndsAt.getTime()
+            : ahora
+        return prisma.user.update({
+          where: { id: u.id },
+          data: {
+            planStatus: 'ACTIVE',
+            subscriptionEndsAt: new Date(base + 30 * 24 * 60 * 60 * 1000),
+            lastPaymentNote: 'Activación grupal individual (+30 días) por SuperAdmin',
+          },
+        })
+      })
+    )
+    mensaje = `Se agregaron +30 días individuales a ${usuarios.length} usuario(s) activo(s) de esta residencia.`
+  } else if (accion === 'iniciar_cobro_sin_fecha') {
+    const sinFecha = usuarios.filter((u) => !u.subscriptionEndsAt)
+    if (sinFecha.length > 0) {
+      await prisma.user.updateMany({
+        where: { id: { in: sinFecha.map((u) => u.id) } },
+        data: {
+          planStatus: 'PAST_DUE',
+          subscriptionEndsAt: new Date(ahora),
+          lastPaymentNote: 'Cobro individual iniciado (5 días de gracia)',
+        },
+      })
+    }
+    mensaje =
+      sinFecha.length > 0
+        ? `Se inició el período de cobro individual (5 días de gracia) a ${sinFecha.length} usuario(s) sin fecha.`
+        : 'Todos los usuarios activos ya tenían una fecha asignada.'
+  }
+
+  await logAudit({
+    actorId: superAdmin.id,
+    actorRole: 'SUPERADMIN',
+    action: 'update',
+    entity: 'residency_users_subscription',
+    entityId: residencyId,
+    newValue: { residencyId, accion, totalUsuarios: usuarios.length },
+    reason: `Acción masiva controlada en residencia: ${mensaje}`,
+  })
+
+  revalidatePath(`/dashboard/plataforma/residencia/${residencyId}`)
+  revalidatePath('/dashboard/plataforma')
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard')
+
+  redirect(
+    `/dashboard/plataforma/residencia/${residencyId}?ok=${encodeURIComponent(mensaje)}`
+  )
 }
 
 export async function procesarPagoSuscripcion(formData: FormData): Promise<void> {
@@ -222,31 +567,59 @@ export async function procesarPagoSuscripcion(formData: FormData): Promise<void>
   if (!pago || pago.status !== 'PENDIENTE') return
 
   if (decision === 'APROBADO') {
-    const base =
-      pago.residency.subscriptionEndsAt && pago.residency.subscriptionEndsAt.getTime() > Date.now()
-        ? pago.residency.subscriptionEndsAt.getTime()
-        : Date.now()
-    const nuevaFecha = new Date(base + pago.periodMonths * 30 * 24 * 60 * 60 * 1000)
+    if (pago.billingScope === 'INDIVIDUAL' && pago.userId) {
+      const usuario = await prisma.user.findUnique({ where: { id: pago.userId } })
+      const base =
+        usuario?.subscriptionEndsAt && usuario.subscriptionEndsAt.getTime() > Date.now()
+          ? usuario.subscriptionEndsAt.getTime()
+          : Date.now()
+      const nuevaFecha = new Date(base + pago.periodMonths * 30 * 24 * 60 * 60 * 1000)
 
-    await prisma.$transaction([
-      prisma.subscriptionPayment.update({
-        where: { id: paymentId },
-        data: {
-          status: 'APROBADO',
-          reviewedBy: superAdmin.email,
-          reviewedAt: new Date(),
-        },
-      }),
-      prisma.residency.update({
-        where: { id: pago.residencyId },
-        data: {
-          planStatus: 'ACTIVE',
-          isActive: true,
-          subscriptionEndsAt: nuevaFecha,
-          lastPaymentNote: `Aprobado pago ${pago.reference ?? pago.id} (+${pago.periodMonths} mes/es)`,
-        },
-      }),
-    ])
+      await prisma.$transaction([
+        prisma.subscriptionPayment.update({
+          where: { id: paymentId },
+          data: {
+            status: 'APROBADO',
+            reviewedBy: superAdmin.email,
+            reviewedAt: new Date(),
+          },
+        }),
+        prisma.user.update({
+          where: { id: pago.userId },
+          data: {
+            planStatus: 'ACTIVE',
+            subscriptionEndsAt: nuevaFecha,
+            lastPaymentNote: `Aprobado pago individual ${pago.reference ?? pago.id} (+${pago.periodMonths} mes/es)`,
+          },
+        }),
+      ])
+    } else {
+      const base =
+        pago.residency.subscriptionEndsAt && pago.residency.subscriptionEndsAt.getTime() > Date.now()
+          ? pago.residency.subscriptionEndsAt.getTime()
+          : Date.now()
+      const nuevaFecha = new Date(base + pago.periodMonths * 30 * 24 * 60 * 60 * 1000)
+
+      await prisma.$transaction([
+        prisma.subscriptionPayment.update({
+          where: { id: paymentId },
+          data: {
+            status: 'APROBADO',
+            reviewedBy: superAdmin.email,
+            reviewedAt: new Date(),
+          },
+        }),
+        prisma.residency.update({
+          where: { id: pago.residencyId },
+          data: {
+            planStatus: 'ACTIVE',
+            isActive: true,
+            subscriptionEndsAt: nuevaFecha,
+            lastPaymentNote: `Aprobado pago ${pago.reference ?? pago.id} (+${pago.periodMonths} mes/es)`,
+          },
+        }),
+      ])
+    }
   } else {
     await prisma.subscriptionPayment.update({
       where: { id: paymentId },
@@ -269,5 +642,6 @@ export async function procesarPagoSuscripcion(formData: FormData): Promise<void>
   })
 
   revalidatePath('/dashboard/plataforma')
+  revalidatePath(`/dashboard/plataforma/residencia/${pago.residencyId}`)
   revalidatePath('/dashboard/suscripcion')
 }

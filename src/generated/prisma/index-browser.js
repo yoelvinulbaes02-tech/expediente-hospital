@@ -127,7 +127,9 @@ exports.Prisma.ResidencyScalarFieldEnum = {
   specialty: 'specialty',
   interfaceMode: 'interfaceMode',
   planName: 'planName',
+  billingMode: 'billingMode',
   monthlyPriceUsd: 'monthlyPriceUsd',
+  individualPriceUsd: 'individualPriceUsd',
   maxActiveUsers: 'maxActiveUsers',
   planStatus: 'planStatus',
   subscriptionEndsAt: 'subscriptionEndsAt',
@@ -141,6 +143,8 @@ exports.Prisma.ResidencyScalarFieldEnum = {
 exports.Prisma.SubscriptionPaymentScalarFieldEnum = {
   id: 'id',
   residencyId: 'residencyId',
+  userId: 'userId',
+  billingScope: 'billingScope',
   amountUsd: 'amountUsd',
   periodMonths: 'periodMonths',
   method: 'method',
@@ -162,6 +166,10 @@ exports.Prisma.UserScalarFieldEnum = {
   residencyId: 'residencyId',
   isActive: 'isActive',
   mustChangePassword: 'mustChangePassword',
+  planStatus: 'planStatus',
+  subscriptionEndsAt: 'subscriptionEndsAt',
+  individualPriceUsd: 'individualPriceUsd',
+  lastPaymentNote: 'lastPaymentNote',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -467,6 +475,11 @@ exports.InterfaceMode = exports.$Enums.InterfaceMode = {
   HOSPITALIZACION: 'HOSPITALIZACION',
   CONSULTAS: 'CONSULTAS',
   MEDICINA_INTERNA: 'MEDICINA_INTERNA'
+};
+
+exports.BillingMode = exports.$Enums.BillingMode = {
+  RESIDENCY: 'RESIDENCY',
+  INDIVIDUAL: 'INDIVIDUAL'
 };
 
 exports.PlanStatus = exports.$Enums.PlanStatus = {

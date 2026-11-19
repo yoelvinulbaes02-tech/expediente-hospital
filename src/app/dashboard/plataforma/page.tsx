@@ -36,19 +36,27 @@ export default async function PlataformaPage({
     prisma.residency.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
+        users: {
+          where: { isActive: true, role: { not: 'SUPERADMIN' } },
+          select: { id: true, planStatus: true, individualPriceUsd: true },
+        },
         _count: {
           select: {
-            users: { where: { isActive: true } },
+            users: { where: { isActive: true, role: { not: 'SUPERADMIN' } } },
             patients: true,
             episodes: true,
             consultations: true,
+            payments: { where: { status: 'APROBADO' } },
           },
         },
       },
     }),
     prisma.subscriptionPayment.findMany({
       where: { status: 'PENDIENTE' },
-      include: { residency: { select: { name: true, slug: true } } },
+      include: {
+        residency: { select: { name: true, slug: true } },
+        user: { select: { fullName: true, email: true } },
+      },
       orderBy: { createdAt: 'asc' },
     }),
   ])
@@ -56,9 +64,20 @@ export default async function PlataformaPage({
   const residenciasActivas = residencias.filter(
     (r) => r.isActive && r.planStatus !== 'SUSPENDED'
   )
-  const mrrEstimado = residenciasActivas
-    .filter((r) => r.planStatus === 'ACTIVE')
-    .reduce((acc, r) => acc + r.monthlyPriceUsd, 0)
+
+  const mrrEstimado = residenciasActivas.reduce((acc, r) => {
+    if (r.billingMode === 'INDIVIDUAL') {
+      const sumaIndividual = r.users
+        .filter((u) => u.planStatus === 'ACTIVE')
+        .reduce((sum, u) => sum + (u.individualPriceUsd ?? r.individualPriceUsd), 0)
+      return acc + sumaIndividual
+    }
+    if (r.planStatus === 'ACTIVE') {
+      return acc + r.monthlyPriceUsd
+    }
+    return acc
+  }, 0)
+
   const totalUsuarios = residencias.reduce((acc, r) => acc + r._count.users, 0)
 
   async function cerrarSesion() {
@@ -74,7 +93,7 @@ export default async function PlataformaPage({
             NEXO Plataforma Multi-Tenant
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Control central de residencias, interfaces y suscripciones mensuales B2B
+            Control central de residencias, cobro grupal o individual y suscripciones mensuales B2B
           </p>
         </div>
 
@@ -118,7 +137,7 @@ export default async function PlataformaPage({
             </p>
           </div>
           <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">MRR mensual activo</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">MRR mensual estimado</p>
             <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
               ${mrrEstimado} USD
             </p>
@@ -130,18 +149,18 @@ export default async function PlataformaPage({
             </p>
           </div>
           <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Pagos por aprobar</p>
-            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1 tabular-nums">
-              {pagosPendientes.length}
+            <p className="text-xs text-slate-500 dark:text-slate-400">Residencias en cobro individual</p>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1 tabular-nums">
+              {residencias.filter((r) => r.billingMode === 'INDIVIDUAL').length}
             </p>
           </div>
         </div>
 
-        {/* COLA DE PAGOS PENDIENTES */}
+        {/* COLA DE PAGOS PENDIENTES (SI EXISTIERA ALGUNO LEGACY) */}
         {pagosPendientes.length > 0 && (
           <div className="bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-700 rounded-xl p-5 space-y-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
-              Pagos B2B pendientes de aprobación ({pagosPendientes.length})
+              Pagos pendientes de aprobación ({pagosPendientes.length})
             </h2>
             <div className="divide-y divide-slate-200 dark:divide-slate-700">
               {pagosPendientes.map((pago) => (
@@ -151,7 +170,8 @@ export default async function PlataformaPage({
                 >
                   <div className="text-xs space-y-0.5">
                     <p className="text-sm font-bold text-slate-900 dark:text-white">
-                      {pago.residency.name} ·{' '}
+                      {pago.residency.name}
+                      {pago.user ? ` · ${pago.user.fullName}` : ''} ·{' '}
                       <span className="text-emerald-700 tabular-nums">
                         ${pago.amountUsd.toFixed(2)} USD ({pago.periodMonths} mes/es)
                       </span>
@@ -199,7 +219,7 @@ export default async function PlataformaPage({
               Registrar Nueva Residencia / Servicio
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Crea un espacio aislado con su propia interfaz (Consultas o Hospitalización) y su cuenta administradora inicial.
+              Crea un espacio aislado con su propia interfaz, su modalidad de cobro (Grupal o Individual por usuario) y su cuenta administradora inicial.
             </p>
           </div>
 
@@ -245,6 +265,20 @@ export default async function PlataformaPage({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Modalidad de Cobro *
+              </label>
+              <select
+                name="billingMode"
+                defaultValue="RESIDENCY"
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
+              >
+                <option value="RESIDENCY">🏢 Grupal (Paga la residencia)</option>
+                <option value="INDIVIDUAL">👤 Individual (Paga cada usuario)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Nombre del Plan
               </label>
               <input
@@ -254,21 +288,33 @@ export default async function PlataformaPage({
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  USD / mes
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  USD Grupal
                 </label>
                 <input
                   name="monthlyPriceUsd"
                   type="number"
                   defaultValue={49}
                   min={0}
-                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  className="w-full px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  USD Ind.
+                </label>
+                <input
+                  name="individualPriceUsd"
+                  type="number"
+                  defaultValue={15}
+                  min={0}
+                  className="w-full px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Máx. users
                 </label>
                 <input
@@ -276,11 +322,11 @@ export default async function PlataformaPage({
                   type="number"
                   defaultValue={25}
                   min={1}
-                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  className="w-full px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Días
                 </label>
                 <input
@@ -288,7 +334,7 @@ export default async function PlataformaPage({
                   type="number"
                   defaultValue={30}
                   min={1}
-                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  className="w-full px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
                 />
               </div>
             </div>
@@ -345,7 +391,7 @@ export default async function PlataformaPage({
               />
             </div>
 
-            <div className="md:col-span-3 flex justify-end">
+            <div className="md:col-span-2 flex items-end justify-end">
               <button
                 type="submit"
                 className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold cursor-pointer"
@@ -358,10 +404,15 @@ export default async function PlataformaPage({
 
         {/* LISTADO DE RESIDENCIAS */}
         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-x-auto">
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">
-              Residencias y Servicios Registrados
-            </h2>
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                Residencias y Servicios Registrados
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Cada residencia mantiene sus usuarios, pagos y modalidad completamente aislados. Pulsa &quot;Gestionar Usuarios&quot; para controlar suscripciones individuales dentro de esa residencia.
+              </p>
+            </div>
           </div>
 
           <table className="w-full text-sm text-left">
@@ -369,90 +420,157 @@ export default async function PlataformaPage({
               <tr>
                 <th className="px-4 py-3">Residencia / Especialidad</th>
                 <th className="px-4 py-3">Actividad</th>
-                <th className="px-4 py-3">Interfaz y Plan</th>
-                <th className="px-4 py-3">Vigencia</th>
-                <th className="px-4 py-3 text-right">Acciones rápidas</th>
+                <th className="px-4 py-3">Interfaz, Cobro y Plan</th>
+                <th className="px-4 py-3">Vigencia Grupal</th>
+                <th className="px-4 py-3 text-right">Control por Residencia</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-              {residencias.map((r) => (
-                <tr key={r.id}>
-                  <td className="px-4 py-3">
-                    <p className="font-bold text-slate-900 dark:text-white">{r.name}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {r.specialty} · <span className="font-mono">{r.slug}</span>
-                    </p>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums">
-                    <p>Usuarios: {r._count.users} / {r.maxActiveUsers}</p>
-                    <p>Pacientes: {r._count.patients}</p>
-                    <p>
-                      {r.interfaceMode === 'CONSULTAS'
-                        ? `Consultas: ${r._count.consultations}`
-                        : `Episodios: ${r._count.episodes}`}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <form action={actualizarResidencia} className="flex flex-wrap items-center gap-1.5">
-                      <input type="hidden" name="residencyId" value={r.id} />
-                      <select
-                        name="interfaceMode"
-                        defaultValue={r.interfaceMode}
-                        className="px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                      >
-                        <option value="HOSPITALIZACION">Hospitalización / Nefrología</option>
-                        <option value="MEDICINA_INTERNA">Medicina Interna</option>
-                        <option value="CONSULTAS">Consultas</option>
-                      </select>
-                      <select
-                        name="planStatus"
-                        defaultValue={r.planStatus}
-                        className="px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                      >
-                        <option value="ACTIVE">Activa</option>
-                        <option value="TRIAL">Prueba</option>
-                        <option value="PAST_DUE">Gracia</option>
-                        <option value="SUSPENDED">Suspendida</option>
-                      </select>
-                      <input
-                        name="monthlyPriceUsd"
-                        type="number"
-                        defaultValue={r.monthlyPriceUsd}
-                        className="w-16 px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
-                        title="USD mensuales"
-                      />
-                      <input
-                        name="maxActiveUsers"
-                        type="number"
-                        defaultValue={r.maxActiveUsers}
-                        className="w-14 px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
-                        title="Máximo usuarios"
-                      />
-                      <button
-                        type="submit"
-                        className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold cursor-pointer"
-                      >
-                        Guardar
-                      </button>
-                    </form>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums">
-                    {r.subscriptionEndsAt ? fmtFecha(r.subscriptionEndsAt) : 'Sin fecha'}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <form action={extenderSuscripcion} className="inline-flex gap-1.5">
-                      <input type="hidden" name="residencyId" value={r.id} />
-                      <input type="hidden" name="dias" value="30" />
-                      <button
-                        type="submit"
-                        className="px-2.5 py-1 rounded border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold cursor-pointer whitespace-nowrap"
-                      >
-                        +30 días
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
+              {residencias.map((r) => {
+                const esIndividual = r.billingMode === 'INDIVIDUAL'
+                const usuariosVigentes = r.users.filter((u) => u.planStatus === 'ACTIVE').length
+                return (
+                  <tr key={r.id}>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <p className="font-bold text-slate-900 dark:text-white">{r.name}</p>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                            esIndividual
+                              ? 'bg-blue-50 text-blue-800 border-blue-200'
+                              : 'bg-slate-100 text-slate-700 border-slate-200'
+                          }`}
+                        >
+                          {esIndividual
+                            ? `👤 Individual ($${r.individualPriceUsd}/u)`
+                            : `🏢 Grupal ($${r.monthlyPriceUsd})`}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        {r.specialty} · <span className="font-mono">{r.slug}</span>
+                      </p>
+                    </td>
+
+                    <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums">
+                      <p>
+                        Usuarios: {r._count.users} / {r.maxActiveUsers}
+                      </p>
+                      {esIndividual && (
+                        <p className="text-blue-700 dark:text-blue-300 font-semibold">
+                          Con plan activo: {usuariosVigentes}
+                        </p>
+                      )}
+                      <p>Pacientes: {r._count.patients}</p>
+                      <p>
+                        {r.interfaceMode === 'CONSULTAS'
+                          ? `Consultas: ${r._count.consultations}`
+                          : `Episodios: ${r._count.episodes}`}
+                      </p>
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <form action={actualizarResidencia} className="flex flex-wrap items-center gap-1.5">
+                        <input type="hidden" name="residencyId" value={r.id} />
+                        <select
+                          name="interfaceMode"
+                          defaultValue={r.interfaceMode}
+                          title="Interfaz asignada"
+                          className="px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        >
+                          <option value="HOSPITALIZACION">Hospitalización / Nefrología</option>
+                          <option value="MEDICINA_INTERNA">Medicina Interna</option>
+                          <option value="CONSULTAS">Consultas Externas</option>
+                        </select>
+                        <select
+                          name="billingMode"
+                          defaultValue={r.billingMode}
+                          title="Modalidad de cobro"
+                          className="px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
+                        >
+                          <option value="RESIDENCY">Cobro Grupal</option>
+                          <option value="INDIVIDUAL">Cobro Individual</option>
+                        </select>
+                        <select
+                          name="planStatus"
+                          defaultValue={r.planStatus}
+                          title="Estado global de la residencia"
+                          className="px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        >
+                          <option value="ACTIVE">Activa</option>
+                          <option value="TRIAL">Prueba</option>
+                          <option value="PAST_DUE">Gracia</option>
+                          <option value="SUSPENDED">Suspendida</option>
+                        </select>
+                        <input
+                          name="monthlyPriceUsd"
+                          type="number"
+                          min={0}
+                          defaultValue={r.monthlyPriceUsd}
+                          className="w-16 px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                          title="USD mensuales (Grupal)"
+                        />
+                        <input
+                          name="individualPriceUsd"
+                          type="number"
+                          min={0}
+                          defaultValue={r.individualPriceUsd}
+                          className="w-16 px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                          title="USD mensuales (Individual por usuario)"
+                        />
+                        <input
+                          name="maxActiveUsers"
+                          type="number"
+                          min={1}
+                          defaultValue={r.maxActiveUsers}
+                          className="w-14 px-2 py-1 border rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                          title="Máximo usuarios"
+                        />
+                        <button
+                          type="submit"
+                          className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold cursor-pointer"
+                        >
+                          Guardar
+                        </button>
+                      </form>
+                    </td>
+
+                    <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums">
+                      {esIndividual ? (
+                        <span className="text-blue-700 dark:text-blue-300 font-semibold">
+                          Por cada usuario
+                        </span>
+                      ) : r.subscriptionEndsAt ? (
+                        fmtFecha(r.subscriptionEndsAt)
+                      ) : (
+                        'Sin fecha'
+                      )}
+                    </td>
+
+                    <td className="px-4 py-3 text-right">
+                      <div className="inline-flex flex-wrap items-center justify-end gap-1.5">
+                        <Link
+                          href={`/dashboard/plataforma/residencia/${r.id}`}
+                          className="px-2.5 py-1 rounded border border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap"
+                        >
+                          👤 Gestionar Usuarios ({r._count.users})
+                        </Link>
+                        {!esIndividual && (
+                          <form action={extenderSuscripcion} className="inline-flex">
+                            <input type="hidden" name="residencyId" value={r.id} />
+                            <input type="hidden" name="dias" value="30" />
+                            <button
+                              type="submit"
+                              className="px-2.5 py-1 rounded border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold cursor-pointer whitespace-nowrap"
+                            >
+                              +30 días
+                            </button>
+                          </form>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

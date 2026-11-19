@@ -31,6 +31,11 @@ enum PlanStatus {
   SUSPENDED
 }
 
+enum BillingMode {
+  RESIDENCY
+  INDIVIDUAL
+}
+
 model Residency {
   id                  String        @id @default(cuid())
   name                String
@@ -38,7 +43,9 @@ model Residency {
   specialty           String        @default("General")
   interfaceMode       InterfaceMode @default(HOSPITALIZACION)
   planName            String        @default("Plan Residencia Mensual")
+  billingMode         BillingMode   @default(RESIDENCY)
   monthlyPriceUsd     Int           @default(49)
+  individualPriceUsd  Int           @default(15)
   maxActiveUsers      Int           @default(25)
   planStatus          PlanStatus    @default(ACTIVE)
   subscriptionEndsAt  DateTime?     @db.Timestamptz
@@ -56,40 +63,49 @@ model Residency {
 }
 
 model SubscriptionPayment {
-  id           String    @id @default(cuid())
+  id           String      @id @default(cuid())
   residencyId  String
+  userId       String?
+  billingScope BillingMode @default(RESIDENCY)
   amountUsd    Float
-  periodMonths Int       @default(1)
-  method       String    @default("transferencia")
+  periodMonths Int         @default(1)
+  method       String      @default("transferencia")
   reference    String?
   notes        String?
-  status       String    @default("PENDIENTE")
+  status       String      @default("PENDIENTE")
   requestedBy  String
   reviewedBy   String?
-  reviewedAt   DateTime? @db.Timestamptz
-  createdAt    DateTime  @default(now()) @db.Timestamptz
+  reviewedAt   DateTime?   @db.Timestamptz
+  createdAt    DateTime    @default(now()) @db.Timestamptz
 
   residency Residency @relation(fields: [residencyId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
 
   @@index([residencyId, status])
+  @@index([residencyId, userId])
 }
 
 model User {
-  id                 String     @id @default(cuid())
-  email              String     @unique
-  passwordHash       String
-  fullName           String
-  role               Role       @default(READONLY)
-  residencyId        String?
-  isActive           Boolean    @default(true)
-  mustChangePassword Boolean    @default(false)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  id                   String                @id @default(cuid())
+  email                String                @unique
+  passwordHash         String
+  fullName             String
+  role                 Role                  @default(READONLY)
+  residencyId          String?
+  isActive             Boolean               @default(true)
+  mustChangePassword   Boolean               @default(false)
+  planStatus           PlanStatus            @default(ACTIVE)
+  subscriptionEndsAt   DateTime?             @db.Timestamptz
+  individualPriceUsd   Int?
+  lastPaymentNote      String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 
-  residency          Residency? @relation(fields: [residencyId], references: [id])
-  auditEntries       AuditLog[]
-  episodesAtCharge   Episode[]  @relation("EpisodeResponsible")
-  consultations      Consultation[] @relation("ConsultationDoctor")
+  residency            Residency?            @relation(fields: [residencyId], references: [id])
+  auditEntries         AuditLog[]
+  episodesAtCharge     Episode[]             @relation("EpisodeResponsible")
+  consultations        Consultation[]        @relation("ConsultationDoctor")
+  subscriptionPayments SubscriptionPayment[]
 
   @@index([residencyId])
 }

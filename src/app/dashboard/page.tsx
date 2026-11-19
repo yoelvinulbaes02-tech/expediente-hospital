@@ -42,6 +42,8 @@ export default async function DashboardPage({
   const nombreMedico = ctx.user.fullName || ''
   const emailMedico = ctx.user.email || ''
   const esAdmin = userRole === 'ADMIN'
+  const esPagoIndividual = residency.billingMode === 'INDIVIDUAL'
+  const puedeVerSuscripcion = esAdmin || esPagoIndividual
   const puedeRegistrar = ROLES_CLINICOS.includes(userRole) && !suscripcionBloqueada
   const esModoConsultas = ctx.interfaceMode === 'CONSULTAS'
 
@@ -242,11 +244,16 @@ export default async function DashboardPage({
           <ThemeToggle />
 
           <div className="hidden md:flex items-center gap-3">
+            {puedeVerSuscripcion && (
+              <Link
+                href="/dashboard/suscripcion"
+                className="bg-teal-600 text-white px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors shadow-sm"
+              >
+                {esPagoIndividual ? '💳 Mi Suscripción' : '💳 Suscripción'}
+              </Link>
+            )}
             {esAdmin && (
               <>
-                <Link href="/dashboard/suscripcion" className="bg-teal-600 text-white px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors shadow-sm">
-                  💳 Suscripción
-                </Link>
                 <Link href="/dashboard/usuarios" className="bg-slate-600 text-white px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm">
                   👥 Usuarios
                 </Link>
@@ -302,11 +309,17 @@ export default async function DashboardPage({
                 <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">{userRole}</p>
               </div>
 
+              {puedeVerSuscripcion && (
+                <Link
+                  href="/dashboard/suscripcion"
+                  className="block px-3 py-3 rounded-lg text-sm font-medium text-teal-700 dark:text-teal-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+                  {esPagoIndividual ? '💳 Mi Suscripción' : '💳 Suscripción'}
+                </Link>
+              )}
+
               {esAdmin && (
                 <>
-                  <Link href="/dashboard/suscripcion" className="block px-3 py-3 rounded-lg text-sm font-medium text-teal-700 dark:text-teal-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-                    💳 Suscripción
-                  </Link>
                   <Link href="/dashboard/usuarios" className="block px-3 py-3 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
                     👥 Usuarios
                   </Link>
@@ -340,7 +353,7 @@ export default async function DashboardPage({
             }`}
           >
             <p className="font-medium">{suscripcion.mensajeAviso}</p>
-            {esAdmin && (
+            {puedeVerSuscripcion && (
               <Link
                 href="/dashboard/suscripcion"
                 className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold text-white text-center ${
@@ -349,7 +362,7 @@ export default async function DashboardPage({
                     : 'bg-amber-600 hover:bg-amber-700'
                 }`}
               >
-                Gestionar pago mensual →
+                {esPagoIndividual ? 'Renovar mi suscripción →' : 'Gestionar pago mensual →'}
               </Link>
             )}
           </div>

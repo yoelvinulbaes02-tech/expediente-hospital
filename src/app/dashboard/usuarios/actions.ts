@@ -37,6 +37,7 @@ async function exigirAdmin() {
     id: ctx.user.id,
     role: String(ctx.user.role),
     residencyId: ctx.residency.id,
+    billingMode: ctx.residency.billingMode,
     maxActiveUsers: ctx.residency.maxActiveUsers,
     suscripcionBloqueada: ctx.suscripcion?.bloqueada ?? false,
   }
@@ -119,6 +120,9 @@ export async function crearUsuario(
         role: role as RolValido,
         residencyId: admin.residencyId,
         mustChangePassword: true,
+        ...(admin.billingMode === 'INDIVIDUAL'
+          ? { planStatus: 'PAST_DUE', subscriptionEndsAt: new Date() }
+          : {}),
       },
     })
     .catch((e: unknown) => {

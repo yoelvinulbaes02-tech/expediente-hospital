@@ -28,12 +28,16 @@ const OPCIONES_MESES = [
 export function PagoHibridoSuscripcion({
   monthlyPriceUsd,
   residencyName,
+  billingMode = 'RESIDENCY',
+  titularPago,
   paypalClientId,
   paypalConfigurado,
   paypalEnv,
 }: {
   monthlyPriceUsd: number
   residencyName: string
+  billingMode?: 'RESIDENCY' | 'INDIVIDUAL'
+  titularPago?: string
   paypalClientId: string
   paypalConfigurado: boolean
   paypalEnv: 'sandbox' | 'live'
@@ -47,6 +51,7 @@ export function PagoHibridoSuscripcion({
   const periodMonthsRef = useRef(periodMonths)
   const contenedorPayPalRef = useRef<HTMLDivElement | null>(null)
 
+  const esIndividual = billingMode === 'INDIVIDUAL'
   const montoTotal = (monthlyPriceUsd * periodMonths).toFixed(2)
   const paypalHabilitado = paypalConfigurado && paypalClientId.length > 0 && monthlyPriceUsd > 0
 
@@ -95,7 +100,12 @@ export function PagoHibridoSuscripcion({
           },
           onApprove: async (data) => {
             setProcesando(true)
-            setEstadoPago({ tipo: 'info', texto: 'Verificando pago y activando tu residencia...' })
+            setEstadoPago({
+              tipo: 'info',
+              texto: esIndividual
+                ? 'Verificando pago y activando tu cuenta...'
+                : 'Verificando pago y activando tu residencia...',
+            })
             try {
               const res = await fetch('/api/paypal/capture-order', {
                 method: 'POST',
@@ -119,7 +129,9 @@ export function PagoHibridoSuscripcion({
               const refTexto = json.captureRef ? ` · Ref. ${json.captureRef}` : ''
               setEstadoPago({
                 tipo: 'ok',
-                texto: `Pago confirmado al instante${refTexto}. Suscripción renovada por ${json.periodMonths ?? periodMonthsRef.current} mes(es).`,
+                texto: esIndividual
+                  ? `Pago individual confirmado al instante${refTexto}. Tu acceso quedó renovado por ${json.periodMonths ?? periodMonthsRef.current} mes(es).`
+                  : `Pago confirmado al instante${refTexto}. Suscripción renovada por ${json.periodMonths ?? periodMonthsRef.current} mes(es).`,
               })
               router.refresh()
             } finally {
@@ -218,14 +230,14 @@ export function PagoHibridoSuscripcion({
       script?.removeEventListener('error', onError)
       void instanciaBotones?.close?.()
     }
-  }, [paypalClientId, paypalHabilitado, router])
+  }, [esIndividual, paypalClientId, paypalHabilitado, router])
 
   return (
     <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-700 pb-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Renovar Suscripción Mensual
+            {esIndividual ? 'Renovar Mi Suscripción Individual' : 'Renovar Suscripción Mensual'}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Pago seguro con activación inmediata vía PayPal o tarjeta de crédito y débito (Visa / Mastercard).
@@ -284,7 +296,9 @@ export function PagoHibridoSuscripcion({
         <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-xs">
           <div>
             <p className="font-semibold text-slate-800 dark:text-slate-200">
-              Total a pagar por {residencyName} ({periodMonths} {periodMonths === 1 ? 'mes' : 'meses'}):
+              {esIndividual
+                ? `Total a pagar para ${titularPago || 'tu cuenta'} en ${residencyName} (${periodMonths} ${periodMonths === 1 ? 'mes' : 'meses'}):`
+                : `Total a pagar por ${residencyName} (${periodMonths} ${periodMonths === 1 ? 'mes' : 'meses'}):`}
             </p>
             <p className="text-slate-500 dark:text-slate-400">
               Activación automática al completarse el pago. Acepta cuenta PayPal y tarjetas de crédito o débito.
@@ -308,7 +322,9 @@ export function PagoHibridoSuscripcion({
 
         {monthlyPriceUsd <= 0 ? (
           <div className="rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-900/40 dark:border-slate-700 p-4 text-xs text-slate-700 dark:text-slate-300">
-            Esta residencia tiene configurada una tarifa mensual de <strong>$0 USD</strong>, por lo que no requiere cobro en línea.
+            {esIndividual
+              ? 'Tu residencia tiene configurada una tarifa individual de $0 USD, por lo que no requiere cobro en línea.'
+              : 'Esta residencia tiene configurada una tarifa mensual de $0 USD, por lo que no requiere cobro en línea.'}
           </div>
         ) : paypalHabilitado ? (
           <div className="max-w-md mx-auto pt-1">

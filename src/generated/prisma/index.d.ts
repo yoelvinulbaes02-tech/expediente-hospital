@@ -150,6 +150,14 @@ export const PlanStatus: {
 export type PlanStatus = (typeof PlanStatus)[keyof typeof PlanStatus]
 
 
+export const BillingMode: {
+  RESIDENCY: 'RESIDENCY',
+  INDIVIDUAL: 'INDIVIDUAL'
+};
+
+export type BillingMode = (typeof BillingMode)[keyof typeof BillingMode]
+
+
 export const HandoffStatus: {
   PENDIENTE: 'PENDIENTE',
   ACEPTADO: 'ACEPTADO'
@@ -170,6 +178,10 @@ export const InterfaceMode: typeof $Enums.InterfaceMode
 export type PlanStatus = $Enums.PlanStatus
 
 export const PlanStatus: typeof $Enums.PlanStatus
+
+export type BillingMode = $Enums.BillingMode
+
+export const BillingMode: typeof $Enums.BillingMode
 
 export type HandoffStatus = $Enums.HandoffStatus
 
@@ -2754,12 +2766,14 @@ export namespace Prisma {
     auditEntries: number
     episodesAtCharge: number
     consultations: number
+    subscriptionPayments: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     auditEntries?: boolean | UserCountOutputTypeCountAuditEntriesArgs
     episodesAtCharge?: boolean | UserCountOutputTypeCountEpisodesAtChargeArgs
     consultations?: boolean | UserCountOutputTypeCountConsultationsArgs
+    subscriptionPayments?: boolean | UserCountOutputTypeCountSubscriptionPaymentsArgs
   }
 
   // Custom InputTypes
@@ -2792,6 +2806,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountConsultationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ConsultationWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSubscriptionPaymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SubscriptionPaymentWhereInput
   }
 
 
@@ -2992,11 +3013,13 @@ export namespace Prisma {
 
   export type ResidencyAvgAggregateOutputType = {
     monthlyPriceUsd: number | null
+    individualPriceUsd: number | null
     maxActiveUsers: number | null
   }
 
   export type ResidencySumAggregateOutputType = {
     monthlyPriceUsd: number | null
+    individualPriceUsd: number | null
     maxActiveUsers: number | null
   }
 
@@ -3007,7 +3030,9 @@ export namespace Prisma {
     specialty: string | null
     interfaceMode: $Enums.InterfaceMode | null
     planName: string | null
+    billingMode: $Enums.BillingMode | null
     monthlyPriceUsd: number | null
+    individualPriceUsd: number | null
     maxActiveUsers: number | null
     planStatus: $Enums.PlanStatus | null
     subscriptionEndsAt: Date | null
@@ -3025,7 +3050,9 @@ export namespace Prisma {
     specialty: string | null
     interfaceMode: $Enums.InterfaceMode | null
     planName: string | null
+    billingMode: $Enums.BillingMode | null
     monthlyPriceUsd: number | null
+    individualPriceUsd: number | null
     maxActiveUsers: number | null
     planStatus: $Enums.PlanStatus | null
     subscriptionEndsAt: Date | null
@@ -3043,7 +3070,9 @@ export namespace Prisma {
     specialty: number
     interfaceMode: number
     planName: number
+    billingMode: number
     monthlyPriceUsd: number
+    individualPriceUsd: number
     maxActiveUsers: number
     planStatus: number
     subscriptionEndsAt: number
@@ -3058,11 +3087,13 @@ export namespace Prisma {
 
   export type ResidencyAvgAggregateInputType = {
     monthlyPriceUsd?: true
+    individualPriceUsd?: true
     maxActiveUsers?: true
   }
 
   export type ResidencySumAggregateInputType = {
     monthlyPriceUsd?: true
+    individualPriceUsd?: true
     maxActiveUsers?: true
   }
 
@@ -3073,7 +3104,9 @@ export namespace Prisma {
     specialty?: true
     interfaceMode?: true
     planName?: true
+    billingMode?: true
     monthlyPriceUsd?: true
+    individualPriceUsd?: true
     maxActiveUsers?: true
     planStatus?: true
     subscriptionEndsAt?: true
@@ -3091,7 +3124,9 @@ export namespace Prisma {
     specialty?: true
     interfaceMode?: true
     planName?: true
+    billingMode?: true
     monthlyPriceUsd?: true
+    individualPriceUsd?: true
     maxActiveUsers?: true
     planStatus?: true
     subscriptionEndsAt?: true
@@ -3109,7 +3144,9 @@ export namespace Prisma {
     specialty?: true
     interfaceMode?: true
     planName?: true
+    billingMode?: true
     monthlyPriceUsd?: true
+    individualPriceUsd?: true
     maxActiveUsers?: true
     planStatus?: true
     subscriptionEndsAt?: true
@@ -3214,7 +3251,9 @@ export namespace Prisma {
     specialty: string
     interfaceMode: $Enums.InterfaceMode
     planName: string
+    billingMode: $Enums.BillingMode
     monthlyPriceUsd: number
+    individualPriceUsd: number
     maxActiveUsers: number
     planStatus: $Enums.PlanStatus
     subscriptionEndsAt: Date | null
@@ -3251,7 +3290,9 @@ export namespace Prisma {
     specialty?: boolean
     interfaceMode?: boolean
     planName?: boolean
+    billingMode?: boolean
     monthlyPriceUsd?: boolean
+    individualPriceUsd?: boolean
     maxActiveUsers?: boolean
     planStatus?: boolean
     subscriptionEndsAt?: boolean
@@ -3275,7 +3316,9 @@ export namespace Prisma {
     specialty?: boolean
     interfaceMode?: boolean
     planName?: boolean
+    billingMode?: boolean
     monthlyPriceUsd?: boolean
+    individualPriceUsd?: boolean
     maxActiveUsers?: boolean
     planStatus?: boolean
     subscriptionEndsAt?: boolean
@@ -3293,7 +3336,9 @@ export namespace Prisma {
     specialty?: boolean
     interfaceMode?: boolean
     planName?: boolean
+    billingMode?: boolean
     monthlyPriceUsd?: boolean
+    individualPriceUsd?: boolean
     maxActiveUsers?: boolean
     planStatus?: boolean
     subscriptionEndsAt?: boolean
@@ -3311,7 +3356,9 @@ export namespace Prisma {
     specialty?: boolean
     interfaceMode?: boolean
     planName?: boolean
+    billingMode?: boolean
     monthlyPriceUsd?: boolean
+    individualPriceUsd?: boolean
     maxActiveUsers?: boolean
     planStatus?: boolean
     subscriptionEndsAt?: boolean
@@ -3322,7 +3369,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ResidencyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "slug" | "specialty" | "interfaceMode" | "planName" | "monthlyPriceUsd" | "maxActiveUsers" | "planStatus" | "subscriptionEndsAt" | "billingContactEmail" | "lastPaymentNote" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["residency"]>
+  export type ResidencyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "slug" | "specialty" | "interfaceMode" | "planName" | "billingMode" | "monthlyPriceUsd" | "individualPriceUsd" | "maxActiveUsers" | "planStatus" | "subscriptionEndsAt" | "billingContactEmail" | "lastPaymentNote" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["residency"]>
   export type ResidencyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | Residency$usersArgs<ExtArgs>
     patients?: boolean | Residency$patientsArgs<ExtArgs>
@@ -3350,7 +3397,9 @@ export namespace Prisma {
       specialty: string
       interfaceMode: $Enums.InterfaceMode
       planName: string
+      billingMode: $Enums.BillingMode
       monthlyPriceUsd: number
+      individualPriceUsd: number
       maxActiveUsers: number
       planStatus: $Enums.PlanStatus
       subscriptionEndsAt: Date | null
@@ -3793,7 +3842,9 @@ export namespace Prisma {
     readonly specialty: FieldRef<"Residency", 'String'>
     readonly interfaceMode: FieldRef<"Residency", 'InterfaceMode'>
     readonly planName: FieldRef<"Residency", 'String'>
+    readonly billingMode: FieldRef<"Residency", 'BillingMode'>
     readonly monthlyPriceUsd: FieldRef<"Residency", 'Int'>
+    readonly individualPriceUsd: FieldRef<"Residency", 'Int'>
     readonly maxActiveUsers: FieldRef<"Residency", 'Int'>
     readonly planStatus: FieldRef<"Residency", 'PlanStatus'>
     readonly subscriptionEndsAt: FieldRef<"Residency", 'DateTime'>
@@ -4358,6 +4409,8 @@ export namespace Prisma {
   export type SubscriptionPaymentMinAggregateOutputType = {
     id: string | null
     residencyId: string | null
+    userId: string | null
+    billingScope: $Enums.BillingMode | null
     amountUsd: number | null
     periodMonths: number | null
     method: string | null
@@ -4373,6 +4426,8 @@ export namespace Prisma {
   export type SubscriptionPaymentMaxAggregateOutputType = {
     id: string | null
     residencyId: string | null
+    userId: string | null
+    billingScope: $Enums.BillingMode | null
     amountUsd: number | null
     periodMonths: number | null
     method: string | null
@@ -4388,6 +4443,8 @@ export namespace Prisma {
   export type SubscriptionPaymentCountAggregateOutputType = {
     id: number
     residencyId: number
+    userId: number
+    billingScope: number
     amountUsd: number
     periodMonths: number
     method: number
@@ -4415,6 +4472,8 @@ export namespace Prisma {
   export type SubscriptionPaymentMinAggregateInputType = {
     id?: true
     residencyId?: true
+    userId?: true
+    billingScope?: true
     amountUsd?: true
     periodMonths?: true
     method?: true
@@ -4430,6 +4489,8 @@ export namespace Prisma {
   export type SubscriptionPaymentMaxAggregateInputType = {
     id?: true
     residencyId?: true
+    userId?: true
+    billingScope?: true
     amountUsd?: true
     periodMonths?: true
     method?: true
@@ -4445,6 +4506,8 @@ export namespace Prisma {
   export type SubscriptionPaymentCountAggregateInputType = {
     id?: true
     residencyId?: true
+    userId?: true
+    billingScope?: true
     amountUsd?: true
     periodMonths?: true
     method?: true
@@ -4547,6 +4610,8 @@ export namespace Prisma {
   export type SubscriptionPaymentGroupByOutputType = {
     id: string
     residencyId: string
+    userId: string | null
+    billingScope: $Enums.BillingMode
     amountUsd: number
     periodMonths: number
     method: string
@@ -4581,6 +4646,8 @@ export namespace Prisma {
   export type SubscriptionPaymentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     residencyId?: boolean
+    userId?: boolean
+    billingScope?: boolean
     amountUsd?: boolean
     periodMonths?: boolean
     method?: boolean
@@ -4592,11 +4659,14 @@ export namespace Prisma {
     reviewedAt?: boolean
     createdAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
   }, ExtArgs["result"]["subscriptionPayment"]>
 
   export type SubscriptionPaymentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     residencyId?: boolean
+    userId?: boolean
+    billingScope?: boolean
     amountUsd?: boolean
     periodMonths?: boolean
     method?: boolean
@@ -4608,11 +4678,14 @@ export namespace Prisma {
     reviewedAt?: boolean
     createdAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
   }, ExtArgs["result"]["subscriptionPayment"]>
 
   export type SubscriptionPaymentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     residencyId?: boolean
+    userId?: boolean
+    billingScope?: boolean
     amountUsd?: boolean
     periodMonths?: boolean
     method?: boolean
@@ -4624,11 +4697,14 @@ export namespace Prisma {
     reviewedAt?: boolean
     createdAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
   }, ExtArgs["result"]["subscriptionPayment"]>
 
   export type SubscriptionPaymentSelectScalar = {
     id?: boolean
     residencyId?: boolean
+    userId?: boolean
+    billingScope?: boolean
     amountUsd?: boolean
     periodMonths?: boolean
     method?: boolean
@@ -4641,25 +4717,31 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type SubscriptionPaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "amountUsd" | "periodMonths" | "method" | "reference" | "notes" | "status" | "requestedBy" | "reviewedBy" | "reviewedAt" | "createdAt", ExtArgs["result"]["subscriptionPayment"]>
+  export type SubscriptionPaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "userId" | "billingScope" | "amountUsd" | "periodMonths" | "method" | "reference" | "notes" | "status" | "requestedBy" | "reviewedBy" | "reviewedAt" | "createdAt", ExtArgs["result"]["subscriptionPayment"]>
   export type SubscriptionPaymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
   }
   export type SubscriptionPaymentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
   }
   export type SubscriptionPaymentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
   }
 
   export type $SubscriptionPaymentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "SubscriptionPayment"
     objects: {
       residency: Prisma.$ResidencyPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       residencyId: string
+      userId: string | null
+      billingScope: $Enums.BillingMode
       amountUsd: number
       periodMonths: number
       method: string
@@ -5065,6 +5147,7 @@ export namespace Prisma {
   export interface Prisma__SubscriptionPaymentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     residency<T extends ResidencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ResidencyDefaultArgs<ExtArgs>>): Prisma__ResidencyClient<$Result.GetResult<Prisma.$ResidencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends SubscriptionPayment$userArgs<ExtArgs> = {}>(args?: Subset<T, SubscriptionPayment$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5096,6 +5179,8 @@ export namespace Prisma {
   interface SubscriptionPaymentFieldRefs {
     readonly id: FieldRef<"SubscriptionPayment", 'String'>
     readonly residencyId: FieldRef<"SubscriptionPayment", 'String'>
+    readonly userId: FieldRef<"SubscriptionPayment", 'String'>
+    readonly billingScope: FieldRef<"SubscriptionPayment", 'BillingMode'>
     readonly amountUsd: FieldRef<"SubscriptionPayment", 'Float'>
     readonly periodMonths: FieldRef<"SubscriptionPayment", 'Int'>
     readonly method: FieldRef<"SubscriptionPayment", 'String'>
@@ -5507,6 +5592,25 @@ export namespace Prisma {
   }
 
   /**
+   * SubscriptionPayment.user
+   */
+  export type SubscriptionPayment$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * SubscriptionPayment without action
    */
   export type SubscriptionPaymentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5531,8 +5635,18 @@ export namespace Prisma {
 
   export type AggregateUser = {
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
+  }
+
+  export type UserAvgAggregateOutputType = {
+    individualPriceUsd: number | null
+  }
+
+  export type UserSumAggregateOutputType = {
+    individualPriceUsd: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -5544,6 +5658,10 @@ export namespace Prisma {
     residencyId: string | null
     isActive: boolean | null
     mustChangePassword: boolean | null
+    planStatus: $Enums.PlanStatus | null
+    subscriptionEndsAt: Date | null
+    individualPriceUsd: number | null
+    lastPaymentNote: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5557,6 +5675,10 @@ export namespace Prisma {
     residencyId: string | null
     isActive: boolean | null
     mustChangePassword: boolean | null
+    planStatus: $Enums.PlanStatus | null
+    subscriptionEndsAt: Date | null
+    individualPriceUsd: number | null
+    lastPaymentNote: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5570,11 +5692,23 @@ export namespace Prisma {
     residencyId: number
     isActive: number
     mustChangePassword: number
+    planStatus: number
+    subscriptionEndsAt: number
+    individualPriceUsd: number
+    lastPaymentNote: number
     createdAt: number
     updatedAt: number
     _all: number
   }
 
+
+  export type UserAvgAggregateInputType = {
+    individualPriceUsd?: true
+  }
+
+  export type UserSumAggregateInputType = {
+    individualPriceUsd?: true
+  }
 
   export type UserMinAggregateInputType = {
     id?: true
@@ -5585,6 +5719,10 @@ export namespace Prisma {
     residencyId?: true
     isActive?: true
     mustChangePassword?: true
+    planStatus?: true
+    subscriptionEndsAt?: true
+    individualPriceUsd?: true
+    lastPaymentNote?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5598,6 +5736,10 @@ export namespace Prisma {
     residencyId?: true
     isActive?: true
     mustChangePassword?: true
+    planStatus?: true
+    subscriptionEndsAt?: true
+    individualPriceUsd?: true
+    lastPaymentNote?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5611,6 +5753,10 @@ export namespace Prisma {
     residencyId?: true
     isActive?: true
     mustChangePassword?: true
+    planStatus?: true
+    subscriptionEndsAt?: true
+    individualPriceUsd?: true
+    lastPaymentNote?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -5654,6 +5800,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: UserAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
@@ -5684,6 +5842,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: UserCountAggregateInputType | true
+    _avg?: UserAvgAggregateInputType
+    _sum?: UserSumAggregateInputType
     _min?: UserMinAggregateInputType
     _max?: UserMaxAggregateInputType
   }
@@ -5697,9 +5857,15 @@ export namespace Prisma {
     residencyId: string | null
     isActive: boolean
     mustChangePassword: boolean
+    planStatus: $Enums.PlanStatus
+    subscriptionEndsAt: Date | null
+    individualPriceUsd: number | null
+    lastPaymentNote: string | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
@@ -5727,12 +5893,17 @@ export namespace Prisma {
     residencyId?: boolean
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: boolean
+    subscriptionEndsAt?: boolean
+    individualPriceUsd?: boolean
+    lastPaymentNote?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     residency?: boolean | User$residencyArgs<ExtArgs>
     auditEntries?: boolean | User$auditEntriesArgs<ExtArgs>
     episodesAtCharge?: boolean | User$episodesAtChargeArgs<ExtArgs>
     consultations?: boolean | User$consultationsArgs<ExtArgs>
+    subscriptionPayments?: boolean | User$subscriptionPaymentsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -5745,6 +5916,10 @@ export namespace Prisma {
     residencyId?: boolean
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: boolean
+    subscriptionEndsAt?: boolean
+    individualPriceUsd?: boolean
+    lastPaymentNote?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     residency?: boolean | User$residencyArgs<ExtArgs>
@@ -5759,6 +5934,10 @@ export namespace Prisma {
     residencyId?: boolean
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: boolean
+    subscriptionEndsAt?: boolean
+    individualPriceUsd?: boolean
+    lastPaymentNote?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     residency?: boolean | User$residencyArgs<ExtArgs>
@@ -5773,16 +5952,21 @@ export namespace Prisma {
     residencyId?: boolean
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: boolean
+    subscriptionEndsAt?: boolean
+    individualPriceUsd?: boolean
+    lastPaymentNote?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "fullName" | "role" | "residencyId" | "isActive" | "mustChangePassword" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "fullName" | "role" | "residencyId" | "isActive" | "mustChangePassword" | "planStatus" | "subscriptionEndsAt" | "individualPriceUsd" | "lastPaymentNote" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     residency?: boolean | User$residencyArgs<ExtArgs>
     auditEntries?: boolean | User$auditEntriesArgs<ExtArgs>
     episodesAtCharge?: boolean | User$episodesAtChargeArgs<ExtArgs>
     consultations?: boolean | User$consultationsArgs<ExtArgs>
+    subscriptionPayments?: boolean | User$subscriptionPaymentsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5799,6 +5983,7 @@ export namespace Prisma {
       auditEntries: Prisma.$AuditLogPayload<ExtArgs>[]
       episodesAtCharge: Prisma.$EpisodePayload<ExtArgs>[]
       consultations: Prisma.$ConsultationPayload<ExtArgs>[]
+      subscriptionPayments: Prisma.$SubscriptionPaymentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5809,6 +5994,10 @@ export namespace Prisma {
       residencyId: string | null
       isActive: boolean
       mustChangePassword: boolean
+      planStatus: $Enums.PlanStatus
+      subscriptionEndsAt: Date | null
+      individualPriceUsd: number | null
+      lastPaymentNote: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -6209,6 +6398,7 @@ export namespace Prisma {
     auditEntries<T extends User$auditEntriesArgs<ExtArgs> = {}>(args?: Subset<T, User$auditEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     episodesAtCharge<T extends User$episodesAtChargeArgs<ExtArgs> = {}>(args?: Subset<T, User$episodesAtChargeArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     consultations<T extends User$consultationsArgs<ExtArgs> = {}>(args?: Subset<T, User$consultationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConsultationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    subscriptionPayments<T extends User$subscriptionPaymentsArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6246,6 +6436,10 @@ export namespace Prisma {
     readonly residencyId: FieldRef<"User", 'String'>
     readonly isActive: FieldRef<"User", 'Boolean'>
     readonly mustChangePassword: FieldRef<"User", 'Boolean'>
+    readonly planStatus: FieldRef<"User", 'PlanStatus'>
+    readonly subscriptionEndsAt: FieldRef<"User", 'DateTime'>
+    readonly individualPriceUsd: FieldRef<"User", 'Int'>
+    readonly lastPaymentNote: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -6737,6 +6931,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ConsultationScalarFieldEnum | ConsultationScalarFieldEnum[]
+  }
+
+  /**
+   * User.subscriptionPayments
+   */
+  export type User$subscriptionPaymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionPayment
+     */
+    select?: SubscriptionPaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionPayment
+     */
+    omit?: SubscriptionPaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionPaymentInclude<ExtArgs> | null
+    where?: SubscriptionPaymentWhereInput
+    orderBy?: SubscriptionPaymentOrderByWithRelationInput | SubscriptionPaymentOrderByWithRelationInput[]
+    cursor?: SubscriptionPaymentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SubscriptionPaymentScalarFieldEnum | SubscriptionPaymentScalarFieldEnum[]
   }
 
   /**
@@ -27483,7 +27701,9 @@ export namespace Prisma {
     specialty: 'specialty',
     interfaceMode: 'interfaceMode',
     planName: 'planName',
+    billingMode: 'billingMode',
     monthlyPriceUsd: 'monthlyPriceUsd',
+    individualPriceUsd: 'individualPriceUsd',
     maxActiveUsers: 'maxActiveUsers',
     planStatus: 'planStatus',
     subscriptionEndsAt: 'subscriptionEndsAt',
@@ -27500,6 +27720,8 @@ export namespace Prisma {
   export const SubscriptionPaymentScalarFieldEnum: {
     id: 'id',
     residencyId: 'residencyId',
+    userId: 'userId',
+    billingScope: 'billingScope',
     amountUsd: 'amountUsd',
     periodMonths: 'periodMonths',
     method: 'method',
@@ -27524,6 +27746,10 @@ export namespace Prisma {
     residencyId: 'residencyId',
     isActive: 'isActive',
     mustChangePassword: 'mustChangePassword',
+    planStatus: 'planStatus',
+    subscriptionEndsAt: 'subscriptionEndsAt',
+    individualPriceUsd: 'individualPriceUsd',
+    lastPaymentNote: 'lastPaymentNote',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -27929,6 +28155,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'BillingMode'
+   */
+  export type EnumBillingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BillingMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'BillingMode[]'
+   */
+  export type ListEnumBillingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BillingMode[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -28060,7 +28300,9 @@ export namespace Prisma {
     specialty?: StringFilter<"Residency"> | string
     interfaceMode?: EnumInterfaceModeFilter<"Residency"> | $Enums.InterfaceMode
     planName?: StringFilter<"Residency"> | string
+    billingMode?: EnumBillingModeFilter<"Residency"> | $Enums.BillingMode
     monthlyPriceUsd?: IntFilter<"Residency"> | number
+    individualPriceUsd?: IntFilter<"Residency"> | number
     maxActiveUsers?: IntFilter<"Residency"> | number
     planStatus?: EnumPlanStatusFilter<"Residency"> | $Enums.PlanStatus
     subscriptionEndsAt?: DateTimeNullableFilter<"Residency"> | Date | string | null
@@ -28083,7 +28325,9 @@ export namespace Prisma {
     specialty?: SortOrder
     interfaceMode?: SortOrder
     planName?: SortOrder
+    billingMode?: SortOrder
     monthlyPriceUsd?: SortOrder
+    individualPriceUsd?: SortOrder
     maxActiveUsers?: SortOrder
     planStatus?: SortOrder
     subscriptionEndsAt?: SortOrderInput | SortOrder
@@ -28109,7 +28353,9 @@ export namespace Prisma {
     specialty?: StringFilter<"Residency"> | string
     interfaceMode?: EnumInterfaceModeFilter<"Residency"> | $Enums.InterfaceMode
     planName?: StringFilter<"Residency"> | string
+    billingMode?: EnumBillingModeFilter<"Residency"> | $Enums.BillingMode
     monthlyPriceUsd?: IntFilter<"Residency"> | number
+    individualPriceUsd?: IntFilter<"Residency"> | number
     maxActiveUsers?: IntFilter<"Residency"> | number
     planStatus?: EnumPlanStatusFilter<"Residency"> | $Enums.PlanStatus
     subscriptionEndsAt?: DateTimeNullableFilter<"Residency"> | Date | string | null
@@ -28132,7 +28378,9 @@ export namespace Prisma {
     specialty?: SortOrder
     interfaceMode?: SortOrder
     planName?: SortOrder
+    billingMode?: SortOrder
     monthlyPriceUsd?: SortOrder
+    individualPriceUsd?: SortOrder
     maxActiveUsers?: SortOrder
     planStatus?: SortOrder
     subscriptionEndsAt?: SortOrderInput | SortOrder
@@ -28158,7 +28406,9 @@ export namespace Prisma {
     specialty?: StringWithAggregatesFilter<"Residency"> | string
     interfaceMode?: EnumInterfaceModeWithAggregatesFilter<"Residency"> | $Enums.InterfaceMode
     planName?: StringWithAggregatesFilter<"Residency"> | string
+    billingMode?: EnumBillingModeWithAggregatesFilter<"Residency"> | $Enums.BillingMode
     monthlyPriceUsd?: IntWithAggregatesFilter<"Residency"> | number
+    individualPriceUsd?: IntWithAggregatesFilter<"Residency"> | number
     maxActiveUsers?: IntWithAggregatesFilter<"Residency"> | number
     planStatus?: EnumPlanStatusWithAggregatesFilter<"Residency"> | $Enums.PlanStatus
     subscriptionEndsAt?: DateTimeNullableWithAggregatesFilter<"Residency"> | Date | string | null
@@ -28175,6 +28425,8 @@ export namespace Prisma {
     NOT?: SubscriptionPaymentWhereInput | SubscriptionPaymentWhereInput[]
     id?: StringFilter<"SubscriptionPayment"> | string
     residencyId?: StringFilter<"SubscriptionPayment"> | string
+    userId?: StringNullableFilter<"SubscriptionPayment"> | string | null
+    billingScope?: EnumBillingModeFilter<"SubscriptionPayment"> | $Enums.BillingMode
     amountUsd?: FloatFilter<"SubscriptionPayment"> | number
     periodMonths?: IntFilter<"SubscriptionPayment"> | number
     method?: StringFilter<"SubscriptionPayment"> | string
@@ -28186,11 +28438,14 @@ export namespace Prisma {
     reviewedAt?: DateTimeNullableFilter<"SubscriptionPayment"> | Date | string | null
     createdAt?: DateTimeFilter<"SubscriptionPayment"> | Date | string
     residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
   export type SubscriptionPaymentOrderByWithRelationInput = {
     id?: SortOrder
     residencyId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    billingScope?: SortOrder
     amountUsd?: SortOrder
     periodMonths?: SortOrder
     method?: SortOrder
@@ -28202,6 +28457,7 @@ export namespace Prisma {
     reviewedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     residency?: ResidencyOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
   }
 
   export type SubscriptionPaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -28210,6 +28466,8 @@ export namespace Prisma {
     OR?: SubscriptionPaymentWhereInput[]
     NOT?: SubscriptionPaymentWhereInput | SubscriptionPaymentWhereInput[]
     residencyId?: StringFilter<"SubscriptionPayment"> | string
+    userId?: StringNullableFilter<"SubscriptionPayment"> | string | null
+    billingScope?: EnumBillingModeFilter<"SubscriptionPayment"> | $Enums.BillingMode
     amountUsd?: FloatFilter<"SubscriptionPayment"> | number
     periodMonths?: IntFilter<"SubscriptionPayment"> | number
     method?: StringFilter<"SubscriptionPayment"> | string
@@ -28221,11 +28479,14 @@ export namespace Prisma {
     reviewedAt?: DateTimeNullableFilter<"SubscriptionPayment"> | Date | string | null
     createdAt?: DateTimeFilter<"SubscriptionPayment"> | Date | string
     residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type SubscriptionPaymentOrderByWithAggregationInput = {
     id?: SortOrder
     residencyId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    billingScope?: SortOrder
     amountUsd?: SortOrder
     periodMonths?: SortOrder
     method?: SortOrder
@@ -28249,6 +28510,8 @@ export namespace Prisma {
     NOT?: SubscriptionPaymentScalarWhereWithAggregatesInput | SubscriptionPaymentScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"SubscriptionPayment"> | string
     residencyId?: StringWithAggregatesFilter<"SubscriptionPayment"> | string
+    userId?: StringNullableWithAggregatesFilter<"SubscriptionPayment"> | string | null
+    billingScope?: EnumBillingModeWithAggregatesFilter<"SubscriptionPayment"> | $Enums.BillingMode
     amountUsd?: FloatWithAggregatesFilter<"SubscriptionPayment"> | number
     periodMonths?: IntWithAggregatesFilter<"SubscriptionPayment"> | number
     method?: StringWithAggregatesFilter<"SubscriptionPayment"> | string
@@ -28273,12 +28536,17 @@ export namespace Prisma {
     residencyId?: StringNullableFilter<"User"> | string | null
     isActive?: BoolFilter<"User"> | boolean
     mustChangePassword?: BoolFilter<"User"> | boolean
+    planStatus?: EnumPlanStatusFilter<"User"> | $Enums.PlanStatus
+    subscriptionEndsAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    individualPriceUsd?: IntNullableFilter<"User"> | number | null
+    lastPaymentNote?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     residency?: XOR<ResidencyNullableScalarRelationFilter, ResidencyWhereInput> | null
     auditEntries?: AuditLogListRelationFilter
     episodesAtCharge?: EpisodeListRelationFilter
     consultations?: ConsultationListRelationFilter
+    subscriptionPayments?: SubscriptionPaymentListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -28290,12 +28558,17 @@ export namespace Prisma {
     residencyId?: SortOrderInput | SortOrder
     isActive?: SortOrder
     mustChangePassword?: SortOrder
+    planStatus?: SortOrder
+    subscriptionEndsAt?: SortOrderInput | SortOrder
+    individualPriceUsd?: SortOrderInput | SortOrder
+    lastPaymentNote?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     residency?: ResidencyOrderByWithRelationInput
     auditEntries?: AuditLogOrderByRelationAggregateInput
     episodesAtCharge?: EpisodeOrderByRelationAggregateInput
     consultations?: ConsultationOrderByRelationAggregateInput
+    subscriptionPayments?: SubscriptionPaymentOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -28310,12 +28583,17 @@ export namespace Prisma {
     residencyId?: StringNullableFilter<"User"> | string | null
     isActive?: BoolFilter<"User"> | boolean
     mustChangePassword?: BoolFilter<"User"> | boolean
+    planStatus?: EnumPlanStatusFilter<"User"> | $Enums.PlanStatus
+    subscriptionEndsAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    individualPriceUsd?: IntNullableFilter<"User"> | number | null
+    lastPaymentNote?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     residency?: XOR<ResidencyNullableScalarRelationFilter, ResidencyWhereInput> | null
     auditEntries?: AuditLogListRelationFilter
     episodesAtCharge?: EpisodeListRelationFilter
     consultations?: ConsultationListRelationFilter
+    subscriptionPayments?: SubscriptionPaymentListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -28327,11 +28605,17 @@ export namespace Prisma {
     residencyId?: SortOrderInput | SortOrder
     isActive?: SortOrder
     mustChangePassword?: SortOrder
+    planStatus?: SortOrder
+    subscriptionEndsAt?: SortOrderInput | SortOrder
+    individualPriceUsd?: SortOrderInput | SortOrder
+    lastPaymentNote?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
+    _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
+    _sum?: UserSumOrderByAggregateInput
   }
 
   export type UserScalarWhereWithAggregatesInput = {
@@ -28346,6 +28630,10 @@ export namespace Prisma {
     residencyId?: StringNullableWithAggregatesFilter<"User"> | string | null
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
     mustChangePassword?: BoolWithAggregatesFilter<"User"> | boolean
+    planStatus?: EnumPlanStatusWithAggregatesFilter<"User"> | $Enums.PlanStatus
+    subscriptionEndsAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    individualPriceUsd?: IntNullableWithAggregatesFilter<"User"> | number | null
+    lastPaymentNote?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -30054,7 +30342,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -30077,7 +30367,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -30100,7 +30392,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30123,7 +30417,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30146,7 +30442,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -30164,7 +30462,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30182,7 +30482,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30195,6 +30497,7 @@ export namespace Prisma {
 
   export type SubscriptionPaymentCreateInput = {
     id?: string
+    billingScope?: $Enums.BillingMode
     amountUsd: number
     periodMonths?: number
     method?: string
@@ -30206,11 +30509,14 @@ export namespace Prisma {
     reviewedAt?: Date | string | null
     createdAt?: Date | string
     residency: ResidencyCreateNestedOneWithoutPaymentsInput
+    user?: UserCreateNestedOneWithoutSubscriptionPaymentsInput
   }
 
   export type SubscriptionPaymentUncheckedCreateInput = {
     id?: string
     residencyId: string
+    userId?: string | null
+    billingScope?: $Enums.BillingMode
     amountUsd: number
     periodMonths?: number
     method?: string
@@ -30225,6 +30531,7 @@ export namespace Prisma {
 
   export type SubscriptionPaymentUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     amountUsd?: FloatFieldUpdateOperationsInput | number
     periodMonths?: IntFieldUpdateOperationsInput | number
     method?: StringFieldUpdateOperationsInput | string
@@ -30236,11 +30543,14 @@ export namespace Prisma {
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneRequiredWithoutPaymentsNestedInput
+    user?: UserUpdateOneWithoutSubscriptionPaymentsNestedInput
   }
 
   export type SubscriptionPaymentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     residencyId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     amountUsd?: FloatFieldUpdateOperationsInput | number
     periodMonths?: IntFieldUpdateOperationsInput | number
     method?: StringFieldUpdateOperationsInput | string
@@ -30256,6 +30566,8 @@ export namespace Prisma {
   export type SubscriptionPaymentCreateManyInput = {
     id?: string
     residencyId: string
+    userId?: string | null
+    billingScope?: $Enums.BillingMode
     amountUsd: number
     periodMonths?: number
     method?: string
@@ -30270,6 +30582,7 @@ export namespace Prisma {
 
   export type SubscriptionPaymentUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     amountUsd?: FloatFieldUpdateOperationsInput | number
     periodMonths?: IntFieldUpdateOperationsInput | number
     method?: StringFieldUpdateOperationsInput | string
@@ -30285,6 +30598,8 @@ export namespace Prisma {
   export type SubscriptionPaymentUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     residencyId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     amountUsd?: FloatFieldUpdateOperationsInput | number
     periodMonths?: IntFieldUpdateOperationsInput | number
     method?: StringFieldUpdateOperationsInput | string
@@ -30305,12 +30620,17 @@ export namespace Prisma {
     role?: $Enums.Role
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     residency?: ResidencyCreateNestedOneWithoutUsersInput
     auditEntries?: AuditLogCreateNestedManyWithoutActorInput
     episodesAtCharge?: EpisodeCreateNestedManyWithoutResponsibleInput
     consultations?: ConsultationCreateNestedManyWithoutDoctorInput
+    subscriptionPayments?: SubscriptionPaymentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -30322,11 +30642,16 @@ export namespace Prisma {
     residencyId?: string | null
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     auditEntries?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     episodesAtCharge?: EpisodeUncheckedCreateNestedManyWithoutResponsibleInput
     consultations?: ConsultationUncheckedCreateNestedManyWithoutDoctorInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -30337,12 +30662,17 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneWithoutUsersNestedInput
     auditEntries?: AuditLogUpdateManyWithoutActorNestedInput
     episodesAtCharge?: EpisodeUpdateManyWithoutResponsibleNestedInput
     consultations?: ConsultationUpdateManyWithoutDoctorNestedInput
+    subscriptionPayments?: SubscriptionPaymentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -30354,11 +30684,16 @@ export namespace Prisma {
     residencyId?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEntries?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     episodesAtCharge?: EpisodeUncheckedUpdateManyWithoutResponsibleNestedInput
     consultations?: ConsultationUncheckedUpdateManyWithoutDoctorNestedInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -30370,6 +30705,10 @@ export namespace Prisma {
     residencyId?: string | null
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30382,6 +30721,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30395,6 +30738,10 @@ export namespace Prisma {
     residencyId?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32370,6 +32717,13 @@ export namespace Prisma {
     not?: NestedEnumInterfaceModeFilter<$PrismaModel> | $Enums.InterfaceMode
   }
 
+  export type EnumBillingModeFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingMode | EnumBillingModeFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingMode[] | ListEnumBillingModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingMode[] | ListEnumBillingModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingModeFilter<$PrismaModel> | $Enums.BillingMode
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -32492,7 +32846,9 @@ export namespace Prisma {
     specialty?: SortOrder
     interfaceMode?: SortOrder
     planName?: SortOrder
+    billingMode?: SortOrder
     monthlyPriceUsd?: SortOrder
+    individualPriceUsd?: SortOrder
     maxActiveUsers?: SortOrder
     planStatus?: SortOrder
     subscriptionEndsAt?: SortOrder
@@ -32505,6 +32861,7 @@ export namespace Prisma {
 
   export type ResidencyAvgOrderByAggregateInput = {
     monthlyPriceUsd?: SortOrder
+    individualPriceUsd?: SortOrder
     maxActiveUsers?: SortOrder
   }
 
@@ -32515,7 +32872,9 @@ export namespace Prisma {
     specialty?: SortOrder
     interfaceMode?: SortOrder
     planName?: SortOrder
+    billingMode?: SortOrder
     monthlyPriceUsd?: SortOrder
+    individualPriceUsd?: SortOrder
     maxActiveUsers?: SortOrder
     planStatus?: SortOrder
     subscriptionEndsAt?: SortOrder
@@ -32533,7 +32892,9 @@ export namespace Prisma {
     specialty?: SortOrder
     interfaceMode?: SortOrder
     planName?: SortOrder
+    billingMode?: SortOrder
     monthlyPriceUsd?: SortOrder
+    individualPriceUsd?: SortOrder
     maxActiveUsers?: SortOrder
     planStatus?: SortOrder
     subscriptionEndsAt?: SortOrder
@@ -32546,6 +32907,7 @@ export namespace Prisma {
 
   export type ResidencySumOrderByAggregateInput = {
     monthlyPriceUsd?: SortOrder
+    individualPriceUsd?: SortOrder
     maxActiveUsers?: SortOrder
   }
 
@@ -32575,6 +32937,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumInterfaceModeFilter<$PrismaModel>
     _max?: NestedEnumInterfaceModeFilter<$PrismaModel>
+  }
+
+  export type EnumBillingModeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingMode | EnumBillingModeFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingMode[] | ListEnumBillingModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingMode[] | ListEnumBillingModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingModeWithAggregatesFilter<$PrismaModel> | $Enums.BillingMode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBillingModeFilter<$PrismaModel>
+    _max?: NestedEnumBillingModeFilter<$PrismaModel>
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -32673,9 +33045,16 @@ export namespace Prisma {
     isNot?: ResidencyWhereInput
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
   export type SubscriptionPaymentCountOrderByAggregateInput = {
     id?: SortOrder
     residencyId?: SortOrder
+    userId?: SortOrder
+    billingScope?: SortOrder
     amountUsd?: SortOrder
     periodMonths?: SortOrder
     method?: SortOrder
@@ -32696,6 +33075,8 @@ export namespace Prisma {
   export type SubscriptionPaymentMaxOrderByAggregateInput = {
     id?: SortOrder
     residencyId?: SortOrder
+    userId?: SortOrder
+    billingScope?: SortOrder
     amountUsd?: SortOrder
     periodMonths?: SortOrder
     method?: SortOrder
@@ -32711,6 +33092,8 @@ export namespace Prisma {
   export type SubscriptionPaymentMinOrderByAggregateInput = {
     id?: SortOrder
     residencyId?: SortOrder
+    userId?: SortOrder
+    billingScope?: SortOrder
     amountUsd?: SortOrder
     periodMonths?: SortOrder
     method?: SortOrder
@@ -32751,6 +33134,17 @@ export namespace Prisma {
     not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type ResidencyNullableScalarRelationFilter = {
     is?: ResidencyWhereInput | null
     isNot?: ResidencyWhereInput | null
@@ -32775,8 +33169,16 @@ export namespace Prisma {
     residencyId?: SortOrder
     isActive?: SortOrder
     mustChangePassword?: SortOrder
+    planStatus?: SortOrder
+    subscriptionEndsAt?: SortOrder
+    individualPriceUsd?: SortOrder
+    lastPaymentNote?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type UserAvgOrderByAggregateInput = {
+    individualPriceUsd?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -32788,6 +33190,10 @@ export namespace Prisma {
     residencyId?: SortOrder
     isActive?: SortOrder
     mustChangePassword?: SortOrder
+    planStatus?: SortOrder
+    subscriptionEndsAt?: SortOrder
+    individualPriceUsd?: SortOrder
+    lastPaymentNote?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32801,8 +33207,16 @@ export namespace Prisma {
     residencyId?: SortOrder
     isActive?: SortOrder
     mustChangePassword?: SortOrder
+    planStatus?: SortOrder
+    subscriptionEndsAt?: SortOrder
+    individualPriceUsd?: SortOrder
+    lastPaymentNote?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type UserSumOrderByAggregateInput = {
+    individualPriceUsd?: SortOrder
   }
 
   export type EnumRoleWithAggregatesFilter<$PrismaModel = never> = {
@@ -32813,6 +33227,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRoleFilter<$PrismaModel>
     _max?: NestedEnumRoleFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type BigIntFilter<$PrismaModel = never> = {
@@ -32962,17 +33392,6 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type AllergyListRelationFilter = {
     every?: AllergyWhereInput
     some?: AllergyWhereInput
@@ -33065,22 +33484,6 @@ export namespace Prisma {
     age?: SortOrder
   }
 
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
   export type FloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -33113,11 +33516,6 @@ export namespace Prisma {
     every?: HandoffWhereInput
     some?: HandoffWhereInput
     none?: HandoffWhereInput
-  }
-
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
   }
 
   export type TaskListRelationFilter = {
@@ -34078,6 +34476,10 @@ export namespace Prisma {
     set?: $Enums.InterfaceMode
   }
 
+  export type EnumBillingModeFieldUpdateOperationsInput = {
+    set?: $Enums.BillingMode
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -34252,6 +34654,12 @@ export namespace Prisma {
     connect?: ResidencyWhereUniqueInput
   }
 
+  export type UserCreateNestedOneWithoutSubscriptionPaymentsInput = {
+    create?: XOR<UserCreateWithoutSubscriptionPaymentsInput, UserUncheckedCreateWithoutSubscriptionPaymentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSubscriptionPaymentsInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type FloatFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -34266,6 +34674,16 @@ export namespace Prisma {
     upsert?: ResidencyUpsertWithoutPaymentsInput
     connect?: ResidencyWhereUniqueInput
     update?: XOR<XOR<ResidencyUpdateToOneWithWhereWithoutPaymentsInput, ResidencyUpdateWithoutPaymentsInput>, ResidencyUncheckedUpdateWithoutPaymentsInput>
+  }
+
+  export type UserUpdateOneWithoutSubscriptionPaymentsNestedInput = {
+    create?: XOR<UserCreateWithoutSubscriptionPaymentsInput, UserUncheckedCreateWithoutSubscriptionPaymentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSubscriptionPaymentsInput
+    upsert?: UserUpsertWithoutSubscriptionPaymentsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSubscriptionPaymentsInput, UserUpdateWithoutSubscriptionPaymentsInput>, UserUncheckedUpdateWithoutSubscriptionPaymentsInput>
   }
 
   export type ResidencyCreateNestedOneWithoutUsersInput = {
@@ -34295,6 +34713,13 @@ export namespace Prisma {
     connect?: ConsultationWhereUniqueInput | ConsultationWhereUniqueInput[]
   }
 
+  export type SubscriptionPaymentCreateNestedManyWithoutUserInput = {
+    create?: XOR<SubscriptionPaymentCreateWithoutUserInput, SubscriptionPaymentUncheckedCreateWithoutUserInput> | SubscriptionPaymentCreateWithoutUserInput[] | SubscriptionPaymentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SubscriptionPaymentCreateOrConnectWithoutUserInput | SubscriptionPaymentCreateOrConnectWithoutUserInput[]
+    createMany?: SubscriptionPaymentCreateManyUserInputEnvelope
+    connect?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+  }
+
   export type AuditLogUncheckedCreateNestedManyWithoutActorInput = {
     create?: XOR<AuditLogCreateWithoutActorInput, AuditLogUncheckedCreateWithoutActorInput> | AuditLogCreateWithoutActorInput[] | AuditLogUncheckedCreateWithoutActorInput[]
     connectOrCreate?: AuditLogCreateOrConnectWithoutActorInput | AuditLogCreateOrConnectWithoutActorInput[]
@@ -34316,8 +34741,23 @@ export namespace Prisma {
     connect?: ConsultationWhereUniqueInput | ConsultationWhereUniqueInput[]
   }
 
+  export type SubscriptionPaymentUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SubscriptionPaymentCreateWithoutUserInput, SubscriptionPaymentUncheckedCreateWithoutUserInput> | SubscriptionPaymentCreateWithoutUserInput[] | SubscriptionPaymentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SubscriptionPaymentCreateOrConnectWithoutUserInput | SubscriptionPaymentCreateOrConnectWithoutUserInput[]
+    createMany?: SubscriptionPaymentCreateManyUserInputEnvelope
+    connect?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+  }
+
   export type EnumRoleFieldUpdateOperationsInput = {
     set?: $Enums.Role
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type ResidencyUpdateOneWithoutUsersNestedInput = {
@@ -34372,6 +34812,20 @@ export namespace Prisma {
     deleteMany?: ConsultationScalarWhereInput | ConsultationScalarWhereInput[]
   }
 
+  export type SubscriptionPaymentUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SubscriptionPaymentCreateWithoutUserInput, SubscriptionPaymentUncheckedCreateWithoutUserInput> | SubscriptionPaymentCreateWithoutUserInput[] | SubscriptionPaymentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SubscriptionPaymentCreateOrConnectWithoutUserInput | SubscriptionPaymentCreateOrConnectWithoutUserInput[]
+    upsert?: SubscriptionPaymentUpsertWithWhereUniqueWithoutUserInput | SubscriptionPaymentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SubscriptionPaymentCreateManyUserInputEnvelope
+    set?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+    disconnect?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+    delete?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+    connect?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+    update?: SubscriptionPaymentUpdateWithWhereUniqueWithoutUserInput | SubscriptionPaymentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SubscriptionPaymentUpdateManyWithWhereWithoutUserInput | SubscriptionPaymentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SubscriptionPaymentScalarWhereInput | SubscriptionPaymentScalarWhereInput[]
+  }
+
   export type AuditLogUncheckedUpdateManyWithoutActorNestedInput = {
     create?: XOR<AuditLogCreateWithoutActorInput, AuditLogUncheckedCreateWithoutActorInput> | AuditLogCreateWithoutActorInput[] | AuditLogUncheckedCreateWithoutActorInput[]
     connectOrCreate?: AuditLogCreateOrConnectWithoutActorInput | AuditLogCreateOrConnectWithoutActorInput[]
@@ -34412,6 +34866,20 @@ export namespace Prisma {
     update?: ConsultationUpdateWithWhereUniqueWithoutDoctorInput | ConsultationUpdateWithWhereUniqueWithoutDoctorInput[]
     updateMany?: ConsultationUpdateManyWithWhereWithoutDoctorInput | ConsultationUpdateManyWithWhereWithoutDoctorInput[]
     deleteMany?: ConsultationScalarWhereInput | ConsultationScalarWhereInput[]
+  }
+
+  export type SubscriptionPaymentUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SubscriptionPaymentCreateWithoutUserInput, SubscriptionPaymentUncheckedCreateWithoutUserInput> | SubscriptionPaymentCreateWithoutUserInput[] | SubscriptionPaymentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SubscriptionPaymentCreateOrConnectWithoutUserInput | SubscriptionPaymentCreateOrConnectWithoutUserInput[]
+    upsert?: SubscriptionPaymentUpsertWithWhereUniqueWithoutUserInput | SubscriptionPaymentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SubscriptionPaymentCreateManyUserInputEnvelope
+    set?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+    disconnect?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+    delete?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+    connect?: SubscriptionPaymentWhereUniqueInput | SubscriptionPaymentWhereUniqueInput[]
+    update?: SubscriptionPaymentUpdateWithWhereUniqueWithoutUserInput | SubscriptionPaymentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SubscriptionPaymentUpdateManyWithWhereWithoutUserInput | SubscriptionPaymentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SubscriptionPaymentScalarWhereInput | SubscriptionPaymentScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutAuditEntriesInput = {
@@ -34508,14 +34976,6 @@ export namespace Prisma {
     connectOrCreate?: ViralSerologyCreateOrConnectWithoutPatientInput | ViralSerologyCreateOrConnectWithoutPatientInput[]
     createMany?: ViralSerologyCreateManyPatientInputEnvelope
     connect?: ViralSerologyWhereUniqueInput | ViralSerologyWhereUniqueInput[]
-  }
-
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type ResidencyUpdateOneWithoutPatientsNestedInput = {
@@ -35489,6 +35949,13 @@ export namespace Prisma {
     not?: NestedEnumInterfaceModeFilter<$PrismaModel> | $Enums.InterfaceMode
   }
 
+  export type NestedEnumBillingModeFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingMode | EnumBillingModeFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingMode[] | ListEnumBillingModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingMode[] | ListEnumBillingModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingModeFilter<$PrismaModel> | $Enums.BillingMode
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -35573,6 +36040,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumInterfaceModeFilter<$PrismaModel>
     _max?: NestedEnumInterfaceModeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumBillingModeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingMode | EnumBillingModeFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingMode[] | ListEnumBillingModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingMode[] | ListEnumBillingModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingModeWithAggregatesFilter<$PrismaModel> | $Enums.BillingMode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBillingModeFilter<$PrismaModel>
+    _max?: NestedEnumBillingModeFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -35709,6 +36186,33 @@ export namespace Prisma {
     _max?: NestedEnumRoleFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedBigIntFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -35759,33 +36263,6 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -35827,11 +36304,16 @@ export namespace Prisma {
     role?: $Enums.Role
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     auditEntries?: AuditLogCreateNestedManyWithoutActorInput
     episodesAtCharge?: EpisodeCreateNestedManyWithoutResponsibleInput
     consultations?: ConsultationCreateNestedManyWithoutDoctorInput
+    subscriptionPayments?: SubscriptionPaymentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutResidencyInput = {
@@ -35842,11 +36324,16 @@ export namespace Prisma {
     role?: $Enums.Role
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     auditEntries?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     episodesAtCharge?: EpisodeUncheckedCreateNestedManyWithoutResponsibleInput
     consultations?: ConsultationUncheckedCreateNestedManyWithoutDoctorInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutResidencyInput = {
@@ -36077,6 +36564,7 @@ export namespace Prisma {
 
   export type SubscriptionPaymentCreateWithoutResidencyInput = {
     id?: string
+    billingScope?: $Enums.BillingMode
     amountUsd: number
     periodMonths?: number
     method?: string
@@ -36087,10 +36575,13 @@ export namespace Prisma {
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
     createdAt?: Date | string
+    user?: UserCreateNestedOneWithoutSubscriptionPaymentsInput
   }
 
   export type SubscriptionPaymentUncheckedCreateWithoutResidencyInput = {
     id?: string
+    userId?: string | null
+    billingScope?: $Enums.BillingMode
     amountUsd: number
     periodMonths?: number
     method?: string
@@ -36141,6 +36632,10 @@ export namespace Prisma {
     residencyId?: StringNullableFilter<"User"> | string | null
     isActive?: BoolFilter<"User"> | boolean
     mustChangePassword?: BoolFilter<"User"> | boolean
+    planStatus?: EnumPlanStatusFilter<"User"> | $Enums.PlanStatus
+    subscriptionEndsAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    individualPriceUsd?: IntNullableFilter<"User"> | number | null
+    lastPaymentNote?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
   }
@@ -36303,6 +36798,8 @@ export namespace Prisma {
     NOT?: SubscriptionPaymentScalarWhereInput | SubscriptionPaymentScalarWhereInput[]
     id?: StringFilter<"SubscriptionPayment"> | string
     residencyId?: StringFilter<"SubscriptionPayment"> | string
+    userId?: StringNullableFilter<"SubscriptionPayment"> | string | null
+    billingScope?: EnumBillingModeFilter<"SubscriptionPayment"> | $Enums.BillingMode
     amountUsd?: FloatFilter<"SubscriptionPayment"> | number
     periodMonths?: IntFilter<"SubscriptionPayment"> | number
     method?: StringFilter<"SubscriptionPayment"> | string
@@ -36322,7 +36819,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -36344,7 +36843,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -36362,6 +36863,51 @@ export namespace Prisma {
   export type ResidencyCreateOrConnectWithoutPaymentsInput = {
     where: ResidencyWhereUniqueInput
     create: XOR<ResidencyCreateWithoutPaymentsInput, ResidencyUncheckedCreateWithoutPaymentsInput>
+  }
+
+  export type UserCreateWithoutSubscriptionPaymentsInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    fullName: string
+    role?: $Enums.Role
+    isActive?: boolean
+    mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    residency?: ResidencyCreateNestedOneWithoutUsersInput
+    auditEntries?: AuditLogCreateNestedManyWithoutActorInput
+    episodesAtCharge?: EpisodeCreateNestedManyWithoutResponsibleInput
+    consultations?: ConsultationCreateNestedManyWithoutDoctorInput
+  }
+
+  export type UserUncheckedCreateWithoutSubscriptionPaymentsInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    fullName: string
+    role?: $Enums.Role
+    residencyId?: string | null
+    isActive?: boolean
+    mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    auditEntries?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    episodesAtCharge?: EpisodeUncheckedCreateNestedManyWithoutResponsibleInput
+    consultations?: ConsultationUncheckedCreateNestedManyWithoutDoctorInput
+  }
+
+  export type UserCreateOrConnectWithoutSubscriptionPaymentsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSubscriptionPaymentsInput, UserUncheckedCreateWithoutSubscriptionPaymentsInput>
   }
 
   export type ResidencyUpsertWithoutPaymentsInput = {
@@ -36382,7 +36928,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36404,7 +36952,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36419,6 +36969,57 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
+  export type UserUpsertWithoutSubscriptionPaymentsInput = {
+    update: XOR<UserUpdateWithoutSubscriptionPaymentsInput, UserUncheckedUpdateWithoutSubscriptionPaymentsInput>
+    create: XOR<UserCreateWithoutSubscriptionPaymentsInput, UserUncheckedCreateWithoutSubscriptionPaymentsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSubscriptionPaymentsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSubscriptionPaymentsInput, UserUncheckedUpdateWithoutSubscriptionPaymentsInput>
+  }
+
+  export type UserUpdateWithoutSubscriptionPaymentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    residency?: ResidencyUpdateOneWithoutUsersNestedInput
+    auditEntries?: AuditLogUpdateManyWithoutActorNestedInput
+    episodesAtCharge?: EpisodeUpdateManyWithoutResponsibleNestedInput
+    consultations?: ConsultationUpdateManyWithoutDoctorNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSubscriptionPaymentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    residencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    auditEntries?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    episodesAtCharge?: EpisodeUncheckedUpdateManyWithoutResponsibleNestedInput
+    consultations?: ConsultationUncheckedUpdateManyWithoutDoctorNestedInput
+  }
+
   export type ResidencyCreateWithoutUsersInput = {
     id?: string
     name: string
@@ -36426,7 +37027,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -36448,7 +37051,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -36678,6 +37283,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SubscriptionPaymentCreateWithoutUserInput = {
+    id?: string
+    billingScope?: $Enums.BillingMode
+    amountUsd: number
+    periodMonths?: number
+    method?: string
+    reference?: string | null
+    notes?: string | null
+    status?: string
+    requestedBy: string
+    reviewedBy?: string | null
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    residency: ResidencyCreateNestedOneWithoutPaymentsInput
+  }
+
+  export type SubscriptionPaymentUncheckedCreateWithoutUserInput = {
+    id?: string
+    residencyId: string
+    billingScope?: $Enums.BillingMode
+    amountUsd: number
+    periodMonths?: number
+    method?: string
+    reference?: string | null
+    notes?: string | null
+    status?: string
+    requestedBy: string
+    reviewedBy?: string | null
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type SubscriptionPaymentCreateOrConnectWithoutUserInput = {
+    where: SubscriptionPaymentWhereUniqueInput
+    create: XOR<SubscriptionPaymentCreateWithoutUserInput, SubscriptionPaymentUncheckedCreateWithoutUserInput>
+  }
+
+  export type SubscriptionPaymentCreateManyUserInputEnvelope = {
+    data: SubscriptionPaymentCreateManyUserInput | SubscriptionPaymentCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ResidencyUpsertWithoutUsersInput = {
     update: XOR<ResidencyUpdateWithoutUsersInput, ResidencyUncheckedUpdateWithoutUsersInput>
     create: XOR<ResidencyCreateWithoutUsersInput, ResidencyUncheckedCreateWithoutUsersInput>
@@ -36696,7 +37343,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36718,7 +37367,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36804,6 +37455,22 @@ export namespace Prisma {
     data: XOR<ConsultationUpdateManyMutationInput, ConsultationUncheckedUpdateManyWithoutDoctorInput>
   }
 
+  export type SubscriptionPaymentUpsertWithWhereUniqueWithoutUserInput = {
+    where: SubscriptionPaymentWhereUniqueInput
+    update: XOR<SubscriptionPaymentUpdateWithoutUserInput, SubscriptionPaymentUncheckedUpdateWithoutUserInput>
+    create: XOR<SubscriptionPaymentCreateWithoutUserInput, SubscriptionPaymentUncheckedCreateWithoutUserInput>
+  }
+
+  export type SubscriptionPaymentUpdateWithWhereUniqueWithoutUserInput = {
+    where: SubscriptionPaymentWhereUniqueInput
+    data: XOR<SubscriptionPaymentUpdateWithoutUserInput, SubscriptionPaymentUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SubscriptionPaymentUpdateManyWithWhereWithoutUserInput = {
+    where: SubscriptionPaymentScalarWhereInput
+    data: XOR<SubscriptionPaymentUpdateManyMutationInput, SubscriptionPaymentUncheckedUpdateManyWithoutUserInput>
+  }
+
   export type UserCreateWithoutAuditEntriesInput = {
     id?: string
     email: string
@@ -36812,11 +37479,16 @@ export namespace Prisma {
     role?: $Enums.Role
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     residency?: ResidencyCreateNestedOneWithoutUsersInput
     episodesAtCharge?: EpisodeCreateNestedManyWithoutResponsibleInput
     consultations?: ConsultationCreateNestedManyWithoutDoctorInput
+    subscriptionPayments?: SubscriptionPaymentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAuditEntriesInput = {
@@ -36828,10 +37500,15 @@ export namespace Prisma {
     residencyId?: string | null
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     episodesAtCharge?: EpisodeUncheckedCreateNestedManyWithoutResponsibleInput
     consultations?: ConsultationUncheckedCreateNestedManyWithoutDoctorInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAuditEntriesInput = {
@@ -36858,11 +37535,16 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneWithoutUsersNestedInput
     episodesAtCharge?: EpisodeUpdateManyWithoutResponsibleNestedInput
     consultations?: ConsultationUpdateManyWithoutDoctorNestedInput
+    subscriptionPayments?: SubscriptionPaymentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditEntriesInput = {
@@ -36874,10 +37556,15 @@ export namespace Prisma {
     residencyId?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episodesAtCharge?: EpisodeUncheckedUpdateManyWithoutResponsibleNestedInput
     consultations?: ConsultationUncheckedUpdateManyWithoutDoctorNestedInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ResidencyCreateWithoutPatientsInput = {
@@ -36887,7 +37574,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -36909,7 +37598,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -37198,7 +37889,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -37220,7 +37913,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -37368,7 +38063,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -37390,7 +38087,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -37617,11 +38316,16 @@ export namespace Prisma {
     role?: $Enums.Role
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     residency?: ResidencyCreateNestedOneWithoutUsersInput
     auditEntries?: AuditLogCreateNestedManyWithoutActorInput
     consultations?: ConsultationCreateNestedManyWithoutDoctorInput
+    subscriptionPayments?: SubscriptionPaymentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEpisodesAtChargeInput = {
@@ -37633,10 +38337,15 @@ export namespace Prisma {
     residencyId?: string | null
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     auditEntries?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     consultations?: ConsultationUncheckedCreateNestedManyWithoutDoctorInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEpisodesAtChargeInput = {
@@ -37925,7 +38634,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -37947,7 +38658,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -38155,11 +38868,16 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneWithoutUsersNestedInput
     auditEntries?: AuditLogUpdateManyWithoutActorNestedInput
     consultations?: ConsultationUpdateManyWithoutDoctorNestedInput
+    subscriptionPayments?: SubscriptionPaymentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEpisodesAtChargeInput = {
@@ -38171,10 +38889,15 @@ export namespace Prisma {
     residencyId?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEntries?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     consultations?: ConsultationUncheckedUpdateManyWithoutDoctorNestedInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type TaskUpsertWithWhereUniqueWithoutEpisodeInput = {
@@ -38432,7 +39155,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -38454,7 +39179,9 @@ export namespace Prisma {
     specialty?: string
     interfaceMode?: $Enums.InterfaceMode
     planName?: string
+    billingMode?: $Enums.BillingMode
     monthlyPriceUsd?: number
+    individualPriceUsd?: number
     maxActiveUsers?: number
     planStatus?: $Enums.PlanStatus
     subscriptionEndsAt?: Date | string | null
@@ -38531,11 +39258,16 @@ export namespace Prisma {
     role?: $Enums.Role
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     residency?: ResidencyCreateNestedOneWithoutUsersInput
     auditEntries?: AuditLogCreateNestedManyWithoutActorInput
     episodesAtCharge?: EpisodeCreateNestedManyWithoutResponsibleInput
+    subscriptionPayments?: SubscriptionPaymentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutConsultationsInput = {
@@ -38547,10 +39279,15 @@ export namespace Prisma {
     residencyId?: string | null
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     auditEntries?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     episodesAtCharge?: EpisodeUncheckedCreateNestedManyWithoutResponsibleInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutConsultationsInput = {
@@ -38576,7 +39313,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -38598,7 +39337,9 @@ export namespace Prisma {
     specialty?: StringFieldUpdateOperationsInput | string
     interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
     planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
     maxActiveUsers?: IntFieldUpdateOperationsInput | number
     planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -38687,11 +39428,16 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneWithoutUsersNestedInput
     auditEntries?: AuditLogUpdateManyWithoutActorNestedInput
     episodesAtCharge?: EpisodeUpdateManyWithoutResponsibleNestedInput
+    subscriptionPayments?: SubscriptionPaymentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutConsultationsInput = {
@@ -38703,10 +39449,15 @@ export namespace Prisma {
     residencyId?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEntries?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     episodesAtCharge?: EpisodeUncheckedUpdateManyWithoutResponsibleNestedInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type EpisodeCreateWithoutInternalMedicineProfileInput = {
@@ -41237,6 +41988,10 @@ export namespace Prisma {
     role?: $Enums.Role
     isActive?: boolean
     mustChangePassword?: boolean
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    individualPriceUsd?: number | null
+    lastPaymentNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -41319,6 +42074,8 @@ export namespace Prisma {
 
   export type SubscriptionPaymentCreateManyResidencyInput = {
     id?: string
+    userId?: string | null
+    billingScope?: $Enums.BillingMode
     amountUsd: number
     periodMonths?: number
     method?: string
@@ -41339,11 +42096,16 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEntries?: AuditLogUpdateManyWithoutActorNestedInput
     episodesAtCharge?: EpisodeUpdateManyWithoutResponsibleNestedInput
     consultations?: ConsultationUpdateManyWithoutDoctorNestedInput
+    subscriptionPayments?: SubscriptionPaymentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutResidencyInput = {
@@ -41354,11 +42116,16 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEntries?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     episodesAtCharge?: EpisodeUncheckedUpdateManyWithoutResponsibleNestedInput
     consultations?: ConsultationUncheckedUpdateManyWithoutDoctorNestedInput
+    subscriptionPayments?: SubscriptionPaymentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutResidencyInput = {
@@ -41369,6 +42136,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     isActive?: BoolFieldUpdateOperationsInput | boolean
     mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    individualPriceUsd?: NullableIntFieldUpdateOperationsInput | number | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41637,6 +42408,7 @@ export namespace Prisma {
 
   export type SubscriptionPaymentUpdateWithoutResidencyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     amountUsd?: FloatFieldUpdateOperationsInput | number
     periodMonths?: IntFieldUpdateOperationsInput | number
     method?: StringFieldUpdateOperationsInput | string
@@ -41647,10 +42419,13 @@ export namespace Prisma {
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutSubscriptionPaymentsNestedInput
   }
 
   export type SubscriptionPaymentUncheckedUpdateWithoutResidencyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     amountUsd?: FloatFieldUpdateOperationsInput | number
     periodMonths?: IntFieldUpdateOperationsInput | number
     method?: StringFieldUpdateOperationsInput | string
@@ -41665,6 +42440,8 @@ export namespace Prisma {
 
   export type SubscriptionPaymentUncheckedUpdateManyWithoutResidencyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
     amountUsd?: FloatFieldUpdateOperationsInput | number
     periodMonths?: IntFieldUpdateOperationsInput | number
     method?: StringFieldUpdateOperationsInput | string
@@ -41753,6 +42530,22 @@ export namespace Prisma {
     updatedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type SubscriptionPaymentCreateManyUserInput = {
+    id?: string
+    residencyId: string
+    billingScope?: $Enums.BillingMode
+    amountUsd: number
+    periodMonths?: number
+    method?: string
+    reference?: string | null
+    notes?: string | null
+    status?: string
+    requestedBy: string
+    reviewedBy?: string | null
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
   }
 
   export type AuditLogUpdateWithoutActorInput = {
@@ -42011,6 +42804,54 @@ export namespace Prisma {
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SubscriptionPaymentUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    amountUsd?: FloatFieldUpdateOperationsInput | number
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    method?: StringFieldUpdateOperationsInput | string
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    requestedBy?: StringFieldUpdateOperationsInput | string
+    reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    residency?: ResidencyUpdateOneRequiredWithoutPaymentsNestedInput
+  }
+
+  export type SubscriptionPaymentUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    amountUsd?: FloatFieldUpdateOperationsInput | number
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    method?: StringFieldUpdateOperationsInput | string
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    requestedBy?: StringFieldUpdateOperationsInput | string
+    reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SubscriptionPaymentUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    billingScope?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    amountUsd?: FloatFieldUpdateOperationsInput | number
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    method?: StringFieldUpdateOperationsInput | string
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    requestedBy?: StringFieldUpdateOperationsInput | string
+    reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type EpisodeCreateManyPatientInput = {

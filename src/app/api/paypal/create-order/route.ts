@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { obtenerContextoResidencia } from '@/lib/tenant'
+import { obtenerContextoResidencia, obtenerTarifaIndividualUsuario } from '@/lib/tenant'
 import { crearOrdenPayPal, estaPayPalConfigurado } from '@/lib/paypal'
 
 const PERIODOS_VALIDOS = [1, 3, 6, 12]
@@ -16,9 +16,12 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       )
     }
-    if (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
+
+    const esIndividual = ctx.residency.billingMode === 'INDIVIDUAL'
+
+    if (!esIndividual && ctx.user.role !== 'ADMIN' && ctx.user.role !== 'SUPERADMIN') {
       return NextResponse.json(
-        { error: 'Solo el administrador de la residencia puede realizar pagos.' },
+        { error: 'Solo el administrador de la residencia puede realizar pagos grupales.' },
         { status: 403 }
       )
     }
@@ -34,18 +37,27 @@ export async function POST(req: NextRequest) {
     const periodMonthsRaw = Number(body.periodMonths ?? 1)
     const periodMonths = PERIODOS_VALIDOS.includes(periodMonthsRaw) ? periodMonthsRaw : 1
 
-    const amountUsd = Number((ctx.residency.monthlyPriceUsd * periodMonths).toFixed(2))
+    const tarifaMensual = esIndividual
+      ? obtenerTarifaIndividualUsuario(ctx.residency, ctx.user)
+      : ctx.residency.monthlyPriceUsd
+    const amountUsd = Number((tarifaMensual * periodMonths).toFixed(2))
+
     if (amountUsd <= 0) {
       return NextResponse.json(
-        { error: 'El monto mensual de esta residencia es $0 USD; no requiere pago.' },
+        { error: 'La tarifa asignada es $0 USD; no requiere pago en línea.' },
         { status: 400 }
       )
     }
 
+    const scope = esIndividual ? 'INDIVIDUAL' : 'RESIDENCY'
+    const description = esIndividual
+      ? `NEXO Individual ${ctx.user.fullName} - ${ctx.residency.name} (${periodMonths}m)`
+      : `NEXO Suscripción ${ctx.residency.name} (${periodMonths} mes/es)`
+
     const orden = await crearOrdenPayPal({
       amountUsd,
-      description: `NEXO Suscripción ${ctx.residency.name} (${periodMonths} mes/es)`,
-      customId: `${ctx.residency.id}|${periodMonths}|${ctx.user.id}`,
+      description,
+      customId: `${ctx.residency.id}|${periodMonths}|${ctx.user.id}|${scope}`,
     })
 
     return NextResponse.json({ orderID: orden.id })
