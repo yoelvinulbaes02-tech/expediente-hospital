@@ -32,6 +32,7 @@ const ENTIDADES: Record<string, string> = {
   episode_drain: 'un drenaje',
   episode_drain_entry: 'un registro de débito de drenaje',
   wound_care: 'una cura quirúrgica',
+  hemodialysis_item: 'un registro de Hemodiálisis',
 }
 
 export function describirRegistro(log: {
@@ -202,6 +203,31 @@ export function describirRegistro(log: {
       return {
         que: 'Reinició los pagos recibidos de prueba en SuperAdmin',
         detalle: log.reason ?? '',
+      }
+
+    case 'hemodialysis_item:create':
+      return {
+        que: 'Registró un elemento en la Unidad de Hemodiálisis',
+        detalle: unir(
+          lleno(n.section) && `Área: ${String(n.section)}`,
+          lleno(n.patientName) && String(n.patientName),
+          lleno(n.title) && cortar(String(n.title))
+        ),
+      }
+
+    case 'hemodialysis_item:update':
+      return {
+        que:
+          n.isActive === false
+            ? 'Finalizó / cerró un pendiente de Hemodiálisis'
+            : n.accion === 'dosis'
+              ? 'Registró dosis aplicada en Hemodiálisis'
+              : n.isActive === true && o.isActive === false
+                ? 'Reactivó un registro de Hemodiálisis'
+                : 'Modificó un registro de Hemodiálisis',
+        detalle: log.reason
+          ? log.reason
+          : unir(lleno(n.patientName) && String(n.patientName), lleno(n.title) && cortar(String(n.title))),
       }
 
     default: {

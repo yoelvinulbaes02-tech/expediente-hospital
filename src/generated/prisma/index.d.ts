@@ -94,6 +94,11 @@ export type EpisodeDrain = $Result.DefaultSelection<Prisma.$EpisodeDrainPayload>
  */
 export type EpisodeDrainEntry = $Result.DefaultSelection<Prisma.$EpisodeDrainEntryPayload>
 /**
+ * Model HemodialysisItem
+ * 
+ */
+export type HemodialysisItem = $Result.DefaultSelection<Prisma.$HemodialysisItemPayload>
+/**
  * Model MedicalHistory
  * 
  */
@@ -508,6 +513,16 @@ export class PrismaClient<
     * ```
     */
   get episodeDrainEntry(): Prisma.EpisodeDrainEntryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.hemodialysisItem`: Exposes CRUD operations for the **HemodialysisItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more HemodialysisItems
+    * const hemodialysisItems = await prisma.hemodialysisItem.findMany()
+    * ```
+    */
+  get hemodialysisItem(): Prisma.HemodialysisItemDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.medicalHistory`: Exposes CRUD operations for the **MedicalHistory** model.
@@ -1091,6 +1106,7 @@ export namespace Prisma {
     BaseDepartmentPlanEntry: 'BaseDepartmentPlanEntry',
     EpisodeDrain: 'EpisodeDrain',
     EpisodeDrainEntry: 'EpisodeDrainEntry',
+    HemodialysisItem: 'HemodialysisItem',
     MedicalHistory: 'MedicalHistory',
     ImportantAlert: 'ImportantAlert',
     GfrRecord: 'GfrRecord',
@@ -1118,7 +1134,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "residency" | "subscriptionPayment" | "user" | "auditLog" | "patient" | "episode" | "consultation" | "internalMedicineProfile" | "surgicalProfile" | "episodeAntibiotic" | "surgicalDevice" | "woundCare" | "woundCareLog" | "baseDepartmentPlanEntry" | "episodeDrain" | "episodeDrainEntry" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
+      modelProps: "residency" | "subscriptionPayment" | "user" | "auditLog" | "patient" | "episode" | "consultation" | "internalMedicineProfile" | "surgicalProfile" | "episodeAntibiotic" | "surgicalDevice" | "woundCare" | "woundCareLog" | "baseDepartmentPlanEntry" | "episodeDrain" | "episodeDrainEntry" | "hemodialysisItem" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2306,6 +2322,80 @@ export namespace Prisma {
           }
         }
       }
+      HemodialysisItem: {
+        payload: Prisma.$HemodialysisItemPayload<ExtArgs>
+        fields: Prisma.HemodialysisItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.HemodialysisItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.HemodialysisItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>
+          }
+          findFirst: {
+            args: Prisma.HemodialysisItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.HemodialysisItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>
+          }
+          findMany: {
+            args: Prisma.HemodialysisItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>[]
+          }
+          create: {
+            args: Prisma.HemodialysisItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>
+          }
+          createMany: {
+            args: Prisma.HemodialysisItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.HemodialysisItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>[]
+          }
+          delete: {
+            args: Prisma.HemodialysisItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>
+          }
+          update: {
+            args: Prisma.HemodialysisItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.HemodialysisItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.HemodialysisItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.HemodialysisItemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>[]
+          }
+          upsert: {
+            args: Prisma.HemodialysisItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HemodialysisItemPayload>
+          }
+          aggregate: {
+            args: Prisma.HemodialysisItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateHemodialysisItem>
+          }
+          groupBy: {
+            args: Prisma.HemodialysisItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<HemodialysisItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.HemodialysisItemCountArgs<ExtArgs>
+            result: $Utils.Optional<HemodialysisItemCountAggregateOutputType> | number
+          }
+        }
+      }
       MedicalHistory: {
         payload: Prisma.$MedicalHistoryPayload<ExtArgs>
         fields: Prisma.MedicalHistoryFieldRefs
@@ -3333,6 +3423,7 @@ export namespace Prisma {
     baseDepartmentPlanEntry?: BaseDepartmentPlanEntryOmit
     episodeDrain?: EpisodeDrainOmit
     episodeDrainEntry?: EpisodeDrainEntryOmit
+    hemodialysisItem?: HemodialysisItemOmit
     medicalHistory?: MedicalHistoryOmit
     importantAlert?: ImportantAlertOmit
     gfrRecord?: GfrRecordOmit
@@ -3432,6 +3523,7 @@ export namespace Prisma {
     payments: number
     surgicalDevices: number
     woundCares: number
+    hemodialysisItems: number
   }
 
   export type ResidencyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3442,6 +3534,7 @@ export namespace Prisma {
     payments?: boolean | ResidencyCountOutputTypeCountPaymentsArgs
     surgicalDevices?: boolean | ResidencyCountOutputTypeCountSurgicalDevicesArgs
     woundCares?: boolean | ResidencyCountOutputTypeCountWoundCaresArgs
+    hemodialysisItems?: boolean | ResidencyCountOutputTypeCountHemodialysisItemsArgs
   }
 
   // Custom InputTypes
@@ -3502,6 +3595,13 @@ export namespace Prisma {
    */
   export type ResidencyCountOutputTypeCountWoundCaresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: WoundCareWhereInput
+  }
+
+  /**
+   * ResidencyCountOutputType without action
+   */
+  export type ResidencyCountOutputTypeCountHemodialysisItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HemodialysisItemWhereInput
   }
 
 
@@ -4221,6 +4321,7 @@ export namespace Prisma {
     payments?: boolean | Residency$paymentsArgs<ExtArgs>
     surgicalDevices?: boolean | Residency$surgicalDevicesArgs<ExtArgs>
     woundCares?: boolean | Residency$woundCaresArgs<ExtArgs>
+    hemodialysisItems?: boolean | Residency$hemodialysisItemsArgs<ExtArgs>
     _count?: boolean | ResidencyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["residency"]>
 
@@ -4320,6 +4421,7 @@ export namespace Prisma {
     payments?: boolean | Residency$paymentsArgs<ExtArgs>
     surgicalDevices?: boolean | Residency$surgicalDevicesArgs<ExtArgs>
     woundCares?: boolean | Residency$woundCaresArgs<ExtArgs>
+    hemodialysisItems?: boolean | Residency$hemodialysisItemsArgs<ExtArgs>
     _count?: boolean | ResidencyCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ResidencyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4335,6 +4437,7 @@ export namespace Prisma {
       payments: Prisma.$SubscriptionPaymentPayload<ExtArgs>[]
       surgicalDevices: Prisma.$SurgicalDevicePayload<ExtArgs>[]
       woundCares: Prisma.$WoundCarePayload<ExtArgs>[]
+      hemodialysisItems: Prisma.$HemodialysisItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4764,6 +4867,7 @@ export namespace Prisma {
     payments<T extends Residency$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Residency$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     surgicalDevices<T extends Residency$surgicalDevicesArgs<ExtArgs> = {}>(args?: Subset<T, Residency$surgicalDevicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SurgicalDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     woundCares<T extends Residency$woundCaresArgs<ExtArgs> = {}>(args?: Subset<T, Residency$woundCaresArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WoundCarePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    hemodialysisItems<T extends Residency$hemodialysisItemsArgs<ExtArgs> = {}>(args?: Subset<T, Residency$hemodialysisItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5377,6 +5481,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: WoundCareScalarFieldEnum | WoundCareScalarFieldEnum[]
+  }
+
+  /**
+   * Residency.hemodialysisItems
+   */
+  export type Residency$hemodialysisItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    where?: HemodialysisItemWhereInput
+    orderBy?: HemodialysisItemOrderByWithRelationInput | HemodialysisItemOrderByWithRelationInput[]
+    cursor?: HemodialysisItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: HemodialysisItemScalarFieldEnum | HemodialysisItemScalarFieldEnum[]
   }
 
   /**
@@ -24420,6 +24548,1402 @@ export namespace Prisma {
 
 
   /**
+   * Model HemodialysisItem
+   */
+
+  export type AggregateHemodialysisItem = {
+    _count: HemodialysisItemCountAggregateOutputType | null
+    _avg: HemodialysisItemAvgAggregateOutputType | null
+    _sum: HemodialysisItemSumAggregateOutputType | null
+    _min: HemodialysisItemMinAggregateOutputType | null
+    _max: HemodialysisItemMaxAggregateOutputType | null
+  }
+
+  export type HemodialysisItemAvgAggregateOutputType = {
+    durationDays: number | null
+  }
+
+  export type HemodialysisItemSumAggregateOutputType = {
+    durationDays: number | null
+  }
+
+  export type HemodialysisItemMinAggregateOutputType = {
+    id: string | null
+    residencyId: string | null
+    section: string | null
+    patientName: string | null
+    title: string | null
+    details: string | null
+    shiftLabel: string | null
+    eventDate: Date | null
+    durationDays: number | null
+    isPriority: boolean | null
+    isActive: boolean | null
+    resolutionNote: string | null
+    lastCheckAt: Date | null
+    lastCheckBy: string | null
+    lastCheckByName: string | null
+    lastCheckByRole: string | null
+    createdBy: string | null
+    createdByName: string | null
+    createdByRole: string | null
+    createdAt: Date | null
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+    resolvedBy: string | null
+    resolvedByName: string | null
+    resolvedByRole: string | null
+    resolvedAt: Date | null
+  }
+
+  export type HemodialysisItemMaxAggregateOutputType = {
+    id: string | null
+    residencyId: string | null
+    section: string | null
+    patientName: string | null
+    title: string | null
+    details: string | null
+    shiftLabel: string | null
+    eventDate: Date | null
+    durationDays: number | null
+    isPriority: boolean | null
+    isActive: boolean | null
+    resolutionNote: string | null
+    lastCheckAt: Date | null
+    lastCheckBy: string | null
+    lastCheckByName: string | null
+    lastCheckByRole: string | null
+    createdBy: string | null
+    createdByName: string | null
+    createdByRole: string | null
+    createdAt: Date | null
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+    resolvedBy: string | null
+    resolvedByName: string | null
+    resolvedByRole: string | null
+    resolvedAt: Date | null
+  }
+
+  export type HemodialysisItemCountAggregateOutputType = {
+    id: number
+    residencyId: number
+    section: number
+    patientName: number
+    title: number
+    details: number
+    shiftLabel: number
+    eventDate: number
+    durationDays: number
+    isPriority: number
+    isActive: number
+    resolutionNote: number
+    lastCheckAt: number
+    lastCheckBy: number
+    lastCheckByName: number
+    lastCheckByRole: number
+    createdBy: number
+    createdByName: number
+    createdByRole: number
+    createdAt: number
+    updatedBy: number
+    updatedByName: number
+    updatedByRole: number
+    updatedAt: number
+    resolvedBy: number
+    resolvedByName: number
+    resolvedByRole: number
+    resolvedAt: number
+    _all: number
+  }
+
+
+  export type HemodialysisItemAvgAggregateInputType = {
+    durationDays?: true
+  }
+
+  export type HemodialysisItemSumAggregateInputType = {
+    durationDays?: true
+  }
+
+  export type HemodialysisItemMinAggregateInputType = {
+    id?: true
+    residencyId?: true
+    section?: true
+    patientName?: true
+    title?: true
+    details?: true
+    shiftLabel?: true
+    eventDate?: true
+    durationDays?: true
+    isPriority?: true
+    isActive?: true
+    resolutionNote?: true
+    lastCheckAt?: true
+    lastCheckBy?: true
+    lastCheckByName?: true
+    lastCheckByRole?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+    resolvedBy?: true
+    resolvedByName?: true
+    resolvedByRole?: true
+    resolvedAt?: true
+  }
+
+  export type HemodialysisItemMaxAggregateInputType = {
+    id?: true
+    residencyId?: true
+    section?: true
+    patientName?: true
+    title?: true
+    details?: true
+    shiftLabel?: true
+    eventDate?: true
+    durationDays?: true
+    isPriority?: true
+    isActive?: true
+    resolutionNote?: true
+    lastCheckAt?: true
+    lastCheckBy?: true
+    lastCheckByName?: true
+    lastCheckByRole?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+    resolvedBy?: true
+    resolvedByName?: true
+    resolvedByRole?: true
+    resolvedAt?: true
+  }
+
+  export type HemodialysisItemCountAggregateInputType = {
+    id?: true
+    residencyId?: true
+    section?: true
+    patientName?: true
+    title?: true
+    details?: true
+    shiftLabel?: true
+    eventDate?: true
+    durationDays?: true
+    isPriority?: true
+    isActive?: true
+    resolutionNote?: true
+    lastCheckAt?: true
+    lastCheckBy?: true
+    lastCheckByName?: true
+    lastCheckByRole?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+    resolvedBy?: true
+    resolvedByName?: true
+    resolvedByRole?: true
+    resolvedAt?: true
+    _all?: true
+  }
+
+  export type HemodialysisItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HemodialysisItem to aggregate.
+     */
+    where?: HemodialysisItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HemodialysisItems to fetch.
+     */
+    orderBy?: HemodialysisItemOrderByWithRelationInput | HemodialysisItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: HemodialysisItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HemodialysisItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HemodialysisItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned HemodialysisItems
+    **/
+    _count?: true | HemodialysisItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: HemodialysisItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: HemodialysisItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: HemodialysisItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: HemodialysisItemMaxAggregateInputType
+  }
+
+  export type GetHemodialysisItemAggregateType<T extends HemodialysisItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateHemodialysisItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateHemodialysisItem[P]>
+      : GetScalarType<T[P], AggregateHemodialysisItem[P]>
+  }
+
+
+
+
+  export type HemodialysisItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HemodialysisItemWhereInput
+    orderBy?: HemodialysisItemOrderByWithAggregationInput | HemodialysisItemOrderByWithAggregationInput[]
+    by: HemodialysisItemScalarFieldEnum[] | HemodialysisItemScalarFieldEnum
+    having?: HemodialysisItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: HemodialysisItemCountAggregateInputType | true
+    _avg?: HemodialysisItemAvgAggregateInputType
+    _sum?: HemodialysisItemSumAggregateInputType
+    _min?: HemodialysisItemMinAggregateInputType
+    _max?: HemodialysisItemMaxAggregateInputType
+  }
+
+  export type HemodialysisItemGroupByOutputType = {
+    id: string
+    residencyId: string
+    section: string
+    patientName: string
+    title: string
+    details: string | null
+    shiftLabel: string | null
+    eventDate: Date | null
+    durationDays: number | null
+    isPriority: boolean
+    isActive: boolean
+    resolutionNote: string | null
+    lastCheckAt: Date | null
+    lastCheckBy: string | null
+    lastCheckByName: string | null
+    lastCheckByRole: string | null
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt: Date
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+    resolvedBy: string | null
+    resolvedByName: string | null
+    resolvedByRole: string | null
+    resolvedAt: Date | null
+    _count: HemodialysisItemCountAggregateOutputType | null
+    _avg: HemodialysisItemAvgAggregateOutputType | null
+    _sum: HemodialysisItemSumAggregateOutputType | null
+    _min: HemodialysisItemMinAggregateOutputType | null
+    _max: HemodialysisItemMaxAggregateOutputType | null
+  }
+
+  type GetHemodialysisItemGroupByPayload<T extends HemodialysisItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<HemodialysisItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof HemodialysisItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], HemodialysisItemGroupByOutputType[P]>
+            : GetScalarType<T[P], HemodialysisItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type HemodialysisItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    section?: boolean
+    patientName?: boolean
+    title?: boolean
+    details?: boolean
+    shiftLabel?: boolean
+    eventDate?: boolean
+    durationDays?: boolean
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: boolean
+    lastCheckAt?: boolean
+    lastCheckBy?: boolean
+    lastCheckByName?: boolean
+    lastCheckByRole?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    resolvedBy?: boolean
+    resolvedByName?: boolean
+    resolvedByRole?: boolean
+    resolvedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hemodialysisItem"]>
+
+  export type HemodialysisItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    section?: boolean
+    patientName?: boolean
+    title?: boolean
+    details?: boolean
+    shiftLabel?: boolean
+    eventDate?: boolean
+    durationDays?: boolean
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: boolean
+    lastCheckAt?: boolean
+    lastCheckBy?: boolean
+    lastCheckByName?: boolean
+    lastCheckByRole?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    resolvedBy?: boolean
+    resolvedByName?: boolean
+    resolvedByRole?: boolean
+    resolvedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hemodialysisItem"]>
+
+  export type HemodialysisItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    section?: boolean
+    patientName?: boolean
+    title?: boolean
+    details?: boolean
+    shiftLabel?: boolean
+    eventDate?: boolean
+    durationDays?: boolean
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: boolean
+    lastCheckAt?: boolean
+    lastCheckBy?: boolean
+    lastCheckByName?: boolean
+    lastCheckByRole?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    resolvedBy?: boolean
+    resolvedByName?: boolean
+    resolvedByRole?: boolean
+    resolvedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hemodialysisItem"]>
+
+  export type HemodialysisItemSelectScalar = {
+    id?: boolean
+    residencyId?: boolean
+    section?: boolean
+    patientName?: boolean
+    title?: boolean
+    details?: boolean
+    shiftLabel?: boolean
+    eventDate?: boolean
+    durationDays?: boolean
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: boolean
+    lastCheckAt?: boolean
+    lastCheckBy?: boolean
+    lastCheckByName?: boolean
+    lastCheckByRole?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    resolvedBy?: boolean
+    resolvedByName?: boolean
+    resolvedByRole?: boolean
+    resolvedAt?: boolean
+  }
+
+  export type HemodialysisItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "section" | "patientName" | "title" | "details" | "shiftLabel" | "eventDate" | "durationDays" | "isPriority" | "isActive" | "resolutionNote" | "lastCheckAt" | "lastCheckBy" | "lastCheckByName" | "lastCheckByRole" | "createdBy" | "createdByName" | "createdByRole" | "createdAt" | "updatedBy" | "updatedByName" | "updatedByRole" | "updatedAt" | "resolvedBy" | "resolvedByName" | "resolvedByRole" | "resolvedAt", ExtArgs["result"]["hemodialysisItem"]>
+  export type HemodialysisItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+  }
+  export type HemodialysisItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+  }
+  export type HemodialysisItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+  }
+
+  export type $HemodialysisItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "HemodialysisItem"
+    objects: {
+      residency: Prisma.$ResidencyPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      residencyId: string
+      section: string
+      patientName: string
+      title: string
+      details: string | null
+      shiftLabel: string | null
+      eventDate: Date | null
+      durationDays: number | null
+      isPriority: boolean
+      isActive: boolean
+      resolutionNote: string | null
+      lastCheckAt: Date | null
+      lastCheckBy: string | null
+      lastCheckByName: string | null
+      lastCheckByRole: string | null
+      createdBy: string
+      createdByName: string
+      createdByRole: string
+      createdAt: Date
+      updatedBy: string | null
+      updatedByName: string | null
+      updatedByRole: string | null
+      updatedAt: Date | null
+      resolvedBy: string | null
+      resolvedByName: string | null
+      resolvedByRole: string | null
+      resolvedAt: Date | null
+    }, ExtArgs["result"]["hemodialysisItem"]>
+    composites: {}
+  }
+
+  type HemodialysisItemGetPayload<S extends boolean | null | undefined | HemodialysisItemDefaultArgs> = $Result.GetResult<Prisma.$HemodialysisItemPayload, S>
+
+  type HemodialysisItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<HemodialysisItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: HemodialysisItemCountAggregateInputType | true
+    }
+
+  export interface HemodialysisItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['HemodialysisItem'], meta: { name: 'HemodialysisItem' } }
+    /**
+     * Find zero or one HemodialysisItem that matches the filter.
+     * @param {HemodialysisItemFindUniqueArgs} args - Arguments to find a HemodialysisItem
+     * @example
+     * // Get one HemodialysisItem
+     * const hemodialysisItem = await prisma.hemodialysisItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends HemodialysisItemFindUniqueArgs>(args: SelectSubset<T, HemodialysisItemFindUniqueArgs<ExtArgs>>): Prisma__HemodialysisItemClient<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one HemodialysisItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {HemodialysisItemFindUniqueOrThrowArgs} args - Arguments to find a HemodialysisItem
+     * @example
+     * // Get one HemodialysisItem
+     * const hemodialysisItem = await prisma.hemodialysisItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends HemodialysisItemFindUniqueOrThrowArgs>(args: SelectSubset<T, HemodialysisItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__HemodialysisItemClient<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HemodialysisItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HemodialysisItemFindFirstArgs} args - Arguments to find a HemodialysisItem
+     * @example
+     * // Get one HemodialysisItem
+     * const hemodialysisItem = await prisma.hemodialysisItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends HemodialysisItemFindFirstArgs>(args?: SelectSubset<T, HemodialysisItemFindFirstArgs<ExtArgs>>): Prisma__HemodialysisItemClient<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HemodialysisItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HemodialysisItemFindFirstOrThrowArgs} args - Arguments to find a HemodialysisItem
+     * @example
+     * // Get one HemodialysisItem
+     * const hemodialysisItem = await prisma.hemodialysisItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends HemodialysisItemFindFirstOrThrowArgs>(args?: SelectSubset<T, HemodialysisItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__HemodialysisItemClient<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more HemodialysisItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HemodialysisItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all HemodialysisItems
+     * const hemodialysisItems = await prisma.hemodialysisItem.findMany()
+     * 
+     * // Get first 10 HemodialysisItems
+     * const hemodialysisItems = await prisma.hemodialysisItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const hemodialysisItemWithIdOnly = await prisma.hemodialysisItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends HemodialysisItemFindManyArgs>(args?: SelectSubset<T, HemodialysisItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a HemodialysisItem.
+     * @param {HemodialysisItemCreateArgs} args - Arguments to create a HemodialysisItem.
+     * @example
+     * // Create one HemodialysisItem
+     * const HemodialysisItem = await prisma.hemodialysisItem.create({
+     *   data: {
+     *     // ... data to create a HemodialysisItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends HemodialysisItemCreateArgs>(args: SelectSubset<T, HemodialysisItemCreateArgs<ExtArgs>>): Prisma__HemodialysisItemClient<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many HemodialysisItems.
+     * @param {HemodialysisItemCreateManyArgs} args - Arguments to create many HemodialysisItems.
+     * @example
+     * // Create many HemodialysisItems
+     * const hemodialysisItem = await prisma.hemodialysisItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends HemodialysisItemCreateManyArgs>(args?: SelectSubset<T, HemodialysisItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many HemodialysisItems and returns the data saved in the database.
+     * @param {HemodialysisItemCreateManyAndReturnArgs} args - Arguments to create many HemodialysisItems.
+     * @example
+     * // Create many HemodialysisItems
+     * const hemodialysisItem = await prisma.hemodialysisItem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many HemodialysisItems and only return the `id`
+     * const hemodialysisItemWithIdOnly = await prisma.hemodialysisItem.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends HemodialysisItemCreateManyAndReturnArgs>(args?: SelectSubset<T, HemodialysisItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a HemodialysisItem.
+     * @param {HemodialysisItemDeleteArgs} args - Arguments to delete one HemodialysisItem.
+     * @example
+     * // Delete one HemodialysisItem
+     * const HemodialysisItem = await prisma.hemodialysisItem.delete({
+     *   where: {
+     *     // ... filter to delete one HemodialysisItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends HemodialysisItemDeleteArgs>(args: SelectSubset<T, HemodialysisItemDeleteArgs<ExtArgs>>): Prisma__HemodialysisItemClient<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one HemodialysisItem.
+     * @param {HemodialysisItemUpdateArgs} args - Arguments to update one HemodialysisItem.
+     * @example
+     * // Update one HemodialysisItem
+     * const hemodialysisItem = await prisma.hemodialysisItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends HemodialysisItemUpdateArgs>(args: SelectSubset<T, HemodialysisItemUpdateArgs<ExtArgs>>): Prisma__HemodialysisItemClient<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more HemodialysisItems.
+     * @param {HemodialysisItemDeleteManyArgs} args - Arguments to filter HemodialysisItems to delete.
+     * @example
+     * // Delete a few HemodialysisItems
+     * const { count } = await prisma.hemodialysisItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends HemodialysisItemDeleteManyArgs>(args?: SelectSubset<T, HemodialysisItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HemodialysisItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HemodialysisItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many HemodialysisItems
+     * const hemodialysisItem = await prisma.hemodialysisItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends HemodialysisItemUpdateManyArgs>(args: SelectSubset<T, HemodialysisItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HemodialysisItems and returns the data updated in the database.
+     * @param {HemodialysisItemUpdateManyAndReturnArgs} args - Arguments to update many HemodialysisItems.
+     * @example
+     * // Update many HemodialysisItems
+     * const hemodialysisItem = await prisma.hemodialysisItem.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more HemodialysisItems and only return the `id`
+     * const hemodialysisItemWithIdOnly = await prisma.hemodialysisItem.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends HemodialysisItemUpdateManyAndReturnArgs>(args: SelectSubset<T, HemodialysisItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one HemodialysisItem.
+     * @param {HemodialysisItemUpsertArgs} args - Arguments to update or create a HemodialysisItem.
+     * @example
+     * // Update or create a HemodialysisItem
+     * const hemodialysisItem = await prisma.hemodialysisItem.upsert({
+     *   create: {
+     *     // ... data to create a HemodialysisItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the HemodialysisItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends HemodialysisItemUpsertArgs>(args: SelectSubset<T, HemodialysisItemUpsertArgs<ExtArgs>>): Prisma__HemodialysisItemClient<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of HemodialysisItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HemodialysisItemCountArgs} args - Arguments to filter HemodialysisItems to count.
+     * @example
+     * // Count the number of HemodialysisItems
+     * const count = await prisma.hemodialysisItem.count({
+     *   where: {
+     *     // ... the filter for the HemodialysisItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends HemodialysisItemCountArgs>(
+      args?: Subset<T, HemodialysisItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], HemodialysisItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a HemodialysisItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HemodialysisItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends HemodialysisItemAggregateArgs>(args: Subset<T, HemodialysisItemAggregateArgs>): Prisma.PrismaPromise<GetHemodialysisItemAggregateType<T>>
+
+    /**
+     * Group by HemodialysisItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HemodialysisItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends HemodialysisItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: HemodialysisItemGroupByArgs['orderBy'] }
+        : { orderBy?: HemodialysisItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, HemodialysisItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetHemodialysisItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the HemodialysisItem model
+   */
+  readonly fields: HemodialysisItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for HemodialysisItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__HemodialysisItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    residency<T extends ResidencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ResidencyDefaultArgs<ExtArgs>>): Prisma__ResidencyClient<$Result.GetResult<Prisma.$ResidencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the HemodialysisItem model
+   */
+  interface HemodialysisItemFieldRefs {
+    readonly id: FieldRef<"HemodialysisItem", 'String'>
+    readonly residencyId: FieldRef<"HemodialysisItem", 'String'>
+    readonly section: FieldRef<"HemodialysisItem", 'String'>
+    readonly patientName: FieldRef<"HemodialysisItem", 'String'>
+    readonly title: FieldRef<"HemodialysisItem", 'String'>
+    readonly details: FieldRef<"HemodialysisItem", 'String'>
+    readonly shiftLabel: FieldRef<"HemodialysisItem", 'String'>
+    readonly eventDate: FieldRef<"HemodialysisItem", 'DateTime'>
+    readonly durationDays: FieldRef<"HemodialysisItem", 'Int'>
+    readonly isPriority: FieldRef<"HemodialysisItem", 'Boolean'>
+    readonly isActive: FieldRef<"HemodialysisItem", 'Boolean'>
+    readonly resolutionNote: FieldRef<"HemodialysisItem", 'String'>
+    readonly lastCheckAt: FieldRef<"HemodialysisItem", 'DateTime'>
+    readonly lastCheckBy: FieldRef<"HemodialysisItem", 'String'>
+    readonly lastCheckByName: FieldRef<"HemodialysisItem", 'String'>
+    readonly lastCheckByRole: FieldRef<"HemodialysisItem", 'String'>
+    readonly createdBy: FieldRef<"HemodialysisItem", 'String'>
+    readonly createdByName: FieldRef<"HemodialysisItem", 'String'>
+    readonly createdByRole: FieldRef<"HemodialysisItem", 'String'>
+    readonly createdAt: FieldRef<"HemodialysisItem", 'DateTime'>
+    readonly updatedBy: FieldRef<"HemodialysisItem", 'String'>
+    readonly updatedByName: FieldRef<"HemodialysisItem", 'String'>
+    readonly updatedByRole: FieldRef<"HemodialysisItem", 'String'>
+    readonly updatedAt: FieldRef<"HemodialysisItem", 'DateTime'>
+    readonly resolvedBy: FieldRef<"HemodialysisItem", 'String'>
+    readonly resolvedByName: FieldRef<"HemodialysisItem", 'String'>
+    readonly resolvedByRole: FieldRef<"HemodialysisItem", 'String'>
+    readonly resolvedAt: FieldRef<"HemodialysisItem", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * HemodialysisItem findUnique
+   */
+  export type HemodialysisItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * Filter, which HemodialysisItem to fetch.
+     */
+    where: HemodialysisItemWhereUniqueInput
+  }
+
+  /**
+   * HemodialysisItem findUniqueOrThrow
+   */
+  export type HemodialysisItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * Filter, which HemodialysisItem to fetch.
+     */
+    where: HemodialysisItemWhereUniqueInput
+  }
+
+  /**
+   * HemodialysisItem findFirst
+   */
+  export type HemodialysisItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * Filter, which HemodialysisItem to fetch.
+     */
+    where?: HemodialysisItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HemodialysisItems to fetch.
+     */
+    orderBy?: HemodialysisItemOrderByWithRelationInput | HemodialysisItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HemodialysisItems.
+     */
+    cursor?: HemodialysisItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HemodialysisItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HemodialysisItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HemodialysisItems.
+     */
+    distinct?: HemodialysisItemScalarFieldEnum | HemodialysisItemScalarFieldEnum[]
+  }
+
+  /**
+   * HemodialysisItem findFirstOrThrow
+   */
+  export type HemodialysisItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * Filter, which HemodialysisItem to fetch.
+     */
+    where?: HemodialysisItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HemodialysisItems to fetch.
+     */
+    orderBy?: HemodialysisItemOrderByWithRelationInput | HemodialysisItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HemodialysisItems.
+     */
+    cursor?: HemodialysisItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HemodialysisItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HemodialysisItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HemodialysisItems.
+     */
+    distinct?: HemodialysisItemScalarFieldEnum | HemodialysisItemScalarFieldEnum[]
+  }
+
+  /**
+   * HemodialysisItem findMany
+   */
+  export type HemodialysisItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * Filter, which HemodialysisItems to fetch.
+     */
+    where?: HemodialysisItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HemodialysisItems to fetch.
+     */
+    orderBy?: HemodialysisItemOrderByWithRelationInput | HemodialysisItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing HemodialysisItems.
+     */
+    cursor?: HemodialysisItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HemodialysisItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HemodialysisItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HemodialysisItems.
+     */
+    distinct?: HemodialysisItemScalarFieldEnum | HemodialysisItemScalarFieldEnum[]
+  }
+
+  /**
+   * HemodialysisItem create
+   */
+  export type HemodialysisItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a HemodialysisItem.
+     */
+    data: XOR<HemodialysisItemCreateInput, HemodialysisItemUncheckedCreateInput>
+  }
+
+  /**
+   * HemodialysisItem createMany
+   */
+  export type HemodialysisItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many HemodialysisItems.
+     */
+    data: HemodialysisItemCreateManyInput | HemodialysisItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * HemodialysisItem createManyAndReturn
+   */
+  export type HemodialysisItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * The data used to create many HemodialysisItems.
+     */
+    data: HemodialysisItemCreateManyInput | HemodialysisItemCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * HemodialysisItem update
+   */
+  export type HemodialysisItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a HemodialysisItem.
+     */
+    data: XOR<HemodialysisItemUpdateInput, HemodialysisItemUncheckedUpdateInput>
+    /**
+     * Choose, which HemodialysisItem to update.
+     */
+    where: HemodialysisItemWhereUniqueInput
+  }
+
+  /**
+   * HemodialysisItem updateMany
+   */
+  export type HemodialysisItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update HemodialysisItems.
+     */
+    data: XOR<HemodialysisItemUpdateManyMutationInput, HemodialysisItemUncheckedUpdateManyInput>
+    /**
+     * Filter which HemodialysisItems to update
+     */
+    where?: HemodialysisItemWhereInput
+    /**
+     * Limit how many HemodialysisItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * HemodialysisItem updateManyAndReturn
+   */
+  export type HemodialysisItemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * The data used to update HemodialysisItems.
+     */
+    data: XOR<HemodialysisItemUpdateManyMutationInput, HemodialysisItemUncheckedUpdateManyInput>
+    /**
+     * Filter which HemodialysisItems to update
+     */
+    where?: HemodialysisItemWhereInput
+    /**
+     * Limit how many HemodialysisItems to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * HemodialysisItem upsert
+   */
+  export type HemodialysisItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the HemodialysisItem to update in case it exists.
+     */
+    where: HemodialysisItemWhereUniqueInput
+    /**
+     * In case the HemodialysisItem found by the `where` argument doesn't exist, create a new HemodialysisItem with this data.
+     */
+    create: XOR<HemodialysisItemCreateInput, HemodialysisItemUncheckedCreateInput>
+    /**
+     * In case the HemodialysisItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<HemodialysisItemUpdateInput, HemodialysisItemUncheckedUpdateInput>
+  }
+
+  /**
+   * HemodialysisItem delete
+   */
+  export type HemodialysisItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+    /**
+     * Filter which HemodialysisItem to delete.
+     */
+    where: HemodialysisItemWhereUniqueInput
+  }
+
+  /**
+   * HemodialysisItem deleteMany
+   */
+  export type HemodialysisItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HemodialysisItems to delete
+     */
+    where?: HemodialysisItemWhereInput
+    /**
+     * Limit how many HemodialysisItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * HemodialysisItem without action
+   */
+  export type HemodialysisItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HemodialysisItem
+     */
+    select?: HemodialysisItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HemodialysisItem
+     */
+    omit?: HemodialysisItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HemodialysisItemInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model MedicalHistory
    */
 
@@ -38484,6 +40008,40 @@ export namespace Prisma {
   export type EpisodeDrainEntryScalarFieldEnum = (typeof EpisodeDrainEntryScalarFieldEnum)[keyof typeof EpisodeDrainEntryScalarFieldEnum]
 
 
+  export const HemodialysisItemScalarFieldEnum: {
+    id: 'id',
+    residencyId: 'residencyId',
+    section: 'section',
+    patientName: 'patientName',
+    title: 'title',
+    details: 'details',
+    shiftLabel: 'shiftLabel',
+    eventDate: 'eventDate',
+    durationDays: 'durationDays',
+    isPriority: 'isPriority',
+    isActive: 'isActive',
+    resolutionNote: 'resolutionNote',
+    lastCheckAt: 'lastCheckAt',
+    lastCheckBy: 'lastCheckBy',
+    lastCheckByName: 'lastCheckByName',
+    lastCheckByRole: 'lastCheckByRole',
+    createdBy: 'createdBy',
+    createdByName: 'createdByName',
+    createdByRole: 'createdByRole',
+    createdAt: 'createdAt',
+    updatedBy: 'updatedBy',
+    updatedByName: 'updatedByName',
+    updatedByRole: 'updatedByRole',
+    updatedAt: 'updatedAt',
+    resolvedBy: 'resolvedBy',
+    resolvedByName: 'resolvedByName',
+    resolvedByRole: 'resolvedByRole',
+    resolvedAt: 'resolvedAt'
+  };
+
+  export type HemodialysisItemScalarFieldEnum = (typeof HemodialysisItemScalarFieldEnum)[keyof typeof HemodialysisItemScalarFieldEnum]
+
+
   export const MedicalHistoryScalarFieldEnum: {
     id: 'id',
     patientId: 'patientId',
@@ -38926,6 +40484,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentListRelationFilter
     surgicalDevices?: SurgicalDeviceListRelationFilter
     woundCares?: WoundCareListRelationFilter
+    hemodialysisItems?: HemodialysisItemListRelationFilter
   }
 
   export type ResidencyOrderByWithRelationInput = {
@@ -38962,6 +40521,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentOrderByRelationAggregateInput
     surgicalDevices?: SurgicalDeviceOrderByRelationAggregateInput
     woundCares?: WoundCareOrderByRelationAggregateInput
+    hemodialysisItems?: HemodialysisItemOrderByRelationAggregateInput
   }
 
   export type ResidencyWhereUniqueInput = Prisma.AtLeast<{
@@ -39001,6 +40561,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentListRelationFilter
     surgicalDevices?: SurgicalDeviceListRelationFilter
     woundCares?: WoundCareListRelationFilter
+    hemodialysisItems?: HemodialysisItemListRelationFilter
   }, "id" | "slug">
 
   export type ResidencyOrderByWithAggregationInput = {
@@ -40713,6 +42274,178 @@ export namespace Prisma {
     updatedAt?: DateTimeNullableWithAggregatesFilter<"EpisodeDrainEntry"> | Date | string | null
   }
 
+  export type HemodialysisItemWhereInput = {
+    AND?: HemodialysisItemWhereInput | HemodialysisItemWhereInput[]
+    OR?: HemodialysisItemWhereInput[]
+    NOT?: HemodialysisItemWhereInput | HemodialysisItemWhereInput[]
+    id?: StringFilter<"HemodialysisItem"> | string
+    residencyId?: StringFilter<"HemodialysisItem"> | string
+    section?: StringFilter<"HemodialysisItem"> | string
+    patientName?: StringFilter<"HemodialysisItem"> | string
+    title?: StringFilter<"HemodialysisItem"> | string
+    details?: StringNullableFilter<"HemodialysisItem"> | string | null
+    shiftLabel?: StringNullableFilter<"HemodialysisItem"> | string | null
+    eventDate?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    durationDays?: IntNullableFilter<"HemodialysisItem"> | number | null
+    isPriority?: BoolFilter<"HemodialysisItem"> | boolean
+    isActive?: BoolFilter<"HemodialysisItem"> | boolean
+    resolutionNote?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    lastCheckBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    createdBy?: StringFilter<"HemodialysisItem"> | string
+    createdByName?: StringFilter<"HemodialysisItem"> | string
+    createdByRole?: StringFilter<"HemodialysisItem"> | string
+    createdAt?: DateTimeFilter<"HemodialysisItem"> | Date | string
+    updatedBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    resolvedBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
+  }
+
+  export type HemodialysisItemOrderByWithRelationInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    section?: SortOrder
+    patientName?: SortOrder
+    title?: SortOrder
+    details?: SortOrderInput | SortOrder
+    shiftLabel?: SortOrderInput | SortOrder
+    eventDate?: SortOrderInput | SortOrder
+    durationDays?: SortOrderInput | SortOrder
+    isPriority?: SortOrder
+    isActive?: SortOrder
+    resolutionNote?: SortOrderInput | SortOrder
+    lastCheckAt?: SortOrderInput | SortOrder
+    lastCheckBy?: SortOrderInput | SortOrder
+    lastCheckByName?: SortOrderInput | SortOrder
+    lastCheckByRole?: SortOrderInput | SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedByName?: SortOrderInput | SortOrder
+    updatedByRole?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    resolvedBy?: SortOrderInput | SortOrder
+    resolvedByName?: SortOrderInput | SortOrder
+    resolvedByRole?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    residency?: ResidencyOrderByWithRelationInput
+  }
+
+  export type HemodialysisItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: HemodialysisItemWhereInput | HemodialysisItemWhereInput[]
+    OR?: HemodialysisItemWhereInput[]
+    NOT?: HemodialysisItemWhereInput | HemodialysisItemWhereInput[]
+    residencyId?: StringFilter<"HemodialysisItem"> | string
+    section?: StringFilter<"HemodialysisItem"> | string
+    patientName?: StringFilter<"HemodialysisItem"> | string
+    title?: StringFilter<"HemodialysisItem"> | string
+    details?: StringNullableFilter<"HemodialysisItem"> | string | null
+    shiftLabel?: StringNullableFilter<"HemodialysisItem"> | string | null
+    eventDate?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    durationDays?: IntNullableFilter<"HemodialysisItem"> | number | null
+    isPriority?: BoolFilter<"HemodialysisItem"> | boolean
+    isActive?: BoolFilter<"HemodialysisItem"> | boolean
+    resolutionNote?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    lastCheckBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    createdBy?: StringFilter<"HemodialysisItem"> | string
+    createdByName?: StringFilter<"HemodialysisItem"> | string
+    createdByRole?: StringFilter<"HemodialysisItem"> | string
+    createdAt?: DateTimeFilter<"HemodialysisItem"> | Date | string
+    updatedBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    resolvedBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
+  }, "id">
+
+  export type HemodialysisItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    section?: SortOrder
+    patientName?: SortOrder
+    title?: SortOrder
+    details?: SortOrderInput | SortOrder
+    shiftLabel?: SortOrderInput | SortOrder
+    eventDate?: SortOrderInput | SortOrder
+    durationDays?: SortOrderInput | SortOrder
+    isPriority?: SortOrder
+    isActive?: SortOrder
+    resolutionNote?: SortOrderInput | SortOrder
+    lastCheckAt?: SortOrderInput | SortOrder
+    lastCheckBy?: SortOrderInput | SortOrder
+    lastCheckByName?: SortOrderInput | SortOrder
+    lastCheckByRole?: SortOrderInput | SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedByName?: SortOrderInput | SortOrder
+    updatedByRole?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    resolvedBy?: SortOrderInput | SortOrder
+    resolvedByName?: SortOrderInput | SortOrder
+    resolvedByRole?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    _count?: HemodialysisItemCountOrderByAggregateInput
+    _avg?: HemodialysisItemAvgOrderByAggregateInput
+    _max?: HemodialysisItemMaxOrderByAggregateInput
+    _min?: HemodialysisItemMinOrderByAggregateInput
+    _sum?: HemodialysisItemSumOrderByAggregateInput
+  }
+
+  export type HemodialysisItemScalarWhereWithAggregatesInput = {
+    AND?: HemodialysisItemScalarWhereWithAggregatesInput | HemodialysisItemScalarWhereWithAggregatesInput[]
+    OR?: HemodialysisItemScalarWhereWithAggregatesInput[]
+    NOT?: HemodialysisItemScalarWhereWithAggregatesInput | HemodialysisItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"HemodialysisItem"> | string
+    residencyId?: StringWithAggregatesFilter<"HemodialysisItem"> | string
+    section?: StringWithAggregatesFilter<"HemodialysisItem"> | string
+    patientName?: StringWithAggregatesFilter<"HemodialysisItem"> | string
+    title?: StringWithAggregatesFilter<"HemodialysisItem"> | string
+    details?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    shiftLabel?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    eventDate?: DateTimeNullableWithAggregatesFilter<"HemodialysisItem"> | Date | string | null
+    durationDays?: IntNullableWithAggregatesFilter<"HemodialysisItem"> | number | null
+    isPriority?: BoolWithAggregatesFilter<"HemodialysisItem"> | boolean
+    isActive?: BoolWithAggregatesFilter<"HemodialysisItem"> | boolean
+    resolutionNote?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    lastCheckAt?: DateTimeNullableWithAggregatesFilter<"HemodialysisItem"> | Date | string | null
+    lastCheckBy?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    lastCheckByName?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    lastCheckByRole?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    createdBy?: StringWithAggregatesFilter<"HemodialysisItem"> | string
+    createdByName?: StringWithAggregatesFilter<"HemodialysisItem"> | string
+    createdByRole?: StringWithAggregatesFilter<"HemodialysisItem"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"HemodialysisItem"> | Date | string
+    updatedBy?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    updatedByName?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    updatedByRole?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"HemodialysisItem"> | Date | string | null
+    resolvedBy?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    resolvedByName?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    resolvedByRole?: StringNullableWithAggregatesFilter<"HemodialysisItem"> | string | null
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"HemodialysisItem"> | Date | string | null
+  }
+
   export type MedicalHistoryWhereInput = {
     AND?: MedicalHistoryWhereInput | MedicalHistoryWhereInput[]
     OR?: MedicalHistoryWhereInput[]
@@ -41732,6 +43465,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateInput = {
@@ -41768,6 +43502,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUpdateInput = {
@@ -41804,6 +43539,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateInput = {
@@ -41840,6 +43576,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyCreateManyInput = {
@@ -43840,6 +45577,222 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type HemodialysisItemCreateInput = {
+    id?: string
+    section: string
+    patientName: string
+    title: string
+    details?: string | null
+    shiftLabel?: string | null
+    eventDate?: Date | string | null
+    durationDays?: number | null
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: string | null
+    lastCheckAt?: Date | string | null
+    lastCheckBy?: string | null
+    lastCheckByName?: string | null
+    lastCheckByRole?: string | null
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolvedByName?: string | null
+    resolvedByRole?: string | null
+    resolvedAt?: Date | string | null
+    residency: ResidencyCreateNestedOneWithoutHemodialysisItemsInput
+  }
+
+  export type HemodialysisItemUncheckedCreateInput = {
+    id?: string
+    residencyId: string
+    section: string
+    patientName: string
+    title: string
+    details?: string | null
+    shiftLabel?: string | null
+    eventDate?: Date | string | null
+    durationDays?: number | null
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: string | null
+    lastCheckAt?: Date | string | null
+    lastCheckBy?: string | null
+    lastCheckByName?: string | null
+    lastCheckByRole?: string | null
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolvedByName?: string | null
+    resolvedByRole?: string | null
+    resolvedAt?: Date | string | null
+  }
+
+  export type HemodialysisItemUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    section?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    shiftLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    eventDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationDays?: NullableIntFieldUpdateOperationsInput | number | null
+    isPriority?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastCheckBy?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    residency?: ResidencyUpdateOneRequiredWithoutHemodialysisItemsNestedInput
+  }
+
+  export type HemodialysisItemUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    section?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    shiftLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    eventDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationDays?: NullableIntFieldUpdateOperationsInput | number | null
+    isPriority?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastCheckBy?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type HemodialysisItemCreateManyInput = {
+    id?: string
+    residencyId: string
+    section: string
+    patientName: string
+    title: string
+    details?: string | null
+    shiftLabel?: string | null
+    eventDate?: Date | string | null
+    durationDays?: number | null
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: string | null
+    lastCheckAt?: Date | string | null
+    lastCheckBy?: string | null
+    lastCheckByName?: string | null
+    lastCheckByRole?: string | null
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolvedByName?: string | null
+    resolvedByRole?: string | null
+    resolvedAt?: Date | string | null
+  }
+
+  export type HemodialysisItemUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    section?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    shiftLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    eventDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationDays?: NullableIntFieldUpdateOperationsInput | number | null
+    isPriority?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastCheckBy?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type HemodialysisItemUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    section?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    shiftLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    eventDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationDays?: NullableIntFieldUpdateOperationsInput | number | null
+    isPriority?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastCheckBy?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type MedicalHistoryCreateInput = {
     id?: string
     pathological?: string | null
@@ -45093,6 +47046,12 @@ export namespace Prisma {
     none?: WoundCareWhereInput
   }
 
+  export type HemodialysisItemListRelationFilter = {
+    every?: HemodialysisItemWhereInput
+    some?: HemodialysisItemWhereInput
+    none?: HemodialysisItemWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -45123,6 +47082,10 @@ export namespace Prisma {
   }
 
   export type WoundCareOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type HemodialysisItemOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -46583,6 +48546,107 @@ export namespace Prisma {
     volumeMl?: SortOrder
   }
 
+  export type HemodialysisItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    section?: SortOrder
+    patientName?: SortOrder
+    title?: SortOrder
+    details?: SortOrder
+    shiftLabel?: SortOrder
+    eventDate?: SortOrder
+    durationDays?: SortOrder
+    isPriority?: SortOrder
+    isActive?: SortOrder
+    resolutionNote?: SortOrder
+    lastCheckAt?: SortOrder
+    lastCheckBy?: SortOrder
+    lastCheckByName?: SortOrder
+    lastCheckByRole?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+    resolvedBy?: SortOrder
+    resolvedByName?: SortOrder
+    resolvedByRole?: SortOrder
+    resolvedAt?: SortOrder
+  }
+
+  export type HemodialysisItemAvgOrderByAggregateInput = {
+    durationDays?: SortOrder
+  }
+
+  export type HemodialysisItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    section?: SortOrder
+    patientName?: SortOrder
+    title?: SortOrder
+    details?: SortOrder
+    shiftLabel?: SortOrder
+    eventDate?: SortOrder
+    durationDays?: SortOrder
+    isPriority?: SortOrder
+    isActive?: SortOrder
+    resolutionNote?: SortOrder
+    lastCheckAt?: SortOrder
+    lastCheckBy?: SortOrder
+    lastCheckByName?: SortOrder
+    lastCheckByRole?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+    resolvedBy?: SortOrder
+    resolvedByName?: SortOrder
+    resolvedByRole?: SortOrder
+    resolvedAt?: SortOrder
+  }
+
+  export type HemodialysisItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    section?: SortOrder
+    patientName?: SortOrder
+    title?: SortOrder
+    details?: SortOrder
+    shiftLabel?: SortOrder
+    eventDate?: SortOrder
+    durationDays?: SortOrder
+    isPriority?: SortOrder
+    isActive?: SortOrder
+    resolutionNote?: SortOrder
+    lastCheckAt?: SortOrder
+    lastCheckBy?: SortOrder
+    lastCheckByName?: SortOrder
+    lastCheckByRole?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+    resolvedBy?: SortOrder
+    resolvedByName?: SortOrder
+    resolvedByRole?: SortOrder
+    resolvedAt?: SortOrder
+  }
+
+  export type HemodialysisItemSumOrderByAggregateInput = {
+    durationDays?: SortOrder
+  }
+
   export type MedicalHistoryCountOrderByAggregateInput = {
     id?: SortOrder
     patientId?: SortOrder
@@ -47160,6 +49224,13 @@ export namespace Prisma {
     connect?: WoundCareWhereUniqueInput | WoundCareWhereUniqueInput[]
   }
 
+  export type HemodialysisItemCreateNestedManyWithoutResidencyInput = {
+    create?: XOR<HemodialysisItemCreateWithoutResidencyInput, HemodialysisItemUncheckedCreateWithoutResidencyInput> | HemodialysisItemCreateWithoutResidencyInput[] | HemodialysisItemUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: HemodialysisItemCreateOrConnectWithoutResidencyInput | HemodialysisItemCreateOrConnectWithoutResidencyInput[]
+    createMany?: HemodialysisItemCreateManyResidencyInputEnvelope
+    connect?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutResidencyInput = {
     create?: XOR<UserCreateWithoutResidencyInput, UserUncheckedCreateWithoutResidencyInput> | UserCreateWithoutResidencyInput[] | UserUncheckedCreateWithoutResidencyInput[]
     connectOrCreate?: UserCreateOrConnectWithoutResidencyInput | UserCreateOrConnectWithoutResidencyInput[]
@@ -47207,6 +49278,13 @@ export namespace Prisma {
     connectOrCreate?: WoundCareCreateOrConnectWithoutResidencyInput | WoundCareCreateOrConnectWithoutResidencyInput[]
     createMany?: WoundCareCreateManyResidencyInputEnvelope
     connect?: WoundCareWhereUniqueInput | WoundCareWhereUniqueInput[]
+  }
+
+  export type HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput = {
+    create?: XOR<HemodialysisItemCreateWithoutResidencyInput, HemodialysisItemUncheckedCreateWithoutResidencyInput> | HemodialysisItemCreateWithoutResidencyInput[] | HemodialysisItemUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: HemodialysisItemCreateOrConnectWithoutResidencyInput | HemodialysisItemCreateOrConnectWithoutResidencyInput[]
+    createMany?: HemodialysisItemCreateManyResidencyInputEnvelope
+    connect?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -47347,6 +49425,20 @@ export namespace Prisma {
     deleteMany?: WoundCareScalarWhereInput | WoundCareScalarWhereInput[]
   }
 
+  export type HemodialysisItemUpdateManyWithoutResidencyNestedInput = {
+    create?: XOR<HemodialysisItemCreateWithoutResidencyInput, HemodialysisItemUncheckedCreateWithoutResidencyInput> | HemodialysisItemCreateWithoutResidencyInput[] | HemodialysisItemUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: HemodialysisItemCreateOrConnectWithoutResidencyInput | HemodialysisItemCreateOrConnectWithoutResidencyInput[]
+    upsert?: HemodialysisItemUpsertWithWhereUniqueWithoutResidencyInput | HemodialysisItemUpsertWithWhereUniqueWithoutResidencyInput[]
+    createMany?: HemodialysisItemCreateManyResidencyInputEnvelope
+    set?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+    disconnect?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+    delete?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+    connect?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+    update?: HemodialysisItemUpdateWithWhereUniqueWithoutResidencyInput | HemodialysisItemUpdateWithWhereUniqueWithoutResidencyInput[]
+    updateMany?: HemodialysisItemUpdateManyWithWhereWithoutResidencyInput | HemodialysisItemUpdateManyWithWhereWithoutResidencyInput[]
+    deleteMany?: HemodialysisItemScalarWhereInput | HemodialysisItemScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutResidencyNestedInput = {
     create?: XOR<UserCreateWithoutResidencyInput, UserUncheckedCreateWithoutResidencyInput> | UserCreateWithoutResidencyInput[] | UserUncheckedCreateWithoutResidencyInput[]
     connectOrCreate?: UserCreateOrConnectWithoutResidencyInput | UserCreateOrConnectWithoutResidencyInput[]
@@ -47443,6 +49535,20 @@ export namespace Prisma {
     update?: WoundCareUpdateWithWhereUniqueWithoutResidencyInput | WoundCareUpdateWithWhereUniqueWithoutResidencyInput[]
     updateMany?: WoundCareUpdateManyWithWhereWithoutResidencyInput | WoundCareUpdateManyWithWhereWithoutResidencyInput[]
     deleteMany?: WoundCareScalarWhereInput | WoundCareScalarWhereInput[]
+  }
+
+  export type HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput = {
+    create?: XOR<HemodialysisItemCreateWithoutResidencyInput, HemodialysisItemUncheckedCreateWithoutResidencyInput> | HemodialysisItemCreateWithoutResidencyInput[] | HemodialysisItemUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: HemodialysisItemCreateOrConnectWithoutResidencyInput | HemodialysisItemCreateOrConnectWithoutResidencyInput[]
+    upsert?: HemodialysisItemUpsertWithWhereUniqueWithoutResidencyInput | HemodialysisItemUpsertWithWhereUniqueWithoutResidencyInput[]
+    createMany?: HemodialysisItemCreateManyResidencyInputEnvelope
+    set?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+    disconnect?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+    delete?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+    connect?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+    update?: HemodialysisItemUpdateWithWhereUniqueWithoutResidencyInput | HemodialysisItemUpdateWithWhereUniqueWithoutResidencyInput[]
+    updateMany?: HemodialysisItemUpdateManyWithWhereWithoutResidencyInput | HemodialysisItemUpdateManyWithWhereWithoutResidencyInput[]
+    deleteMany?: HemodialysisItemScalarWhereInput | HemodialysisItemScalarWhereInput[]
   }
 
   export type ResidencyCreateNestedOneWithoutPaymentsInput = {
@@ -48935,6 +51041,20 @@ export namespace Prisma {
     update?: XOR<XOR<EpisodeDrainUpdateToOneWithWhereWithoutEntriesInput, EpisodeDrainUpdateWithoutEntriesInput>, EpisodeDrainUncheckedUpdateWithoutEntriesInput>
   }
 
+  export type ResidencyCreateNestedOneWithoutHemodialysisItemsInput = {
+    create?: XOR<ResidencyCreateWithoutHemodialysisItemsInput, ResidencyUncheckedCreateWithoutHemodialysisItemsInput>
+    connectOrCreate?: ResidencyCreateOrConnectWithoutHemodialysisItemsInput
+    connect?: ResidencyWhereUniqueInput
+  }
+
+  export type ResidencyUpdateOneRequiredWithoutHemodialysisItemsNestedInput = {
+    create?: XOR<ResidencyCreateWithoutHemodialysisItemsInput, ResidencyUncheckedCreateWithoutHemodialysisItemsInput>
+    connectOrCreate?: ResidencyCreateOrConnectWithoutHemodialysisItemsInput
+    upsert?: ResidencyUpsertWithoutHemodialysisItemsInput
+    connect?: ResidencyWhereUniqueInput
+    update?: XOR<XOR<ResidencyUpdateToOneWithWhereWithoutHemodialysisItemsInput, ResidencyUpdateWithoutHemodialysisItemsInput>, ResidencyUncheckedUpdateWithoutHemodialysisItemsInput>
+  }
+
   export type PatientCreateNestedOneWithoutMedicalHistoryInput = {
     create?: XOR<PatientCreateWithoutMedicalHistoryInput, PatientUncheckedCreateWithoutMedicalHistoryInput>
     connectOrCreate?: PatientCreateOrConnectWithoutMedicalHistoryInput
@@ -49921,6 +52041,76 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type HemodialysisItemCreateWithoutResidencyInput = {
+    id?: string
+    section: string
+    patientName: string
+    title: string
+    details?: string | null
+    shiftLabel?: string | null
+    eventDate?: Date | string | null
+    durationDays?: number | null
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: string | null
+    lastCheckAt?: Date | string | null
+    lastCheckBy?: string | null
+    lastCheckByName?: string | null
+    lastCheckByRole?: string | null
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolvedByName?: string | null
+    resolvedByRole?: string | null
+    resolvedAt?: Date | string | null
+  }
+
+  export type HemodialysisItemUncheckedCreateWithoutResidencyInput = {
+    id?: string
+    section: string
+    patientName: string
+    title: string
+    details?: string | null
+    shiftLabel?: string | null
+    eventDate?: Date | string | null
+    durationDays?: number | null
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: string | null
+    lastCheckAt?: Date | string | null
+    lastCheckBy?: string | null
+    lastCheckByName?: string | null
+    lastCheckByRole?: string | null
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolvedByName?: string | null
+    resolvedByRole?: string | null
+    resolvedAt?: Date | string | null
+  }
+
+  export type HemodialysisItemCreateOrConnectWithoutResidencyInput = {
+    where: HemodialysisItemWhereUniqueInput
+    create: XOR<HemodialysisItemCreateWithoutResidencyInput, HemodialysisItemUncheckedCreateWithoutResidencyInput>
+  }
+
+  export type HemodialysisItemCreateManyResidencyInputEnvelope = {
+    data: HemodialysisItemCreateManyResidencyInput | HemodialysisItemCreateManyResidencyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithWhereUniqueWithoutResidencyInput = {
     where: UserWhereUniqueInput
     update: XOR<UserUpdateWithoutResidencyInput, UserUncheckedUpdateWithoutResidencyInput>
@@ -50207,6 +52397,56 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"WoundCare"> | Date | string
   }
 
+  export type HemodialysisItemUpsertWithWhereUniqueWithoutResidencyInput = {
+    where: HemodialysisItemWhereUniqueInput
+    update: XOR<HemodialysisItemUpdateWithoutResidencyInput, HemodialysisItemUncheckedUpdateWithoutResidencyInput>
+    create: XOR<HemodialysisItemCreateWithoutResidencyInput, HemodialysisItemUncheckedCreateWithoutResidencyInput>
+  }
+
+  export type HemodialysisItemUpdateWithWhereUniqueWithoutResidencyInput = {
+    where: HemodialysisItemWhereUniqueInput
+    data: XOR<HemodialysisItemUpdateWithoutResidencyInput, HemodialysisItemUncheckedUpdateWithoutResidencyInput>
+  }
+
+  export type HemodialysisItemUpdateManyWithWhereWithoutResidencyInput = {
+    where: HemodialysisItemScalarWhereInput
+    data: XOR<HemodialysisItemUpdateManyMutationInput, HemodialysisItemUncheckedUpdateManyWithoutResidencyInput>
+  }
+
+  export type HemodialysisItemScalarWhereInput = {
+    AND?: HemodialysisItemScalarWhereInput | HemodialysisItemScalarWhereInput[]
+    OR?: HemodialysisItemScalarWhereInput[]
+    NOT?: HemodialysisItemScalarWhereInput | HemodialysisItemScalarWhereInput[]
+    id?: StringFilter<"HemodialysisItem"> | string
+    residencyId?: StringFilter<"HemodialysisItem"> | string
+    section?: StringFilter<"HemodialysisItem"> | string
+    patientName?: StringFilter<"HemodialysisItem"> | string
+    title?: StringFilter<"HemodialysisItem"> | string
+    details?: StringNullableFilter<"HemodialysisItem"> | string | null
+    shiftLabel?: StringNullableFilter<"HemodialysisItem"> | string | null
+    eventDate?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    durationDays?: IntNullableFilter<"HemodialysisItem"> | number | null
+    isPriority?: BoolFilter<"HemodialysisItem"> | boolean
+    isActive?: BoolFilter<"HemodialysisItem"> | boolean
+    resolutionNote?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    lastCheckBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    lastCheckByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    createdBy?: StringFilter<"HemodialysisItem"> | string
+    createdByName?: StringFilter<"HemodialysisItem"> | string
+    createdByRole?: StringFilter<"HemodialysisItem"> | string
+    createdAt?: DateTimeFilter<"HemodialysisItem"> | Date | string
+    updatedBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    updatedAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+    resolvedBy?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedByName?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedByRole?: StringNullableFilter<"HemodialysisItem"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
+  }
+
   export type ResidencyCreateWithoutPaymentsInput = {
     id?: string
     name: string
@@ -50240,6 +52480,7 @@ export namespace Prisma {
     consultations?: ConsultationCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutPaymentsInput = {
@@ -50275,6 +52516,7 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutPaymentsInput = {
@@ -50371,6 +52613,7 @@ export namespace Prisma {
     consultations?: ConsultationUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutPaymentsInput = {
@@ -50406,6 +52649,7 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type UserUpsertWithoutSubscriptionPaymentsInput = {
@@ -50492,6 +52736,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutUsersInput = {
@@ -50527,6 +52772,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutUsersInput = {
@@ -50856,6 +53102,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutUsersInput = {
@@ -50891,6 +53138,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type AuditLogUpsertWithWhereUniqueWithoutActorInput = {
@@ -51109,6 +53357,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutPatientsInput = {
@@ -51144,6 +53393,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutPatientsInput = {
@@ -51466,6 +53716,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutPatientsInput = {
@@ -51501,6 +53752,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type EpisodeUpsertWithWhereUniqueWithoutPatientInput = {
@@ -51662,6 +53914,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutEpisodesInput = {
@@ -51697,6 +53950,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutEpisodesInput = {
@@ -52426,6 +54680,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutEpisodesInput = {
@@ -52461,6 +54716,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type PatientUpsertWithoutEpisodesInput = {
@@ -53119,6 +55375,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutConsultationsInput = {
@@ -53154,6 +55411,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutConsultationsInput = {
@@ -53299,6 +55557,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutConsultationsInput = {
@@ -53334,6 +55593,7 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type PatientUpsertWithoutConsultationsInput = {
@@ -54147,6 +56407,7 @@ export namespace Prisma {
     consultations?: ConsultationCreateNestedManyWithoutResidencyInput
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutSurgicalDevicesInput = {
@@ -54182,6 +56443,7 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedCreateNestedManyWithoutResidencyInput
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutSurgicalDevicesInput = {
@@ -54342,6 +56604,7 @@ export namespace Prisma {
     consultations?: ConsultationUpdateManyWithoutResidencyNestedInput
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutSurgicalDevicesInput = {
@@ -54377,6 +56640,7 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedUpdateManyWithoutResidencyNestedInput
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type EpisodeUpsertWithoutSurgicalDevicesInput = {
@@ -54527,6 +56791,7 @@ export namespace Prisma {
     consultations?: ConsultationCreateNestedManyWithoutResidencyInput
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutWoundCaresInput = {
@@ -54562,6 +56827,7 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedCreateNestedManyWithoutResidencyInput
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutWoundCaresInput = {
@@ -54637,6 +56903,7 @@ export namespace Prisma {
     consultations?: ConsultationUpdateManyWithoutResidencyNestedInput
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutWoundCaresInput = {
@@ -54672,6 +56939,7 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedUpdateManyWithoutResidencyNestedInput
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type WoundCareLogUpsertWithWhereUniqueWithoutWoundCareInput = {
@@ -55363,6 +57631,166 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     removedBy?: NullableStringFieldUpdateOperationsInput | string | null
     removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ResidencyCreateWithoutHemodialysisItemsInput = {
+    id?: string
+    name: string
+    slug: string
+    specialty?: string
+    interfaceMode?: $Enums.InterfaceMode
+    planName?: string
+    billingMode?: $Enums.BillingMode
+    monthlyPriceUsd?: number
+    individualPriceUsd?: number
+    maxActiveUsers?: number
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    billingContactEmail?: string | null
+    lastPaymentNote?: string | null
+    isActive?: boolean
+    teamMa?: string | null
+    teamR4?: string | null
+    teamR3?: string | null
+    teamR2?: string | null
+    teamR1?: string | null
+    teamAutoMode?: boolean
+    teamUpdatedBy?: string | null
+    teamUpdatedAt?: Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutResidencyInput
+    patients?: PatientCreateNestedManyWithoutResidencyInput
+    episodes?: EpisodeCreateNestedManyWithoutResidencyInput
+    consultations?: ConsultationCreateNestedManyWithoutResidencyInput
+    payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
+    surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
+    woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+  }
+
+  export type ResidencyUncheckedCreateWithoutHemodialysisItemsInput = {
+    id?: string
+    name: string
+    slug: string
+    specialty?: string
+    interfaceMode?: $Enums.InterfaceMode
+    planName?: string
+    billingMode?: $Enums.BillingMode
+    monthlyPriceUsd?: number
+    individualPriceUsd?: number
+    maxActiveUsers?: number
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    billingContactEmail?: string | null
+    lastPaymentNote?: string | null
+    isActive?: boolean
+    teamMa?: string | null
+    teamR4?: string | null
+    teamR3?: string | null
+    teamR2?: string | null
+    teamR1?: string | null
+    teamAutoMode?: boolean
+    teamUpdatedBy?: string | null
+    teamUpdatedAt?: Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutResidencyInput
+    patients?: PatientUncheckedCreateNestedManyWithoutResidencyInput
+    episodes?: EpisodeUncheckedCreateNestedManyWithoutResidencyInput
+    consultations?: ConsultationUncheckedCreateNestedManyWithoutResidencyInput
+    payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
+    surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
+    woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+  }
+
+  export type ResidencyCreateOrConnectWithoutHemodialysisItemsInput = {
+    where: ResidencyWhereUniqueInput
+    create: XOR<ResidencyCreateWithoutHemodialysisItemsInput, ResidencyUncheckedCreateWithoutHemodialysisItemsInput>
+  }
+
+  export type ResidencyUpsertWithoutHemodialysisItemsInput = {
+    update: XOR<ResidencyUpdateWithoutHemodialysisItemsInput, ResidencyUncheckedUpdateWithoutHemodialysisItemsInput>
+    create: XOR<ResidencyCreateWithoutHemodialysisItemsInput, ResidencyUncheckedCreateWithoutHemodialysisItemsInput>
+    where?: ResidencyWhereInput
+  }
+
+  export type ResidencyUpdateToOneWithWhereWithoutHemodialysisItemsInput = {
+    where?: ResidencyWhereInput
+    data: XOR<ResidencyUpdateWithoutHemodialysisItemsInput, ResidencyUncheckedUpdateWithoutHemodialysisItemsInput>
+  }
+
+  export type ResidencyUpdateWithoutHemodialysisItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    specialty?: StringFieldUpdateOperationsInput | string
+    interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
+    planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
+    maxActiveUsers?: IntFieldUpdateOperationsInput | number
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    billingContactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    teamMa?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR4?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR3?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR2?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR1?: NullableStringFieldUpdateOperationsInput | string | null
+    teamAutoMode?: BoolFieldUpdateOperationsInput | boolean
+    teamUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    teamUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutResidencyNestedInput
+    patients?: PatientUpdateManyWithoutResidencyNestedInput
+    episodes?: EpisodeUpdateManyWithoutResidencyNestedInput
+    consultations?: ConsultationUpdateManyWithoutResidencyNestedInput
+    payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
+    surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
+    woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+  }
+
+  export type ResidencyUncheckedUpdateWithoutHemodialysisItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    specialty?: StringFieldUpdateOperationsInput | string
+    interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
+    planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
+    maxActiveUsers?: IntFieldUpdateOperationsInput | number
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    billingContactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    teamMa?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR4?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR3?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR2?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR1?: NullableStringFieldUpdateOperationsInput | string | null
+    teamAutoMode?: BoolFieldUpdateOperationsInput | boolean
+    teamUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    teamUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutResidencyNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutResidencyNestedInput
+    episodes?: EpisodeUncheckedUpdateManyWithoutResidencyNestedInput
+    consultations?: ConsultationUncheckedUpdateManyWithoutResidencyNestedInput
+    payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
+    surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
+    woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type PatientCreateWithoutMedicalHistoryInput = {
@@ -58287,6 +60715,36 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type HemodialysisItemCreateManyResidencyInput = {
+    id?: string
+    section: string
+    patientName: string
+    title: string
+    details?: string | null
+    shiftLabel?: string | null
+    eventDate?: Date | string | null
+    durationDays?: number | null
+    isPriority?: boolean
+    isActive?: boolean
+    resolutionNote?: string | null
+    lastCheckAt?: Date | string | null
+    lastCheckBy?: string | null
+    lastCheckByName?: string | null
+    lastCheckByRole?: string | null
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolvedByName?: string | null
+    resolvedByRole?: string | null
+    resolvedAt?: Date | string | null
+  }
+
   export type UserUpdateWithoutResidencyInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -58777,6 +61235,96 @@ export namespace Prisma {
     dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HemodialysisItemUpdateWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    section?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    shiftLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    eventDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationDays?: NullableIntFieldUpdateOperationsInput | number | null
+    isPriority?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastCheckBy?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type HemodialysisItemUncheckedUpdateWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    section?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    shiftLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    eventDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationDays?: NullableIntFieldUpdateOperationsInput | number | null
+    isPriority?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastCheckBy?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type HemodialysisItemUncheckedUpdateManyWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    section?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    shiftLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    eventDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationDays?: NullableIntFieldUpdateOperationsInput | number | null
+    isPriority?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastCheckBy?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AuditLogCreateManyActorInput = {

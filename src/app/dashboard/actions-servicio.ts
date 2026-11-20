@@ -433,3 +433,349 @@ export async function archivarCuraPaciente(formData: FormData): Promise<{
   revalidatePath('/dashboard')
   return { ok: true }
 }
+
+// ─── 5. UNIDAD DE HEMODIÁLISIS (GUARDIA Y SEGUIMIENTO EN NEFROLOGÍA) ───
+const SECCIONES_HEMODIALISIS = ['novedad', 'predialisis', 'antibiotico', 'cultivo', 'nota'] as const
+type SeccionHemodialisis = (typeof SECCIONES_HEMODIALISIS)[number]
+
+function parsearSeccionHd(raw: string): SeccionHemodialisis | null {
+  return SECCIONES_HEMODIALISIS.includes(raw as SeccionHemodialisis)
+    ? (raw as SeccionHemodialisis)
+    : null
+}
+
+function parsearFechaLocalDo(raw: string): Date | null {
+  const limpio = raw.trim()
+  if (!limpio) return null
+  if (/^\d{4}-\d{2}-\d{2}$/.test(limpio)) {
+    const f = new Date(`${limpio}T12:00:00-04:00`)
+    return Number.isNaN(f.getTime()) ? null : f
+  }
+  const f = new Date(limpio)
+  return Number.isNaN(f.getTime()) ? null : f
+}
+
+export async function crearItemHemodialisis(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const authRes = await exigirEscrituraDashboard()
+  if (!authRes.ok) return { ok: false, error: authRes.error }
+  const { ctx } = authRes
+  const residency = ctx.residency!
+
+  if (ctx.interfaceMode !== 'HOSPITALIZACION') {
+    return { ok: false, error: 'La unidad de Hemodiálisis solo está disponible en Nefrología.' }
+  }
+
+  const section = parsearSeccionHd(String(formData.get('section') ?? '').trim())
+  if (!section) return { ok: false, error: 'Sección de Hemodiálisis inválida.' }
+
+  const patientNameRaw = String(formData.get('patientName') ?? '').trim()
+  const title = String(formData.get('title') ?? '').trim()
+  const details = String(formData.get('details') ?? '').trim() || null
+  const shiftLabel = String(formData.get('shiftLabel') ?? '').trim() || null
+  const eventDateRaw = String(formData.get('eventDate') ?? '').trim()
+  const durationRaw = String(formData.get('durationDays') ?? '').trim()
+  const isPriority = String(formData.get('isPriority') ?? '') === 'true'
+
+  const patientName =
+    patientNameRaw || (section === 'nota' && isPriority ? 'Servicio de Hemodiálisis' : '')
+
+  if (!patientName || !title) {
+    return {
+      ok: false,
+      error: 'Completa el paciente/referencia y el detalle principal.',
+    }
+  }
+
+  const eventDate = parsearFechaLocalDo(eventDateRaw) ?? new Date()
+  const durationParsed = durationRaw ? parseInt(durationRaw, 10) : null
+  const durationDays =
+    durationParsed !== null && !Number.isNaN(durationParsed) && durationParsed > 0
+      ? Math.min(365, durationParsed)
+      : null
+
+  const actorName = ctx.user.fullName || ctx.user.email
+  const actorRole = String(ctx.user.role)
+
+  const item = await prisma.hemodialysisItem.create({
+    data: {
+      residencyId: residency.id,
+      section,
+      patientName,
+      title,
+      details,
+      shiftLabel,
+      eventDate,
+      durationDays,
+      isPriority,
+      isActive: true,
+      createdBy: ctx.user.email,
+      createdByName: actorName,
+      createdByRole: actorRole,
+    },
+  })
+
+  await logAudit({
+    actorId: ctx.user.id,
+    actorRole,
+    action: 'create',
+    entity: 'hemodialysis_item',
+    entityId: item.id,
+    newValue: {
+      section,
+      patientName,
+      title,
+      details,
+      shiftLabel,
+      isPriority,
+      actorName,
+      actorRole,
+    },
+    reason: `Registro en Hemodiálisis (${section}): ${patientName} — ${title}`,
+  })
+
+  revalidatePath('/dashboard')
+  return { ok: true }
+}
+
+export async function editarItemHemodialisis(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const authRes = await exigirEscrituraDashboard()
+  if (!authRes.ok) return { ok: false, error: authRes.error }
+  const { ctx } = authRes
+  const residency = ctx.residency!
+
+  const itemId = String(formData.get('itemId') ?? '').trim()
+  if (!itemId) return { ok: false, error: 'Registro no especificado.' }
+
+  const existente = await prisma.hemodialysisItem.findFirst({
+    where: { id: itemId, residencyId: residency.id },
+  })
+  if (!existente) return { ok: false, error: 'Registro de Hemodiálisis no encontrado.' }
+
+  const patientName = String(formData.get('patientName') ?? '').trim()
+  const title = String(formData.get('title') ?? '').trim()
+  const details = String(formData.get('details') ?? '').trim() || null
+  const shiftLabel = String(formData.get('shiftLabel') ?? '').trim() || null
+  const eventDateRaw = String(formData.get('eventDate') ?? '').trim()
+  const durationRaw = String(formData.get('durationDays') ?? '').trim()
+  const isPriority = String(formData.get('isPriority') ?? '') === 'true'
+
+  if (!patientName || !title) {
+    return { ok: false, error: 'El paciente/referencia y la descripción no pueden quedar vacíos.' }
+  }
+
+  const eventDate = eventDateRaw ? parsearFechaLocalDo(eventDateRaw) : existente.eventDate
+  const durationParsed = durationRaw ? parseInt(durationRaw, 10) : null
+  const durationDays =
+    durationParsed !== null && !Number.isNaN(durationParsed) && durationParsed > 0
+      ? Math.min(365, durationParsed)
+      : null
+
+  const actorName = ctx.user.fullName || ctx.user.email
+  const actorRole = String(ctx.user.role)
+
+  await prisma.hemodialysisItem.update({
+    where: { id: existente.id },
+    data: {
+      patientName,
+      title,
+      details,
+      shiftLabel,
+      eventDate,
+      durationDays,
+      isPriority,
+      updatedBy: ctx.user.email,
+      updatedByName: actorName,
+      updatedByRole: actorRole,
+      updatedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: ctx.user.id,
+    actorRole,
+    action: 'update',
+    entity: 'hemodialysis_item',
+    entityId: existente.id,
+    oldValue: {
+      patientName: existente.patientName,
+      title: existente.title,
+      details: existente.details,
+      shiftLabel: existente.shiftLabel,
+      isPriority: existente.isPriority,
+    },
+    newValue: {
+      patientName,
+      title,
+      details,
+      shiftLabel,
+      isPriority,
+      updatedByName: actorName,
+      updatedByRole: actorRole,
+    },
+    reason: `Modificación en Hemodiálisis (${existente.section}): ${patientName}`,
+  })
+
+  revalidatePath('/dashboard')
+  return { ok: true }
+}
+
+export async function registrarDosisHemodialisis(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const authRes = await exigirEscrituraDashboard()
+  if (!authRes.ok) return { ok: false, error: authRes.error }
+  const { ctx } = authRes
+  const residency = ctx.residency!
+
+  const itemId = String(formData.get('itemId') ?? '').trim()
+  const existente = await prisma.hemodialysisItem.findFirst({
+    where: { id: itemId, residencyId: residency.id, isActive: true },
+  })
+  if (!existente) return { ok: false, error: 'Esquema antibiótico no encontrado.' }
+
+  const actorName = ctx.user.fullName || ctx.user.email
+  const actorRole = String(ctx.user.role)
+  const ahora = new Date()
+
+  await prisma.hemodialysisItem.update({
+    where: { id: existente.id },
+    data: {
+      lastCheckAt: ahora,
+      lastCheckBy: ctx.user.email,
+      lastCheckByName: actorName,
+      lastCheckByRole: actorRole,
+    },
+  })
+
+  await logAudit({
+    actorId: ctx.user.id,
+    actorRole,
+    action: 'update',
+    entity: 'hemodialysis_item',
+    entityId: existente.id,
+    newValue: {
+      accion: 'dosis',
+      patientName: existente.patientName,
+      title: existente.title,
+      lastCheckByName: actorName,
+      lastCheckByRole: actorRole,
+      lastCheckAt: ahora.toISOString(),
+    },
+    reason: `Dosis registrada en Hemodiálisis para ${existente.patientName}: ${existente.title}`,
+  })
+
+  revalidatePath('/dashboard')
+  return { ok: true }
+}
+
+export async function resolverItemHemodialisis(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const authRes = await exigirEscrituraDashboard()
+  if (!authRes.ok) return { ok: false, error: authRes.error }
+  const { ctx } = authRes
+  const residency = ctx.residency!
+
+  const itemId = String(formData.get('itemId') ?? '').trim()
+  const resolutionNote = String(formData.get('resolutionNote') ?? '').trim() || null
+
+  const existente = await prisma.hemodialysisItem.findFirst({
+    where: { id: itemId, residencyId: residency.id },
+  })
+  if (!existente) return { ok: false, error: 'Registro no encontrado.' }
+
+  const actorName = ctx.user.fullName || ctx.user.email
+  const actorRole = String(ctx.user.role)
+
+  await prisma.hemodialysisItem.update({
+    where: { id: existente.id },
+    data: {
+      isActive: false,
+      resolutionNote,
+      resolvedBy: ctx.user.email,
+      resolvedByName: actorName,
+      resolvedByRole: actorRole,
+      resolvedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: ctx.user.id,
+    actorRole,
+    action: 'update',
+    entity: 'hemodialysis_item',
+    entityId: existente.id,
+    oldValue: { isActive: true, patientName: existente.patientName, title: existente.title },
+    newValue: {
+      isActive: false,
+      resolutionNote,
+      resolvedByName: actorName,
+      resolvedByRole: actorRole,
+    },
+    reason: resolutionNote
+      ? `Cerrado en Hemodiálisis (${existente.patientName}): ${resolutionNote}`
+      : `Cerrado / resuelto en Hemodiálisis (${existente.patientName})`,
+  })
+
+  revalidatePath('/dashboard')
+  return { ok: true }
+}
+
+export async function reactivarItemHemodialisis(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const authRes = await exigirEscrituraDashboard()
+  if (!authRes.ok) return { ok: false, error: authRes.error }
+  const { ctx } = authRes
+  const residency = ctx.residency!
+
+  const itemId = String(formData.get('itemId') ?? '').trim()
+  const existente = await prisma.hemodialysisItem.findFirst({
+    where: { id: itemId, residencyId: residency.id },
+  })
+  if (!existente) return { ok: false, error: 'Registro no encontrado.' }
+
+  const actorName = ctx.user.fullName || ctx.user.email
+  const actorRole = String(ctx.user.role)
+
+  await prisma.hemodialysisItem.update({
+    where: { id: existente.id },
+    data: {
+      isActive: true,
+      updatedBy: ctx.user.email,
+      updatedByName: actorName,
+      updatedByRole: actorRole,
+      updatedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: ctx.user.id,
+    actorRole,
+    action: 'update',
+    entity: 'hemodialysis_item',
+    entityId: existente.id,
+    oldValue: { isActive: false },
+    newValue: {
+      isActive: true,
+      patientName: existente.patientName,
+      title: existente.title,
+      updatedByName: actorName,
+      updatedByRole: actorRole,
+    },
+    reason: `Reactivado en Hemodiálisis: ${existente.patientName}`,
+  })
+
+  revalidatePath('/dashboard')
+  return { ok: true }
+}
+

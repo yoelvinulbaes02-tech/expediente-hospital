@@ -8,6 +8,7 @@ import { completarTareaDesdeDashboard, entregarLote } from '@/app/dashboard/acti
 import { TeamServicioCard } from '@/components/TeamServicioCard'
 import { CirugiaResumenPanel, type ResumenCirugiaStats } from '@/components/CirugiaResumenPanel'
 import { CurasPanel, type CuraPacienteItem } from '@/components/CurasPanel'
+import { HemodialisisPanel, type HemodialisisItemData } from '@/components/HemodialisisPanel'
 import { ESTADOS_CIRUGIA, type TeamServicioData } from '@/lib/cirugia-constants'
 
 type TareaPendienteResumen = {
@@ -128,12 +129,14 @@ export function ListaPacientes({
   resumenCirugiaGuardado = null,
   conteosDispositivosCirugia,
   curas = [],
+  hemodialisisItems = [],
+  ahoraIso = '',
 }: {
   episodes: Episodio[]
   userId: string
   miEmail: string
   doctores: Doctor[]
-  vistaInicial?: 'propio' | 'interconsulta' | 'curas'
+  vistaInicial?: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis'
   puedeMarcarTareas?: boolean
   puedeEditarServicio?: boolean
   interfaceMode?: 'HOSPITALIZACION' | 'MEDICINA_INTERNA' | 'CIRUGIA'
@@ -143,12 +146,19 @@ export function ListaPacientes({
   resumenCirugiaGuardado?: ResumenCirugiaStats | null
   conteosDispositivosCirugia?: Record<string, number>
   curas?: CuraPacienteItem[]
+  hemodialisisItems?: HemodialisisItemData[]
+  ahoraIso?: string
 }) {
   const esMedicinaInterna = interfaceMode === 'MEDICINA_INTERNA'
   const esCirugia = interfaceMode === 'CIRUGIA'
+  const esNefrologia = interfaceMode === 'HOSPITALIZACION'
   const router = useRouter()
-  const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta' | 'curas'>(
-    vistaInicial === 'curas' && !esCirugia ? 'propio' : vistaInicial
+  const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta' | 'curas' | 'hemodialisis'>(
+    vistaInicial === 'curas' && !esCirugia
+      ? 'propio'
+      : vistaInicial === 'hemodialisis' && !esNefrologia
+        ? 'propio'
+        : vistaInicial
   )
   const [busqueda, setBusqueda] = useState('')
   const [soloPendientes, setSoloPendientes] = useState(false)
@@ -160,7 +170,12 @@ export function ListaPacientes({
   const [enviando, setEnviando] = useState(false)
   const [mensaje, setMensaje] = useState<Mensaje | null>(null)
 
-  const cambiarArea = (nuevaArea: 'propio' | 'interconsulta' | 'curas') => {
+  const activosHemodialisis = useMemo(
+    () => hemodialisisItems.filter((i) => i.isActive).length,
+    [hemodialisisItems]
+  )
+
+  const cambiarArea = (nuevaArea: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis') => {
     setAreaGuardia(nuevaArea)
     setSeleccionados([])
     if (typeof window !== 'undefined') {
@@ -169,6 +184,8 @@ export function ListaPacientes({
         url.searchParams.set('vista', 'interconsulta')
       } else if (nuevaArea === 'curas') {
         url.searchParams.set('vista', 'curas')
+      } else if (nuevaArea === 'hemodialisis') {
+        url.searchParams.set('vista', 'hemodialisis')
       } else {
         url.searchParams.delete('vista')
       }
@@ -302,7 +319,7 @@ export function ListaPacientes({
         id="lista-pacientes"
         className="scroll-mt-20 flex flex-wrap items-center justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
       >
-        <div className={`grid gap-2 w-full sm:w-auto ${esCirugia ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        <div className={`grid gap-2 w-full sm:w-auto ${esCirugia || esNefrologia ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <button
             type="button"
             onClick={() => cambiarArea('propio')}
@@ -349,6 +366,23 @@ export function ListaPacientes({
               </span>
             </button>
           )}
+
+          {esNefrologia && (
+            <button
+              type="button"
+              onClick={() => cambiarArea('hemodialisis')}
+              className={`py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                areaGuardia === 'hemodialisis'
+                  ? 'bg-cyan-700 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              <span>🩸</span> Hemodiálisis
+              <span className={`px-2 py-0.2 rounded-full text-xs font-bold ${areaGuardia === 'hemodialisis' ? 'bg-cyan-900 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                {activosHemodialisis}
+              </span>
+            </button>
+          )}
         </div>
 
         <Link
@@ -363,6 +397,12 @@ export function ListaPacientes({
 
       {esCirugia && areaGuardia === 'curas' ? (
         <CurasPanel curas={curas} puedeRegistrar={puedeMarcarTareas} />
+      ) : esNefrologia && areaGuardia === 'hemodialisis' ? (
+        <HemodialisisPanel
+          items={hemodialisisItems}
+          puedeRegistrar={puedeMarcarTareas}
+          ahoraIso={ahoraIso}
+        />
       ) : (
         <>
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">

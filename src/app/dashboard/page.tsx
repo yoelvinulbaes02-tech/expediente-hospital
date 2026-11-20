@@ -13,6 +13,7 @@ import {
 } from '@/lib/cirugia-constants'
 import type { ResumenCirugiaStats } from '@/components/CirugiaResumenPanel'
 import type { CuraPacienteItem } from '@/components/CurasPanel'
+import type { HemodialisisItemData, SeccionHd } from '@/components/HemodialisisPanel'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -45,14 +46,17 @@ export default async function DashboardPage({
   const esModoConsultas = ctx.interfaceMode === 'CONSULTAS'
   const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
   const esModoCirugia = ctx.interfaceMode === 'CIRUGIA'
+  const esModoNefrologia = !esModoConsultas && !esModoMedicinaInterna && !esModoCirugia
   const requiereTeamServicio = esModoMedicinaInterna || esModoCirugia
 
-  const vistaInicial: 'propio' | 'interconsulta' | 'curas' =
+  const vistaInicial: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis' =
     vista === 'curas' && esModoCirugia
       ? 'curas'
-      : vista === 'interconsulta'
-        ? 'interconsulta'
-        : 'propio'
+      : vista === 'hemodialisis' && esModoNefrologia
+        ? 'hemodialisis'
+        : vista === 'interconsulta'
+          ? 'interconsulta'
+          : 'propio'
 
   const userId = ctx.user.id
   const userRole = String(ctx.user.role)
@@ -366,6 +370,57 @@ export default async function DashboardPage({
     }
   }
 
+  let hemodialisisSerializados: HemodialisisItemData[] = []
+  if (esModoNefrologia) {
+    const [hdActivosDb, hdResueltosDb] = await Promise.all([
+      prisma.hemodialysisItem
+        .findMany({
+          where: { residencyId: residency.id, isActive: true },
+          orderBy: [{ isPriority: 'desc' }, { createdAt: 'desc' }],
+        })
+        .catch(() => []),
+      prisma.hemodialysisItem
+        .findMany({
+          where: { residencyId: residency.id, isActive: false },
+          orderBy: [{ resolvedAt: 'desc' }, { createdAt: 'desc' }],
+          take: 40,
+        })
+        .catch(() => []),
+    ])
+
+    hemodialisisSerializados = [...hdActivosDb, ...hdResueltosDb].map((item) => ({
+      id: item.id,
+      section: item.section as SeccionHd,
+      patientName: item.patientName,
+      title: item.title,
+      details: item.details,
+      shiftLabel: item.shiftLabel,
+      eventDate: item.eventDate ? item.eventDate.toISOString() : null,
+      durationDays: item.durationDays,
+      isPriority: item.isPriority,
+      isActive: item.isActive,
+      resolutionNote: item.resolutionNote,
+      lastCheckAt: item.lastCheckAt ? item.lastCheckAt.toISOString() : null,
+      lastCheckBy: item.lastCheckBy,
+      lastCheckByName: item.lastCheckByName,
+      lastCheckByRole: item.lastCheckByRole,
+      createdBy: item.createdBy,
+      createdByName: item.createdByName,
+      createdByRole: item.createdByRole,
+      createdAt: item.createdAt.toISOString(),
+      updatedBy: item.updatedBy,
+      updatedByName: item.updatedByName,
+      updatedByRole: item.updatedByRole,
+      updatedAt: item.updatedAt ? item.updatedAt.toISOString() : null,
+      resolvedBy: item.resolvedBy,
+      resolvedByName: item.resolvedByName,
+      resolvedByRole: item.resolvedByRole,
+      resolvedAt: item.resolvedAt ? item.resolvedAt.toISOString() : null,
+    }))
+  }
+
+  const ahoraIso = new Date().toISOString()
+
   const episodes = episodesBase.map((ep) => ({
     ...ep,
     internalMedicineProfile: perfilesMI.get(ep.id) ?? null,
@@ -602,6 +657,8 @@ export default async function DashboardPage({
             resumenCirugiaGuardado={resumenCirugiaGuardado}
             conteosDispositivosCirugia={conteosDispositivosCirugia}
             curas={curasSerializadas}
+            hemodialisisItems={hemodialisisSerializados}
+            ahoraIso={ahoraIso}
           />
         )}
       </main>

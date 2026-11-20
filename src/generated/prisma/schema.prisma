@@ -65,13 +65,14 @@ model Residency {
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 
-  users           User[]
-  patients        Patient[]
-  episodes        Episode[]
-  consultations   Consultation[]
-  payments        SubscriptionPayment[]
-  surgicalDevices SurgicalDevice[]
-  woundCares      WoundCare[]
+  users             User[]
+  patients          Patient[]
+  episodes          Episode[]
+  consultations     Consultation[]
+  payments          SubscriptionPayment[]
+  surgicalDevices   SurgicalDevice[]
+  woundCares        WoundCare[]
+  hemodialysisItems HemodialysisItem[]
 }
 
 model SubscriptionPayment {
@@ -447,6 +448,43 @@ model EpisodeDrainEntry {
   drain EpisodeDrain @relation(fields: [drainId], references: [id], onDelete: Cascade)
 
   @@index([drainId, recordedAt])
+}
+
+// ─── UNIDAD DE HEMODIÁLISIS (GUARDIA Y SEGUIMIENTO EN NEFROLOGÍA) ───
+model HemodialysisItem {
+  id              String    @id @default(cuid())
+  residencyId     String
+  section         String // novedad | predialisis | antibiotico | cultivo | nota
+  patientName     String
+  title           String
+  details         String?
+  shiftLabel      String?
+  eventDate       DateTime? @db.Timestamptz
+  durationDays    Int?
+  isPriority      Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  resolutionNote  String?
+  lastCheckAt     DateTime? @db.Timestamptz
+  lastCheckBy     String?
+  lastCheckByName String?
+  lastCheckByRole String?
+  createdBy       String
+  createdByName   String
+  createdByRole   String
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+  updatedBy       String?
+  updatedByName   String?
+  updatedByRole   String?
+  updatedAt       DateTime? @db.Timestamptz
+  resolvedBy      String?
+  resolvedByName  String?
+  resolvedByRole  String?
+  resolvedAt      DateTime? @db.Timestamptz
+
+  residency Residency @relation(fields: [residencyId], references: [id])
+
+  @@index([residencyId, isActive, section])
+  @@index([residencyId, createdAt])
 }
 
 // ─── ANTECEDENTES DEL PACIENTE ───

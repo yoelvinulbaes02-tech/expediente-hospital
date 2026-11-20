@@ -409,6 +409,37 @@ exports.Prisma.EpisodeDrainEntryScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.HemodialysisItemScalarFieldEnum = {
+  id: 'id',
+  residencyId: 'residencyId',
+  section: 'section',
+  patientName: 'patientName',
+  title: 'title',
+  details: 'details',
+  shiftLabel: 'shiftLabel',
+  eventDate: 'eventDate',
+  durationDays: 'durationDays',
+  isPriority: 'isPriority',
+  isActive: 'isActive',
+  resolutionNote: 'resolutionNote',
+  lastCheckAt: 'lastCheckAt',
+  lastCheckBy: 'lastCheckBy',
+  lastCheckByName: 'lastCheckByName',
+  lastCheckByRole: 'lastCheckByRole',
+  createdBy: 'createdBy',
+  createdByName: 'createdByName',
+  createdByRole: 'createdByRole',
+  createdAt: 'createdAt',
+  updatedBy: 'updatedBy',
+  updatedByName: 'updatedByName',
+  updatedByRole: 'updatedByRole',
+  updatedAt: 'updatedAt',
+  resolvedBy: 'resolvedBy',
+  resolvedByName: 'resolvedByName',
+  resolvedByRole: 'resolvedByRole',
+  resolvedAt: 'resolvedAt'
+};
+
 exports.Prisma.MedicalHistoryScalarFieldEnum = {
   id: 'id',
   patientId: 'patientId',
@@ -644,6 +675,7 @@ exports.Prisma.ModelName = {
   BaseDepartmentPlanEntry: 'BaseDepartmentPlanEntry',
   EpisodeDrain: 'EpisodeDrain',
   EpisodeDrainEntry: 'EpisodeDrainEntry',
+  HemodialysisItem: 'HemodialysisItem',
   MedicalHistory: 'MedicalHistory',
   ImportantAlert: 'ImportantAlert',
   GfrRecord: 'GfrRecord',
