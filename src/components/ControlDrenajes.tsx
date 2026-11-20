@@ -198,8 +198,8 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
   const drenajesGrafica = drenajesSeleccionados.length > 0 ? drenajesSeleccionados : conDatos
   const filtroActivo = drenajesSeleccionados.length > 0 ? seleccion : 'todos'
 
-  const series = drenajesGrafica.map((drain, idx) => {
-    const color = COLORES_SERIE[conDatos.findIndex((d) => d.id === drain.id) % COLORES_SERIE.length]
+  const tarjetas = drenajesGrafica.map((drain) => {
+    const color = COLORES_SERIE[conDatos.findIndex((d) => d.id === drain.id) % COLORES_SERIE.length] ?? '#fb923c'
     const cronologicos = [...drain.entries].sort(
       (a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()
     )
@@ -229,83 +229,23 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
     const tendencia = calcularTendencia(puntos.map((p) => p.valor))
     return {
       id: drain.id,
-      name: drain.name + (drain.isActive ? '' : ' (retirado)'),
-      color: color ?? '#ea580c',
+      name: drain.name,
+      location: drain.location,
+      isActive: drain.isActive,
+      color,
       puntos,
       tendencia,
-      idxGlobal: idx,
     }
   })
 
-  // Para la tendencia principal: si hay 1 drenaje seleccionado usamos su tendencia;
-  // si están todos, sumamos por día o comparamos la serie total combinada por toma/día.
-  let tendenciaPrincipal: TendenciaInfo | null = null
-  if (series.length === 1) {
-    tendenciaPrincipal = series[0].tendencia
-  } else if (modo === 'diario') {
-    const mapaTotal = new Map<number, number>()
-    series.forEach((s) =>
-      s.puntos.forEach((p) => mapaTotal.set(p.xTs, (mapaTotal.get(p.xTs) ?? 0) + p.valor))
-    )
-    const valoresTotales = Array.from(mapaTotal.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([, v]) => v)
-    tendenciaPrincipal = calcularTendencia(valoresTotales)
-  } else {
-    const todosCronologicos = drenajesGrafica
-      .flatMap((d) => d.entries)
-      .sort((a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime())
-      .map((e) => e.volumeMl)
-    tendenciaPrincipal = calcularTendencia(todosCronologicos)
-  }
-
-  const todosPuntos = series.flatMap((s) => s.puntos)
-  const minVal = 0
-  const maxRaw = Math.max(...todosPuntos.map((p) => p.valor), 10)
-  const maxVal = Math.ceil((maxRaw * 1.18) / 10) * 10 || 50
-
-  const allTs = todosPuntos.map((p) => p.xTs)
-  const minTs = Math.min(...allTs)
-  const maxTs = Math.max(...allTs)
-
-  const W = 520
-  const H = 148
-  const padIzq = 42
-  const padDer = 20
-  const padArr = 24
-  const padAba = 26
-  const innerW = W - padIzq - padDer
-  const innerH = H - padArr - padAba
-
-  const getX = (xTs: number, idxEnSerie: number, lenEnSerie: number) => {
-    if (maxTs === minTs) {
-      if (lenEnSerie <= 1) return padIzq + innerW / 2
-      return padIzq + (idxEnSerie * innerW) / (lenEnSerie - 1)
-    }
-    return padIzq + ((xTs - minTs) / (maxTs - minTs)) * innerW
-  }
-
-  const getY = (val: number) =>
-    padArr + ((maxVal - val) / (maxVal - minVal)) * innerH
-
-  const ticksY = [0, Math.round(maxVal * 0.5), maxVal]
-  const todosValores = todosPuntos.map((p) => p.valor)
-  const minDato = Math.min(...todosValores)
-  const maxDato = Math.max(...todosValores)
-
-  const primeraEtiqueta = [...todosPuntos].sort((a, b) => a.xTs - b.xTs)[0]?.label ?? ''
-  const ultimaEtiqueta =
-    [...todosPuntos].sort((a, b) => a.xTs - b.xTs)[todosPuntos.length - 1]?.label ?? ''
-
   return (
-    <div className="bg-orange-50/30 border border-orange-100 rounded-lg p-3.5 space-y-2.5">
+    <div className="bg-orange-50/25 border border-orange-100 rounded-lg p-3.5 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <BarChart3 className="w-3.5 h-3.5 text-orange-400" />
-          <h3 className="text-xs font-bold text-slate-800">
-            Tendencia de Drenajes (mL)
+        <div className="flex items-center gap-1.5">
+          <BarChart3 className="w-4 h-4 text-orange-400" />
+          <h3 className="text-xs sm:text-sm font-bold text-slate-800">
+            Tendencia por Drenaje (mL)
           </h3>
-          <BadgeTendencia tendencia={tendenciaPrincipal} />
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
@@ -313,7 +253,7 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
             <button
               type="button"
               onClick={() => setModo('registro')}
-              className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
+              className={`px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer transition-colors ${
                 modo === 'registro'
                   ? 'bg-orange-400 text-white'
                   : 'text-slate-600 hover:bg-slate-100'
@@ -324,7 +264,7 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
             <button
               type="button"
               onClick={() => setModo('diario')}
-              className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
+              className={`px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer transition-colors ${
                 modo === 'diario'
                   ? 'bg-orange-400 text-white'
                   : 'text-slate-600 hover:bg-slate-100'
@@ -338,9 +278,9 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
             <select
               value={filtroActivo}
               onChange={(e) => setSeleccion(e.target.value)}
-              className="px-2 py-1 border border-slate-300 rounded-md text-[10px] font-bold bg-white text-slate-800 max-w-36"
+              className="px-2.5 py-1 border border-slate-300 rounded-md text-[11px] font-bold bg-white text-slate-800 max-w-48"
             >
-              <option value="todos">Todos ({conDatos.length})</option>
+              <option value="todos">Todos por separado ({conDatos.length})</option>
               {conDatos.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
@@ -352,151 +292,174 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-md p-2.5">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500 mb-1">
-          <span>
-            {modo === 'registro' ? 'Evolución por registro' : 'Total diario (mL/día)'}
-          </span>
-          <span className="tabular-nums">
-            Mín: <strong className="text-slate-800">{minDato} mL</strong> · Máx:{' '}
-            <strong className="text-slate-800">{maxDato} mL</strong>
-          </span>
-        </div>
+      <div className={`grid grid-cols-1 ${tarjetas.length > 1 ? 'md:grid-cols-2' : ''} gap-3`}>
+        {tarjetas.map((t) => {
+          const minVal = 0
+          const maxRaw = Math.max(...t.puntos.map((p) => p.valor), 10)
+          const maxVal = Math.ceil((maxRaw * 1.2) / 10) * 10 || 50
+          const valores = t.puntos.map((p) => p.valor)
+          const minDato = Math.min(...valores)
+          const maxDato = Math.max(...valores)
 
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-h-36 select-none overflow-visible" role="img">
-          {ticksY.map((t, idx) => (
-            <g key={idx}>
-              <line
-                x1={padIzq}
-                y1={getY(t)}
-                x2={W - padDer}
-                y2={getY(t)}
-                stroke={t === 0 ? '#cbd5e1' : '#f1f5f9'}
-                strokeWidth="1.5"
-              />
-              <text
-                x={padIzq - 8}
-                y={getY(t) + 3.5}
-                textAnchor="end"
-                fontSize="10"
-                fill="#64748b"
-                fontFamily="monospace"
-              >
-                {t}
-              </text>
-            </g>
-          ))}
+          const W = 460
+          const H = 152
+          const padIzq = 42
+          const padDer = 24
+          const padArr = 26
+          const padAba = 26
+          const innerW = W - padIzq - padDer
+          const innerH = H - padArr - padAba
 
-          {primeraEtiqueta && (
-            <text x={padIzq} y={H - 8} fontSize="10" fill="#64748b" textAnchor="start">
-              {primeraEtiqueta}
-            </text>
-          )}
-          {ultimaEtiqueta && ultimaEtiqueta !== primeraEtiqueta && (
-            <text x={W - padDer} y={H - 8} fontSize="10" fill="#64748b" textAnchor="end">
-              {ultimaEtiqueta}
-            </text>
-          )}
+          const getX = (idx: number, len: number) => {
+            if (len <= 1) return padIzq + innerW / 2
+            return padIzq + (idx * innerW) / (len - 1)
+          }
 
-          {series.map((s) => {
-            const coords = s.puntos.map((p, idx) => ({
-              x: getX(p.xTs, idx, s.puntos.length),
-              y: getY(p.valor),
-              valor: p.valor,
-              label: p.label,
-            }))
-            const poly = coords.map((c) => `${c.x},${c.y}`).join(' ')
-            const mostrarBadges = series.length === 1 || coords.length <= 8
+          const getY = (val: number) =>
+            padArr + ((maxVal - val) / (maxVal - minVal)) * innerH
 
-            return (
-              <g key={s.id}>
+          const ticksY = [0, Math.round(maxVal * 0.5), maxVal]
+          const coords = t.puntos.map((p, idx) => ({
+            x: getX(idx, t.puntos.length),
+            y: getY(p.valor),
+            valor: p.valor,
+            label: p.label,
+          }))
+          const poly = coords.map((c) => `${c.x},${c.y}`).join(' ')
+          const mostrarEtiquetaIdx = (i: number, len: number) => {
+            if (len <= 4) return true
+            return i === 0 || i === len - 1 || i === Math.floor((len - 1) / 2)
+          }
+
+          return (
+            <div
+              key={t.id}
+              className="bg-white border border-slate-200 rounded-lg p-3 space-y-2"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: t.color }}
+                  />
+                  <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 truncate">
+                    {t.name}
+                    {t.location ? ` · ${t.location}` : ''}
+                    {!t.isActive ? ' (retirado)' : ''}
+                  </h4>
+                </div>
+                <BadgeTendencia tendencia={t.tendencia} />
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500">
+                <span>
+                  {modo === 'registro'
+                    ? `${t.puntos.length} toma(s) en orden cronológico`
+                    : `${t.puntos.length} día(s) registrado(s)`}
+                </span>
+                <span className="tabular-nums">
+                  Mín: <strong className="text-slate-800">{minDato} mL</strong> · Máx:{' '}
+                  <strong className="text-slate-800">{maxDato} mL</strong> · Último:{' '}
+                  <strong className="text-slate-900">{t.tendencia?.ultimo ?? 0} mL</strong>
+                </span>
+              </div>
+
+              <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-h-40 select-none overflow-visible" role="img">
+                {ticksY.map((tick, idx) => (
+                  <g key={idx}>
+                    <line
+                      x1={padIzq}
+                      y1={getY(tick)}
+                      x2={W - padDer}
+                      y2={getY(tick)}
+                      stroke={tick === 0 ? '#cbd5e1' : '#f1f5f9'}
+                      strokeWidth="1.5"
+                    />
+                    <text
+                      x={padIzq - 8}
+                      y={getY(tick) + 3.5}
+                      textAnchor="end"
+                      fontSize="10"
+                      fill="#64748b"
+                      fontFamily="monospace"
+                    >
+                      {tick}
+                    </text>
+                  </g>
+                ))}
+
                 {coords.length >= 2 && (
                   <polyline
                     points={poly}
                     fill="none"
-                    stroke={s.color}
+                    stroke={t.color}
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 )}
-                {coords.map((c, i) => (
-                  <g key={i}>
-                    <circle
-                      cx={c.x}
-                      cy={c.y}
-                      r={4.5}
-                      fill={s.color}
-                      stroke="#ffffff"
-                      strokeWidth="2"
-                    >
-                      <title>{`${s.name}: ${c.valor} mL (${c.label})`}</title>
-                    </circle>
-                    {mostrarBadges && (
-                      <>
-                        <rect
-                          x={c.x - 16}
-                          y={c.y - 20}
-                          width={32}
-                          height={14}
-                          rx={3}
-                          fill="#ffffff"
-                          stroke={s.color}
-                          strokeWidth="1"
-                        />
+
+                {coords.map((c, i) => {
+                  const boxY = Math.max(4, c.y - 21)
+                  return (
+                    <g key={i}>
+                      <circle
+                        cx={c.x}
+                        cy={c.y}
+                        r={4.5}
+                        fill={t.color}
+                        stroke="#ffffff"
+                        strokeWidth="2"
+                      >
+                        <title>{`${t.name}: ${c.valor} mL (${c.label})`}</title>
+                      </circle>
+                      <rect
+                        x={c.x - 18}
+                        y={boxY}
+                        width={36}
+                        height={15}
+                        rx={3}
+                        fill="#ffffff"
+                        stroke={t.color}
+                        strokeWidth="1"
+                      />
+                      <text
+                        x={c.x}
+                        y={boxY + 10.5}
+                        textAnchor="middle"
+                        fontSize="9.5"
+                        fontWeight="bold"
+                        fill="#0f172a"
+                      >
+                        {c.valor}
+                      </text>
+
+                      {mostrarEtiquetaIdx(i, coords.length) && (
                         <text
                           x={c.x}
-                          y={c.y - 10}
-                          textAnchor="middle"
-                          fontSize="9.5"
-                          fontWeight="bold"
-                          fill="#0f172a"
+                          y={H - 6}
+                          fontSize="9"
+                          fill="#64748b"
+                          textAnchor={
+                            coords.length === 1
+                              ? 'middle'
+                              : i === 0
+                                ? 'start'
+                                : i === coords.length - 1
+                                  ? 'end'
+                                  : 'middle'
+                          }
                         >
-                          {c.valor}
+                          {c.label}
                         </text>
-                      </>
-                    )}
-                  </g>
-                ))}
-              </g>
-            )
-          })}
-        </svg>
-
-        {/* Leyenda con tendencia individual por drenaje */}
-        <div className="flex flex-wrap gap-2 pt-2 mt-2 border-t border-slate-100">
-          {series.map((s) => {
-            const t = s.tendencia
-            return (
-              <div
-                key={s.id}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-[11px]"
-              >
-                <span
-                  className="w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: s.color }}
-                />
-                <span className="font-bold text-slate-800">{s.name}:</span>
-                <span className="font-semibold text-slate-700 tabular-nums">
-                  {t ? `${t.ultimo} mL` : '—'}
-                </span>
-                {t?.estado === 'sube' && (
-                  <span className="text-red-700 font-bold tabular-nums">
-                    (↑ +{t.delta} mL)
-                  </span>
-                )}
-                {t?.estado === 'baja' && (
-                  <span className="text-emerald-700 font-bold tabular-nums">
-                    (↓ {t.delta} mL)
-                  </span>
-                )}
-                {t?.estado === 'igual' && (
-                  <span className="text-slate-500 font-semibold">(→ 0 mL)</span>
-                )}
-              </div>
-            )
-          })}
-        </div>
+                      )}
+                    </g>
+                  )
+                })}
+              </svg>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
