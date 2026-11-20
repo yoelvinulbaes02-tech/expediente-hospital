@@ -163,6 +163,9 @@ exports.Prisma.SubscriptionPaymentScalarFieldEnum = {
   requestedBy: 'requestedBy',
   reviewedBy: 'reviewedBy',
   reviewedAt: 'reviewedAt',
+  isTestReset: 'isTestReset',
+  resetAt: 'resetAt',
+  resetBy: 'resetBy',
   createdAt: 'createdAt'
 };
 
@@ -357,6 +360,9 @@ exports.Prisma.WoundCareScalarFieldEnum = {
   baseDepartment: 'baseDepartment',
   isActive: 'isActive',
   createdBy: 'createdBy',
+  dischargeReason: 'dischargeReason',
+  dischargedBy: 'dischargedBy',
+  dischargedAt: 'dischargedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -376,6 +382,29 @@ exports.Prisma.BaseDepartmentPlanEntryScalarFieldEnum = {
   isActive: 'isActive',
   createdBy: 'createdBy',
   createdAt: 'createdAt',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.EpisodeDrainScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  name: 'name',
+  location: 'location',
+  isActive: 'isActive',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  removedBy: 'removedBy',
+  removedAt: 'removedAt'
+};
+
+exports.Prisma.EpisodeDrainEntryScalarFieldEnum = {
+  id: 'id',
+  drainId: 'drainId',
+  volumeMl: 'volumeMl',
+  characteristic: 'characteristic',
+  recordedBy: 'recordedBy',
+  recordedAt: 'recordedAt',
   updatedBy: 'updatedBy',
   updatedAt: 'updatedAt'
 };
@@ -613,6 +642,8 @@ exports.Prisma.ModelName = {
   WoundCare: 'WoundCare',
   WoundCareLog: 'WoundCareLog',
   BaseDepartmentPlanEntry: 'BaseDepartmentPlanEntry',
+  EpisodeDrain: 'EpisodeDrain',
+  EpisodeDrainEntry: 'EpisodeDrainEntry',
   MedicalHistory: 'MedicalHistory',
   ImportantAlert: 'ImportantAlert',
   GfrRecord: 'GfrRecord',

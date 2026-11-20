@@ -659,3 +659,43 @@ export async function procesarPagoSuscripcion(formData: FormData): Promise<void>
   revalidatePath(`/dashboard/plataforma/residencia/${pago.residencyId}`)
   revalidatePath('/dashboard/suscripcion')
 }
+
+export async function reiniciarPagosPrueba(): Promise<void> {
+  const superAdmin = await exigirSuperAdmin()
+
+  const ahora = new Date()
+  const resultado = await prisma.subscriptionPayment.updateMany({
+    where: { isTestReset: false },
+    data: {
+      isTestReset: true,
+      resetAt: ahora,
+      resetBy: superAdmin.email,
+    },
+  })
+
+  await logAudit({
+    actorId: superAdmin.id,
+    actorRole: 'SUPERADMIN',
+    action: 'update',
+    entity: 'subscription_payment_reset',
+    entityId: 'global',
+    newValue: {
+      pagosReiniciados: resultado.count,
+      resetBy: superAdmin.email,
+      resetAt: ahora.toISOString(),
+    },
+    reason: `Reinicio manual de pagos de prueba en SuperAdmin (${resultado.count} registro(s) archivado(s))`,
+  })
+
+  revalidatePath('/dashboard/plataforma', 'layout')
+  revalidatePath('/dashboard/suscripcion')
+
+  redirect(
+    '/dashboard/plataforma?ok=' +
+      encodeURIComponent(
+        resultado.count > 0
+          ? `Pagos recibidos reiniciados a $0.00 USD (${resultado.count} transacción/es de prueba archivadas).`
+          : 'No había transacciones activas para reiniciar.'
+      )
+  )
+}

@@ -31,8 +31,7 @@ import { ListaEvoluciones } from '@/components/ListaEvoluciones'
 import { BotonImprimirSignos } from '@/components/BotonImprimirSignos'
 import { TratamientoActual } from '@/components/TratamientoActual'
 import { PlanDepartamentoBase, type PlanBaseEntryItem } from '@/components/PlanDepartamentoBase'
-import { DrenajesMultiplesInput } from '@/components/DrenajesMultiplesInput'
-import { normalizarDrenajes } from '@/lib/cirugia-constants'
+import { ControlDrenajes, type EpisodeDrainItem } from '@/components/ControlDrenajes'
 
 const ETIQUETA_ROL: Record<string, string> = {
   SUPERADMIN: 'Propietario Plataforma',
@@ -178,7 +177,6 @@ export default async function ExpedientePage({
   const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
   const esModoCirugia = ctx.interfaceMode === 'CIRUGIA'
   const ocultarPesoSignos = esModoMedicinaInterna || esModoCirugia
-  const mostrarDrenaje = esModoCirugia
 
   const [
     internalMedicineProfile,
@@ -186,6 +184,7 @@ export default async function ExpedientePage({
     antibiotics,
     surgicalDevices,
     basePlanEntriesDb,
+    episodeDrainsDb,
   ] = await Promise.all([
     esModoMedicinaInterna
       ? prisma.internalMedicineProfile
@@ -218,6 +217,15 @@ export default async function ExpedientePage({
           .findMany({
             where: { episodeId: episode.id },
             orderBy: { createdAt: 'asc' },
+          })
+          .catch(() => [])
+      : Promise.resolve([]),
+    esModoCirugia
+      ? prisma.episodeDrain
+          .findMany({
+            where: { episodeId: episode.id },
+            include: { entries: { orderBy: { recordedAt: 'desc' } } },
+            orderBy: [{ isActive: 'desc' }, { createdAt: 'asc' }],
           })
           .catch(() => [])
       : Promise.resolve([]),
@@ -264,8 +272,8 @@ export default async function ExpedientePage({
   const soloDiuresisInterconsulta = esInterconsulta && !esModoMedicinaInterna && !esModoCirugia
   const volverHref =
     vista === 'interconsulta' || (!vista && esInterconsulta)
-      ? '/dashboard?vista=interconsulta'
-      : '/dashboard'
+      ? '/dashboard?vista=interconsulta#lista-pacientes'
+      : '/dashboard#lista-pacientes'
 
   // Cálculo de estancia
   const diffTiempo = new Date().getTime() - new Date(episode.admissionDate).getTime()
@@ -330,6 +338,35 @@ export default async function ExpedientePage({
     if (p.createdBy) emails.add(p.createdBy)
     if (p.updatedBy) emails.add(p.updatedBy)
   })
+  episodeDrainsDb.forEach((dr) => {
+    emails.add(dr.createdBy)
+    if (dr.removedBy) emails.add(dr.removedBy)
+    dr.entries.forEach((ent) => {
+      emails.add(ent.recordedBy)
+      if (ent.updatedBy) emails.add(ent.updatedBy)
+    })
+  })
+
+  const drenajesSerializados: EpisodeDrainItem[] = episodeDrainsDb.map((dr) => ({
+    id: dr.id,
+    name: dr.name,
+    location: dr.location,
+    isActive: dr.isActive,
+    createdBy: dr.createdBy,
+    createdAt: dr.createdAt.toISOString(),
+    removedBy: dr.removedBy,
+    removedAt: dr.removedAt ? dr.removedAt.toISOString() : null,
+    entries: dr.entries.map((ent) => ({
+      id: ent.id,
+      volumeMl: ent.volumeMl,
+      characteristic: ent.characteristic,
+      recordedBy: ent.recordedBy,
+      recordedAt: ent.recordedAt.toISOString(),
+      updatedBy: ent.updatedBy,
+      updatedAt: ent.updatedAt ? ent.updatedAt.toISOString() : null,
+    })),
+  }))
+  const ahoraIso = new Date().toISOString()
 
   if (entregaPendiente) {
     emails.add(entregaPendiente.entregadoPor)
@@ -1099,8 +1136,6 @@ export default async function ExpedientePage({
                         <label className="block text-xs font-bold text-sky-800 mb-1">Diuresis (mL)</label>
                         <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
                       </div>
-
-                      {mostrarDrenaje && <DrenajesMultiplesInput />}
                     </div>
                     <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2 cursor-pointer">
                       Guardar Signos
@@ -1170,21 +1205,31 @@ export default async function ExpedientePage({
               />
             </div>
 
+            {/* CONTROL INDEPENDIENTE DE DRENAJES (CIRUGÍA) */}
+            {esModoCirugia && (
+              <ControlDrenajes
+                episodeId={episode.id}
+                drenajes={drenajesSerializados}
+                nombres={nombres}
+                roles={roles}
+                puedeRegistrar={permisos.puedeRegistrar}
+                ahoraIso={ahoraIso}
+              />
+            )}
+
             {/* Tendencia */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:hidden">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
                 {soloDiuresisInterconsulta
                   ? 'Control y Tendencia de Diuresis'
-                  : mostrarDrenaje
-                    ? 'Tendencia de Signos Vitales, Diuresis y Drenaje'
-                    : ocultarPesoSignos
-                      ? 'Tendencia de Signos Vitales y Diuresis'
-                      : 'Tendencia de Signos Vitales, Peso y Diuresis'}
+                  : ocultarPesoSignos
+                    ? 'Tendencia de Signos Vitales y Diuresis'
+                    : 'Tendencia de Signos Vitales, Peso y Diuresis'}
               </h2>
               <GraficasSignos
                 registros={registrosGrafica}
                 hideWeight={ocultarPesoSignos}
-                showDrainage={mostrarDrenaje}
+                showDrainage={false}
               />
             </div>
 
@@ -1207,17 +1252,12 @@ export default async function ExpedientePage({
                     {!soloDiuresisInterconsulta && <th className="px-3 py-2">SpO2</th>}
                     {!ocultarPesoSignos && <th className="px-3 py-2">Peso</th>}
                     <th className="px-3 py-2 font-bold text-sky-800">Diuresis</th>
-                    {mostrarDrenaje && <th className="px-3 py-2 font-bold text-orange-800">Drenaje</th>}
                     <th className="px-3 py-2">Registró</th>
                     {permisos.puedeRegistrar && <th className="px-3 py-2 text-right print:hidden">Editar</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {episode.vitals.map((v) => {
-                    const listaDrenajes = mostrarDrenaje
-                      ? normalizarDrenajes(v.drainages, v.drainage, v.drainageNotes)
-                      : []
-
                     return (
                     <tr key={v.id} className="border-b hover:bg-slate-50">
                       <td className="px-3 py-2 text-slate-500 whitespace-nowrap">{fechaCorta(v.createdAt)}</td>
@@ -1237,33 +1277,6 @@ export default async function ExpedientePage({
                       <td className="px-3 py-2 font-bold text-sky-800">
                         {v.diuresis !== null && v.diuresis !== undefined ? `${v.diuresis} mL` : '—'}
                       </td>
-                      {mostrarDrenaje && (
-                        <td className="px-3 py-2 font-bold text-orange-800 min-w-36">
-                          {listaDrenajes.length > 0 ? (
-                            <div className="space-y-0.5">
-                              {listaDrenajes.map((d, dIdx) => (
-                                <div key={dIdx} className="text-[11px] leading-snug">
-                                  <span className="font-bold text-orange-900">{d.name}:</span>{' '}
-                                  <span>{d.volumeMl !== null ? `${d.volumeMl} mL` : '—'}</span>
-                                  {d.notes && (
-                                    <span className="text-[10px] font-normal text-slate-500">
-                                      {' '}
-                                      ({d.notes})
-                                    </span>
-                                  )}
-                                </div>
-                              ))}
-                              {listaDrenajes.length > 1 && v.drainage !== null && v.drainage !== undefined && (
-                                <span className="inline-block text-[10px] bg-orange-100 text-orange-900 px-1.5 py-0.2 rounded font-extrabold mt-0.5">
-                                  Total: {v.drainage} mL
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            '—'
-                          )}
-                        </td>
-                      )}
                       <td className="px-3 py-2 text-slate-500 whitespace-nowrap">
                         <span>{nombres[v.recordedBy] ?? v.recordedBy}</span>
                         {v.updatedBy && (
@@ -1280,7 +1293,7 @@ export default async function ExpedientePage({
                             <summary className="list-none cursor-pointer text-blue-600 hover:text-blue-800 font-semibold">
                               ✏️
                             </summary>
-                            <div className={`absolute right-0 mt-1 ${mostrarDrenaje ? 'w-80' : 'w-64'} bg-white p-3 rounded-xl border border-slate-300 shadow-xl z-30`}>
+                            <div className="absolute right-0 mt-1 w-64 bg-white p-3 rounded-xl border border-slate-300 shadow-xl z-30">
                               <p className="text-xs font-bold text-slate-800 mb-2 border-b pb-1">
                                 Corregir toma de signos:
                               </p>
@@ -1323,9 +1336,6 @@ export default async function ExpedientePage({
                                     <label className="block text-[10px] text-slate-500">Diuresis (mL):</label>
                                     <input name="diuresis" defaultValue={v.diuresis ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
                                   </div>
-                                  {mostrarDrenaje && (
-                                    <DrenajesMultiplesInput compact initialDrainages={listaDrenajes} />
-                                  )}
                                 </div>
                                 <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1 rounded font-bold hover:bg-slate-900 mt-1 cursor-pointer">
                                   Guardar Corrección
@@ -1344,7 +1354,7 @@ export default async function ExpedientePage({
                         colSpan={
                           soloDiuresisInterconsulta
                             ? 5
-                            : 9 - (ocultarPesoSignos ? 1 : 0) + (mostrarDrenaje ? 1 : 0)
+                            : 9 - (ocultarPesoSignos ? 1 : 0)
                         }
                         className="text-center py-4 text-slate-400"
                       >

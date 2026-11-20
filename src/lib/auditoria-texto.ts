@@ -29,6 +29,9 @@ const ENTIDADES: Record<string, string> = {
   task: 'una tarea',
   user: 'un usuario',
   base_department_plan: 'un plan del departamento base',
+  episode_drain: 'un drenaje',
+  episode_drain_entry: 'un registro de débito de drenaje',
+  wound_care: 'una cura quirúrgica',
 }
 
 export function describirRegistro(log: {
@@ -156,6 +159,49 @@ export function describirRegistro(log: {
           : lleno(n.contenido)
             ? cortar(String(n.contenido))
             : '',
+      }
+
+    case 'episode_drain:create':
+      return {
+        que: 'Agregó un drenaje quirúrgico al control independiente',
+        detalle: unir(
+          lleno(n.name) && String(n.name),
+          lleno(n.location) && `Ubicación: ${String(n.location)}`,
+          typeof n.initialVolumeMl === 'number' && `Inicial: ${n.initialVolumeMl} mL`
+        ),
+      }
+
+    case 'episode_drain:update':
+      return {
+        que: 'Retiró un drenaje quirúrgico',
+        detalle: log.reason ? log.reason : lleno(n.name) ? String(n.name) : '',
+      }
+
+    case 'episode_drain_entry:create':
+      return {
+        que: 'Registró débito de drenaje',
+        detalle: unir(
+          lleno(n.drainName) && String(n.drainName),
+          typeof n.volumeMl === 'number' && `${n.volumeMl} mL`,
+          lleno(n.characteristic) && String(n.characteristic)
+        ),
+      }
+
+    case 'episode_drain_entry:update':
+      return {
+        que: 'Corrigió un registro de débito de drenaje',
+        detalle: unir(
+          lleno(n.drainName) && String(n.drainName),
+          typeof o.volumeMl === 'number' && typeof n.volumeMl === 'number'
+            ? `${o.volumeMl} mL → ${n.volumeMl} mL`
+            : typeof n.volumeMl === 'number' && `${n.volumeMl} mL`
+        ),
+      }
+
+    case 'subscription_payment_reset:update':
+      return {
+        que: 'Reinició los pagos recibidos de prueba en SuperAdmin',
+        detalle: log.reason ?? '',
       }
 
     default: {

@@ -402,6 +402,7 @@ export async function archivarCuraPaciente(formData: FormData): Promise<{
   const residency = ctx.residency!
 
   const woundCareId = String(formData.get('woundCareId') ?? '').trim()
+  const reason = String(formData.get('reason') ?? '').trim() || null
   const cura = await prisma.woundCare.findFirst({
     where: { id: woundCareId, residencyId: residency.id },
   })
@@ -409,7 +410,12 @@ export async function archivarCuraPaciente(formData: FormData): Promise<{
 
   await prisma.woundCare.update({
     where: { id: cura.id },
-    data: { isActive: false },
+    data: {
+      isActive: false,
+      dischargeReason: reason,
+      dischargedBy: ctx.user.email,
+      dischargedAt: new Date(),
+    },
   })
 
   await logAudit({
@@ -418,8 +424,10 @@ export async function archivarCuraPaciente(formData: FormData): Promise<{
     action: 'update',
     entity: 'wound_care',
     entityId: cura.id,
-    newValue: { isActive: false },
-    reason: `Alta de seguimiento de curas (${cura.patientName})`,
+    newValue: { isActive: false, dischargeReason: reason, dischargedBy: ctx.user.email },
+    reason: reason
+      ? `Alta de seguimiento de curas (${cura.patientName}): ${reason}`
+      : `Alta de seguimiento de curas (${cura.patientName})`,
   })
 
   revalidatePath('/dashboard')

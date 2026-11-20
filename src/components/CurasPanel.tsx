@@ -56,6 +56,8 @@ export function CurasPanel({
   const [notasPorCura, setNotasPorCura] = useState<Record<string, string>>({})
   const [historialAbierto, setHistorialAbierto] = useState<Record<string, boolean>>({})
   const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [altaConfirmId, setAltaConfirmId] = useState<string | null>(null)
+  const [altaMotivo, setAltaMotivo] = useState('')
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
 
   const filtradas = useMemo(() => {
@@ -102,7 +104,7 @@ export function CurasPanel({
       setNotasPorCura((prev) => ({ ...prev, [woundCareId]: '' }))
       setMensaje({
         tipo: 'ok',
-        texto: `Evidencia de cura registrada para ${patientName}.`,
+        texto: `Cura registrada para ${patientName}.`,
       })
       router.refresh()
     })
@@ -126,13 +128,16 @@ export function CurasPanel({
     setMensaje(null)
     const fd = new FormData()
     fd.set('woundCareId', woundCareId)
+    fd.set('reason', altaMotivo.trim())
     startTransition(async () => {
       const res = await archivarCuraPaciente(fd)
       if (!res.ok) {
-        setMensaje({ tipo: 'error', texto: res.error ?? 'No se pudo retirar.' })
+        setMensaje({ tipo: 'error', texto: res.error ?? 'No se pudo dar de alta.' })
         return
       }
-      setMensaje({ tipo: 'ok', texto: `${patientName} retirado del listado activo de Curas.` })
+      setAltaConfirmId(null)
+      setAltaMotivo('')
+      setMensaje({ tipo: 'ok', texto: `${patientName} dado de alta del listado de Curas.` })
       router.refresh()
     })
   }
@@ -142,10 +147,10 @@ export function CurasPanel({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-            Curas Quirúrgicas y Evidencia ({curas.length})
+            Curas Quirúrgicas ({curas.length})
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Listado de pacientes en seguimiento de curas con checklist de evidencia (fecha, hora y responsable).
+            Listado de pacientes en seguimiento de curas con checklist de curas realizadas (fecha, hora y responsable).
           </p>
         </div>
 
@@ -242,9 +247,8 @@ export function CurasPanel({
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
             >
               <option value="Estable">Estable</option>
-              <option value="Delicado">Delicado</option>
-              <option value="Cuidado Intermedio">Cuidado Intermedio</option>
-              <option value="Crítico">Crítico</option>
+              <option value="Inestable">Inestable</option>
+              <option value="De cuidado">De cuidado</option>
             </select>
           </div>
 
@@ -360,13 +364,16 @@ export function CurasPanel({
                   />
                   <select
                     name="patientStatus"
-                    defaultValue={cura.patientStatus}
+                    defaultValue={
+                      ['Estable', 'Inestable', 'De cuidado'].includes(cura.patientStatus)
+                        ? cura.patientStatus
+                        : 'De cuidado'
+                    }
                     className="px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                   >
                     <option value="Estable">Estable</option>
-                    <option value="Delicado">Delicado</option>
-                    <option value="Cuidado Intermedio">Cuidado Intermedio</option>
-                    <option value="Crítico">Crítico</option>
+                    <option value="Inestable">Inestable</option>
+                    <option value="De cuidado">De cuidado</option>
                   </select>
                   <input
                     name="careFrequency"
@@ -434,7 +441,7 @@ export function CurasPanel({
                         }
                         className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                       >
-                        {expandido ? 'Ocultar evidencia ▲' : `Ver evidencia (${cura.logs.length}) ▼`}
+                        {expandido ? 'Ocultar historial ▲' : `Ver historial (${cura.logs.length}) ▼`}
                       </button>
                     )}
 
@@ -450,7 +457,15 @@ export function CurasPanel({
                         <button
                           type="button"
                           disabled={isPending}
-                          onClick={() => handleArchivar(cura.id, cura.patientName)}
+                          onClick={() => {
+                            if (altaConfirmId === cura.id) {
+                              setAltaConfirmId(null)
+                              setAltaMotivo('')
+                            } else {
+                              setAltaConfirmId(cura.id)
+                              setAltaMotivo('')
+                            }
+                          }}
                           title="Finalizar seguimiento de curas"
                           className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-800 cursor-pointer"
                         >
@@ -461,6 +476,40 @@ export function CurasPanel({
                     )}
                   </div>
                 </div>
+
+                {altaConfirmId === cura.id && puedeRegistrar && (
+                  <div className="bg-red-50/80 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-3 space-y-2">
+                    <p className="text-xs font-bold text-red-900 dark:text-red-200">
+                      ¿Confirmar alta de seguimiento de curas para {cura.patientName}?
+                    </p>
+                    <input
+                      value={altaMotivo}
+                      onChange={(e) => setAltaMotivo(e.target.value)}
+                      placeholder="Motivo del alta (opcional, ej. herida cicatrizada, egreso hospitalario)"
+                      className="w-full px-2.5 py-1.5 border border-red-200 dark:border-red-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAltaConfirmId(null)
+                          setAltaMotivo('')
+                        }}
+                        className="px-2.5 py-1 rounded border border-slate-300 dark:border-slate-600 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleArchivar(cura.id, cura.patientName)}
+                        className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-bold cursor-pointer"
+                      >
+                        {isPending ? 'Procesando...' : 'Confirmar Alta'}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {ultimaCura ? (
                   <div className="text-[11px] text-emerald-800 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg px-2.5 py-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
@@ -483,7 +532,7 @@ export function CurasPanel({
                 {expandido && cura.logs.length > 0 && (
                   <div className="space-y-1.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 max-h-56 overflow-y-auto">
                     <p className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                      Checklist de Evidencia de Curas Realizadas:
+                      Historial de Curas Realizadas:
                     </p>
                     {cura.logs.map((log) => (
                       <div

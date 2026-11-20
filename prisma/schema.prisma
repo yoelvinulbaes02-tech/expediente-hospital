@@ -88,6 +88,9 @@ model SubscriptionPayment {
   requestedBy  String
   reviewedBy   String?
   reviewedAt   DateTime?   @db.Timestamptz
+  isTestReset  Boolean     @default(false)
+  resetAt      DateTime?   @db.Timestamptz
+  resetBy      String?
   createdAt    DateTime    @default(now()) @db.Timestamptz
 
   residency Residency @relation(fields: [residencyId], references: [id])
@@ -95,6 +98,7 @@ model SubscriptionPayment {
 
   @@index([residencyId, status])
   @@index([residencyId, userId])
+  @@index([isTestReset, status, createdAt])
 }
 
 model User {
@@ -236,6 +240,7 @@ model Episode {
   antibiotics               EpisodeAntibiotic[]
   surgicalDevices           SurgicalDevice[]
   baseDepartmentPlanEntries BaseDepartmentPlanEntry[]
+  drains                    EpisodeDrain[]
 
   @@index([residencyId, status])
   @@index([responsibleId])
@@ -357,21 +362,24 @@ model SurgicalDevice {
   @@index([episodeId, isActive])
 }
 
-// ─── CURAS QUIRÚRGICAS Y CHECKLIST DE EVIDENCIA ───
+// ─── CURAS QUIRÚRGICAS Y CHECKLIST DE SEGUIMIENTO ───
 model WoundCare {
-  id             String   @id @default(cuid())
-  residencyId    String
-  roomBed        String
-  patientName    String
-  age            Int?
-  diagnosis      String
-  patientStatus  String   @default("Estable")
-  careFrequency  String   @default("c/24h")
-  baseDepartment String
-  isActive       Boolean  @default(true)
-  createdBy      String
-  createdAt      DateTime @default(now()) @db.Timestamptz
-  updatedAt      DateTime @updatedAt
+  id              String    @id @default(cuid())
+  residencyId     String
+  roomBed         String
+  patientName     String
+  age             Int?
+  diagnosis       String
+  patientStatus   String    @default("Estable")
+  careFrequency   String    @default("c/24h")
+  baseDepartment  String
+  isActive        Boolean   @default(true)
+  createdBy       String
+  dischargeReason String?
+  dischargedBy    String?
+  dischargedAt    DateTime? @db.Timestamptz
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+  updatedAt       DateTime  @updatedAt
 
   residency Residency      @relation(fields: [residencyId], references: [id])
   logs      WoundCareLog[]
@@ -406,6 +414,39 @@ model BaseDepartmentPlanEntry {
 
   @@index([episodeId, isActive])
   @@index([episodeId, createdAt])
+}
+
+// ─── CONTROL INDEPENDIENTE DE DRENAJES (CIRUGÍA) ───
+model EpisodeDrain {
+  id        String    @id @default(cuid())
+  episodeId String
+  name      String
+  location  String?
+  isActive  Boolean   @default(true)
+  createdBy String
+  createdAt DateTime  @default(now()) @db.Timestamptz
+  removedBy String?
+  removedAt DateTime? @db.Timestamptz
+
+  episode Episode             @relation(fields: [episodeId], references: [id])
+  entries EpisodeDrainEntry[]
+
+  @@index([episodeId, isActive])
+}
+
+model EpisodeDrainEntry {
+  id             String    @id @default(cuid())
+  drainId        String
+  volumeMl       Int
+  characteristic String?
+  recordedBy     String
+  recordedAt     DateTime  @default(now()) @db.Timestamptz
+  updatedBy      String?
+  updatedAt      DateTime? @db.Timestamptz
+
+  drain EpisodeDrain @relation(fields: [drainId], references: [id], onDelete: Cascade)
+
+  @@index([drainId, recordedAt])
 }
 
 // ─── ANTECEDENTES DEL PACIENTE ───

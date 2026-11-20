@@ -1540,3 +1540,239 @@ export async function retirarDispositivoQuirurgico(formData: FormData): Promise<
   revalidatePath(`/dashboard/paciente/${episodeId}`)
   revalidatePath('/dashboard')
 }
+
+// ─── 21. CONTROL INDEPENDIENTE DE DRENAJES (SEPARADO DE SIGNOS VITALES) ───
+export async function agregarDrenaje(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const episodeId = String(formData.get('episodeId') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const name = String(formData.get('name') ?? '').trim()
+  const location = String(formData.get('location') ?? '').trim() || null
+  const initialVolStr = String(formData.get('initialVolumeMl') ?? '').trim()
+  const characteristic = String(formData.get('characteristic') ?? '').trim() || null
+
+  if (!name) {
+    return { ok: false, error: 'Escribe el nombre o tipo de drenaje (ej. Sonda pleural).' }
+  }
+
+  let initialVolumeMl: number | null = null
+  if (initialVolStr !== '') {
+    const parsed = Number(initialVolStr)
+    if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0 || parsed > 20000) {
+      return { ok: false, error: 'El débito inicial debe ser un entero entre 0 y 20,000 mL.' }
+    }
+    initialVolumeMl = parsed
+  }
+
+  const creado = await prisma.episodeDrain.create({
+    data: {
+      episodeId,
+      name,
+      location,
+      isActive: true,
+      createdBy: email,
+    },
+  })
+
+  if (initialVolumeMl !== null) {
+    await prisma.episodeDrainEntry.create({
+      data: {
+        drainId: creado.id,
+        volumeMl: initialVolumeMl,
+        characteristic,
+        recordedBy: email,
+      },
+    })
+  }
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'create',
+    entity: 'episode_drain',
+    entityId: creado.id,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: {
+      name,
+      location,
+      initialVolumeMl,
+      characteristic,
+      createdBy: email,
+    },
+    reason: `Drenaje agregado: ${name}${location ? ` (${location})` : ''}`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  return { ok: true }
+}
+
+export async function registrarDebitoDrenaje(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const episodeId = String(formData.get('episodeId') ?? '').trim()
+  const drainId = String(formData.get('drainId') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const volStr = String(formData.get('volumeMl') ?? '').trim()
+  const characteristic = String(formData.get('characteristic') ?? '').trim() || null
+
+  const volumeMl = Number(volStr)
+  if (
+    volStr === '' ||
+    !Number.isFinite(volumeMl) ||
+    !Number.isInteger(volumeMl) ||
+    volumeMl < 0 ||
+    volumeMl > 20000
+  ) {
+    return { ok: false, error: 'El volumen en mL debe ser un número entero entre 0 y 20,000.' }
+  }
+
+  const drain = await prisma.episodeDrain.findFirst({
+    where: { id: drainId, episodeId, isActive: true },
+  })
+  if (!drain) {
+    return { ok: false, error: 'Drenaje no encontrado o ya fue retirado.' }
+  }
+
+  const entry = await prisma.episodeDrainEntry.create({
+    data: {
+      drainId: drain.id,
+      volumeMl,
+      characteristic,
+      recordedBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'create',
+    entity: 'episode_drain_entry',
+    entityId: entry.id,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: {
+      drainId: drain.id,
+      drainName: drain.name,
+      volumeMl,
+      characteristic,
+      recordedBy: email,
+    },
+    reason: `Débito registrado en ${drain.name}: ${volumeMl} mL`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  return { ok: true }
+}
+
+export async function editarDebitoDrenaje(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const episodeId = String(formData.get('episodeId') ?? '').trim()
+  const entryId = String(formData.get('entryId') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const volStr = String(formData.get('volumeMl') ?? '').trim()
+  const characteristic = String(formData.get('characteristic') ?? '').trim() || null
+
+  const volumeMl = Number(volStr)
+  if (
+    volStr === '' ||
+    !Number.isFinite(volumeMl) ||
+    !Number.isInteger(volumeMl) ||
+    volumeMl < 0 ||
+    volumeMl > 20000
+  ) {
+    return { ok: false, error: 'El volumen en mL debe ser un número entero entre 0 y 20,000.' }
+  }
+
+  const previo = await prisma.episodeDrainEntry.findFirst({
+    where: { id: entryId, drain: { episodeId } },
+    include: { drain: { select: { name: true } } },
+  })
+  if (!previo) {
+    return { ok: false, error: 'Registro de débito no encontrado.' }
+  }
+
+  await prisma.episodeDrainEntry.update({
+    where: { id: previo.id },
+    data: {
+      volumeMl,
+      characteristic,
+      updatedBy: email,
+      updatedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode_drain_entry',
+    entityId: previo.id,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: {
+      drainName: previo.drain.name,
+      volumeMl: previo.volumeMl,
+      characteristic: previo.characteristic,
+    },
+    newValue: {
+      drainName: previo.drain.name,
+      volumeMl,
+      characteristic,
+      updatedBy: email,
+    },
+    reason: `Corrección de débito en ${previo.drain.name}: ${volumeMl} mL`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  return { ok: true }
+}
+
+export async function retirarDrenaje(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const episodeId = String(formData.get('episodeId') ?? '').trim()
+  const drainId = String(formData.get('drainId') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const previo = await prisma.episodeDrain.findFirst({
+    where: { id: drainId, episodeId, isActive: true },
+  })
+  if (!previo) {
+    return { ok: false, error: 'Drenaje no encontrado.' }
+  }
+
+  await prisma.episodeDrain.update({
+    where: { id: previo.id },
+    data: {
+      isActive: false,
+      removedBy: email,
+      removedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode_drain',
+    entityId: previo.id,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: { name: previo.name, isActive: true },
+    newValue: { name: previo.name, isActive: false, removedBy: email },
+    reason: `Drenaje retirado: ${previo.name}`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  return { ok: true }
+}

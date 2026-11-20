@@ -10,7 +10,56 @@ import {
   crearResidenciaConAdmin,
   extenderSuscripcion,
   procesarPagoSuscripcion,
+  reiniciarPagosPrueba,
 } from './actions'
+
+const NOMBRES_MESES = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+]
+
+function obtenerMesClaveDo(d: Date): string {
+  const partes = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Santo_Domingo',
+    year: 'numeric',
+    month: '2-digit',
+  }).formatToParts(d)
+  const y = partes.find((p) => p.type === 'year')?.value ?? String(d.getFullYear())
+  const m = partes.find((p) => p.type === 'month')?.value ?? String(d.getMonth() + 1).padStart(2, '0')
+  return `${y}-${m}`
+}
+
+function formatearMesLabel(ym: string): string {
+  const match = /^(\d{4})-(\d{2})$/.exec(ym)
+  if (!match) return ym
+  const year = match[1]
+  const monthIdx = parseInt(match[2], 10) - 1
+  const nombre = NOMBRES_MESES[monthIdx] ?? match[2]
+  return `${nombre} ${year}`
+}
+
+function rangoMesDo(ym: string): { start: Date; end: Date } | null {
+  const match = /^(\d{4})-(\d{2})$/.exec(ym)
+  if (!match) return null
+  const y = parseInt(match[1], 10)
+  const m = parseInt(match[2], 10)
+  if (m < 1 || m > 12) return null
+  const start = new Date(`${y}-${String(m).padStart(2, '0')}-01T00:00:00-04:00`)
+  const ny = m === 12 ? y + 1 : y
+  const nm = m === 12 ? 1 : m + 1
+  const end = new Date(`${ny}-${String(nm).padStart(2, '0')}-01T00:00:00-04:00`)
+  return { start, end }
+}
 
 const fmtFecha = (d: Date) =>
   d.toLocaleDateString('es-DO', {
@@ -39,6 +88,8 @@ export default async function PlataformaPage({
     resId?: string
     alcance?: string
     pq?: string
+    mes?: string
+    verPruebas?: string
   }>
 }) {
   const ctx = await obtenerContextoResidencia()
@@ -46,96 +97,155 @@ export default async function PlataformaPage({
   if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
   if (ctx.user.role !== 'SUPERADMIN') redirect('/dashboard')
 
-  const { ok, error, resId, alcance, pq } = await searchParams
+  const { ok, error, resId, alcance, pq, mes, verPruebas } = await searchParams
+  const mesActual = obtenerMesClaveDo(new Date())
+  const filtroMes =
+    mes === 'todos' ? 'todos' : mes && /^\d{4}-\d{2}$/.test(mes) ? mes : mesActual
+  const rangoMesSeleccionado = filtroMes === 'todos' ? null : rangoMesDo(filtroMes)
+  const rangoMesActual = rangoMesDo(mesActual)!
+  const viendoPruebas = verPruebas === '1'
+
   const filtroResidencia = (resId ?? '').trim()
   const filtroAlcance = alcance === 'INDIVIDUAL' || alcance === 'RESIDENCY' ? alcance : ''
   const filtroTextoPago = (pq ?? '').trim()
 
-  const inicioMes = new Date()
-  inicioMes.setDate(1)
-  inicioMes.setHours(0, 0, 0, 0)
+  const [
+    residencias,
+    pagosPendientes,
+    historialPagos,
+    resumenIngresos,
+    ingresosMesActual,
+    ingresosMesFiltro,
+    pagosAprobadosFechas,
+    archivadosPruebaCount,
+    todosUsuariosEmail,
+  ] = await Promise.all([
+    prisma.residency.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        users: {
+          where: { isActive: true, role: { not: 'SUPERADMIN' } },
+          select: { id: true, planStatus: true, individualPriceUsd: true },
+        },
+        payments: {
+          where: { status: 'APROBADO', isTestReset: false },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: {
+            user: { select: { fullName: true } },
+          },
+        },
+        _count: {
+          select: {
+            users: { where: { isActive: true, role: { not: 'SUPERADMIN' } } },
+            patients: true,
+            episodes: true,
+            consultations: true,
+            payments: { where: { status: 'APROBADO', isTestReset: false } },
+          },
+        },
+      },
+    }),
+    prisma.subscriptionPayment.findMany({
+      where: { status: 'PENDIENTE', isTestReset: false },
+      include: {
+        residency: { select: { name: true, slug: true } },
+        user: { select: { fullName: true, email: true } },
+      },
+      orderBy: { createdAt: 'asc' },
+    }),
+    prisma.subscriptionPayment.findMany({
+      where: {
+        isTestReset: viendoPruebas,
+        ...(rangoMesSeleccionado
+          ? { createdAt: { gte: rangoMesSeleccionado.start, lt: rangoMesSeleccionado.end } }
+          : {}),
+        ...(filtroResidencia ? { residencyId: filtroResidencia } : {}),
+        ...(filtroAlcance ? { billingScope: filtroAlcance } : {}),
+        ...(filtroTextoPago
+          ? {
+              OR: [
+                { requestedBy: { contains: filtroTextoPago, mode: 'insensitive' } },
+                { reference: { contains: filtroTextoPago, mode: 'insensitive' } },
+                { notes: { contains: filtroTextoPago, mode: 'insensitive' } },
+                { user: { fullName: { contains: filtroTextoPago, mode: 'insensitive' } } },
+                { residency: { name: { contains: filtroTextoPago, mode: 'insensitive' } } },
+              ],
+            }
+          : {}),
+      },
+      include: {
+        residency: { select: { id: true, name: true, slug: true } },
+        user: { select: { id: true, fullName: true, email: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    }),
+    prisma.subscriptionPayment.aggregate({
+      where: { status: 'APROBADO', isTestReset: false },
+      _sum: { amountUsd: true },
+      _count: { _all: true },
+    }),
+    prisma.subscriptionPayment.aggregate({
+      where: {
+        status: 'APROBADO',
+        isTestReset: false,
+        createdAt: { gte: rangoMesActual.start, lt: rangoMesActual.end },
+      },
+      _sum: { amountUsd: true },
+      _count: { _all: true },
+    }),
+    rangoMesSeleccionado
+      ? prisma.subscriptionPayment.aggregate({
+          where: {
+            status: 'APROBADO',
+            isTestReset: false,
+            createdAt: { gte: rangoMesSeleccionado.start, lt: rangoMesSeleccionado.end },
+          },
+          _sum: { amountUsd: true },
+          _count: { _all: true },
+        })
+      : prisma.subscriptionPayment.aggregate({
+          where: { status: 'APROBADO', isTestReset: false },
+          _sum: { amountUsd: true },
+          _count: { _all: true },
+        }),
+    prisma.subscriptionPayment.findMany({
+      where: { status: 'APROBADO', isTestReset: false },
+      select: { createdAt: true, amountUsd: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.subscriptionPayment.count({
+      where: { isTestReset: true },
+    }),
+    prisma.user.findMany({
+      select: { email: true, fullName: true },
+    }),
+  ])
 
-  const [residencias, pagosPendientes, historialPagos, resumenIngresos, ingresosMes, todosUsuariosEmail] =
-    await Promise.all([
-      prisma.residency.findMany({
-        orderBy: { createdAt: 'desc' },
-        include: {
-          users: {
-            where: { isActive: true, role: { not: 'SUPERADMIN' } },
-            select: { id: true, planStatus: true, individualPriceUsd: true },
-          },
-          payments: {
-            where: { status: 'APROBADO' },
-            orderBy: { createdAt: 'desc' },
-            take: 1,
-            include: {
-              user: { select: { fullName: true } },
-            },
-          },
-          _count: {
-            select: {
-              users: { where: { isActive: true, role: { not: 'SUPERADMIN' } } },
-              patients: true,
-              episodes: true,
-              consultations: true,
-              payments: { where: { status: 'APROBADO' } },
-            },
-          },
-        },
-      }),
-      prisma.subscriptionPayment.findMany({
-        where: { status: 'PENDIENTE' },
-        include: {
-          residency: { select: { name: true, slug: true } },
-          user: { select: { fullName: true, email: true } },
-        },
-        orderBy: { createdAt: 'asc' },
-      }),
-      prisma.subscriptionPayment.findMany({
-        where: {
-          ...(filtroResidencia ? { residencyId: filtroResidencia } : {}),
-          ...(filtroAlcance ? { billingScope: filtroAlcance } : {}),
-          ...(filtroTextoPago
-            ? {
-                OR: [
-                  { requestedBy: { contains: filtroTextoPago, mode: 'insensitive' } },
-                  { reference: { contains: filtroTextoPago, mode: 'insensitive' } },
-                  { notes: { contains: filtroTextoPago, mode: 'insensitive' } },
-                  { user: { fullName: { contains: filtroTextoPago, mode: 'insensitive' } } },
-                  { residency: { name: { contains: filtroTextoPago, mode: 'insensitive' } } },
-                ],
-              }
-            : {}),
-        },
-        include: {
-          residency: { select: { id: true, name: true, slug: true } },
-          user: { select: { id: true, fullName: true, email: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 60,
-      }),
-      prisma.subscriptionPayment.aggregate({
-        where: { status: 'APROBADO' },
-        _sum: { amountUsd: true },
-        _count: { _all: true },
-      }),
-      prisma.subscriptionPayment.aggregate({
-        where: { status: 'APROBADO', createdAt: { gte: inicioMes } },
-        _sum: { amountUsd: true },
-        _count: { _all: true },
-      }),
-      prisma.user.findMany({
-        select: { email: true, fullName: true },
-      }),
-    ])
+  const mapaMeses = new Map<string, { total: number; count: number }>()
+  mapaMeses.set(mesActual, { total: 0, count: 0 })
+  for (const p of pagosAprobadosFechas) {
+    const clave = obtenerMesClaveDo(p.createdAt)
+    const prev = mapaMeses.get(clave) ?? { total: 0, count: 0 }
+    mapaMeses.set(clave, { total: prev.total + p.amountUsd, count: prev.count + 1 })
+  }
+  if (filtroMes !== 'todos' && !mapaMeses.has(filtroMes)) {
+    mapaMeses.set(filtroMes, { total: 0, count: 0 })
+  }
+  const mesesDisponibles = Array.from(mapaMeses.entries())
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([key, val]) => ({ key, label: formatearMesLabel(key), ...val }))
 
   const mapaNombrePorEmail = new Map(
     todosUsuariosEmail.map((u) => [u.email.toLowerCase(), u.fullName])
   )
   const totalIngresosUsd = resumenIngresos._sum.amountUsd ?? 0
   const totalPagosAprobados = resumenIngresos._count._all ?? 0
-  const ingresosMesUsd = ingresosMes._sum.amountUsd ?? 0
-  const pagosMesCount = ingresosMes._count._all ?? 0
+  const ingresosMesActualUsd = ingresosMesActual._sum.amountUsd ?? 0
+  const pagosMesActualCount = ingresosMesActual._count._all ?? 0
+  const ingresosFiltroUsd = ingresosMesFiltro._sum.amountUsd ?? 0
+  const pagosFiltroCount = ingresosMesFiltro._count._all ?? 0
 
   const residenciasActivas = residencias.filter(
     (r) => r.isActive && r.planStatus !== 'SUSPENDED'
@@ -219,12 +329,18 @@ export default async function PlataformaPage({
             </p>
           </div>
           <div className="bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Pagos recibidos (este mes)</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {filtroMes === 'todos'
+                ? 'Pagos recibidos (histórico)'
+                : `Pagos recibidos (${formatearMesLabel(filtroMes)})`}
+            </p>
             <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1 tabular-nums">
-              ${ingresosMesUsd.toFixed(2)} USD
+              ${ingresosFiltroUsd.toFixed(2)} USD
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
-              {pagosMesCount} pago(s) · Histórico: ${totalIngresosUsd.toFixed(2)} ({totalPagosAprobados})
+              {pagosFiltroCount} pago(s) · Mes actual ({formatearMesLabel(mesActual)}): $
+              {ingresosMesActualUsd.toFixed(2)} ({pagosMesActualCount}) · Total acumulado: $
+              {totalIngresosUsd.toFixed(2)} ({totalPagosAprobados})
             </p>
           </div>
           <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
@@ -297,19 +413,123 @@ export default async function PlataformaPage({
           </div>
         )}
 
-        {/* HISTORIAL GLOBAL DE PAGOS RECIBIDOS (VISIBLE SIEMPRE EN SUPERADMIN) */}
+        {/* HISTORIAL GLOBAL DE PAGOS RECIBIDOS (MENSUAL AUTOMÁTICO + FILTRO POR MES + REINICIO DE PRUEBAS) */}
         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            <div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                💳 Pagos Recibidos en la Plataforma ({historialPagos.length})
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Registro automático en tiempo real de quién pagó, en qué residencia, cuánto, método (PayPal/Tarjeta) y fecha exacta.
-              </p>
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 space-y-3">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                  💳 Pagos Recibidos en la Plataforma ({historialPagos.length})
+                  {viendoPruebas && (
+                    <span className="ml-2 text-[11px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
+                      Viendo pruebas archivadas
+                    </span>
+                  )}
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Se reinicia automáticamente en $0.00 cada 1ro de mes conservando el historial de todos los meses anteriores para consulta por mes.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {archivadosPruebaCount > 0 && (
+                  <Link
+                    href={
+                      viendoPruebas
+                        ? `/dashboard/plataforma?mes=${filtroMes}`
+                        : `/dashboard/plataforma?mes=todos&verPruebas=1`
+                    }
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  >
+                    {viendoPruebas
+                      ? '← Volver a pagos reales'
+                      : `Ver pruebas archivadas (${archivadosPruebaCount})`}
+                  </Link>
+                )}
+
+                <details className="relative inline-block">
+                  <summary className="list-none cursor-pointer px-3 py-1.5 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 text-red-800 text-xs font-bold">
+                    ↺ Reiniciar pagos de prueba
+                  </summary>
+                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-red-200 dark:border-red-800 rounded-xl shadow-xl p-4 z-30 text-left space-y-2.5">
+                    <p className="text-xs font-bold text-red-900 dark:text-red-200">
+                      ¿Reiniciar Pagos Recibidos a $0.00 USD?
+                    </p>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                      Archiva los pagos de prueba actuales para que el contador mensual, el histórico real, &quot;Últ. pago&quot; y la tabla de transacciones queden limpios en <strong>$0.00</strong> antes de comenzar a cobrar en producción. La auditoría interna se conserva intacta.
+                    </p>
+                    <form action={reiniciarPagosPrueba}>
+                      <button
+                        type="submit"
+                        className="w-full py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold cursor-pointer"
+                      >
+                        Confirmar reinicio a $0.00
+                      </button>
+                    </form>
+                  </div>
+                </details>
+              </div>
             </div>
 
+            {/* BARRA DE MESES CON INGRESOS + FILTROS */}
+            {mesesDisponibles.length > 0 && !viendoPruebas && (
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1">
+                  Cierre por mes:
+                </span>
+                {mesesDisponibles.map((m) => {
+                  const activo = filtroMes === m.key
+                  return (
+                    <Link
+                      key={m.key}
+                      href={`/dashboard/plataforma?mes=${m.key}${
+                        filtroResidencia ? `&resId=${encodeURIComponent(filtroResidencia)}` : ''
+                      }${filtroAlcance ? `&alcance=${filtroAlcance}` : ''}${
+                        filtroTextoPago ? `&pq=${encodeURIComponent(filtroTextoPago)}` : ''
+                      }`}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors tabular-nums ${
+                        activo
+                          ? 'bg-emerald-600 text-white border-emerald-700'
+                          : 'bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {m.label}
+                      {m.key === mesActual ? ' (Actual)' : ''}: ${m.total.toFixed(2)} ({m.count})
+                    </Link>
+                  )
+                })}
+                <Link
+                  href={`/dashboard/plataforma?mes=todos${
+                    filtroResidencia ? `&resId=${encodeURIComponent(filtroResidencia)}` : ''
+                  }${filtroAlcance ? `&alcance=${filtroAlcance}` : ''}${
+                    filtroTextoPago ? `&pq=${encodeURIComponent(filtroTextoPago)}` : ''
+                  }`}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
+                    filtroMes === 'todos'
+                      ? 'bg-slate-800 text-white border-slate-900'
+                      : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  Todos los meses (${totalIngresosUsd.toFixed(2)})
+                </Link>
+              </div>
+            )}
+
             <form method="get" action="/dashboard/plataforma" className="flex flex-wrap items-center gap-2">
+              <select
+                name="mes"
+                defaultValue={filtroMes}
+                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
+              >
+                {mesesDisponibles.map((m) => (
+                  <option key={m.key} value={m.key}>
+                    {m.label}
+                    {m.key === mesActual ? ' (Mes actual)' : ''} · ${m.total.toFixed(2)} ({m.count})
+                  </option>
+                ))}
+                <option value="todos">Todos los meses (Histórico)</option>
+              </select>
+
               <select
                 name="resId"
                 defaultValue={filtroResidencia}
@@ -346,12 +566,12 @@ export default async function PlataformaPage({
               >
                 Filtrar
               </button>
-              {(filtroResidencia || filtroAlcance || filtroTextoPago) && (
+              {(filtroResidencia || filtroAlcance || filtroTextoPago || filtroMes !== mesActual || viendoPruebas) && (
                 <Link
                   href="/dashboard/plataforma"
                   className="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
                 >
-                  Limpiar
+                  Mes actual
                 </Link>
               )}
             </form>

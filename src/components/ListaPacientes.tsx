@@ -298,7 +298,10 @@ export function ListaPacientes({
       )}
 
       {/* SELECTOR DE GUARDIA */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+      <div
+        id="lista-pacientes"
+        className="scroll-mt-20 flex flex-wrap items-center justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
+      >
         <div className={`grid gap-2 w-full sm:w-auto ${esCirugia ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <button
             type="button"

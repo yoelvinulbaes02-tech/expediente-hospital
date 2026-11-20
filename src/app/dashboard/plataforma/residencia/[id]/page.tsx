@@ -97,7 +97,7 @@ export default async function ControlResidenciaSuperAdminPage({
       orderBy: [{ isActive: 'desc' }, { fullName: 'asc' }],
     }),
     prisma.subscriptionPayment.findMany({
-      where: { residencyId: residency.id },
+      where: { residencyId: residency.id, isTestReset: false },
       include: {
         user: { select: { fullName: true, email: true } },
       },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useSyncExternalStore, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Activity,
@@ -17,6 +17,40 @@ import {
   guardarResumenCirugiaConfig,
 } from '@/app/dashboard/actions-servicio'
 import { CATEGORIAS_DISPOSITIVOS_CIRUGIA } from '@/lib/cirugia-constants'
+
+const STORAGE_RESUMEN_KEY = 'nexo_cirugia_resumen_open'
+const STORAGE_CATETERES_KEY = 'nexo_cirugia_cateteres_open'
+const PANEL_TOGGLE_EVENT = 'nexo:cirugia-panel-toggle'
+
+function suscribirPanelStorage(callback: () => void) {
+  if (typeof window === 'undefined') return () => {}
+  const handler = () => callback()
+  window.addEventListener('storage', handler)
+  window.addEventListener(PANEL_TOGGLE_EVENT, handler)
+  return () => {
+    window.removeEventListener('storage', handler)
+    window.removeEventListener(PANEL_TOGGLE_EVENT, handler)
+  }
+}
+
+function leerEstadoPanel(key: string): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return window.localStorage.getItem(key) === 'true'
+  } catch {
+    return false
+  }
+}
+
+function escribirEstadoPanel(key: string, open: boolean) {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(key, open ? 'true' : 'false')
+    window.dispatchEvent(new Event(PANEL_TOGGLE_EVENT))
+  } catch {
+    // ignore storage quota errors
+  }
+}
 
 export type ResumenCirugiaStats = {
   mode: 'auto' | 'manual'
@@ -39,8 +73,18 @@ export function CirugiaResumenPanel({
   puedeEditar: boolean
 }) {
   const router = useRouter()
-  const [resumenAbierto, setResumenAbierto] = useState(true)
-  const [cateteresAbierto, setCateteresAbierto] = useState(true)
+  const resumenAbierto = useSyncExternalStore(
+    suscribirPanelStorage,
+    () => leerEstadoPanel(STORAGE_RESUMEN_KEY),
+    () => false
+  )
+  const cateteresAbierto = useSyncExternalStore(
+    suscribirPanelStorage,
+    () => leerEstadoPanel(STORAGE_CATETERES_KEY),
+    () => false
+  )
+  const setResumenAbierto = (next: boolean) => escribirEstadoPanel(STORAGE_RESUMEN_KEY, next)
+  const setCateteresAbierto = (next: boolean) => escribirEstadoPanel(STORAGE_CATETERES_KEY, next)
   const [editandoResumen, setEditandoResumen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -190,7 +234,7 @@ export function CirugiaResumenPanel({
 
             <button
               type="button"
-              onClick={() => setResumenAbierto((v) => !v)}
+              onClick={() => setResumenAbierto(!resumenAbierto)}
               className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 cursor-pointer"
             >
               {resumenAbierto ? (
@@ -344,7 +388,7 @@ export function CirugiaResumenPanel({
 
           <button
             type="button"
-            onClick={() => setCateteresAbierto((v) => !v)}
+            onClick={() => setCateteresAbierto(!cateteresAbierto)}
             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 cursor-pointer"
           >
             {cateteresAbierto ? (

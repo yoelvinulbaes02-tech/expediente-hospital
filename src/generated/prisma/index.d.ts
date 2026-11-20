@@ -84,6 +84,16 @@ export type WoundCareLog = $Result.DefaultSelection<Prisma.$WoundCareLogPayload>
  */
 export type BaseDepartmentPlanEntry = $Result.DefaultSelection<Prisma.$BaseDepartmentPlanEntryPayload>
 /**
+ * Model EpisodeDrain
+ * 
+ */
+export type EpisodeDrain = $Result.DefaultSelection<Prisma.$EpisodeDrainPayload>
+/**
+ * Model EpisodeDrainEntry
+ * 
+ */
+export type EpisodeDrainEntry = $Result.DefaultSelection<Prisma.$EpisodeDrainEntryPayload>
+/**
  * Model MedicalHistory
  * 
  */
@@ -478,6 +488,26 @@ export class PrismaClient<
     * ```
     */
   get baseDepartmentPlanEntry(): Prisma.BaseDepartmentPlanEntryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.episodeDrain`: Exposes CRUD operations for the **EpisodeDrain** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EpisodeDrains
+    * const episodeDrains = await prisma.episodeDrain.findMany()
+    * ```
+    */
+  get episodeDrain(): Prisma.EpisodeDrainDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.episodeDrainEntry`: Exposes CRUD operations for the **EpisodeDrainEntry** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EpisodeDrainEntries
+    * const episodeDrainEntries = await prisma.episodeDrainEntry.findMany()
+    * ```
+    */
+  get episodeDrainEntry(): Prisma.EpisodeDrainEntryDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.medicalHistory`: Exposes CRUD operations for the **MedicalHistory** model.
@@ -1059,6 +1089,8 @@ export namespace Prisma {
     WoundCare: 'WoundCare',
     WoundCareLog: 'WoundCareLog',
     BaseDepartmentPlanEntry: 'BaseDepartmentPlanEntry',
+    EpisodeDrain: 'EpisodeDrain',
+    EpisodeDrainEntry: 'EpisodeDrainEntry',
     MedicalHistory: 'MedicalHistory',
     ImportantAlert: 'ImportantAlert',
     GfrRecord: 'GfrRecord',
@@ -1086,7 +1118,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "residency" | "subscriptionPayment" | "user" | "auditLog" | "patient" | "episode" | "consultation" | "internalMedicineProfile" | "surgicalProfile" | "episodeAntibiotic" | "surgicalDevice" | "woundCare" | "woundCareLog" | "baseDepartmentPlanEntry" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
+      modelProps: "residency" | "subscriptionPayment" | "user" | "auditLog" | "patient" | "episode" | "consultation" | "internalMedicineProfile" | "surgicalProfile" | "episodeAntibiotic" | "surgicalDevice" | "woundCare" | "woundCareLog" | "baseDepartmentPlanEntry" | "episodeDrain" | "episodeDrainEntry" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2126,6 +2158,154 @@ export namespace Prisma {
           }
         }
       }
+      EpisodeDrain: {
+        payload: Prisma.$EpisodeDrainPayload<ExtArgs>
+        fields: Prisma.EpisodeDrainFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EpisodeDrainFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EpisodeDrainFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>
+          }
+          findFirst: {
+            args: Prisma.EpisodeDrainFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EpisodeDrainFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>
+          }
+          findMany: {
+            args: Prisma.EpisodeDrainFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>[]
+          }
+          create: {
+            args: Prisma.EpisodeDrainCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>
+          }
+          createMany: {
+            args: Prisma.EpisodeDrainCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EpisodeDrainCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>[]
+          }
+          delete: {
+            args: Prisma.EpisodeDrainDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>
+          }
+          update: {
+            args: Prisma.EpisodeDrainUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>
+          }
+          deleteMany: {
+            args: Prisma.EpisodeDrainDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EpisodeDrainUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EpisodeDrainUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>[]
+          }
+          upsert: {
+            args: Prisma.EpisodeDrainUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainPayload>
+          }
+          aggregate: {
+            args: Prisma.EpisodeDrainAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEpisodeDrain>
+          }
+          groupBy: {
+            args: Prisma.EpisodeDrainGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EpisodeDrainGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EpisodeDrainCountArgs<ExtArgs>
+            result: $Utils.Optional<EpisodeDrainCountAggregateOutputType> | number
+          }
+        }
+      }
+      EpisodeDrainEntry: {
+        payload: Prisma.$EpisodeDrainEntryPayload<ExtArgs>
+        fields: Prisma.EpisodeDrainEntryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EpisodeDrainEntryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EpisodeDrainEntryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>
+          }
+          findFirst: {
+            args: Prisma.EpisodeDrainEntryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EpisodeDrainEntryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>
+          }
+          findMany: {
+            args: Prisma.EpisodeDrainEntryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>[]
+          }
+          create: {
+            args: Prisma.EpisodeDrainEntryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>
+          }
+          createMany: {
+            args: Prisma.EpisodeDrainEntryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EpisodeDrainEntryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>[]
+          }
+          delete: {
+            args: Prisma.EpisodeDrainEntryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>
+          }
+          update: {
+            args: Prisma.EpisodeDrainEntryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>
+          }
+          deleteMany: {
+            args: Prisma.EpisodeDrainEntryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EpisodeDrainEntryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EpisodeDrainEntryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>[]
+          }
+          upsert: {
+            args: Prisma.EpisodeDrainEntryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EpisodeDrainEntryPayload>
+          }
+          aggregate: {
+            args: Prisma.EpisodeDrainEntryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEpisodeDrainEntry>
+          }
+          groupBy: {
+            args: Prisma.EpisodeDrainEntryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EpisodeDrainEntryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EpisodeDrainEntryCountArgs<ExtArgs>
+            result: $Utils.Optional<EpisodeDrainEntryCountAggregateOutputType> | number
+          }
+        }
+      }
       MedicalHistory: {
         payload: Prisma.$MedicalHistoryPayload<ExtArgs>
         fields: Prisma.MedicalHistoryFieldRefs
@@ -3151,6 +3331,8 @@ export namespace Prisma {
     woundCare?: WoundCareOmit
     woundCareLog?: WoundCareLogOmit
     baseDepartmentPlanEntry?: BaseDepartmentPlanEntryOmit
+    episodeDrain?: EpisodeDrainOmit
+    episodeDrainEntry?: EpisodeDrainEntryOmit
     medicalHistory?: MedicalHistoryOmit
     importantAlert?: ImportantAlertOmit
     gfrRecord?: GfrRecordOmit
@@ -3458,6 +3640,7 @@ export namespace Prisma {
     antibiotics: number
     surgicalDevices: number
     baseDepartmentPlanEntries: number
+    drains: number
   }
 
   export type EpisodeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3475,6 +3658,7 @@ export namespace Prisma {
     antibiotics?: boolean | EpisodeCountOutputTypeCountAntibioticsArgs
     surgicalDevices?: boolean | EpisodeCountOutputTypeCountSurgicalDevicesArgs
     baseDepartmentPlanEntries?: boolean | EpisodeCountOutputTypeCountBaseDepartmentPlanEntriesArgs
+    drains?: boolean | EpisodeCountOutputTypeCountDrainsArgs
   }
 
   // Custom InputTypes
@@ -3586,6 +3770,13 @@ export namespace Prisma {
     where?: BaseDepartmentPlanEntryWhereInput
   }
 
+  /**
+   * EpisodeCountOutputType without action
+   */
+  export type EpisodeCountOutputTypeCountDrainsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EpisodeDrainWhereInput
+  }
+
 
   /**
    * Count Type WoundCareCountOutputType
@@ -3615,6 +3806,37 @@ export namespace Prisma {
    */
   export type WoundCareCountOutputTypeCountLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: WoundCareLogWhereInput
+  }
+
+
+  /**
+   * Count Type EpisodeDrainCountOutputType
+   */
+
+  export type EpisodeDrainCountOutputType = {
+    entries: number
+  }
+
+  export type EpisodeDrainCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    entries?: boolean | EpisodeDrainCountOutputTypeCountEntriesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * EpisodeDrainCountOutputType without action
+   */
+  export type EpisodeDrainCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainCountOutputType
+     */
+    select?: EpisodeDrainCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * EpisodeDrainCountOutputType without action
+   */
+  export type EpisodeDrainCountOutputTypeCountEntriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EpisodeDrainEntryWhereInput
   }
 
 
@@ -5212,6 +5434,9 @@ export namespace Prisma {
     requestedBy: string | null
     reviewedBy: string | null
     reviewedAt: Date | null
+    isTestReset: boolean | null
+    resetAt: Date | null
+    resetBy: string | null
     createdAt: Date | null
   }
 
@@ -5229,6 +5454,9 @@ export namespace Prisma {
     requestedBy: string | null
     reviewedBy: string | null
     reviewedAt: Date | null
+    isTestReset: boolean | null
+    resetAt: Date | null
+    resetBy: string | null
     createdAt: Date | null
   }
 
@@ -5246,6 +5474,9 @@ export namespace Prisma {
     requestedBy: number
     reviewedBy: number
     reviewedAt: number
+    isTestReset: number
+    resetAt: number
+    resetBy: number
     createdAt: number
     _all: number
   }
@@ -5275,6 +5506,9 @@ export namespace Prisma {
     requestedBy?: true
     reviewedBy?: true
     reviewedAt?: true
+    isTestReset?: true
+    resetAt?: true
+    resetBy?: true
     createdAt?: true
   }
 
@@ -5292,6 +5526,9 @@ export namespace Prisma {
     requestedBy?: true
     reviewedBy?: true
     reviewedAt?: true
+    isTestReset?: true
+    resetAt?: true
+    resetBy?: true
     createdAt?: true
   }
 
@@ -5309,6 +5546,9 @@ export namespace Prisma {
     requestedBy?: true
     reviewedBy?: true
     reviewedAt?: true
+    isTestReset?: true
+    resetAt?: true
+    resetBy?: true
     createdAt?: true
     _all?: true
   }
@@ -5413,6 +5653,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy: string | null
     reviewedAt: Date | null
+    isTestReset: boolean
+    resetAt: Date | null
+    resetBy: string | null
     createdAt: Date
     _count: SubscriptionPaymentCountAggregateOutputType | null
     _avg: SubscriptionPaymentAvgAggregateOutputType | null
@@ -5449,6 +5692,9 @@ export namespace Prisma {
     requestedBy?: boolean
     reviewedBy?: boolean
     reviewedAt?: boolean
+    isTestReset?: boolean
+    resetAt?: boolean
+    resetBy?: boolean
     createdAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
     user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
@@ -5468,6 +5714,9 @@ export namespace Prisma {
     requestedBy?: boolean
     reviewedBy?: boolean
     reviewedAt?: boolean
+    isTestReset?: boolean
+    resetAt?: boolean
+    resetBy?: boolean
     createdAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
     user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
@@ -5487,6 +5736,9 @@ export namespace Prisma {
     requestedBy?: boolean
     reviewedBy?: boolean
     reviewedAt?: boolean
+    isTestReset?: boolean
+    resetAt?: boolean
+    resetBy?: boolean
     createdAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
     user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
@@ -5506,10 +5758,13 @@ export namespace Prisma {
     requestedBy?: boolean
     reviewedBy?: boolean
     reviewedAt?: boolean
+    isTestReset?: boolean
+    resetAt?: boolean
+    resetBy?: boolean
     createdAt?: boolean
   }
 
-  export type SubscriptionPaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "userId" | "billingScope" | "amountUsd" | "periodMonths" | "method" | "reference" | "notes" | "status" | "requestedBy" | "reviewedBy" | "reviewedAt" | "createdAt", ExtArgs["result"]["subscriptionPayment"]>
+  export type SubscriptionPaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "userId" | "billingScope" | "amountUsd" | "periodMonths" | "method" | "reference" | "notes" | "status" | "requestedBy" | "reviewedBy" | "reviewedAt" | "isTestReset" | "resetAt" | "resetBy" | "createdAt", ExtArgs["result"]["subscriptionPayment"]>
   export type SubscriptionPaymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
     user?: boolean | SubscriptionPayment$userArgs<ExtArgs>
@@ -5543,6 +5798,9 @@ export namespace Prisma {
       requestedBy: string
       reviewedBy: string | null
       reviewedAt: Date | null
+      isTestReset: boolean
+      resetAt: Date | null
+      resetBy: string | null
       createdAt: Date
     }, ExtArgs["result"]["subscriptionPayment"]>
     composites: {}
@@ -5982,6 +6240,9 @@ export namespace Prisma {
     readonly requestedBy: FieldRef<"SubscriptionPayment", 'String'>
     readonly reviewedBy: FieldRef<"SubscriptionPayment", 'String'>
     readonly reviewedAt: FieldRef<"SubscriptionPayment", 'DateTime'>
+    readonly isTestReset: FieldRef<"SubscriptionPayment", 'Boolean'>
+    readonly resetAt: FieldRef<"SubscriptionPayment", 'DateTime'>
+    readonly resetBy: FieldRef<"SubscriptionPayment", 'String'>
     readonly createdAt: FieldRef<"SubscriptionPayment", 'DateTime'>
   }
     
@@ -10849,6 +11110,7 @@ export namespace Prisma {
     antibiotics?: boolean | Episode$antibioticsArgs<ExtArgs>
     surgicalDevices?: boolean | Episode$surgicalDevicesArgs<ExtArgs>
     baseDepartmentPlanEntries?: boolean | Episode$baseDepartmentPlanEntriesArgs<ExtArgs>
+    drains?: boolean | Episode$drainsArgs<ExtArgs>
     _count?: boolean | EpisodeCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["episode"]>
 
@@ -10987,6 +11249,7 @@ export namespace Prisma {
     antibiotics?: boolean | Episode$antibioticsArgs<ExtArgs>
     surgicalDevices?: boolean | Episode$surgicalDevicesArgs<ExtArgs>
     baseDepartmentPlanEntries?: boolean | Episode$baseDepartmentPlanEntriesArgs<ExtArgs>
+    drains?: boolean | Episode$drainsArgs<ExtArgs>
     _count?: boolean | EpisodeCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type EpisodeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11022,6 +11285,7 @@ export namespace Prisma {
       antibiotics: Prisma.$EpisodeAntibioticPayload<ExtArgs>[]
       surgicalDevices: Prisma.$SurgicalDevicePayload<ExtArgs>[]
       baseDepartmentPlanEntries: Prisma.$BaseDepartmentPlanEntryPayload<ExtArgs>[]
+      drains: Prisma.$EpisodeDrainPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -11470,6 +11734,7 @@ export namespace Prisma {
     antibiotics<T extends Episode$antibioticsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$antibioticsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeAntibioticPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     surgicalDevices<T extends Episode$surgicalDevicesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$surgicalDevicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SurgicalDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     baseDepartmentPlanEntries<T extends Episode$baseDepartmentPlanEntriesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$baseDepartmentPlanEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BaseDepartmentPlanEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    drains<T extends Episode$drainsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$drainsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12342,6 +12607,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BaseDepartmentPlanEntryScalarFieldEnum | BaseDepartmentPlanEntryScalarFieldEnum[]
+  }
+
+  /**
+   * Episode.drains
+   */
+  export type Episode$drainsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    where?: EpisodeDrainWhereInput
+    orderBy?: EpisodeDrainOrderByWithRelationInput | EpisodeDrainOrderByWithRelationInput[]
+    cursor?: EpisodeDrainWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EpisodeDrainScalarFieldEnum | EpisodeDrainScalarFieldEnum[]
   }
 
   /**
@@ -18446,6 +18735,9 @@ export namespace Prisma {
     baseDepartment: string | null
     isActive: boolean | null
     createdBy: string | null
+    dischargeReason: string | null
+    dischargedBy: string | null
+    dischargedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -18462,6 +18754,9 @@ export namespace Prisma {
     baseDepartment: string | null
     isActive: boolean | null
     createdBy: string | null
+    dischargeReason: string | null
+    dischargedBy: string | null
+    dischargedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -18478,6 +18773,9 @@ export namespace Prisma {
     baseDepartment: number
     isActive: number
     createdBy: number
+    dischargeReason: number
+    dischargedBy: number
+    dischargedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -18504,6 +18802,9 @@ export namespace Prisma {
     baseDepartment?: true
     isActive?: true
     createdBy?: true
+    dischargeReason?: true
+    dischargedBy?: true
+    dischargedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -18520,6 +18821,9 @@ export namespace Prisma {
     baseDepartment?: true
     isActive?: true
     createdBy?: true
+    dischargeReason?: true
+    dischargedBy?: true
+    dischargedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -18536,6 +18840,9 @@ export namespace Prisma {
     baseDepartment?: true
     isActive?: true
     createdBy?: true
+    dischargeReason?: true
+    dischargedBy?: true
+    dischargedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -18639,6 +18946,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive: boolean
     createdBy: string
+    dischargeReason: string | null
+    dischargedBy: string | null
+    dischargedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: WoundCareCountAggregateOutputType | null
@@ -18674,6 +18984,9 @@ export namespace Prisma {
     baseDepartment?: boolean
     isActive?: boolean
     createdBy?: boolean
+    dischargeReason?: boolean
+    dischargedBy?: boolean
+    dischargedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
@@ -18693,6 +19006,9 @@ export namespace Prisma {
     baseDepartment?: boolean
     isActive?: boolean
     createdBy?: boolean
+    dischargeReason?: boolean
+    dischargedBy?: boolean
+    dischargedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
@@ -18710,6 +19026,9 @@ export namespace Prisma {
     baseDepartment?: boolean
     isActive?: boolean
     createdBy?: boolean
+    dischargeReason?: boolean
+    dischargedBy?: boolean
+    dischargedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
@@ -18727,11 +19046,14 @@ export namespace Prisma {
     baseDepartment?: boolean
     isActive?: boolean
     createdBy?: boolean
+    dischargeReason?: boolean
+    dischargedBy?: boolean
+    dischargedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type WoundCareOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "roomBed" | "patientName" | "age" | "diagnosis" | "patientStatus" | "careFrequency" | "baseDepartment" | "isActive" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["woundCare"]>
+  export type WoundCareOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "roomBed" | "patientName" | "age" | "diagnosis" | "patientStatus" | "careFrequency" | "baseDepartment" | "isActive" | "createdBy" | "dischargeReason" | "dischargedBy" | "dischargedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["woundCare"]>
   export type WoundCareInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
     logs?: boolean | WoundCare$logsArgs<ExtArgs>
@@ -18762,6 +19084,9 @@ export namespace Prisma {
       baseDepartment: string
       isActive: boolean
       createdBy: string
+      dischargeReason: string | null
+      dischargedBy: string | null
+      dischargedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["woundCare"]>
@@ -19200,6 +19525,9 @@ export namespace Prisma {
     readonly baseDepartment: FieldRef<"WoundCare", 'String'>
     readonly isActive: FieldRef<"WoundCare", 'Boolean'>
     readonly createdBy: FieldRef<"WoundCare", 'String'>
+    readonly dischargeReason: FieldRef<"WoundCare", 'String'>
+    readonly dischargedBy: FieldRef<"WoundCare", 'String'>
+    readonly dischargedAt: FieldRef<"WoundCare", 'DateTime'>
     readonly createdAt: FieldRef<"WoundCare", 'DateTime'>
     readonly updatedAt: FieldRef<"WoundCare", 'DateTime'>
   }
@@ -21807,6 +22135,2287 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: BaseDepartmentPlanEntryInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EpisodeDrain
+   */
+
+  export type AggregateEpisodeDrain = {
+    _count: EpisodeDrainCountAggregateOutputType | null
+    _min: EpisodeDrainMinAggregateOutputType | null
+    _max: EpisodeDrainMaxAggregateOutputType | null
+  }
+
+  export type EpisodeDrainMinAggregateOutputType = {
+    id: string | null
+    episodeId: string | null
+    name: string | null
+    location: string | null
+    isActive: boolean | null
+    createdBy: string | null
+    createdAt: Date | null
+    removedBy: string | null
+    removedAt: Date | null
+  }
+
+  export type EpisodeDrainMaxAggregateOutputType = {
+    id: string | null
+    episodeId: string | null
+    name: string | null
+    location: string | null
+    isActive: boolean | null
+    createdBy: string | null
+    createdAt: Date | null
+    removedBy: string | null
+    removedAt: Date | null
+  }
+
+  export type EpisodeDrainCountAggregateOutputType = {
+    id: number
+    episodeId: number
+    name: number
+    location: number
+    isActive: number
+    createdBy: number
+    createdAt: number
+    removedBy: number
+    removedAt: number
+    _all: number
+  }
+
+
+  export type EpisodeDrainMinAggregateInputType = {
+    id?: true
+    episodeId?: true
+    name?: true
+    location?: true
+    isActive?: true
+    createdBy?: true
+    createdAt?: true
+    removedBy?: true
+    removedAt?: true
+  }
+
+  export type EpisodeDrainMaxAggregateInputType = {
+    id?: true
+    episodeId?: true
+    name?: true
+    location?: true
+    isActive?: true
+    createdBy?: true
+    createdAt?: true
+    removedBy?: true
+    removedAt?: true
+  }
+
+  export type EpisodeDrainCountAggregateInputType = {
+    id?: true
+    episodeId?: true
+    name?: true
+    location?: true
+    isActive?: true
+    createdBy?: true
+    createdAt?: true
+    removedBy?: true
+    removedAt?: true
+    _all?: true
+  }
+
+  export type EpisodeDrainAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EpisodeDrain to aggregate.
+     */
+    where?: EpisodeDrainWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EpisodeDrains to fetch.
+     */
+    orderBy?: EpisodeDrainOrderByWithRelationInput | EpisodeDrainOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EpisodeDrainWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EpisodeDrains from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EpisodeDrains.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EpisodeDrains
+    **/
+    _count?: true | EpisodeDrainCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EpisodeDrainMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EpisodeDrainMaxAggregateInputType
+  }
+
+  export type GetEpisodeDrainAggregateType<T extends EpisodeDrainAggregateArgs> = {
+        [P in keyof T & keyof AggregateEpisodeDrain]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEpisodeDrain[P]>
+      : GetScalarType<T[P], AggregateEpisodeDrain[P]>
+  }
+
+
+
+
+  export type EpisodeDrainGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EpisodeDrainWhereInput
+    orderBy?: EpisodeDrainOrderByWithAggregationInput | EpisodeDrainOrderByWithAggregationInput[]
+    by: EpisodeDrainScalarFieldEnum[] | EpisodeDrainScalarFieldEnum
+    having?: EpisodeDrainScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EpisodeDrainCountAggregateInputType | true
+    _min?: EpisodeDrainMinAggregateInputType
+    _max?: EpisodeDrainMaxAggregateInputType
+  }
+
+  export type EpisodeDrainGroupByOutputType = {
+    id: string
+    episodeId: string
+    name: string
+    location: string | null
+    isActive: boolean
+    createdBy: string
+    createdAt: Date
+    removedBy: string | null
+    removedAt: Date | null
+    _count: EpisodeDrainCountAggregateOutputType | null
+    _min: EpisodeDrainMinAggregateOutputType | null
+    _max: EpisodeDrainMaxAggregateOutputType | null
+  }
+
+  type GetEpisodeDrainGroupByPayload<T extends EpisodeDrainGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EpisodeDrainGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EpisodeDrainGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EpisodeDrainGroupByOutputType[P]>
+            : GetScalarType<T[P], EpisodeDrainGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EpisodeDrainSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    name?: boolean
+    location?: boolean
+    isActive?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    removedBy?: boolean
+    removedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    entries?: boolean | EpisodeDrain$entriesArgs<ExtArgs>
+    _count?: boolean | EpisodeDrainCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["episodeDrain"]>
+
+  export type EpisodeDrainSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    name?: boolean
+    location?: boolean
+    isActive?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    removedBy?: boolean
+    removedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["episodeDrain"]>
+
+  export type EpisodeDrainSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    name?: boolean
+    location?: boolean
+    isActive?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    removedBy?: boolean
+    removedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["episodeDrain"]>
+
+  export type EpisodeDrainSelectScalar = {
+    id?: boolean
+    episodeId?: boolean
+    name?: boolean
+    location?: boolean
+    isActive?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    removedBy?: boolean
+    removedAt?: boolean
+  }
+
+  export type EpisodeDrainOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "name" | "location" | "isActive" | "createdBy" | "createdAt" | "removedBy" | "removedAt", ExtArgs["result"]["episodeDrain"]>
+  export type EpisodeDrainInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    entries?: boolean | EpisodeDrain$entriesArgs<ExtArgs>
+    _count?: boolean | EpisodeDrainCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type EpisodeDrainIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+  export type EpisodeDrainIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+
+  export type $EpisodeDrainPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EpisodeDrain"
+    objects: {
+      episode: Prisma.$EpisodePayload<ExtArgs>
+      entries: Prisma.$EpisodeDrainEntryPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      episodeId: string
+      name: string
+      location: string | null
+      isActive: boolean
+      createdBy: string
+      createdAt: Date
+      removedBy: string | null
+      removedAt: Date | null
+    }, ExtArgs["result"]["episodeDrain"]>
+    composites: {}
+  }
+
+  type EpisodeDrainGetPayload<S extends boolean | null | undefined | EpisodeDrainDefaultArgs> = $Result.GetResult<Prisma.$EpisodeDrainPayload, S>
+
+  type EpisodeDrainCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EpisodeDrainFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EpisodeDrainCountAggregateInputType | true
+    }
+
+  export interface EpisodeDrainDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EpisodeDrain'], meta: { name: 'EpisodeDrain' } }
+    /**
+     * Find zero or one EpisodeDrain that matches the filter.
+     * @param {EpisodeDrainFindUniqueArgs} args - Arguments to find a EpisodeDrain
+     * @example
+     * // Get one EpisodeDrain
+     * const episodeDrain = await prisma.episodeDrain.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EpisodeDrainFindUniqueArgs>(args: SelectSubset<T, EpisodeDrainFindUniqueArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EpisodeDrain that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EpisodeDrainFindUniqueOrThrowArgs} args - Arguments to find a EpisodeDrain
+     * @example
+     * // Get one EpisodeDrain
+     * const episodeDrain = await prisma.episodeDrain.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EpisodeDrainFindUniqueOrThrowArgs>(args: SelectSubset<T, EpisodeDrainFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EpisodeDrain that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainFindFirstArgs} args - Arguments to find a EpisodeDrain
+     * @example
+     * // Get one EpisodeDrain
+     * const episodeDrain = await prisma.episodeDrain.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EpisodeDrainFindFirstArgs>(args?: SelectSubset<T, EpisodeDrainFindFirstArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EpisodeDrain that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainFindFirstOrThrowArgs} args - Arguments to find a EpisodeDrain
+     * @example
+     * // Get one EpisodeDrain
+     * const episodeDrain = await prisma.episodeDrain.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EpisodeDrainFindFirstOrThrowArgs>(args?: SelectSubset<T, EpisodeDrainFindFirstOrThrowArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EpisodeDrains that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EpisodeDrains
+     * const episodeDrains = await prisma.episodeDrain.findMany()
+     * 
+     * // Get first 10 EpisodeDrains
+     * const episodeDrains = await prisma.episodeDrain.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const episodeDrainWithIdOnly = await prisma.episodeDrain.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EpisodeDrainFindManyArgs>(args?: SelectSubset<T, EpisodeDrainFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EpisodeDrain.
+     * @param {EpisodeDrainCreateArgs} args - Arguments to create a EpisodeDrain.
+     * @example
+     * // Create one EpisodeDrain
+     * const EpisodeDrain = await prisma.episodeDrain.create({
+     *   data: {
+     *     // ... data to create a EpisodeDrain
+     *   }
+     * })
+     * 
+     */
+    create<T extends EpisodeDrainCreateArgs>(args: SelectSubset<T, EpisodeDrainCreateArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EpisodeDrains.
+     * @param {EpisodeDrainCreateManyArgs} args - Arguments to create many EpisodeDrains.
+     * @example
+     * // Create many EpisodeDrains
+     * const episodeDrain = await prisma.episodeDrain.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EpisodeDrainCreateManyArgs>(args?: SelectSubset<T, EpisodeDrainCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EpisodeDrains and returns the data saved in the database.
+     * @param {EpisodeDrainCreateManyAndReturnArgs} args - Arguments to create many EpisodeDrains.
+     * @example
+     * // Create many EpisodeDrains
+     * const episodeDrain = await prisma.episodeDrain.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EpisodeDrains and only return the `id`
+     * const episodeDrainWithIdOnly = await prisma.episodeDrain.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EpisodeDrainCreateManyAndReturnArgs>(args?: SelectSubset<T, EpisodeDrainCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EpisodeDrain.
+     * @param {EpisodeDrainDeleteArgs} args - Arguments to delete one EpisodeDrain.
+     * @example
+     * // Delete one EpisodeDrain
+     * const EpisodeDrain = await prisma.episodeDrain.delete({
+     *   where: {
+     *     // ... filter to delete one EpisodeDrain
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EpisodeDrainDeleteArgs>(args: SelectSubset<T, EpisodeDrainDeleteArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EpisodeDrain.
+     * @param {EpisodeDrainUpdateArgs} args - Arguments to update one EpisodeDrain.
+     * @example
+     * // Update one EpisodeDrain
+     * const episodeDrain = await prisma.episodeDrain.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EpisodeDrainUpdateArgs>(args: SelectSubset<T, EpisodeDrainUpdateArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EpisodeDrains.
+     * @param {EpisodeDrainDeleteManyArgs} args - Arguments to filter EpisodeDrains to delete.
+     * @example
+     * // Delete a few EpisodeDrains
+     * const { count } = await prisma.episodeDrain.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EpisodeDrainDeleteManyArgs>(args?: SelectSubset<T, EpisodeDrainDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EpisodeDrains.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EpisodeDrains
+     * const episodeDrain = await prisma.episodeDrain.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EpisodeDrainUpdateManyArgs>(args: SelectSubset<T, EpisodeDrainUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EpisodeDrains and returns the data updated in the database.
+     * @param {EpisodeDrainUpdateManyAndReturnArgs} args - Arguments to update many EpisodeDrains.
+     * @example
+     * // Update many EpisodeDrains
+     * const episodeDrain = await prisma.episodeDrain.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EpisodeDrains and only return the `id`
+     * const episodeDrainWithIdOnly = await prisma.episodeDrain.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EpisodeDrainUpdateManyAndReturnArgs>(args: SelectSubset<T, EpisodeDrainUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EpisodeDrain.
+     * @param {EpisodeDrainUpsertArgs} args - Arguments to update or create a EpisodeDrain.
+     * @example
+     * // Update or create a EpisodeDrain
+     * const episodeDrain = await prisma.episodeDrain.upsert({
+     *   create: {
+     *     // ... data to create a EpisodeDrain
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EpisodeDrain we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EpisodeDrainUpsertArgs>(args: SelectSubset<T, EpisodeDrainUpsertArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EpisodeDrains.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainCountArgs} args - Arguments to filter EpisodeDrains to count.
+     * @example
+     * // Count the number of EpisodeDrains
+     * const count = await prisma.episodeDrain.count({
+     *   where: {
+     *     // ... the filter for the EpisodeDrains we want to count
+     *   }
+     * })
+    **/
+    count<T extends EpisodeDrainCountArgs>(
+      args?: Subset<T, EpisodeDrainCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EpisodeDrainCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EpisodeDrain.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EpisodeDrainAggregateArgs>(args: Subset<T, EpisodeDrainAggregateArgs>): Prisma.PrismaPromise<GetEpisodeDrainAggregateType<T>>
+
+    /**
+     * Group by EpisodeDrain.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EpisodeDrainGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EpisodeDrainGroupByArgs['orderBy'] }
+        : { orderBy?: EpisodeDrainGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EpisodeDrainGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEpisodeDrainGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EpisodeDrain model
+   */
+  readonly fields: EpisodeDrainFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EpisodeDrain.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EpisodeDrainClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    episode<T extends EpisodeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDefaultArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    entries<T extends EpisodeDrain$entriesArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDrain$entriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EpisodeDrain model
+   */
+  interface EpisodeDrainFieldRefs {
+    readonly id: FieldRef<"EpisodeDrain", 'String'>
+    readonly episodeId: FieldRef<"EpisodeDrain", 'String'>
+    readonly name: FieldRef<"EpisodeDrain", 'String'>
+    readonly location: FieldRef<"EpisodeDrain", 'String'>
+    readonly isActive: FieldRef<"EpisodeDrain", 'Boolean'>
+    readonly createdBy: FieldRef<"EpisodeDrain", 'String'>
+    readonly createdAt: FieldRef<"EpisodeDrain", 'DateTime'>
+    readonly removedBy: FieldRef<"EpisodeDrain", 'String'>
+    readonly removedAt: FieldRef<"EpisodeDrain", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EpisodeDrain findUnique
+   */
+  export type EpisodeDrainFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrain to fetch.
+     */
+    where: EpisodeDrainWhereUniqueInput
+  }
+
+  /**
+   * EpisodeDrain findUniqueOrThrow
+   */
+  export type EpisodeDrainFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrain to fetch.
+     */
+    where: EpisodeDrainWhereUniqueInput
+  }
+
+  /**
+   * EpisodeDrain findFirst
+   */
+  export type EpisodeDrainFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrain to fetch.
+     */
+    where?: EpisodeDrainWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EpisodeDrains to fetch.
+     */
+    orderBy?: EpisodeDrainOrderByWithRelationInput | EpisodeDrainOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EpisodeDrains.
+     */
+    cursor?: EpisodeDrainWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EpisodeDrains from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EpisodeDrains.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EpisodeDrains.
+     */
+    distinct?: EpisodeDrainScalarFieldEnum | EpisodeDrainScalarFieldEnum[]
+  }
+
+  /**
+   * EpisodeDrain findFirstOrThrow
+   */
+  export type EpisodeDrainFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrain to fetch.
+     */
+    where?: EpisodeDrainWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EpisodeDrains to fetch.
+     */
+    orderBy?: EpisodeDrainOrderByWithRelationInput | EpisodeDrainOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EpisodeDrains.
+     */
+    cursor?: EpisodeDrainWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EpisodeDrains from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EpisodeDrains.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EpisodeDrains.
+     */
+    distinct?: EpisodeDrainScalarFieldEnum | EpisodeDrainScalarFieldEnum[]
+  }
+
+  /**
+   * EpisodeDrain findMany
+   */
+  export type EpisodeDrainFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrains to fetch.
+     */
+    where?: EpisodeDrainWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EpisodeDrains to fetch.
+     */
+    orderBy?: EpisodeDrainOrderByWithRelationInput | EpisodeDrainOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EpisodeDrains.
+     */
+    cursor?: EpisodeDrainWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EpisodeDrains from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EpisodeDrains.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EpisodeDrains.
+     */
+    distinct?: EpisodeDrainScalarFieldEnum | EpisodeDrainScalarFieldEnum[]
+  }
+
+  /**
+   * EpisodeDrain create
+   */
+  export type EpisodeDrainCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EpisodeDrain.
+     */
+    data: XOR<EpisodeDrainCreateInput, EpisodeDrainUncheckedCreateInput>
+  }
+
+  /**
+   * EpisodeDrain createMany
+   */
+  export type EpisodeDrainCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EpisodeDrains.
+     */
+    data: EpisodeDrainCreateManyInput | EpisodeDrainCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EpisodeDrain createManyAndReturn
+   */
+  export type EpisodeDrainCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * The data used to create many EpisodeDrains.
+     */
+    data: EpisodeDrainCreateManyInput | EpisodeDrainCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EpisodeDrain update
+   */
+  export type EpisodeDrainUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EpisodeDrain.
+     */
+    data: XOR<EpisodeDrainUpdateInput, EpisodeDrainUncheckedUpdateInput>
+    /**
+     * Choose, which EpisodeDrain to update.
+     */
+    where: EpisodeDrainWhereUniqueInput
+  }
+
+  /**
+   * EpisodeDrain updateMany
+   */
+  export type EpisodeDrainUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EpisodeDrains.
+     */
+    data: XOR<EpisodeDrainUpdateManyMutationInput, EpisodeDrainUncheckedUpdateManyInput>
+    /**
+     * Filter which EpisodeDrains to update
+     */
+    where?: EpisodeDrainWhereInput
+    /**
+     * Limit how many EpisodeDrains to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EpisodeDrain updateManyAndReturn
+   */
+  export type EpisodeDrainUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * The data used to update EpisodeDrains.
+     */
+    data: XOR<EpisodeDrainUpdateManyMutationInput, EpisodeDrainUncheckedUpdateManyInput>
+    /**
+     * Filter which EpisodeDrains to update
+     */
+    where?: EpisodeDrainWhereInput
+    /**
+     * Limit how many EpisodeDrains to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EpisodeDrain upsert
+   */
+  export type EpisodeDrainUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EpisodeDrain to update in case it exists.
+     */
+    where: EpisodeDrainWhereUniqueInput
+    /**
+     * In case the EpisodeDrain found by the `where` argument doesn't exist, create a new EpisodeDrain with this data.
+     */
+    create: XOR<EpisodeDrainCreateInput, EpisodeDrainUncheckedCreateInput>
+    /**
+     * In case the EpisodeDrain was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EpisodeDrainUpdateInput, EpisodeDrainUncheckedUpdateInput>
+  }
+
+  /**
+   * EpisodeDrain delete
+   */
+  export type EpisodeDrainDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+    /**
+     * Filter which EpisodeDrain to delete.
+     */
+    where: EpisodeDrainWhereUniqueInput
+  }
+
+  /**
+   * EpisodeDrain deleteMany
+   */
+  export type EpisodeDrainDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EpisodeDrains to delete
+     */
+    where?: EpisodeDrainWhereInput
+    /**
+     * Limit how many EpisodeDrains to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EpisodeDrain.entries
+   */
+  export type EpisodeDrain$entriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    where?: EpisodeDrainEntryWhereInput
+    orderBy?: EpisodeDrainEntryOrderByWithRelationInput | EpisodeDrainEntryOrderByWithRelationInput[]
+    cursor?: EpisodeDrainEntryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EpisodeDrainEntryScalarFieldEnum | EpisodeDrainEntryScalarFieldEnum[]
+  }
+
+  /**
+   * EpisodeDrain without action
+   */
+  export type EpisodeDrainDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrain
+     */
+    select?: EpisodeDrainSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrain
+     */
+    omit?: EpisodeDrainOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EpisodeDrainEntry
+   */
+
+  export type AggregateEpisodeDrainEntry = {
+    _count: EpisodeDrainEntryCountAggregateOutputType | null
+    _avg: EpisodeDrainEntryAvgAggregateOutputType | null
+    _sum: EpisodeDrainEntrySumAggregateOutputType | null
+    _min: EpisodeDrainEntryMinAggregateOutputType | null
+    _max: EpisodeDrainEntryMaxAggregateOutputType | null
+  }
+
+  export type EpisodeDrainEntryAvgAggregateOutputType = {
+    volumeMl: number | null
+  }
+
+  export type EpisodeDrainEntrySumAggregateOutputType = {
+    volumeMl: number | null
+  }
+
+  export type EpisodeDrainEntryMinAggregateOutputType = {
+    id: string | null
+    drainId: string | null
+    volumeMl: number | null
+    characteristic: string | null
+    recordedBy: string | null
+    recordedAt: Date | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type EpisodeDrainEntryMaxAggregateOutputType = {
+    id: string | null
+    drainId: string | null
+    volumeMl: number | null
+    characteristic: string | null
+    recordedBy: string | null
+    recordedAt: Date | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type EpisodeDrainEntryCountAggregateOutputType = {
+    id: number
+    drainId: number
+    volumeMl: number
+    characteristic: number
+    recordedBy: number
+    recordedAt: number
+    updatedBy: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type EpisodeDrainEntryAvgAggregateInputType = {
+    volumeMl?: true
+  }
+
+  export type EpisodeDrainEntrySumAggregateInputType = {
+    volumeMl?: true
+  }
+
+  export type EpisodeDrainEntryMinAggregateInputType = {
+    id?: true
+    drainId?: true
+    volumeMl?: true
+    characteristic?: true
+    recordedBy?: true
+    recordedAt?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type EpisodeDrainEntryMaxAggregateInputType = {
+    id?: true
+    drainId?: true
+    volumeMl?: true
+    characteristic?: true
+    recordedBy?: true
+    recordedAt?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type EpisodeDrainEntryCountAggregateInputType = {
+    id?: true
+    drainId?: true
+    volumeMl?: true
+    characteristic?: true
+    recordedBy?: true
+    recordedAt?: true
+    updatedBy?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type EpisodeDrainEntryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EpisodeDrainEntry to aggregate.
+     */
+    where?: EpisodeDrainEntryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EpisodeDrainEntries to fetch.
+     */
+    orderBy?: EpisodeDrainEntryOrderByWithRelationInput | EpisodeDrainEntryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EpisodeDrainEntryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EpisodeDrainEntries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EpisodeDrainEntries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EpisodeDrainEntries
+    **/
+    _count?: true | EpisodeDrainEntryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EpisodeDrainEntryAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EpisodeDrainEntrySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EpisodeDrainEntryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EpisodeDrainEntryMaxAggregateInputType
+  }
+
+  export type GetEpisodeDrainEntryAggregateType<T extends EpisodeDrainEntryAggregateArgs> = {
+        [P in keyof T & keyof AggregateEpisodeDrainEntry]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEpisodeDrainEntry[P]>
+      : GetScalarType<T[P], AggregateEpisodeDrainEntry[P]>
+  }
+
+
+
+
+  export type EpisodeDrainEntryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EpisodeDrainEntryWhereInput
+    orderBy?: EpisodeDrainEntryOrderByWithAggregationInput | EpisodeDrainEntryOrderByWithAggregationInput[]
+    by: EpisodeDrainEntryScalarFieldEnum[] | EpisodeDrainEntryScalarFieldEnum
+    having?: EpisodeDrainEntryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EpisodeDrainEntryCountAggregateInputType | true
+    _avg?: EpisodeDrainEntryAvgAggregateInputType
+    _sum?: EpisodeDrainEntrySumAggregateInputType
+    _min?: EpisodeDrainEntryMinAggregateInputType
+    _max?: EpisodeDrainEntryMaxAggregateInputType
+  }
+
+  export type EpisodeDrainEntryGroupByOutputType = {
+    id: string
+    drainId: string
+    volumeMl: number
+    characteristic: string | null
+    recordedBy: string
+    recordedAt: Date
+    updatedBy: string | null
+    updatedAt: Date | null
+    _count: EpisodeDrainEntryCountAggregateOutputType | null
+    _avg: EpisodeDrainEntryAvgAggregateOutputType | null
+    _sum: EpisodeDrainEntrySumAggregateOutputType | null
+    _min: EpisodeDrainEntryMinAggregateOutputType | null
+    _max: EpisodeDrainEntryMaxAggregateOutputType | null
+  }
+
+  type GetEpisodeDrainEntryGroupByPayload<T extends EpisodeDrainEntryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EpisodeDrainEntryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EpisodeDrainEntryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EpisodeDrainEntryGroupByOutputType[P]>
+            : GetScalarType<T[P], EpisodeDrainEntryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EpisodeDrainEntrySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    drainId?: boolean
+    volumeMl?: boolean
+    characteristic?: boolean
+    recordedBy?: boolean
+    recordedAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    drain?: boolean | EpisodeDrainDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["episodeDrainEntry"]>
+
+  export type EpisodeDrainEntrySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    drainId?: boolean
+    volumeMl?: boolean
+    characteristic?: boolean
+    recordedBy?: boolean
+    recordedAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    drain?: boolean | EpisodeDrainDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["episodeDrainEntry"]>
+
+  export type EpisodeDrainEntrySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    drainId?: boolean
+    volumeMl?: boolean
+    characteristic?: boolean
+    recordedBy?: boolean
+    recordedAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    drain?: boolean | EpisodeDrainDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["episodeDrainEntry"]>
+
+  export type EpisodeDrainEntrySelectScalar = {
+    id?: boolean
+    drainId?: boolean
+    volumeMl?: boolean
+    characteristic?: boolean
+    recordedBy?: boolean
+    recordedAt?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }
+
+  export type EpisodeDrainEntryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "drainId" | "volumeMl" | "characteristic" | "recordedBy" | "recordedAt" | "updatedBy" | "updatedAt", ExtArgs["result"]["episodeDrainEntry"]>
+  export type EpisodeDrainEntryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    drain?: boolean | EpisodeDrainDefaultArgs<ExtArgs>
+  }
+  export type EpisodeDrainEntryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    drain?: boolean | EpisodeDrainDefaultArgs<ExtArgs>
+  }
+  export type EpisodeDrainEntryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    drain?: boolean | EpisodeDrainDefaultArgs<ExtArgs>
+  }
+
+  export type $EpisodeDrainEntryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EpisodeDrainEntry"
+    objects: {
+      drain: Prisma.$EpisodeDrainPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      drainId: string
+      volumeMl: number
+      characteristic: string | null
+      recordedBy: string
+      recordedAt: Date
+      updatedBy: string | null
+      updatedAt: Date | null
+    }, ExtArgs["result"]["episodeDrainEntry"]>
+    composites: {}
+  }
+
+  type EpisodeDrainEntryGetPayload<S extends boolean | null | undefined | EpisodeDrainEntryDefaultArgs> = $Result.GetResult<Prisma.$EpisodeDrainEntryPayload, S>
+
+  type EpisodeDrainEntryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EpisodeDrainEntryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EpisodeDrainEntryCountAggregateInputType | true
+    }
+
+  export interface EpisodeDrainEntryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EpisodeDrainEntry'], meta: { name: 'EpisodeDrainEntry' } }
+    /**
+     * Find zero or one EpisodeDrainEntry that matches the filter.
+     * @param {EpisodeDrainEntryFindUniqueArgs} args - Arguments to find a EpisodeDrainEntry
+     * @example
+     * // Get one EpisodeDrainEntry
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EpisodeDrainEntryFindUniqueArgs>(args: SelectSubset<T, EpisodeDrainEntryFindUniqueArgs<ExtArgs>>): Prisma__EpisodeDrainEntryClient<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EpisodeDrainEntry that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EpisodeDrainEntryFindUniqueOrThrowArgs} args - Arguments to find a EpisodeDrainEntry
+     * @example
+     * // Get one EpisodeDrainEntry
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EpisodeDrainEntryFindUniqueOrThrowArgs>(args: SelectSubset<T, EpisodeDrainEntryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EpisodeDrainEntryClient<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EpisodeDrainEntry that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainEntryFindFirstArgs} args - Arguments to find a EpisodeDrainEntry
+     * @example
+     * // Get one EpisodeDrainEntry
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EpisodeDrainEntryFindFirstArgs>(args?: SelectSubset<T, EpisodeDrainEntryFindFirstArgs<ExtArgs>>): Prisma__EpisodeDrainEntryClient<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EpisodeDrainEntry that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainEntryFindFirstOrThrowArgs} args - Arguments to find a EpisodeDrainEntry
+     * @example
+     * // Get one EpisodeDrainEntry
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EpisodeDrainEntryFindFirstOrThrowArgs>(args?: SelectSubset<T, EpisodeDrainEntryFindFirstOrThrowArgs<ExtArgs>>): Prisma__EpisodeDrainEntryClient<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EpisodeDrainEntries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainEntryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EpisodeDrainEntries
+     * const episodeDrainEntries = await prisma.episodeDrainEntry.findMany()
+     * 
+     * // Get first 10 EpisodeDrainEntries
+     * const episodeDrainEntries = await prisma.episodeDrainEntry.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const episodeDrainEntryWithIdOnly = await prisma.episodeDrainEntry.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EpisodeDrainEntryFindManyArgs>(args?: SelectSubset<T, EpisodeDrainEntryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EpisodeDrainEntry.
+     * @param {EpisodeDrainEntryCreateArgs} args - Arguments to create a EpisodeDrainEntry.
+     * @example
+     * // Create one EpisodeDrainEntry
+     * const EpisodeDrainEntry = await prisma.episodeDrainEntry.create({
+     *   data: {
+     *     // ... data to create a EpisodeDrainEntry
+     *   }
+     * })
+     * 
+     */
+    create<T extends EpisodeDrainEntryCreateArgs>(args: SelectSubset<T, EpisodeDrainEntryCreateArgs<ExtArgs>>): Prisma__EpisodeDrainEntryClient<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EpisodeDrainEntries.
+     * @param {EpisodeDrainEntryCreateManyArgs} args - Arguments to create many EpisodeDrainEntries.
+     * @example
+     * // Create many EpisodeDrainEntries
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EpisodeDrainEntryCreateManyArgs>(args?: SelectSubset<T, EpisodeDrainEntryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EpisodeDrainEntries and returns the data saved in the database.
+     * @param {EpisodeDrainEntryCreateManyAndReturnArgs} args - Arguments to create many EpisodeDrainEntries.
+     * @example
+     * // Create many EpisodeDrainEntries
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EpisodeDrainEntries and only return the `id`
+     * const episodeDrainEntryWithIdOnly = await prisma.episodeDrainEntry.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EpisodeDrainEntryCreateManyAndReturnArgs>(args?: SelectSubset<T, EpisodeDrainEntryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EpisodeDrainEntry.
+     * @param {EpisodeDrainEntryDeleteArgs} args - Arguments to delete one EpisodeDrainEntry.
+     * @example
+     * // Delete one EpisodeDrainEntry
+     * const EpisodeDrainEntry = await prisma.episodeDrainEntry.delete({
+     *   where: {
+     *     // ... filter to delete one EpisodeDrainEntry
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EpisodeDrainEntryDeleteArgs>(args: SelectSubset<T, EpisodeDrainEntryDeleteArgs<ExtArgs>>): Prisma__EpisodeDrainEntryClient<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EpisodeDrainEntry.
+     * @param {EpisodeDrainEntryUpdateArgs} args - Arguments to update one EpisodeDrainEntry.
+     * @example
+     * // Update one EpisodeDrainEntry
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EpisodeDrainEntryUpdateArgs>(args: SelectSubset<T, EpisodeDrainEntryUpdateArgs<ExtArgs>>): Prisma__EpisodeDrainEntryClient<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EpisodeDrainEntries.
+     * @param {EpisodeDrainEntryDeleteManyArgs} args - Arguments to filter EpisodeDrainEntries to delete.
+     * @example
+     * // Delete a few EpisodeDrainEntries
+     * const { count } = await prisma.episodeDrainEntry.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EpisodeDrainEntryDeleteManyArgs>(args?: SelectSubset<T, EpisodeDrainEntryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EpisodeDrainEntries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainEntryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EpisodeDrainEntries
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EpisodeDrainEntryUpdateManyArgs>(args: SelectSubset<T, EpisodeDrainEntryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EpisodeDrainEntries and returns the data updated in the database.
+     * @param {EpisodeDrainEntryUpdateManyAndReturnArgs} args - Arguments to update many EpisodeDrainEntries.
+     * @example
+     * // Update many EpisodeDrainEntries
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EpisodeDrainEntries and only return the `id`
+     * const episodeDrainEntryWithIdOnly = await prisma.episodeDrainEntry.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EpisodeDrainEntryUpdateManyAndReturnArgs>(args: SelectSubset<T, EpisodeDrainEntryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EpisodeDrainEntry.
+     * @param {EpisodeDrainEntryUpsertArgs} args - Arguments to update or create a EpisodeDrainEntry.
+     * @example
+     * // Update or create a EpisodeDrainEntry
+     * const episodeDrainEntry = await prisma.episodeDrainEntry.upsert({
+     *   create: {
+     *     // ... data to create a EpisodeDrainEntry
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EpisodeDrainEntry we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EpisodeDrainEntryUpsertArgs>(args: SelectSubset<T, EpisodeDrainEntryUpsertArgs<ExtArgs>>): Prisma__EpisodeDrainEntryClient<$Result.GetResult<Prisma.$EpisodeDrainEntryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EpisodeDrainEntries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainEntryCountArgs} args - Arguments to filter EpisodeDrainEntries to count.
+     * @example
+     * // Count the number of EpisodeDrainEntries
+     * const count = await prisma.episodeDrainEntry.count({
+     *   where: {
+     *     // ... the filter for the EpisodeDrainEntries we want to count
+     *   }
+     * })
+    **/
+    count<T extends EpisodeDrainEntryCountArgs>(
+      args?: Subset<T, EpisodeDrainEntryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EpisodeDrainEntryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EpisodeDrainEntry.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainEntryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EpisodeDrainEntryAggregateArgs>(args: Subset<T, EpisodeDrainEntryAggregateArgs>): Prisma.PrismaPromise<GetEpisodeDrainEntryAggregateType<T>>
+
+    /**
+     * Group by EpisodeDrainEntry.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EpisodeDrainEntryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EpisodeDrainEntryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EpisodeDrainEntryGroupByArgs['orderBy'] }
+        : { orderBy?: EpisodeDrainEntryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EpisodeDrainEntryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEpisodeDrainEntryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EpisodeDrainEntry model
+   */
+  readonly fields: EpisodeDrainEntryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EpisodeDrainEntry.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EpisodeDrainEntryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    drain<T extends EpisodeDrainDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDrainDefaultArgs<ExtArgs>>): Prisma__EpisodeDrainClient<$Result.GetResult<Prisma.$EpisodeDrainPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EpisodeDrainEntry model
+   */
+  interface EpisodeDrainEntryFieldRefs {
+    readonly id: FieldRef<"EpisodeDrainEntry", 'String'>
+    readonly drainId: FieldRef<"EpisodeDrainEntry", 'String'>
+    readonly volumeMl: FieldRef<"EpisodeDrainEntry", 'Int'>
+    readonly characteristic: FieldRef<"EpisodeDrainEntry", 'String'>
+    readonly recordedBy: FieldRef<"EpisodeDrainEntry", 'String'>
+    readonly recordedAt: FieldRef<"EpisodeDrainEntry", 'DateTime'>
+    readonly updatedBy: FieldRef<"EpisodeDrainEntry", 'String'>
+    readonly updatedAt: FieldRef<"EpisodeDrainEntry", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EpisodeDrainEntry findUnique
+   */
+  export type EpisodeDrainEntryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrainEntry to fetch.
+     */
+    where: EpisodeDrainEntryWhereUniqueInput
+  }
+
+  /**
+   * EpisodeDrainEntry findUniqueOrThrow
+   */
+  export type EpisodeDrainEntryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrainEntry to fetch.
+     */
+    where: EpisodeDrainEntryWhereUniqueInput
+  }
+
+  /**
+   * EpisodeDrainEntry findFirst
+   */
+  export type EpisodeDrainEntryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrainEntry to fetch.
+     */
+    where?: EpisodeDrainEntryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EpisodeDrainEntries to fetch.
+     */
+    orderBy?: EpisodeDrainEntryOrderByWithRelationInput | EpisodeDrainEntryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EpisodeDrainEntries.
+     */
+    cursor?: EpisodeDrainEntryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EpisodeDrainEntries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EpisodeDrainEntries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EpisodeDrainEntries.
+     */
+    distinct?: EpisodeDrainEntryScalarFieldEnum | EpisodeDrainEntryScalarFieldEnum[]
+  }
+
+  /**
+   * EpisodeDrainEntry findFirstOrThrow
+   */
+  export type EpisodeDrainEntryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrainEntry to fetch.
+     */
+    where?: EpisodeDrainEntryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EpisodeDrainEntries to fetch.
+     */
+    orderBy?: EpisodeDrainEntryOrderByWithRelationInput | EpisodeDrainEntryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EpisodeDrainEntries.
+     */
+    cursor?: EpisodeDrainEntryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EpisodeDrainEntries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EpisodeDrainEntries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EpisodeDrainEntries.
+     */
+    distinct?: EpisodeDrainEntryScalarFieldEnum | EpisodeDrainEntryScalarFieldEnum[]
+  }
+
+  /**
+   * EpisodeDrainEntry findMany
+   */
+  export type EpisodeDrainEntryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * Filter, which EpisodeDrainEntries to fetch.
+     */
+    where?: EpisodeDrainEntryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EpisodeDrainEntries to fetch.
+     */
+    orderBy?: EpisodeDrainEntryOrderByWithRelationInput | EpisodeDrainEntryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EpisodeDrainEntries.
+     */
+    cursor?: EpisodeDrainEntryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EpisodeDrainEntries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EpisodeDrainEntries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EpisodeDrainEntries.
+     */
+    distinct?: EpisodeDrainEntryScalarFieldEnum | EpisodeDrainEntryScalarFieldEnum[]
+  }
+
+  /**
+   * EpisodeDrainEntry create
+   */
+  export type EpisodeDrainEntryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EpisodeDrainEntry.
+     */
+    data: XOR<EpisodeDrainEntryCreateInput, EpisodeDrainEntryUncheckedCreateInput>
+  }
+
+  /**
+   * EpisodeDrainEntry createMany
+   */
+  export type EpisodeDrainEntryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EpisodeDrainEntries.
+     */
+    data: EpisodeDrainEntryCreateManyInput | EpisodeDrainEntryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EpisodeDrainEntry createManyAndReturn
+   */
+  export type EpisodeDrainEntryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * The data used to create many EpisodeDrainEntries.
+     */
+    data: EpisodeDrainEntryCreateManyInput | EpisodeDrainEntryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EpisodeDrainEntry update
+   */
+  export type EpisodeDrainEntryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EpisodeDrainEntry.
+     */
+    data: XOR<EpisodeDrainEntryUpdateInput, EpisodeDrainEntryUncheckedUpdateInput>
+    /**
+     * Choose, which EpisodeDrainEntry to update.
+     */
+    where: EpisodeDrainEntryWhereUniqueInput
+  }
+
+  /**
+   * EpisodeDrainEntry updateMany
+   */
+  export type EpisodeDrainEntryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EpisodeDrainEntries.
+     */
+    data: XOR<EpisodeDrainEntryUpdateManyMutationInput, EpisodeDrainEntryUncheckedUpdateManyInput>
+    /**
+     * Filter which EpisodeDrainEntries to update
+     */
+    where?: EpisodeDrainEntryWhereInput
+    /**
+     * Limit how many EpisodeDrainEntries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EpisodeDrainEntry updateManyAndReturn
+   */
+  export type EpisodeDrainEntryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * The data used to update EpisodeDrainEntries.
+     */
+    data: XOR<EpisodeDrainEntryUpdateManyMutationInput, EpisodeDrainEntryUncheckedUpdateManyInput>
+    /**
+     * Filter which EpisodeDrainEntries to update
+     */
+    where?: EpisodeDrainEntryWhereInput
+    /**
+     * Limit how many EpisodeDrainEntries to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EpisodeDrainEntry upsert
+   */
+  export type EpisodeDrainEntryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EpisodeDrainEntry to update in case it exists.
+     */
+    where: EpisodeDrainEntryWhereUniqueInput
+    /**
+     * In case the EpisodeDrainEntry found by the `where` argument doesn't exist, create a new EpisodeDrainEntry with this data.
+     */
+    create: XOR<EpisodeDrainEntryCreateInput, EpisodeDrainEntryUncheckedCreateInput>
+    /**
+     * In case the EpisodeDrainEntry was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EpisodeDrainEntryUpdateInput, EpisodeDrainEntryUncheckedUpdateInput>
+  }
+
+  /**
+   * EpisodeDrainEntry delete
+   */
+  export type EpisodeDrainEntryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
+    /**
+     * Filter which EpisodeDrainEntry to delete.
+     */
+    where: EpisodeDrainEntryWhereUniqueInput
+  }
+
+  /**
+   * EpisodeDrainEntry deleteMany
+   */
+  export type EpisodeDrainEntryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EpisodeDrainEntries to delete
+     */
+    where?: EpisodeDrainEntryWhereInput
+    /**
+     * Limit how many EpisodeDrainEntries to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EpisodeDrainEntry without action
+   */
+  export type EpisodeDrainEntryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EpisodeDrainEntry
+     */
+    select?: EpisodeDrainEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EpisodeDrainEntry
+     */
+    omit?: EpisodeDrainEntryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EpisodeDrainEntryInclude<ExtArgs> | null
   }
 
 
@@ -35584,6 +38193,9 @@ export namespace Prisma {
     requestedBy: 'requestedBy',
     reviewedBy: 'reviewedBy',
     reviewedAt: 'reviewedAt',
+    isTestReset: 'isTestReset',
+    resetAt: 'resetAt',
+    resetBy: 'resetBy',
     createdAt: 'createdAt'
   };
 
@@ -35808,6 +38420,9 @@ export namespace Prisma {
     baseDepartment: 'baseDepartment',
     isActive: 'isActive',
     createdBy: 'createdBy',
+    dischargeReason: 'dischargeReason',
+    dischargedBy: 'dischargedBy',
+    dischargedAt: 'dischargedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -35838,6 +38453,35 @@ export namespace Prisma {
   };
 
   export type BaseDepartmentPlanEntryScalarFieldEnum = (typeof BaseDepartmentPlanEntryScalarFieldEnum)[keyof typeof BaseDepartmentPlanEntryScalarFieldEnum]
+
+
+  export const EpisodeDrainScalarFieldEnum: {
+    id: 'id',
+    episodeId: 'episodeId',
+    name: 'name',
+    location: 'location',
+    isActive: 'isActive',
+    createdBy: 'createdBy',
+    createdAt: 'createdAt',
+    removedBy: 'removedBy',
+    removedAt: 'removedAt'
+  };
+
+  export type EpisodeDrainScalarFieldEnum = (typeof EpisodeDrainScalarFieldEnum)[keyof typeof EpisodeDrainScalarFieldEnum]
+
+
+  export const EpisodeDrainEntryScalarFieldEnum: {
+    id: 'id',
+    drainId: 'drainId',
+    volumeMl: 'volumeMl',
+    characteristic: 'characteristic',
+    recordedBy: 'recordedBy',
+    recordedAt: 'recordedAt',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt'
+  };
+
+  export type EpisodeDrainEntryScalarFieldEnum = (typeof EpisodeDrainEntryScalarFieldEnum)[keyof typeof EpisodeDrainEntryScalarFieldEnum]
 
 
   export const MedicalHistoryScalarFieldEnum: {
@@ -36442,6 +39086,9 @@ export namespace Prisma {
     requestedBy?: StringFilter<"SubscriptionPayment"> | string
     reviewedBy?: StringNullableFilter<"SubscriptionPayment"> | string | null
     reviewedAt?: DateTimeNullableFilter<"SubscriptionPayment"> | Date | string | null
+    isTestReset?: BoolFilter<"SubscriptionPayment"> | boolean
+    resetAt?: DateTimeNullableFilter<"SubscriptionPayment"> | Date | string | null
+    resetBy?: StringNullableFilter<"SubscriptionPayment"> | string | null
     createdAt?: DateTimeFilter<"SubscriptionPayment"> | Date | string
     residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -36461,6 +39108,9 @@ export namespace Prisma {
     requestedBy?: SortOrder
     reviewedBy?: SortOrderInput | SortOrder
     reviewedAt?: SortOrderInput | SortOrder
+    isTestReset?: SortOrder
+    resetAt?: SortOrderInput | SortOrder
+    resetBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     residency?: ResidencyOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
@@ -36483,6 +39133,9 @@ export namespace Prisma {
     requestedBy?: StringFilter<"SubscriptionPayment"> | string
     reviewedBy?: StringNullableFilter<"SubscriptionPayment"> | string | null
     reviewedAt?: DateTimeNullableFilter<"SubscriptionPayment"> | Date | string | null
+    isTestReset?: BoolFilter<"SubscriptionPayment"> | boolean
+    resetAt?: DateTimeNullableFilter<"SubscriptionPayment"> | Date | string | null
+    resetBy?: StringNullableFilter<"SubscriptionPayment"> | string | null
     createdAt?: DateTimeFilter<"SubscriptionPayment"> | Date | string
     residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -36502,6 +39155,9 @@ export namespace Prisma {
     requestedBy?: SortOrder
     reviewedBy?: SortOrderInput | SortOrder
     reviewedAt?: SortOrderInput | SortOrder
+    isTestReset?: SortOrder
+    resetAt?: SortOrderInput | SortOrder
+    resetBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: SubscriptionPaymentCountOrderByAggregateInput
     _avg?: SubscriptionPaymentAvgOrderByAggregateInput
@@ -36527,6 +39183,9 @@ export namespace Prisma {
     requestedBy?: StringWithAggregatesFilter<"SubscriptionPayment"> | string
     reviewedBy?: StringNullableWithAggregatesFilter<"SubscriptionPayment"> | string | null
     reviewedAt?: DateTimeNullableWithAggregatesFilter<"SubscriptionPayment"> | Date | string | null
+    isTestReset?: BoolWithAggregatesFilter<"SubscriptionPayment"> | boolean
+    resetAt?: DateTimeNullableWithAggregatesFilter<"SubscriptionPayment"> | Date | string | null
+    resetBy?: StringNullableWithAggregatesFilter<"SubscriptionPayment"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SubscriptionPayment"> | Date | string
   }
 
@@ -36940,6 +39599,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticListRelationFilter
     surgicalDevices?: SurgicalDeviceListRelationFilter
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryListRelationFilter
+    drains?: EpisodeDrainListRelationFilter
   }
 
   export type EpisodeOrderByWithRelationInput = {
@@ -36995,6 +39655,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticOrderByRelationAggregateInput
     surgicalDevices?: SurgicalDeviceOrderByRelationAggregateInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryOrderByRelationAggregateInput
+    drains?: EpisodeDrainOrderByRelationAggregateInput
   }
 
   export type EpisodeWhereUniqueInput = Prisma.AtLeast<{
@@ -37053,6 +39714,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticListRelationFilter
     surgicalDevices?: SurgicalDeviceListRelationFilter
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryListRelationFilter
+    drains?: EpisodeDrainListRelationFilter
   }, "id">
 
   export type EpisodeOrderByWithAggregationInput = {
@@ -37676,6 +40338,9 @@ export namespace Prisma {
     baseDepartment?: StringFilter<"WoundCare"> | string
     isActive?: BoolFilter<"WoundCare"> | boolean
     createdBy?: StringFilter<"WoundCare"> | string
+    dischargeReason?: StringNullableFilter<"WoundCare"> | string | null
+    dischargedBy?: StringNullableFilter<"WoundCare"> | string | null
+    dischargedAt?: DateTimeNullableFilter<"WoundCare"> | Date | string | null
     createdAt?: DateTimeFilter<"WoundCare"> | Date | string
     updatedAt?: DateTimeFilter<"WoundCare"> | Date | string
     residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
@@ -37694,6 +40359,9 @@ export namespace Prisma {
     baseDepartment?: SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
+    dischargeReason?: SortOrderInput | SortOrder
+    dischargedBy?: SortOrderInput | SortOrder
+    dischargedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     residency?: ResidencyOrderByWithRelationInput
@@ -37715,6 +40383,9 @@ export namespace Prisma {
     baseDepartment?: StringFilter<"WoundCare"> | string
     isActive?: BoolFilter<"WoundCare"> | boolean
     createdBy?: StringFilter<"WoundCare"> | string
+    dischargeReason?: StringNullableFilter<"WoundCare"> | string | null
+    dischargedBy?: StringNullableFilter<"WoundCare"> | string | null
+    dischargedAt?: DateTimeNullableFilter<"WoundCare"> | Date | string | null
     createdAt?: DateTimeFilter<"WoundCare"> | Date | string
     updatedAt?: DateTimeFilter<"WoundCare"> | Date | string
     residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
@@ -37733,6 +40404,9 @@ export namespace Prisma {
     baseDepartment?: SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
+    dischargeReason?: SortOrderInput | SortOrder
+    dischargedBy?: SortOrderInput | SortOrder
+    dischargedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: WoundCareCountOrderByAggregateInput
@@ -37757,6 +40431,9 @@ export namespace Prisma {
     baseDepartment?: StringWithAggregatesFilter<"WoundCare"> | string
     isActive?: BoolWithAggregatesFilter<"WoundCare"> | boolean
     createdBy?: StringWithAggregatesFilter<"WoundCare"> | string
+    dischargeReason?: StringNullableWithAggregatesFilter<"WoundCare"> | string | null
+    dischargedBy?: StringNullableWithAggregatesFilter<"WoundCare"> | string | null
+    dischargedAt?: DateTimeNullableWithAggregatesFilter<"WoundCare"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"WoundCare"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"WoundCare"> | Date | string
   }
@@ -37884,6 +40561,156 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"BaseDepartmentPlanEntry"> | Date | string
     updatedBy?: StringNullableWithAggregatesFilter<"BaseDepartmentPlanEntry"> | string | null
     updatedAt?: DateTimeNullableWithAggregatesFilter<"BaseDepartmentPlanEntry"> | Date | string | null
+  }
+
+  export type EpisodeDrainWhereInput = {
+    AND?: EpisodeDrainWhereInput | EpisodeDrainWhereInput[]
+    OR?: EpisodeDrainWhereInput[]
+    NOT?: EpisodeDrainWhereInput | EpisodeDrainWhereInput[]
+    id?: StringFilter<"EpisodeDrain"> | string
+    episodeId?: StringFilter<"EpisodeDrain"> | string
+    name?: StringFilter<"EpisodeDrain"> | string
+    location?: StringNullableFilter<"EpisodeDrain"> | string | null
+    isActive?: BoolFilter<"EpisodeDrain"> | boolean
+    createdBy?: StringFilter<"EpisodeDrain"> | string
+    createdAt?: DateTimeFilter<"EpisodeDrain"> | Date | string
+    removedBy?: StringNullableFilter<"EpisodeDrain"> | string | null
+    removedAt?: DateTimeNullableFilter<"EpisodeDrain"> | Date | string | null
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+    entries?: EpisodeDrainEntryListRelationFilter
+  }
+
+  export type EpisodeDrainOrderByWithRelationInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    name?: SortOrder
+    location?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    removedBy?: SortOrderInput | SortOrder
+    removedAt?: SortOrderInput | SortOrder
+    episode?: EpisodeOrderByWithRelationInput
+    entries?: EpisodeDrainEntryOrderByRelationAggregateInput
+  }
+
+  export type EpisodeDrainWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EpisodeDrainWhereInput | EpisodeDrainWhereInput[]
+    OR?: EpisodeDrainWhereInput[]
+    NOT?: EpisodeDrainWhereInput | EpisodeDrainWhereInput[]
+    episodeId?: StringFilter<"EpisodeDrain"> | string
+    name?: StringFilter<"EpisodeDrain"> | string
+    location?: StringNullableFilter<"EpisodeDrain"> | string | null
+    isActive?: BoolFilter<"EpisodeDrain"> | boolean
+    createdBy?: StringFilter<"EpisodeDrain"> | string
+    createdAt?: DateTimeFilter<"EpisodeDrain"> | Date | string
+    removedBy?: StringNullableFilter<"EpisodeDrain"> | string | null
+    removedAt?: DateTimeNullableFilter<"EpisodeDrain"> | Date | string | null
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+    entries?: EpisodeDrainEntryListRelationFilter
+  }, "id">
+
+  export type EpisodeDrainOrderByWithAggregationInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    name?: SortOrder
+    location?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    removedBy?: SortOrderInput | SortOrder
+    removedAt?: SortOrderInput | SortOrder
+    _count?: EpisodeDrainCountOrderByAggregateInput
+    _max?: EpisodeDrainMaxOrderByAggregateInput
+    _min?: EpisodeDrainMinOrderByAggregateInput
+  }
+
+  export type EpisodeDrainScalarWhereWithAggregatesInput = {
+    AND?: EpisodeDrainScalarWhereWithAggregatesInput | EpisodeDrainScalarWhereWithAggregatesInput[]
+    OR?: EpisodeDrainScalarWhereWithAggregatesInput[]
+    NOT?: EpisodeDrainScalarWhereWithAggregatesInput | EpisodeDrainScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EpisodeDrain"> | string
+    episodeId?: StringWithAggregatesFilter<"EpisodeDrain"> | string
+    name?: StringWithAggregatesFilter<"EpisodeDrain"> | string
+    location?: StringNullableWithAggregatesFilter<"EpisodeDrain"> | string | null
+    isActive?: BoolWithAggregatesFilter<"EpisodeDrain"> | boolean
+    createdBy?: StringWithAggregatesFilter<"EpisodeDrain"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EpisodeDrain"> | Date | string
+    removedBy?: StringNullableWithAggregatesFilter<"EpisodeDrain"> | string | null
+    removedAt?: DateTimeNullableWithAggregatesFilter<"EpisodeDrain"> | Date | string | null
+  }
+
+  export type EpisodeDrainEntryWhereInput = {
+    AND?: EpisodeDrainEntryWhereInput | EpisodeDrainEntryWhereInput[]
+    OR?: EpisodeDrainEntryWhereInput[]
+    NOT?: EpisodeDrainEntryWhereInput | EpisodeDrainEntryWhereInput[]
+    id?: StringFilter<"EpisodeDrainEntry"> | string
+    drainId?: StringFilter<"EpisodeDrainEntry"> | string
+    volumeMl?: IntFilter<"EpisodeDrainEntry"> | number
+    characteristic?: StringNullableFilter<"EpisodeDrainEntry"> | string | null
+    recordedBy?: StringFilter<"EpisodeDrainEntry"> | string
+    recordedAt?: DateTimeFilter<"EpisodeDrainEntry"> | Date | string
+    updatedBy?: StringNullableFilter<"EpisodeDrainEntry"> | string | null
+    updatedAt?: DateTimeNullableFilter<"EpisodeDrainEntry"> | Date | string | null
+    drain?: XOR<EpisodeDrainScalarRelationFilter, EpisodeDrainWhereInput>
+  }
+
+  export type EpisodeDrainEntryOrderByWithRelationInput = {
+    id?: SortOrder
+    drainId?: SortOrder
+    volumeMl?: SortOrder
+    characteristic?: SortOrderInput | SortOrder
+    recordedBy?: SortOrder
+    recordedAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    drain?: EpisodeDrainOrderByWithRelationInput
+  }
+
+  export type EpisodeDrainEntryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EpisodeDrainEntryWhereInput | EpisodeDrainEntryWhereInput[]
+    OR?: EpisodeDrainEntryWhereInput[]
+    NOT?: EpisodeDrainEntryWhereInput | EpisodeDrainEntryWhereInput[]
+    drainId?: StringFilter<"EpisodeDrainEntry"> | string
+    volumeMl?: IntFilter<"EpisodeDrainEntry"> | number
+    characteristic?: StringNullableFilter<"EpisodeDrainEntry"> | string | null
+    recordedBy?: StringFilter<"EpisodeDrainEntry"> | string
+    recordedAt?: DateTimeFilter<"EpisodeDrainEntry"> | Date | string
+    updatedBy?: StringNullableFilter<"EpisodeDrainEntry"> | string | null
+    updatedAt?: DateTimeNullableFilter<"EpisodeDrainEntry"> | Date | string | null
+    drain?: XOR<EpisodeDrainScalarRelationFilter, EpisodeDrainWhereInput>
+  }, "id">
+
+  export type EpisodeDrainEntryOrderByWithAggregationInput = {
+    id?: SortOrder
+    drainId?: SortOrder
+    volumeMl?: SortOrder
+    characteristic?: SortOrderInput | SortOrder
+    recordedBy?: SortOrder
+    recordedAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _count?: EpisodeDrainEntryCountOrderByAggregateInput
+    _avg?: EpisodeDrainEntryAvgOrderByAggregateInput
+    _max?: EpisodeDrainEntryMaxOrderByAggregateInput
+    _min?: EpisodeDrainEntryMinOrderByAggregateInput
+    _sum?: EpisodeDrainEntrySumOrderByAggregateInput
+  }
+
+  export type EpisodeDrainEntryScalarWhereWithAggregatesInput = {
+    AND?: EpisodeDrainEntryScalarWhereWithAggregatesInput | EpisodeDrainEntryScalarWhereWithAggregatesInput[]
+    OR?: EpisodeDrainEntryScalarWhereWithAggregatesInput[]
+    NOT?: EpisodeDrainEntryScalarWhereWithAggregatesInput | EpisodeDrainEntryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EpisodeDrainEntry"> | string
+    drainId?: StringWithAggregatesFilter<"EpisodeDrainEntry"> | string
+    volumeMl?: IntWithAggregatesFilter<"EpisodeDrainEntry"> | number
+    characteristic?: StringNullableWithAggregatesFilter<"EpisodeDrainEntry"> | string | null
+    recordedBy?: StringWithAggregatesFilter<"EpisodeDrainEntry"> | string
+    recordedAt?: DateTimeWithAggregatesFilter<"EpisodeDrainEntry"> | Date | string
+    updatedBy?: StringNullableWithAggregatesFilter<"EpisodeDrainEntry"> | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"EpisodeDrainEntry"> | Date | string | null
   }
 
   export type MedicalHistoryWhereInput = {
@@ -39114,6 +41941,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
     residency: ResidencyCreateNestedOneWithoutPaymentsInput
     user?: UserCreateNestedOneWithoutSubscriptionPaymentsInput
@@ -39133,6 +41963,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
   }
 
@@ -39148,6 +41981,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneRequiredWithoutPaymentsNestedInput
     user?: UserUpdateOneWithoutSubscriptionPaymentsNestedInput
@@ -39167,6 +42003,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -39184,6 +42023,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
   }
 
@@ -39199,6 +42041,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -39216,6 +42061,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -39687,6 +42535,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateInput = {
@@ -39739,6 +42588,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUpdateInput = {
@@ -39791,6 +42641,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateInput = {
@@ -39843,6 +42694,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateManyInput = {
@@ -40569,6 +43421,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive?: boolean
     createdBy: string
+    dischargeReason?: string | null
+    dischargedBy?: string | null
+    dischargedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     residency: ResidencyCreateNestedOneWithoutWoundCaresInput
@@ -40587,6 +43442,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive?: boolean
     createdBy: string
+    dischargeReason?: string | null
+    dischargedBy?: string | null
+    dischargedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     logs?: WoundCareLogUncheckedCreateNestedManyWithoutWoundCareInput
@@ -40603,6 +43461,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneRequiredWithoutWoundCaresNestedInput
@@ -40621,6 +43482,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     logs?: WoundCareLogUncheckedUpdateManyWithoutWoundCareNestedInput
@@ -40638,6 +43502,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive?: boolean
     createdBy: string
+    dischargeReason?: string | null
+    dischargedBy?: string | null
+    dischargedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -40653,6 +43520,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40669,6 +43539,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40800,6 +43673,169 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EpisodeDrainCreateInput = {
+    id?: string
+    name: string
+    location?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdAt?: Date | string
+    removedBy?: string | null
+    removedAt?: Date | string | null
+    episode: EpisodeCreateNestedOneWithoutDrainsInput
+    entries?: EpisodeDrainEntryCreateNestedManyWithoutDrainInput
+  }
+
+  export type EpisodeDrainUncheckedCreateInput = {
+    id?: string
+    episodeId: string
+    name: string
+    location?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdAt?: Date | string
+    removedBy?: string | null
+    removedAt?: Date | string | null
+    entries?: EpisodeDrainEntryUncheckedCreateNestedManyWithoutDrainInput
+  }
+
+  export type EpisodeDrainUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    episode?: EpisodeUpdateOneRequiredWithoutDrainsNestedInput
+    entries?: EpisodeDrainEntryUpdateManyWithoutDrainNestedInput
+  }
+
+  export type EpisodeDrainUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    entries?: EpisodeDrainEntryUncheckedUpdateManyWithoutDrainNestedInput
+  }
+
+  export type EpisodeDrainCreateManyInput = {
+    id?: string
+    episodeId: string
+    name: string
+    location?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdAt?: Date | string
+    removedBy?: string | null
+    removedAt?: Date | string | null
+  }
+
+  export type EpisodeDrainUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EpisodeDrainUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EpisodeDrainEntryCreateInput = {
+    id?: string
+    volumeMl: number
+    characteristic?: string | null
+    recordedBy: string
+    recordedAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
+    drain: EpisodeDrainCreateNestedOneWithoutEntriesInput
+  }
+
+  export type EpisodeDrainEntryUncheckedCreateInput = {
+    id?: string
+    drainId: string
+    volumeMl: number
+    characteristic?: string | null
+    recordedBy: string
+    recordedAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type EpisodeDrainEntryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    volumeMl?: IntFieldUpdateOperationsInput | number
+    characteristic?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedBy?: StringFieldUpdateOperationsInput | string
+    recordedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    drain?: EpisodeDrainUpdateOneRequiredWithoutEntriesNestedInput
+  }
+
+  export type EpisodeDrainEntryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    drainId?: StringFieldUpdateOperationsInput | string
+    volumeMl?: IntFieldUpdateOperationsInput | number
+    characteristic?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedBy?: StringFieldUpdateOperationsInput | string
+    recordedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EpisodeDrainEntryCreateManyInput = {
+    id?: string
+    drainId: string
+    volumeMl: number
+    characteristic?: string | null
+    recordedBy: string
+    recordedAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type EpisodeDrainEntryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    volumeMl?: IntFieldUpdateOperationsInput | number
+    characteristic?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedBy?: StringFieldUpdateOperationsInput | string
+    recordedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EpisodeDrainEntryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    drainId?: StringFieldUpdateOperationsInput | string
+    volumeMl?: IntFieldUpdateOperationsInput | number
+    characteristic?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedBy?: StringFieldUpdateOperationsInput | string
+    recordedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -42366,6 +45402,9 @@ export namespace Prisma {
     requestedBy?: SortOrder
     reviewedBy?: SortOrder
     reviewedAt?: SortOrder
+    isTestReset?: SortOrder
+    resetAt?: SortOrder
+    resetBy?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -42388,6 +45427,9 @@ export namespace Prisma {
     requestedBy?: SortOrder
     reviewedBy?: SortOrder
     reviewedAt?: SortOrder
+    isTestReset?: SortOrder
+    resetAt?: SortOrder
+    resetBy?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -42405,6 +45447,9 @@ export namespace Prisma {
     requestedBy?: SortOrder
     reviewedBy?: SortOrder
     reviewedAt?: SortOrder
+    isTestReset?: SortOrder
+    resetAt?: SortOrder
+    resetBy?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -42829,6 +45874,12 @@ export namespace Prisma {
     none?: BaseDepartmentPlanEntryWhereInput
   }
 
+  export type EpisodeDrainListRelationFilter = {
+    every?: EpisodeDrainWhereInput
+    some?: EpisodeDrainWhereInput
+    none?: EpisodeDrainWhereInput
+  }
+
   export type NoteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -42870,6 +45921,10 @@ export namespace Prisma {
   }
 
   export type BaseDepartmentPlanEntryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EpisodeDrainOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -43321,6 +46376,9 @@ export namespace Prisma {
     baseDepartment?: SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
+    dischargeReason?: SortOrder
+    dischargedBy?: SortOrder
+    dischargedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43341,6 +46399,9 @@ export namespace Prisma {
     baseDepartment?: SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
+    dischargeReason?: SortOrder
+    dischargedBy?: SortOrder
+    dischargedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43357,6 +46418,9 @@ export namespace Prisma {
     baseDepartment?: SortOrder
     isActive?: SortOrder
     createdBy?: SortOrder
+    dischargeReason?: SortOrder
+    dischargedBy?: SortOrder
+    dischargedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43425,6 +46489,98 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type EpisodeDrainEntryListRelationFilter = {
+    every?: EpisodeDrainEntryWhereInput
+    some?: EpisodeDrainEntryWhereInput
+    none?: EpisodeDrainEntryWhereInput
+  }
+
+  export type EpisodeDrainEntryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EpisodeDrainCountOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    name?: SortOrder
+    location?: SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    removedBy?: SortOrder
+    removedAt?: SortOrder
+  }
+
+  export type EpisodeDrainMaxOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    name?: SortOrder
+    location?: SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    removedBy?: SortOrder
+    removedAt?: SortOrder
+  }
+
+  export type EpisodeDrainMinOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    name?: SortOrder
+    location?: SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    removedBy?: SortOrder
+    removedAt?: SortOrder
+  }
+
+  export type EpisodeDrainScalarRelationFilter = {
+    is?: EpisodeDrainWhereInput
+    isNot?: EpisodeDrainWhereInput
+  }
+
+  export type EpisodeDrainEntryCountOrderByAggregateInput = {
+    id?: SortOrder
+    drainId?: SortOrder
+    volumeMl?: SortOrder
+    characteristic?: SortOrder
+    recordedBy?: SortOrder
+    recordedAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EpisodeDrainEntryAvgOrderByAggregateInput = {
+    volumeMl?: SortOrder
+  }
+
+  export type EpisodeDrainEntryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    drainId?: SortOrder
+    volumeMl?: SortOrder
+    characteristic?: SortOrder
+    recordedBy?: SortOrder
+    recordedAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EpisodeDrainEntryMinOrderByAggregateInput = {
+    id?: SortOrder
+    drainId?: SortOrder
+    volumeMl?: SortOrder
+    characteristic?: SortOrder
+    recordedBy?: SortOrder
+    recordedAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EpisodeDrainEntrySumOrderByAggregateInput = {
+    volumeMl?: SortOrder
   }
 
   export type MedicalHistoryCountOrderByAggregateInput = {
@@ -44889,6 +48045,13 @@ export namespace Prisma {
     connect?: BaseDepartmentPlanEntryWhereUniqueInput | BaseDepartmentPlanEntryWhereUniqueInput[]
   }
 
+  export type EpisodeDrainCreateNestedManyWithoutEpisodeInput = {
+    create?: XOR<EpisodeDrainCreateWithoutEpisodeInput, EpisodeDrainUncheckedCreateWithoutEpisodeInput> | EpisodeDrainCreateWithoutEpisodeInput[] | EpisodeDrainUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: EpisodeDrainCreateOrConnectWithoutEpisodeInput | EpisodeDrainCreateOrConnectWithoutEpisodeInput[]
+    createMany?: EpisodeDrainCreateManyEpisodeInputEnvelope
+    connect?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+  }
+
   export type AllergyUncheckedCreateNestedManyWithoutEpisodeInput = {
     create?: XOR<AllergyCreateWithoutEpisodeInput, AllergyUncheckedCreateWithoutEpisodeInput> | AllergyCreateWithoutEpisodeInput[] | AllergyUncheckedCreateWithoutEpisodeInput[]
     connectOrCreate?: AllergyCreateOrConnectWithoutEpisodeInput | AllergyCreateOrConnectWithoutEpisodeInput[]
@@ -44997,6 +48160,13 @@ export namespace Prisma {
     connectOrCreate?: BaseDepartmentPlanEntryCreateOrConnectWithoutEpisodeInput | BaseDepartmentPlanEntryCreateOrConnectWithoutEpisodeInput[]
     createMany?: BaseDepartmentPlanEntryCreateManyEpisodeInputEnvelope
     connect?: BaseDepartmentPlanEntryWhereUniqueInput | BaseDepartmentPlanEntryWhereUniqueInput[]
+  }
+
+  export type EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput = {
+    create?: XOR<EpisodeDrainCreateWithoutEpisodeInput, EpisodeDrainUncheckedCreateWithoutEpisodeInput> | EpisodeDrainCreateWithoutEpisodeInput[] | EpisodeDrainUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: EpisodeDrainCreateOrConnectWithoutEpisodeInput | EpisodeDrainCreateOrConnectWithoutEpisodeInput[]
+    createMany?: EpisodeDrainCreateManyEpisodeInputEnvelope
+    connect?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
   }
 
   export type NullableFloatFieldUpdateOperationsInput = {
@@ -45251,6 +48421,20 @@ export namespace Prisma {
     deleteMany?: BaseDepartmentPlanEntryScalarWhereInput | BaseDepartmentPlanEntryScalarWhereInput[]
   }
 
+  export type EpisodeDrainUpdateManyWithoutEpisodeNestedInput = {
+    create?: XOR<EpisodeDrainCreateWithoutEpisodeInput, EpisodeDrainUncheckedCreateWithoutEpisodeInput> | EpisodeDrainCreateWithoutEpisodeInput[] | EpisodeDrainUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: EpisodeDrainCreateOrConnectWithoutEpisodeInput | EpisodeDrainCreateOrConnectWithoutEpisodeInput[]
+    upsert?: EpisodeDrainUpsertWithWhereUniqueWithoutEpisodeInput | EpisodeDrainUpsertWithWhereUniqueWithoutEpisodeInput[]
+    createMany?: EpisodeDrainCreateManyEpisodeInputEnvelope
+    set?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+    disconnect?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+    delete?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+    connect?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+    update?: EpisodeDrainUpdateWithWhereUniqueWithoutEpisodeInput | EpisodeDrainUpdateWithWhereUniqueWithoutEpisodeInput[]
+    updateMany?: EpisodeDrainUpdateManyWithWhereWithoutEpisodeInput | EpisodeDrainUpdateManyWithWhereWithoutEpisodeInput[]
+    deleteMany?: EpisodeDrainScalarWhereInput | EpisodeDrainScalarWhereInput[]
+  }
+
   export type AllergyUncheckedUpdateManyWithoutEpisodeNestedInput = {
     create?: XOR<AllergyCreateWithoutEpisodeInput, AllergyUncheckedCreateWithoutEpisodeInput> | AllergyCreateWithoutEpisodeInput[] | AllergyUncheckedCreateWithoutEpisodeInput[]
     connectOrCreate?: AllergyCreateOrConnectWithoutEpisodeInput | AllergyCreateOrConnectWithoutEpisodeInput[]
@@ -45467,6 +48651,20 @@ export namespace Prisma {
     deleteMany?: BaseDepartmentPlanEntryScalarWhereInput | BaseDepartmentPlanEntryScalarWhereInput[]
   }
 
+  export type EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput = {
+    create?: XOR<EpisodeDrainCreateWithoutEpisodeInput, EpisodeDrainUncheckedCreateWithoutEpisodeInput> | EpisodeDrainCreateWithoutEpisodeInput[] | EpisodeDrainUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: EpisodeDrainCreateOrConnectWithoutEpisodeInput | EpisodeDrainCreateOrConnectWithoutEpisodeInput[]
+    upsert?: EpisodeDrainUpsertWithWhereUniqueWithoutEpisodeInput | EpisodeDrainUpsertWithWhereUniqueWithoutEpisodeInput[]
+    createMany?: EpisodeDrainCreateManyEpisodeInputEnvelope
+    set?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+    disconnect?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+    delete?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+    connect?: EpisodeDrainWhereUniqueInput | EpisodeDrainWhereUniqueInput[]
+    update?: EpisodeDrainUpdateWithWhereUniqueWithoutEpisodeInput | EpisodeDrainUpdateWithWhereUniqueWithoutEpisodeInput[]
+    updateMany?: EpisodeDrainUpdateManyWithWhereWithoutEpisodeInput | EpisodeDrainUpdateManyWithWhereWithoutEpisodeInput[]
+    deleteMany?: EpisodeDrainScalarWhereInput | EpisodeDrainScalarWhereInput[]
+  }
+
   export type ResidencyCreateNestedOneWithoutConsultationsInput = {
     create?: XOR<ResidencyCreateWithoutConsultationsInput, ResidencyUncheckedCreateWithoutConsultationsInput>
     connectOrCreate?: ResidencyCreateOrConnectWithoutConsultationsInput
@@ -45665,6 +48863,76 @@ export namespace Prisma {
     upsert?: EpisodeUpsertWithoutBaseDepartmentPlanEntriesInput
     connect?: EpisodeWhereUniqueInput
     update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutBaseDepartmentPlanEntriesInput, EpisodeUpdateWithoutBaseDepartmentPlanEntriesInput>, EpisodeUncheckedUpdateWithoutBaseDepartmentPlanEntriesInput>
+  }
+
+  export type EpisodeCreateNestedOneWithoutDrainsInput = {
+    create?: XOR<EpisodeCreateWithoutDrainsInput, EpisodeUncheckedCreateWithoutDrainsInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutDrainsInput
+    connect?: EpisodeWhereUniqueInput
+  }
+
+  export type EpisodeDrainEntryCreateNestedManyWithoutDrainInput = {
+    create?: XOR<EpisodeDrainEntryCreateWithoutDrainInput, EpisodeDrainEntryUncheckedCreateWithoutDrainInput> | EpisodeDrainEntryCreateWithoutDrainInput[] | EpisodeDrainEntryUncheckedCreateWithoutDrainInput[]
+    connectOrCreate?: EpisodeDrainEntryCreateOrConnectWithoutDrainInput | EpisodeDrainEntryCreateOrConnectWithoutDrainInput[]
+    createMany?: EpisodeDrainEntryCreateManyDrainInputEnvelope
+    connect?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+  }
+
+  export type EpisodeDrainEntryUncheckedCreateNestedManyWithoutDrainInput = {
+    create?: XOR<EpisodeDrainEntryCreateWithoutDrainInput, EpisodeDrainEntryUncheckedCreateWithoutDrainInput> | EpisodeDrainEntryCreateWithoutDrainInput[] | EpisodeDrainEntryUncheckedCreateWithoutDrainInput[]
+    connectOrCreate?: EpisodeDrainEntryCreateOrConnectWithoutDrainInput | EpisodeDrainEntryCreateOrConnectWithoutDrainInput[]
+    createMany?: EpisodeDrainEntryCreateManyDrainInputEnvelope
+    connect?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+  }
+
+  export type EpisodeUpdateOneRequiredWithoutDrainsNestedInput = {
+    create?: XOR<EpisodeCreateWithoutDrainsInput, EpisodeUncheckedCreateWithoutDrainsInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutDrainsInput
+    upsert?: EpisodeUpsertWithoutDrainsInput
+    connect?: EpisodeWhereUniqueInput
+    update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutDrainsInput, EpisodeUpdateWithoutDrainsInput>, EpisodeUncheckedUpdateWithoutDrainsInput>
+  }
+
+  export type EpisodeDrainEntryUpdateManyWithoutDrainNestedInput = {
+    create?: XOR<EpisodeDrainEntryCreateWithoutDrainInput, EpisodeDrainEntryUncheckedCreateWithoutDrainInput> | EpisodeDrainEntryCreateWithoutDrainInput[] | EpisodeDrainEntryUncheckedCreateWithoutDrainInput[]
+    connectOrCreate?: EpisodeDrainEntryCreateOrConnectWithoutDrainInput | EpisodeDrainEntryCreateOrConnectWithoutDrainInput[]
+    upsert?: EpisodeDrainEntryUpsertWithWhereUniqueWithoutDrainInput | EpisodeDrainEntryUpsertWithWhereUniqueWithoutDrainInput[]
+    createMany?: EpisodeDrainEntryCreateManyDrainInputEnvelope
+    set?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+    disconnect?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+    delete?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+    connect?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+    update?: EpisodeDrainEntryUpdateWithWhereUniqueWithoutDrainInput | EpisodeDrainEntryUpdateWithWhereUniqueWithoutDrainInput[]
+    updateMany?: EpisodeDrainEntryUpdateManyWithWhereWithoutDrainInput | EpisodeDrainEntryUpdateManyWithWhereWithoutDrainInput[]
+    deleteMany?: EpisodeDrainEntryScalarWhereInput | EpisodeDrainEntryScalarWhereInput[]
+  }
+
+  export type EpisodeDrainEntryUncheckedUpdateManyWithoutDrainNestedInput = {
+    create?: XOR<EpisodeDrainEntryCreateWithoutDrainInput, EpisodeDrainEntryUncheckedCreateWithoutDrainInput> | EpisodeDrainEntryCreateWithoutDrainInput[] | EpisodeDrainEntryUncheckedCreateWithoutDrainInput[]
+    connectOrCreate?: EpisodeDrainEntryCreateOrConnectWithoutDrainInput | EpisodeDrainEntryCreateOrConnectWithoutDrainInput[]
+    upsert?: EpisodeDrainEntryUpsertWithWhereUniqueWithoutDrainInput | EpisodeDrainEntryUpsertWithWhereUniqueWithoutDrainInput[]
+    createMany?: EpisodeDrainEntryCreateManyDrainInputEnvelope
+    set?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+    disconnect?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+    delete?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+    connect?: EpisodeDrainEntryWhereUniqueInput | EpisodeDrainEntryWhereUniqueInput[]
+    update?: EpisodeDrainEntryUpdateWithWhereUniqueWithoutDrainInput | EpisodeDrainEntryUpdateWithWhereUniqueWithoutDrainInput[]
+    updateMany?: EpisodeDrainEntryUpdateManyWithWhereWithoutDrainInput | EpisodeDrainEntryUpdateManyWithWhereWithoutDrainInput[]
+    deleteMany?: EpisodeDrainEntryScalarWhereInput | EpisodeDrainEntryScalarWhereInput[]
+  }
+
+  export type EpisodeDrainCreateNestedOneWithoutEntriesInput = {
+    create?: XOR<EpisodeDrainCreateWithoutEntriesInput, EpisodeDrainUncheckedCreateWithoutEntriesInput>
+    connectOrCreate?: EpisodeDrainCreateOrConnectWithoutEntriesInput
+    connect?: EpisodeDrainWhereUniqueInput
+  }
+
+  export type EpisodeDrainUpdateOneRequiredWithoutEntriesNestedInput = {
+    create?: XOR<EpisodeDrainCreateWithoutEntriesInput, EpisodeDrainUncheckedCreateWithoutEntriesInput>
+    connectOrCreate?: EpisodeDrainCreateOrConnectWithoutEntriesInput
+    upsert?: EpisodeDrainUpsertWithoutEntriesInput
+    connect?: EpisodeDrainWhereUniqueInput
+    update?: XOR<XOR<EpisodeDrainUpdateToOneWithWhereWithoutEntriesInput, EpisodeDrainUpdateWithoutEntriesInput>, EpisodeDrainUncheckedUpdateWithoutEntriesInput>
   }
 
   export type PatientCreateNestedOneWithoutMedicalHistoryInput = {
@@ -46390,6 +49658,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutResidencyInput = {
@@ -46441,6 +49710,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutResidencyInput = {
@@ -46533,6 +49803,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
     user?: UserCreateNestedOneWithoutSubscriptionPaymentsInput
   }
@@ -46550,6 +49823,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
   }
 
@@ -46608,6 +49884,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive?: boolean
     createdBy: string
+    dischargeReason?: string | null
+    dischargedBy?: string | null
+    dischargedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     logs?: WoundCareLogCreateNestedManyWithoutWoundCareInput
@@ -46624,6 +49903,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive?: boolean
     createdBy: string
+    dischargeReason?: string | null
+    dischargedBy?: string | null
+    dischargedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     logs?: WoundCareLogUncheckedCreateNestedManyWithoutWoundCareInput
@@ -46849,6 +50131,9 @@ export namespace Prisma {
     requestedBy?: StringFilter<"SubscriptionPayment"> | string
     reviewedBy?: StringNullableFilter<"SubscriptionPayment"> | string | null
     reviewedAt?: DateTimeNullableFilter<"SubscriptionPayment"> | Date | string | null
+    isTestReset?: BoolFilter<"SubscriptionPayment"> | boolean
+    resetAt?: DateTimeNullableFilter<"SubscriptionPayment"> | Date | string | null
+    resetBy?: StringNullableFilter<"SubscriptionPayment"> | string | null
     createdAt?: DateTimeFilter<"SubscriptionPayment"> | Date | string
   }
 
@@ -46915,6 +50200,9 @@ export namespace Prisma {
     baseDepartment?: StringFilter<"WoundCare"> | string
     isActive?: BoolFilter<"WoundCare"> | boolean
     createdBy?: StringFilter<"WoundCare"> | string
+    dischargeReason?: StringNullableFilter<"WoundCare"> | string | null
+    dischargedBy?: StringNullableFilter<"WoundCare"> | string | null
+    dischargedAt?: DateTimeNullableFilter<"WoundCare"> | Date | string | null
     createdAt?: DateTimeFilter<"WoundCare"> | Date | string
     updatedAt?: DateTimeFilter<"WoundCare"> | Date | string
   }
@@ -47343,6 +50631,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutResponsibleInput = {
@@ -47394,6 +50683,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutResponsibleInput = {
@@ -47486,6 +50776,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
     residency: ResidencyCreateNestedOneWithoutPaymentsInput
   }
@@ -47503,6 +50796,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
   }
 
@@ -47904,6 +51200,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutPatientInput = {
@@ -47955,6 +51252,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutPatientInput = {
@@ -49050,6 +52348,40 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type EpisodeDrainCreateWithoutEpisodeInput = {
+    id?: string
+    name: string
+    location?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdAt?: Date | string
+    removedBy?: string | null
+    removedAt?: Date | string | null
+    entries?: EpisodeDrainEntryCreateNestedManyWithoutDrainInput
+  }
+
+  export type EpisodeDrainUncheckedCreateWithoutEpisodeInput = {
+    id?: string
+    name: string
+    location?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdAt?: Date | string
+    removedBy?: string | null
+    removedAt?: Date | string | null
+    entries?: EpisodeDrainEntryUncheckedCreateNestedManyWithoutDrainInput
+  }
+
+  export type EpisodeDrainCreateOrConnectWithoutEpisodeInput = {
+    where: EpisodeDrainWhereUniqueInput
+    create: XOR<EpisodeDrainCreateWithoutEpisodeInput, EpisodeDrainUncheckedCreateWithoutEpisodeInput>
+  }
+
+  export type EpisodeDrainCreateManyEpisodeInputEnvelope = {
+    data: EpisodeDrainCreateManyEpisodeInput | EpisodeDrainCreateManyEpisodeInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ResidencyUpsertWithoutEpisodesInput = {
     update: XOR<ResidencyUpdateWithoutEpisodesInput, ResidencyUncheckedUpdateWithoutEpisodesInput>
     create: XOR<ResidencyCreateWithoutEpisodesInput, ResidencyUncheckedCreateWithoutEpisodesInput>
@@ -49723,6 +53055,37 @@ export namespace Prisma {
     updatedAt?: DateTimeNullableFilter<"BaseDepartmentPlanEntry"> | Date | string | null
   }
 
+  export type EpisodeDrainUpsertWithWhereUniqueWithoutEpisodeInput = {
+    where: EpisodeDrainWhereUniqueInput
+    update: XOR<EpisodeDrainUpdateWithoutEpisodeInput, EpisodeDrainUncheckedUpdateWithoutEpisodeInput>
+    create: XOR<EpisodeDrainCreateWithoutEpisodeInput, EpisodeDrainUncheckedCreateWithoutEpisodeInput>
+  }
+
+  export type EpisodeDrainUpdateWithWhereUniqueWithoutEpisodeInput = {
+    where: EpisodeDrainWhereUniqueInput
+    data: XOR<EpisodeDrainUpdateWithoutEpisodeInput, EpisodeDrainUncheckedUpdateWithoutEpisodeInput>
+  }
+
+  export type EpisodeDrainUpdateManyWithWhereWithoutEpisodeInput = {
+    where: EpisodeDrainScalarWhereInput
+    data: XOR<EpisodeDrainUpdateManyMutationInput, EpisodeDrainUncheckedUpdateManyWithoutEpisodeInput>
+  }
+
+  export type EpisodeDrainScalarWhereInput = {
+    AND?: EpisodeDrainScalarWhereInput | EpisodeDrainScalarWhereInput[]
+    OR?: EpisodeDrainScalarWhereInput[]
+    NOT?: EpisodeDrainScalarWhereInput | EpisodeDrainScalarWhereInput[]
+    id?: StringFilter<"EpisodeDrain"> | string
+    episodeId?: StringFilter<"EpisodeDrain"> | string
+    name?: StringFilter<"EpisodeDrain"> | string
+    location?: StringNullableFilter<"EpisodeDrain"> | string | null
+    isActive?: BoolFilter<"EpisodeDrain"> | boolean
+    createdBy?: StringFilter<"EpisodeDrain"> | string
+    createdAt?: DateTimeFilter<"EpisodeDrain"> | Date | string
+    removedBy?: StringNullableFilter<"EpisodeDrain"> | string | null
+    removedAt?: DateTimeNullableFilter<"EpisodeDrain"> | Date | string | null
+  }
+
   export type ResidencyCreateWithoutConsultationsInput = {
     id?: string
     name: string
@@ -50128,6 +53491,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutInternalMedicineProfileInput = {
@@ -50179,6 +53543,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutInternalMedicineProfileInput = {
@@ -50246,6 +53611,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutInternalMedicineProfileInput = {
@@ -50297,6 +53663,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutSurgicalProfileInput = {
@@ -50348,6 +53715,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutSurgicalProfileInput = {
@@ -50399,6 +53767,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutSurgicalProfileInput = {
@@ -50466,6 +53835,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutSurgicalProfileInput = {
@@ -50517,6 +53887,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutAntibioticsInput = {
@@ -50568,6 +53939,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutAntibioticsInput = {
@@ -50619,6 +53991,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutAntibioticsInput = {
@@ -50686,6 +54059,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutAntibioticsInput = {
@@ -50737,6 +54111,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type ResidencyCreateWithoutSurgicalDevicesInput = {
@@ -50863,6 +54238,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutSurgicalDevicesInput = {
@@ -50914,6 +54290,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutSurgicalDevicesInput = {
@@ -51062,6 +54439,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutSurgicalDevicesInput = {
@@ -51113,6 +54491,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type ResidencyCreateWithoutWoundCaresInput = {
@@ -51333,6 +54712,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive?: boolean
     createdBy: string
+    dischargeReason?: string | null
+    dischargedBy?: string | null
+    dischargedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     residency: ResidencyCreateNestedOneWithoutWoundCaresInput
@@ -51350,6 +54732,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive?: boolean
     createdBy: string
+    dischargeReason?: string | null
+    dischargedBy?: string | null
+    dischargedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -51381,6 +54766,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneRequiredWithoutWoundCaresNestedInput
@@ -51398,6 +54786,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -51451,6 +54842,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutBaseDepartmentPlanEntriesInput = {
@@ -51502,6 +54894,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutBaseDepartmentPlanEntriesInput = {
@@ -51569,6 +54962,7 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutBaseDepartmentPlanEntriesInput = {
@@ -51620,6 +55014,355 @@ export namespace Prisma {
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeCreateWithoutDrainsInput = {
+    id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
+    admissionDate?: Date | string
+    admissionType: string
+    chiefComplaint?: string | null
+    status?: string
+    room?: string | null
+    bed?: string | null
+    attendingDoctor?: string | null
+    admittingDoctor?: string | null
+    primaryDiagnosis?: string | null
+    secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
+    currentTreatment?: string | null
+    treatmentUpdatedBy?: string | null
+    treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
+    baseDepartmentPlan?: string | null
+    anthropometryWeight?: number | null
+    anthropometryWeightUnit?: string | null
+    anthropometryHeightCm?: number | null
+    anthropometryUpdatedBy?: string | null
+    anthropometryUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    responsibleSince?: Date | string | null
+    residency?: ResidencyCreateNestedOneWithoutEpisodesInput
+    patient: PatientCreateNestedOneWithoutEpisodesInput
+    allergies?: AllergyCreateNestedManyWithoutEpisodeInput
+    notes?: NoteCreateNestedManyWithoutEpisodeInput
+    vitals?: VitalSignCreateNestedManyWithoutEpisodeInput
+    handoffs?: HandoffCreateNestedManyWithoutEpisodeInput
+    responsible?: UserCreateNestedOneWithoutEpisodesAtChargeInput
+    tasks?: TaskCreateNestedManyWithoutEpisodeInput
+    importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
+    gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
+    studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
+    viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
+    vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
+    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
+    surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
+    surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeUncheckedCreateWithoutDrainsInput = {
+    id?: string
+    residencyId?: string | null
+    patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
+    admissionDate?: Date | string
+    admissionType: string
+    chiefComplaint?: string | null
+    status?: string
+    room?: string | null
+    bed?: string | null
+    attendingDoctor?: string | null
+    admittingDoctor?: string | null
+    primaryDiagnosis?: string | null
+    secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
+    currentTreatment?: string | null
+    treatmentUpdatedBy?: string | null
+    treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
+    baseDepartmentPlan?: string | null
+    anthropometryWeight?: number | null
+    anthropometryWeightUnit?: string | null
+    anthropometryHeightCm?: number | null
+    anthropometryUpdatedBy?: string | null
+    anthropometryUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    responsibleId?: string | null
+    responsibleSince?: Date | string | null
+    allergies?: AllergyUncheckedCreateNestedManyWithoutEpisodeInput
+    notes?: NoteUncheckedCreateNestedManyWithoutEpisodeInput
+    vitals?: VitalSignUncheckedCreateNestedManyWithoutEpisodeInput
+    handoffs?: HandoffUncheckedCreateNestedManyWithoutEpisodeInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
+    importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
+    gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
+    studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
+    viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
+    vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
+    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
+    surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeCreateOrConnectWithoutDrainsInput = {
+    where: EpisodeWhereUniqueInput
+    create: XOR<EpisodeCreateWithoutDrainsInput, EpisodeUncheckedCreateWithoutDrainsInput>
+  }
+
+  export type EpisodeDrainEntryCreateWithoutDrainInput = {
+    id?: string
+    volumeMl: number
+    characteristic?: string | null
+    recordedBy: string
+    recordedAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type EpisodeDrainEntryUncheckedCreateWithoutDrainInput = {
+    id?: string
+    volumeMl: number
+    characteristic?: string | null
+    recordedBy: string
+    recordedAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type EpisodeDrainEntryCreateOrConnectWithoutDrainInput = {
+    where: EpisodeDrainEntryWhereUniqueInput
+    create: XOR<EpisodeDrainEntryCreateWithoutDrainInput, EpisodeDrainEntryUncheckedCreateWithoutDrainInput>
+  }
+
+  export type EpisodeDrainEntryCreateManyDrainInputEnvelope = {
+    data: EpisodeDrainEntryCreateManyDrainInput | EpisodeDrainEntryCreateManyDrainInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EpisodeUpsertWithoutDrainsInput = {
+    update: XOR<EpisodeUpdateWithoutDrainsInput, EpisodeUncheckedUpdateWithoutDrainsInput>
+    create: XOR<EpisodeCreateWithoutDrainsInput, EpisodeUncheckedCreateWithoutDrainsInput>
+    where?: EpisodeWhereInput
+  }
+
+  export type EpisodeUpdateToOneWithWhereWithoutDrainsInput = {
+    where?: EpisodeWhereInput
+    data: XOR<EpisodeUpdateWithoutDrainsInput, EpisodeUncheckedUpdateWithoutDrainsInput>
+  }
+
+  export type EpisodeUpdateWithoutDrainsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    admissionType?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    bed?: NullableStringFieldUpdateOperationsInput | string | null
+    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryHeightCm?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    residency?: ResidencyUpdateOneWithoutEpisodesNestedInput
+    patient?: PatientUpdateOneRequiredWithoutEpisodesNestedInput
+    allergies?: AllergyUpdateManyWithoutEpisodeNestedInput
+    notes?: NoteUpdateManyWithoutEpisodeNestedInput
+    vitals?: VitalSignUpdateManyWithoutEpisodeNestedInput
+    handoffs?: HandoffUpdateManyWithoutEpisodeNestedInput
+    responsible?: UserUpdateOneWithoutEpisodesAtChargeNestedInput
+    tasks?: TaskUpdateManyWithoutEpisodeNestedInput
+    importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
+    gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
+    studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
+    viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
+    vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
+    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
+    surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
+    surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeUncheckedUpdateWithoutDrainsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    admissionType?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    bed?: NullableStringFieldUpdateOperationsInput | string | null
+    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryHeightCm?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergies?: AllergyUncheckedUpdateManyWithoutEpisodeNestedInput
+    notes?: NoteUncheckedUpdateManyWithoutEpisodeNestedInput
+    vitals?: VitalSignUncheckedUpdateManyWithoutEpisodeNestedInput
+    handoffs?: HandoffUncheckedUpdateManyWithoutEpisodeNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
+    importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
+    gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
+    studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
+    viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
+    vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
+    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
+    surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeDrainEntryUpsertWithWhereUniqueWithoutDrainInput = {
+    where: EpisodeDrainEntryWhereUniqueInput
+    update: XOR<EpisodeDrainEntryUpdateWithoutDrainInput, EpisodeDrainEntryUncheckedUpdateWithoutDrainInput>
+    create: XOR<EpisodeDrainEntryCreateWithoutDrainInput, EpisodeDrainEntryUncheckedCreateWithoutDrainInput>
+  }
+
+  export type EpisodeDrainEntryUpdateWithWhereUniqueWithoutDrainInput = {
+    where: EpisodeDrainEntryWhereUniqueInput
+    data: XOR<EpisodeDrainEntryUpdateWithoutDrainInput, EpisodeDrainEntryUncheckedUpdateWithoutDrainInput>
+  }
+
+  export type EpisodeDrainEntryUpdateManyWithWhereWithoutDrainInput = {
+    where: EpisodeDrainEntryScalarWhereInput
+    data: XOR<EpisodeDrainEntryUpdateManyMutationInput, EpisodeDrainEntryUncheckedUpdateManyWithoutDrainInput>
+  }
+
+  export type EpisodeDrainEntryScalarWhereInput = {
+    AND?: EpisodeDrainEntryScalarWhereInput | EpisodeDrainEntryScalarWhereInput[]
+    OR?: EpisodeDrainEntryScalarWhereInput[]
+    NOT?: EpisodeDrainEntryScalarWhereInput | EpisodeDrainEntryScalarWhereInput[]
+    id?: StringFilter<"EpisodeDrainEntry"> | string
+    drainId?: StringFilter<"EpisodeDrainEntry"> | string
+    volumeMl?: IntFilter<"EpisodeDrainEntry"> | number
+    characteristic?: StringNullableFilter<"EpisodeDrainEntry"> | string | null
+    recordedBy?: StringFilter<"EpisodeDrainEntry"> | string
+    recordedAt?: DateTimeFilter<"EpisodeDrainEntry"> | Date | string
+    updatedBy?: StringNullableFilter<"EpisodeDrainEntry"> | string | null
+    updatedAt?: DateTimeNullableFilter<"EpisodeDrainEntry"> | Date | string | null
+  }
+
+  export type EpisodeDrainCreateWithoutEntriesInput = {
+    id?: string
+    name: string
+    location?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdAt?: Date | string
+    removedBy?: string | null
+    removedAt?: Date | string | null
+    episode: EpisodeCreateNestedOneWithoutDrainsInput
+  }
+
+  export type EpisodeDrainUncheckedCreateWithoutEntriesInput = {
+    id?: string
+    episodeId: string
+    name: string
+    location?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdAt?: Date | string
+    removedBy?: string | null
+    removedAt?: Date | string | null
+  }
+
+  export type EpisodeDrainCreateOrConnectWithoutEntriesInput = {
+    where: EpisodeDrainWhereUniqueInput
+    create: XOR<EpisodeDrainCreateWithoutEntriesInput, EpisodeDrainUncheckedCreateWithoutEntriesInput>
+  }
+
+  export type EpisodeDrainUpsertWithoutEntriesInput = {
+    update: XOR<EpisodeDrainUpdateWithoutEntriesInput, EpisodeDrainUncheckedUpdateWithoutEntriesInput>
+    create: XOR<EpisodeDrainCreateWithoutEntriesInput, EpisodeDrainUncheckedCreateWithoutEntriesInput>
+    where?: EpisodeDrainWhereInput
+  }
+
+  export type EpisodeDrainUpdateToOneWithWhereWithoutEntriesInput = {
+    where?: EpisodeDrainWhereInput
+    data: XOR<EpisodeDrainUpdateWithoutEntriesInput, EpisodeDrainUncheckedUpdateWithoutEntriesInput>
+  }
+
+  export type EpisodeDrainUpdateWithoutEntriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    episode?: EpisodeUpdateOneRequiredWithoutDrainsNestedInput
+  }
+
+  export type EpisodeDrainUncheckedUpdateWithoutEntriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PatientCreateWithoutMedicalHistoryInput = {
@@ -51775,6 +55518,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutImportantAlertsInput = {
@@ -51826,6 +55570,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutImportantAlertsInput = {
@@ -51893,6 +55638,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutImportantAlertsInput = {
@@ -51944,6 +55690,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutGfrRecordsInput = {
@@ -51995,6 +55742,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutGfrRecordsInput = {
@@ -52046,6 +55794,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutGfrRecordsInput = {
@@ -52113,6 +55862,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutGfrRecordsInput = {
@@ -52164,6 +55914,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutLabReportsInput = {
@@ -52215,6 +55966,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutLabReportsInput = {
@@ -52266,6 +56018,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutLabReportsInput = {
@@ -52333,6 +56086,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutLabReportsInput = {
@@ -52384,6 +56138,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutStudyReportsInput = {
@@ -52435,6 +56190,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutStudyReportsInput = {
@@ -52486,6 +56242,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutStudyReportsInput = {
@@ -52553,6 +56310,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutStudyReportsInput = {
@@ -52604,6 +56362,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type PatientCreateWithoutViralSerologiesInput = {
@@ -52704,6 +56463,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutViralSerologiesInput = {
@@ -52755,6 +56515,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutViralSerologiesInput = {
@@ -52877,6 +56638,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutViralSerologiesInput = {
@@ -52928,6 +56690,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutVascularAccessesInput = {
@@ -52979,6 +56742,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutVascularAccessesInput = {
@@ -53030,6 +56794,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutVascularAccessesInput = {
@@ -53097,6 +56862,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutVascularAccessesInput = {
@@ -53148,6 +56914,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type PatientCreateWithoutAllergiesInput = {
@@ -53248,6 +57015,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutAllergiesInput = {
@@ -53299,6 +57067,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutAllergiesInput = {
@@ -53421,6 +57190,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutAllergiesInput = {
@@ -53472,6 +57242,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutNotesInput = {
@@ -53523,6 +57294,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutNotesInput = {
@@ -53574,6 +57346,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutNotesInput = {
@@ -53641,6 +57414,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutNotesInput = {
@@ -53692,6 +57466,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutVitalsInput = {
@@ -53743,6 +57518,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutVitalsInput = {
@@ -53794,6 +57570,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutVitalsInput = {
@@ -53861,6 +57638,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutVitalsInput = {
@@ -53912,6 +57690,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutHandoffsInput = {
@@ -53963,6 +57742,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutHandoffsInput = {
@@ -54014,6 +57794,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutHandoffsInput = {
@@ -54081,6 +57862,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutHandoffsInput = {
@@ -54132,6 +57914,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateWithoutTasksInput = {
@@ -54183,6 +57966,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutTasksInput = {
@@ -54234,6 +58018,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutTasksInput = {
@@ -54301,6 +58086,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutTasksInput = {
@@ -54352,6 +58138,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type UserCreateManyResidencyInput = {
@@ -54464,6 +58251,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
   }
 
@@ -54490,6 +58280,9 @@ export namespace Prisma {
     baseDepartment: string
     isActive?: boolean
     createdBy: string
+    dischargeReason?: string | null
+    dischargedBy?: string | null
+    dischargedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -54660,6 +58453,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutResidencyInput = {
@@ -54711,6 +58505,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutResidencyInput = {
@@ -54847,6 +58642,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutSubscriptionPaymentsNestedInput
   }
@@ -54864,6 +58662,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -54880,6 +58681,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -54930,6 +58734,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     logs?: WoundCareLogUpdateManyWithoutWoundCareNestedInput
@@ -54946,6 +58753,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     logs?: WoundCareLogUncheckedUpdateManyWithoutWoundCareNestedInput
@@ -54962,6 +58772,9 @@ export namespace Prisma {
     baseDepartment?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdBy?: StringFieldUpdateOperationsInput | string
+    dischargeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    dischargedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -55062,6 +58875,9 @@ export namespace Prisma {
     requestedBy: string
     reviewedBy?: string | null
     reviewedAt?: Date | string | null
+    isTestReset?: boolean
+    resetAt?: Date | string | null
+    resetBy?: string | null
     createdAt?: Date | string
   }
 
@@ -55171,6 +58987,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutResponsibleInput = {
@@ -55222,6 +59039,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutResponsibleInput = {
@@ -55358,6 +59176,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     residency?: ResidencyUpdateOneRequiredWithoutPaymentsNestedInput
   }
@@ -55375,6 +59196,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -55391,6 +59215,9 @@ export namespace Prisma {
     requestedBy?: StringFieldUpdateOperationsInput | string
     reviewedBy?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isTestReset?: BoolFieldUpdateOperationsInput | boolean
+    resetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resetBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -55528,6 +59355,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutPatientInput = {
@@ -55579,6 +59407,7 @@ export namespace Prisma {
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutPatientInput = {
@@ -55935,6 +59764,17 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedBy?: string | null
     updatedAt?: Date | string | null
+  }
+
+  export type EpisodeDrainCreateManyEpisodeInput = {
+    id?: string
+    name: string
+    location?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdAt?: Date | string
+    removedBy?: string | null
+    removedAt?: Date | string | null
   }
 
   export type AllergyUpdateWithoutEpisodeInput = {
@@ -56450,6 +60290,41 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type EpisodeDrainUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    entries?: EpisodeDrainEntryUpdateManyWithoutDrainNestedInput
+  }
+
+  export type EpisodeDrainUncheckedUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    entries?: EpisodeDrainEntryUncheckedUpdateManyWithoutDrainNestedInput
+  }
+
+  export type EpisodeDrainUncheckedUpdateManyWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    removedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    removedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type WoundCareLogCreateManyWoundCareInput = {
     id?: string
     performedBy: string
@@ -56476,6 +60351,46 @@ export namespace Prisma {
     performedBy?: StringFieldUpdateOperationsInput | string
     performedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EpisodeDrainEntryCreateManyDrainInput = {
+    id?: string
+    volumeMl: number
+    characteristic?: string | null
+    recordedBy: string
+    recordedAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type EpisodeDrainEntryUpdateWithoutDrainInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    volumeMl?: IntFieldUpdateOperationsInput | number
+    characteristic?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedBy?: StringFieldUpdateOperationsInput | string
+    recordedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EpisodeDrainEntryUncheckedUpdateWithoutDrainInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    volumeMl?: IntFieldUpdateOperationsInput | number
+    characteristic?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedBy?: StringFieldUpdateOperationsInput | string
+    recordedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EpisodeDrainEntryUncheckedUpdateManyWithoutDrainInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    volumeMl?: IntFieldUpdateOperationsInput | number
+    characteristic?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedBy?: StringFieldUpdateOperationsInput | string
+    recordedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
 
