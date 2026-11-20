@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { CheckSquare, Plus, ClipboardCheck, Clock, UserCheck, Archive, Search } from 'lucide-react'
+import { CheckSquare, Plus, ClipboardCheck, Clock, UserCheck, Archive } from 'lucide-react'
 import {
   archivarCuraPaciente,
   crearCuraPaciente,
@@ -155,14 +155,22 @@ export function CurasPanel({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative min-w-52">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative min-w-56">
             <input
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar habitación, paciente, depto..."
-              className="w-full pl-8 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              placeholder="🔍 Buscar habitación, paciente, depto..."
+              className="w-full px-3 py-2 pr-8 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {busqueda && (
+              <button
+                type="button"
+                onClick={() => setBusqueda('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs px-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
           {puedeRegistrar && (

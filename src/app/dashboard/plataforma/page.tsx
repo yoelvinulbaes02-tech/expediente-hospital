@@ -556,8 +556,8 @@ export default async function PlataformaPage({
               <input
                 name="pq"
                 defaultValue={filtroTextoPago}
-                placeholder="Buscar usuario, correo o ref..."
-                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white w-48"
+                placeholder="🔍 Buscar usuario, correo o ref..."
+                className="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white w-52 outline-none focus:ring-2 focus:ring-blue-500"
               />
 
               <button

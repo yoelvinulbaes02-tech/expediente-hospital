@@ -18,7 +18,6 @@ import {
   Pill,
   Plus,
   RotateCcw,
-  Search,
   Syringe,
   X,
 } from 'lucide-react'
@@ -86,7 +85,6 @@ const PRESETS_CULTIVO = [
   'Hemocultivo central',
   'Urocultivo',
   'Líquido peritoneal (DP)',
-  'Punta de catéter',
   'Cultivo de secreción / herida',
 ] as const
 
@@ -181,6 +179,23 @@ const fmtDiaLargo = (iso: string) =>
     year: 'numeric',
   })
 
+const fmtDiaGrupoTitulo = (claveDia: string) => {
+  const texto = new Date(`${claveDia}T12:00:00-04:00`).toLocaleDateString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+  return texto.charAt(0).toUpperCase() + texto.slice(1)
+}
+
+function sumarDiasClave(claveDia: string, deltaDias: number): string {
+  const base = new Date(`${claveDia}T12:00:00-04:00`)
+  base.setUTCDate(base.getUTCDate() + deltaDias)
+  return fmtFechaInput(base.toISOString())
+}
+
 function calcularDiasDesde(fechaIso: string | null, ahoraIso: string): number | null {
   if (!fechaIso) return null
   const inicio = new Date(fechaIso).getTime()
@@ -212,6 +227,10 @@ export function HemodialisisPanel({
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
 
   // Estados de formularios de creación (controlados para presets rápidos)
+  const hoyInput = fmtFechaInput(ahoraIso)
+  const mananaInput = sumarDiasClave(hoyInput, 1)
+  const [fechaNovedad, setFechaNovedad] = useState(hoyInput)
+  const [diasNovedadCerrados, setDiasNovedadCerrados] = useState<Record<string, boolean>>({})
   const [cultivoTipoNuevo, setCultivoTipoNuevo] = useState('')
   const [notaEsServicio, setNotaEsServicio] = useState(false)
 
@@ -222,8 +241,6 @@ export function HemodialisisPanel({
   const [openCultivos, setOpenCultivos] = useEstadoPanel(STORAGE_KEYS.cultivo, true)
   const [openNotas, setOpenNotas] = useEstadoPanel(STORAGE_KEYS.nota, true)
   const [openHistorial, setOpenHistorial] = useEstadoPanel(STORAGE_KEYS.historial, false)
-
-  const hoyInput = fmtFechaInput(ahoraIso)
 
   const todosPrincipalesAbiertos =
     openNovedades && openPreDialisis && openAntibioticos && openCultivos && openNotas
@@ -273,6 +290,23 @@ export function HemodialisisPanel({
     const notas = filtradosActivos.filter((i) => i.section === 'nota')
     return { novedades, predialisis, antibioticos, cultivos, notas }
   }, [filtradosActivos])
+
+  const novedadesPorDia = useMemo(() => {
+    const mapa = new Map<string, HemodialisisItemData[]>()
+    for (const item of porSeccion.novedades) {
+      const clave = fmtFechaInput(item.eventDate ?? item.createdAt)
+      const lista = mapa.get(clave) ?? []
+      lista.push(item)
+      mapa.set(clave, lista)
+    }
+    return Array.from(mapa.entries())
+      .sort(([a], [b]) => b.localeCompare(a))
+      .map(([claveDia, lista]) => ({
+        claveDia,
+        titulo: fmtDiaGrupoTitulo(claveDia),
+        items: lista,
+      }))
+  }, [porSeccion.novedades])
 
   const handleCrear = (e: React.FormEvent<HTMLFormElement>, section: SeccionHd) => {
     e.preventDefault()
@@ -637,19 +671,18 @@ export function HemodialisisPanel({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="relative min-w-56">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="relative min-w-60">
               <input
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Buscar paciente, antibiótico, cultivo..."
-                className="w-full pl-8 pr-7 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                placeholder="🔍 Buscar paciente, antibiótico, cultivo..."
+                className="w-full px-3 py-2 pr-8 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500"
               />
               {busqueda && (
                 <button
                   type="button"
                   onClick={() => setBusqueda('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs px-1 cursor-pointer"
                 >
                   ✕
                 </button>
@@ -749,7 +782,14 @@ export function HemodialisisPanel({
             {puedeRegistrar && openNovedades && (
               <button
                 type="button"
-                onClick={() => setFormAbierto(formAbierto === 'novedad' ? null : 'novedad')}
+                onClick={() => {
+                  if (formAbierto === 'novedad') {
+                    setFormAbierto(null)
+                  } else {
+                    setFechaNovedad(hoyInput)
+                    setFormAbierto('novedad')
+                  }
+                }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -807,14 +847,40 @@ export function HemodialisisPanel({
                   </div>
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Fecha de guardia
+                      Fecha correspondiente *
                     </label>
-                    <input
-                      type="date"
-                      name="eventDate"
-                      defaultValue={hoyInput}
-                      className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums"
-                    />
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="date"
+                        name="eventDate"
+                        required
+                        value={fechaNovedad}
+                        onChange={(e) => setFechaNovedad(e.target.value)}
+                        className="flex-1 px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFechaNovedad(hoyInput)}
+                        className={`px-2 py-1.5 rounded-md text-[11px] font-semibold border cursor-pointer ${
+                          fechaNovedad === hoyInput
+                            ? 'bg-blue-600 text-white border-blue-700'
+                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600'
+                        }`}
+                      >
+                        Hoy
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFechaNovedad(mananaInput)}
+                        className={`px-2 py-1.5 rounded-md text-[11px] font-semibold border cursor-pointer ${
+                          fechaNovedad === mananaInput
+                            ? 'bg-blue-600 text-white border-blue-700'
+                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600'
+                        }`}
+                      >
+                        Mañana
+                      </button>
+                    </div>
                   </div>
                   <div className="flex items-end pb-1">
                     <label className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
@@ -863,62 +929,127 @@ export function HemodialisisPanel({
               </form>
             )}
 
-            {porSeccion.novedades.length === 0 ? (
+            {novedadesPorDia.length === 0 ? (
               <p className="text-xs text-slate-400 italic py-2">
                 No hay novedades activas registradas para la guardia actual.
               </p>
             ) : (
-              <div className="divide-y divide-slate-100 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
-                {porSeccion.novedades.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`p-3.5 space-y-2 ${
-                      item.isPriority
-                        ? 'bg-amber-50/40 dark:bg-amber-950/15'
-                        : 'bg-white dark:bg-slate-800'
-                    }`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                      <div className="space-y-1 min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
-                          <span className="font-bold text-slate-900 dark:text-white text-sm">
-                            {item.patientName}
+              <div className="space-y-4">
+                {novedadesPorDia.map((grupo) => {
+                  const diaRetraido = !!diasNovedadCerrados[grupo.claveDia]
+                  return (
+                    <div
+                      key={grupo.claveDia}
+                      className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden"
+                    >
+                      <div className="bg-slate-50 dark:bg-slate-900/60 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                            {grupo.titulo}
+                          </h4>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
+                            · {grupo.items.length} {grupo.items.length === 1 ? 'novedad' : 'novedades'}
                           </span>
-                          {item.shiftLabel && (
-                            <span className="text-slate-600 dark:text-slate-300 font-medium">
-                              · {item.shiftLabel}
-                            </span>
-                          )}
-                          {item.eventDate && (
-                            <span className="text-slate-500 dark:text-slate-400 tabular-nums">
-                              · {fmtFechaCorta(item.eventDate)}
-                            </span>
-                          )}
-                          {item.isPriority && (
-                            <span className="text-red-700 dark:text-red-300 font-bold">
-                              · Prioritario
+                          {grupo.claveDia === hoyInput && (
+                            <span className="text-xs font-bold text-blue-700 dark:text-blue-300">
+                              · Hoy
                             </span>
                           )}
                         </div>
-                        <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-100 font-medium leading-relaxed">
-                          {item.title}
-                        </p>
-                        {item.details && (
-                          <p className="text-xs text-slate-600 dark:text-slate-300">{item.details}</p>
-                        )}
+
+                        <div className="flex items-center gap-2">
+                          {puedeRegistrar && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setFechaNovedad(grupo.claveDia)
+                                setFormAbierto('novedad')
+                              }}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 text-[11px] font-bold hover:bg-blue-50 cursor-pointer"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span>Agregar a este día</span>
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setDiasNovedadCerrados((prev) => ({
+                                ...prev,
+                                [grupo.claveDia]: !prev[grupo.claveDia],
+                              }))
+                            }
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-semibold cursor-pointer"
+                          >
+                            {diaRetraido ? (
+                              <>
+                                <ChevronDown className="w-3 h-3" />
+                                <span>Expandir</span>
+                              </>
+                            ) : (
+                              <>
+                                <ChevronUp className="w-3 h-3" />
+                                <span>Retraer</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="shrink-0">
-                        {renderItemActions(
-                          item,
-                          'Resolver',
-                          'Nota de resolución (opcional, ej. Rx vista, hemocultivo tomado)'
-                        )}
-                      </div>
+                      {!diaRetraido && (
+                        <div className="divide-y divide-slate-100 dark:divide-slate-700">
+                          {grupo.items.map((item) => (
+                            <div
+                              key={item.id}
+                              className={`p-3.5 space-y-2 ${
+                                item.isPriority
+                                  ? 'bg-amber-50/40 dark:bg-amber-950/15'
+                                  : 'bg-white dark:bg-slate-800'
+                              }`}
+                            >
+                              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                                <div className="space-y-1 min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+                                    <span className="font-bold text-slate-900 dark:text-white text-sm">
+                                      {item.patientName}
+                                    </span>
+                                    {item.shiftLabel && (
+                                      <span className="text-slate-600 dark:text-slate-300 font-medium">
+                                        · {item.shiftLabel}
+                                      </span>
+                                    )}
+                                    {item.isPriority && (
+                                      <span className="text-red-700 dark:text-red-300 font-bold">
+                                        · Prioritario
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-100 font-medium leading-relaxed">
+                                    {item.title}
+                                  </p>
+                                  {item.details && (
+                                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                                      {item.details}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div className="shrink-0">
+                                  {renderItemActions(
+                                    item,
+                                    'Resolver',
+                                    'Nota de resolución (opcional, ej. Rx vista, hemocultivo tomado)'
+                                  )}
+                                </div>
+                              </div>
+                              {renderAuditMetadata(item)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {renderAuditMetadata(item)}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
