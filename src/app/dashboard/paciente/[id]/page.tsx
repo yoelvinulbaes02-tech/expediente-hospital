@@ -972,6 +972,20 @@ export default async function ExpedientePage({
           <BannerAlergias alergias={episode.allergies} />
         </div>
 
+        {/* CONTROL INDEPENDIENTE DE DRENAJES (CIRUGÍA) — PRIMERO QUE SIGNOS VITALES */}
+        {esModoCirugia && (
+          <div className="mt-6">
+            <ControlDrenajes
+              episodeId={episode.id}
+              drenajes={drenajesSerializados}
+              nombres={nombres}
+              roles={roles}
+              puedeRegistrar={permisos.puedeRegistrar}
+              ahoraIso={ahoraIso}
+            />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           {/* Columna Izquierda */}
           <div className="lg:col-span-1 space-y-6 print:hidden">
@@ -1204,18 +1218,6 @@ export default async function ExpedientePage({
                 puedeRegistrar={permisos.puedeRegistrar}
               />
             </div>
-
-            {/* CONTROL INDEPENDIENTE DE DRENAJES (CIRUGÍA) */}
-            {esModoCirugia && (
-              <ControlDrenajes
-                episodeId={episode.id}
-                drenajes={drenajesSerializados}
-                nombres={nombres}
-                roles={roles}
-                puedeRegistrar={permisos.puedeRegistrar}
-                ahoraIso={ahoraIso}
-              />
-            )}
 
             {/* Tendencia */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:hidden">
