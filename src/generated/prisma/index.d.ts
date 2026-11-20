@@ -14996,6 +14996,7 @@ export namespace Prisma {
     surgicalSpecialty: string | null
     surgeonAndAssistants: string | null
     surgeryStatus: string | null
+    suspensionReason: string | null
     updatedBy: string | null
     updatedAt: Date | null
   }
@@ -15009,6 +15010,7 @@ export namespace Prisma {
     surgicalSpecialty: string | null
     surgeonAndAssistants: string | null
     surgeryStatus: string | null
+    suspensionReason: string | null
     updatedBy: string | null
     updatedAt: Date | null
   }
@@ -15022,6 +15024,7 @@ export namespace Prisma {
     surgicalSpecialty: number
     surgeonAndAssistants: number
     surgeryStatus: number
+    suspensionReason: number
     updatedBy: number
     updatedAt: number
     _all: number
@@ -15037,6 +15040,7 @@ export namespace Prisma {
     surgicalSpecialty?: true
     surgeonAndAssistants?: true
     surgeryStatus?: true
+    suspensionReason?: true
     updatedBy?: true
     updatedAt?: true
   }
@@ -15050,6 +15054,7 @@ export namespace Prisma {
     surgicalSpecialty?: true
     surgeonAndAssistants?: true
     surgeryStatus?: true
+    suspensionReason?: true
     updatedBy?: true
     updatedAt?: true
   }
@@ -15063,6 +15068,7 @@ export namespace Prisma {
     surgicalSpecialty?: true
     surgeonAndAssistants?: true
     surgeryStatus?: true
+    suspensionReason?: true
     updatedBy?: true
     updatedAt?: true
     _all?: true
@@ -15149,6 +15155,7 @@ export namespace Prisma {
     surgicalSpecialty: string | null
     surgeonAndAssistants: string | null
     surgeryStatus: string
+    suspensionReason: string | null
     updatedBy: string
     updatedAt: Date
     _count: SurgicalProfileCountAggregateOutputType | null
@@ -15179,6 +15186,7 @@ export namespace Prisma {
     surgicalSpecialty?: boolean
     surgeonAndAssistants?: boolean
     surgeryStatus?: boolean
+    suspensionReason?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -15193,6 +15201,7 @@ export namespace Prisma {
     surgicalSpecialty?: boolean
     surgeonAndAssistants?: boolean
     surgeryStatus?: boolean
+    suspensionReason?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -15207,6 +15216,7 @@ export namespace Prisma {
     surgicalSpecialty?: boolean
     surgeonAndAssistants?: boolean
     surgeryStatus?: boolean
+    suspensionReason?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -15221,11 +15231,12 @@ export namespace Prisma {
     surgicalSpecialty?: boolean
     surgeonAndAssistants?: boolean
     surgeryStatus?: boolean
+    suspensionReason?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
   }
 
-  export type SurgicalProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "procedureName" | "surgeryDate" | "surgeryType" | "surgicalSpecialty" | "surgeonAndAssistants" | "surgeryStatus" | "updatedBy" | "updatedAt", ExtArgs["result"]["surgicalProfile"]>
+  export type SurgicalProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "procedureName" | "surgeryDate" | "surgeryType" | "surgicalSpecialty" | "surgeonAndAssistants" | "surgeryStatus" | "suspensionReason" | "updatedBy" | "updatedAt", ExtArgs["result"]["surgicalProfile"]>
   export type SurgicalProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -15250,6 +15261,7 @@ export namespace Prisma {
       surgicalSpecialty: string | null
       surgeonAndAssistants: string | null
       surgeryStatus: string
+      suspensionReason: string | null
       updatedBy: string
       updatedAt: Date
     }, ExtArgs["result"]["surgicalProfile"]>
@@ -15684,6 +15696,7 @@ export namespace Prisma {
     readonly surgicalSpecialty: FieldRef<"SurgicalProfile", 'String'>
     readonly surgeonAndAssistants: FieldRef<"SurgicalProfile", 'String'>
     readonly surgeryStatus: FieldRef<"SurgicalProfile", 'String'>
+    readonly suspensionReason: FieldRef<"SurgicalProfile", 'String'>
     readonly updatedBy: FieldRef<"SurgicalProfile", 'String'>
     readonly updatedAt: FieldRef<"SurgicalProfile", 'DateTime'>
   }
@@ -32040,6 +32053,7 @@ export namespace Prisma {
     diuresis: number
     drainage: number
     drainageNotes: number
+    drainages: number
     recordedBy: number
     updatedBy: number
     updatedAt: number
@@ -32136,6 +32150,7 @@ export namespace Prisma {
     diuresis?: true
     drainage?: true
     drainageNotes?: true
+    drainages?: true
     recordedBy?: true
     updatedBy?: true
     updatedAt?: true
@@ -32245,6 +32260,7 @@ export namespace Prisma {
     diuresis: number | null
     drainage: number | null
     drainageNotes: string | null
+    drainages: JsonValue | null
     recordedBy: string
     updatedBy: string | null
     updatedAt: Date | null
@@ -32286,6 +32302,7 @@ export namespace Prisma {
     diuresis?: boolean
     drainage?: boolean
     drainageNotes?: boolean
+    drainages?: boolean
     recordedBy?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
@@ -32309,6 +32326,7 @@ export namespace Prisma {
     diuresis?: boolean
     drainage?: boolean
     drainageNotes?: boolean
+    drainages?: boolean
     recordedBy?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
@@ -32332,6 +32350,7 @@ export namespace Prisma {
     diuresis?: boolean
     drainage?: boolean
     drainageNotes?: boolean
+    drainages?: boolean
     recordedBy?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
@@ -32355,13 +32374,14 @@ export namespace Prisma {
     diuresis?: boolean
     drainage?: boolean
     drainageNotes?: boolean
+    drainages?: boolean
     recordedBy?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
     createdAt?: boolean
   }
 
-  export type VitalSignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "systolic" | "diastolic" | "heartRate" | "respiratoryRate" | "temperature" | "oxygenSat" | "glucose" | "weight" | "weightUnit" | "painScale" | "diuresis" | "drainage" | "drainageNotes" | "recordedBy" | "updatedBy" | "updatedAt" | "createdAt", ExtArgs["result"]["vitalSign"]>
+  export type VitalSignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "systolic" | "diastolic" | "heartRate" | "respiratoryRate" | "temperature" | "oxygenSat" | "glucose" | "weight" | "weightUnit" | "painScale" | "diuresis" | "drainage" | "drainageNotes" | "drainages" | "recordedBy" | "updatedBy" | "updatedAt" | "createdAt", ExtArgs["result"]["vitalSign"]>
   export type VitalSignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -32393,6 +32413,7 @@ export namespace Prisma {
       diuresis: number | null
       drainage: number | null
       drainageNotes: string | null
+      drainages: Prisma.JsonValue | null
       recordedBy: string
       updatedBy: string | null
       updatedAt: Date | null
@@ -32836,6 +32857,7 @@ export namespace Prisma {
     readonly diuresis: FieldRef<"VitalSign", 'Int'>
     readonly drainage: FieldRef<"VitalSign", 'Int'>
     readonly drainageNotes: FieldRef<"VitalSign", 'String'>
+    readonly drainages: FieldRef<"VitalSign", 'Json'>
     readonly recordedBy: FieldRef<"VitalSign", 'String'>
     readonly updatedBy: FieldRef<"VitalSign", 'String'>
     readonly updatedAt: FieldRef<"VitalSign", 'DateTime'>
@@ -35733,6 +35755,7 @@ export namespace Prisma {
     surgicalSpecialty: 'surgicalSpecialty',
     surgeonAndAssistants: 'surgeonAndAssistants',
     surgeryStatus: 'surgeryStatus',
+    suspensionReason: 'suspensionReason',
     updatedBy: 'updatedBy',
     updatedAt: 'updatedAt'
   };
@@ -35971,6 +35994,7 @@ export namespace Prisma {
     diuresis: 'diuresis',
     drainage: 'drainage',
     drainageNotes: 'drainageNotes',
+    drainages: 'drainages',
     recordedBy: 'recordedBy',
     updatedBy: 'updatedBy',
     updatedAt: 'updatedAt',
@@ -37396,6 +37420,7 @@ export namespace Prisma {
     surgicalSpecialty?: StringNullableFilter<"SurgicalProfile"> | string | null
     surgeonAndAssistants?: StringNullableFilter<"SurgicalProfile"> | string | null
     surgeryStatus?: StringFilter<"SurgicalProfile"> | string
+    suspensionReason?: StringNullableFilter<"SurgicalProfile"> | string | null
     updatedBy?: StringFilter<"SurgicalProfile"> | string
     updatedAt?: DateTimeFilter<"SurgicalProfile"> | Date | string
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
@@ -37410,6 +37435,7 @@ export namespace Prisma {
     surgicalSpecialty?: SortOrderInput | SortOrder
     surgeonAndAssistants?: SortOrderInput | SortOrder
     surgeryStatus?: SortOrder
+    suspensionReason?: SortOrderInput | SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
     episode?: EpisodeOrderByWithRelationInput
@@ -37427,6 +37453,7 @@ export namespace Prisma {
     surgicalSpecialty?: StringNullableFilter<"SurgicalProfile"> | string | null
     surgeonAndAssistants?: StringNullableFilter<"SurgicalProfile"> | string | null
     surgeryStatus?: StringFilter<"SurgicalProfile"> | string
+    suspensionReason?: StringNullableFilter<"SurgicalProfile"> | string | null
     updatedBy?: StringFilter<"SurgicalProfile"> | string
     updatedAt?: DateTimeFilter<"SurgicalProfile"> | Date | string
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
@@ -37441,6 +37468,7 @@ export namespace Prisma {
     surgicalSpecialty?: SortOrderInput | SortOrder
     surgeonAndAssistants?: SortOrderInput | SortOrder
     surgeryStatus?: SortOrder
+    suspensionReason?: SortOrderInput | SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
     _count?: SurgicalProfileCountOrderByAggregateInput
@@ -37460,6 +37488,7 @@ export namespace Prisma {
     surgicalSpecialty?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
     surgeonAndAssistants?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
     surgeryStatus?: StringWithAggregatesFilter<"SurgicalProfile"> | string
+    suspensionReason?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
     updatedBy?: StringWithAggregatesFilter<"SurgicalProfile"> | string
     updatedAt?: DateTimeWithAggregatesFilter<"SurgicalProfile"> | Date | string
   }
@@ -38574,6 +38603,7 @@ export namespace Prisma {
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     drainage?: IntNullableFilter<"VitalSign"> | number | null
     drainageNotes?: StringNullableFilter<"VitalSign"> | string | null
+    drainages?: JsonNullableFilter<"VitalSign">
     recordedBy?: StringFilter<"VitalSign"> | string
     updatedBy?: StringNullableFilter<"VitalSign"> | string | null
     updatedAt?: DateTimeNullableFilter<"VitalSign"> | Date | string | null
@@ -38597,6 +38627,7 @@ export namespace Prisma {
     diuresis?: SortOrderInput | SortOrder
     drainage?: SortOrderInput | SortOrder
     drainageNotes?: SortOrderInput | SortOrder
+    drainages?: SortOrderInput | SortOrder
     recordedBy?: SortOrder
     updatedBy?: SortOrderInput | SortOrder
     updatedAt?: SortOrderInput | SortOrder
@@ -38623,6 +38654,7 @@ export namespace Prisma {
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     drainage?: IntNullableFilter<"VitalSign"> | number | null
     drainageNotes?: StringNullableFilter<"VitalSign"> | string | null
+    drainages?: JsonNullableFilter<"VitalSign">
     recordedBy?: StringFilter<"VitalSign"> | string
     updatedBy?: StringNullableFilter<"VitalSign"> | string | null
     updatedAt?: DateTimeNullableFilter<"VitalSign"> | Date | string | null
@@ -38646,6 +38678,7 @@ export namespace Prisma {
     diuresis?: SortOrderInput | SortOrder
     drainage?: SortOrderInput | SortOrder
     drainageNotes?: SortOrderInput | SortOrder
+    drainages?: SortOrderInput | SortOrder
     recordedBy?: SortOrder
     updatedBy?: SortOrderInput | SortOrder
     updatedAt?: SortOrderInput | SortOrder
@@ -38676,6 +38709,7 @@ export namespace Prisma {
     diuresis?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     drainage?: IntNullableWithAggregatesFilter<"VitalSign"> | number | null
     drainageNotes?: StringNullableWithAggregatesFilter<"VitalSign"> | string | null
+    drainages?: JsonNullableWithAggregatesFilter<"VitalSign">
     recordedBy?: StringWithAggregatesFilter<"VitalSign"> | string
     updatedBy?: StringNullableWithAggregatesFilter<"VitalSign"> | string | null
     updatedAt?: DateTimeNullableWithAggregatesFilter<"VitalSign"> | Date | string | null
@@ -40249,6 +40283,7 @@ export namespace Prisma {
     surgicalSpecialty?: string | null
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
+    suspensionReason?: string | null
     updatedBy: string
     updatedAt?: Date | string
     episode: EpisodeCreateNestedOneWithoutSurgicalProfileInput
@@ -40263,6 +40298,7 @@ export namespace Prisma {
     surgicalSpecialty?: string | null
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
+    suspensionReason?: string | null
     updatedBy: string
     updatedAt?: Date | string
   }
@@ -40275,6 +40311,7 @@ export namespace Prisma {
     surgicalSpecialty?: NullableStringFieldUpdateOperationsInput | string | null
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episode?: EpisodeUpdateOneRequiredWithoutSurgicalProfileNestedInput
@@ -40289,6 +40326,7 @@ export namespace Prisma {
     surgicalSpecialty?: NullableStringFieldUpdateOperationsInput | string | null
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40302,6 +40340,7 @@ export namespace Prisma {
     surgicalSpecialty?: string | null
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
+    suspensionReason?: string | null
     updatedBy: string
     updatedAt?: Date | string
   }
@@ -40314,6 +40353,7 @@ export namespace Prisma {
     surgicalSpecialty?: NullableStringFieldUpdateOperationsInput | string | null
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40327,6 +40367,7 @@ export namespace Prisma {
     surgicalSpecialty?: NullableStringFieldUpdateOperationsInput | string | null
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41544,6 +41585,7 @@ export namespace Prisma {
     diuresis?: number | null
     drainage?: number | null
     drainageNotes?: string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy: string
     updatedBy?: string | null
     updatedAt?: Date | string | null
@@ -41567,6 +41609,7 @@ export namespace Prisma {
     diuresis?: number | null
     drainage?: number | null
     drainageNotes?: string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy: string
     updatedBy?: string | null
     updatedAt?: Date | string | null
@@ -41588,6 +41631,7 @@ export namespace Prisma {
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     drainage?: NullableIntFieldUpdateOperationsInput | number | null
     drainageNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy?: StringFieldUpdateOperationsInput | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -41611,6 +41655,7 @@ export namespace Prisma {
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     drainage?: NullableIntFieldUpdateOperationsInput | number | null
     drainageNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy?: StringFieldUpdateOperationsInput | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -41633,6 +41678,7 @@ export namespace Prisma {
     diuresis?: number | null
     drainage?: number | null
     drainageNotes?: string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy: string
     updatedBy?: string | null
     updatedAt?: Date | string | null
@@ -41654,6 +41700,7 @@ export namespace Prisma {
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     drainage?: NullableIntFieldUpdateOperationsInput | number | null
     drainageNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy?: StringFieldUpdateOperationsInput | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -41676,6 +41723,7 @@ export namespace Prisma {
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     drainage?: NullableIntFieldUpdateOperationsInput | number | null
     drainageNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy?: StringFieldUpdateOperationsInput | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -43132,6 +43180,7 @@ export namespace Prisma {
     surgicalSpecialty?: SortOrder
     surgeonAndAssistants?: SortOrder
     surgeryStatus?: SortOrder
+    suspensionReason?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43145,6 +43194,7 @@ export namespace Prisma {
     surgicalSpecialty?: SortOrder
     surgeonAndAssistants?: SortOrder
     surgeryStatus?: SortOrder
+    suspensionReason?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43158,6 +43208,7 @@ export namespace Prisma {
     surgicalSpecialty?: SortOrder
     surgeonAndAssistants?: SortOrder
     surgeryStatus?: SortOrder
+    suspensionReason?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43733,6 +43784,7 @@ export namespace Prisma {
     diuresis?: SortOrder
     drainage?: SortOrder
     drainageNotes?: SortOrder
+    drainages?: SortOrder
     recordedBy?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
@@ -48490,6 +48542,7 @@ export namespace Prisma {
     diuresis?: number | null
     drainage?: number | null
     drainageNotes?: string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy: string
     updatedBy?: string | null
     updatedAt?: Date | string | null
@@ -48511,6 +48564,7 @@ export namespace Prisma {
     diuresis?: number | null
     drainage?: number | null
     drainageNotes?: string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy: string
     updatedBy?: string | null
     updatedAt?: Date | string | null
@@ -48873,6 +48927,7 @@ export namespace Prisma {
     surgicalSpecialty?: string | null
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
+    suspensionReason?: string | null
     updatedBy: string
     updatedAt?: Date | string
   }
@@ -48885,6 +48940,7 @@ export namespace Prisma {
     surgicalSpecialty?: string | null
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
+    suspensionReason?: string | null
     updatedBy: string
     updatedAt?: Date | string
   }
@@ -49215,6 +49271,7 @@ export namespace Prisma {
     diuresis?: IntNullableFilter<"VitalSign"> | number | null
     drainage?: IntNullableFilter<"VitalSign"> | number | null
     drainageNotes?: StringNullableFilter<"VitalSign"> | string | null
+    drainages?: JsonNullableFilter<"VitalSign">
     recordedBy?: StringFilter<"VitalSign"> | string
     updatedBy?: StringNullableFilter<"VitalSign"> | string | null
     updatedAt?: DateTimeNullableFilter<"VitalSign"> | Date | string | null
@@ -49569,6 +49626,7 @@ export namespace Prisma {
     surgicalSpecialty?: NullableStringFieldUpdateOperationsInput | string | null
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -49581,6 +49639,7 @@ export namespace Prisma {
     surgicalSpecialty?: NullableStringFieldUpdateOperationsInput | string | null
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -55748,6 +55807,7 @@ export namespace Prisma {
     diuresis?: number | null
     drainage?: number | null
     drainageNotes?: string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy: string
     updatedBy?: string | null
     updatedAt?: Date | string | null
@@ -55970,6 +56030,7 @@ export namespace Prisma {
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     drainage?: NullableIntFieldUpdateOperationsInput | number | null
     drainageNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy?: StringFieldUpdateOperationsInput | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -55991,6 +56052,7 @@ export namespace Prisma {
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     drainage?: NullableIntFieldUpdateOperationsInput | number | null
     drainageNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy?: StringFieldUpdateOperationsInput | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -56012,6 +56074,7 @@ export namespace Prisma {
     diuresis?: NullableIntFieldUpdateOperationsInput | number | null
     drainage?: NullableIntFieldUpdateOperationsInput | number | null
     drainageNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    drainages?: NullableJsonNullValueInput | InputJsonValue
     recordedBy?: StringFieldUpdateOperationsInput | string
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

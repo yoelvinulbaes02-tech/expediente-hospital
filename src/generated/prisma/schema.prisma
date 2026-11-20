@@ -311,6 +311,7 @@ model SurgicalProfile {
   surgicalSpecialty    String?
   surgeonAndAssistants String?
   surgeryStatus        String    @default("pendiente") // pendiente | en_quirofano | realizada | suspendida
+  suspensionReason     String?
   updatedBy            String
   updatedAt            DateTime  @updatedAt
 
@@ -579,6 +580,7 @@ model VitalSign {
   diuresis        Int?
   drainage        Int?
   drainageNotes   String?
+  drainages       Json?
   recordedBy      String
   updatedBy       String?
   updatedAt       DateTime? @db.Timestamptz

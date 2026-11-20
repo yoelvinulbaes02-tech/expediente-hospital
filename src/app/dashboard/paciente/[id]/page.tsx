@@ -31,6 +31,8 @@ import { ListaEvoluciones } from '@/components/ListaEvoluciones'
 import { BotonImprimirSignos } from '@/components/BotonImprimirSignos'
 import { TratamientoActual } from '@/components/TratamientoActual'
 import { PlanDepartamentoBase, type PlanBaseEntryItem } from '@/components/PlanDepartamentoBase'
+import { DrenajesMultiplesInput } from '@/components/DrenajesMultiplesInput'
+import { normalizarDrenajes } from '@/lib/cirugia-constants'
 
 const ETIQUETA_ROL: Record<string, string> = {
   SUPERADMIN: 'Propietario Plataforma',
@@ -872,6 +874,7 @@ export default async function ExpedientePage({
             <BloqueMedicinaInterna
               episodeId={episode.id}
               perfil={internalMedicineProfile}
+              virales={episode.viralSerologies[0] ?? null}
               tipificacion={{
                 bloodType: episode.patient.bloodType,
                 recordedBy: episode.patient.bloodTypeRecordedBy,
@@ -1092,23 +1095,12 @@ export default async function ExpedientePage({
                         </div>
                       )}
 
-                      <div className={ocultarPesoSignos && !mostrarDrenaje ? 'col-span-2' : ''}>
+                      <div className={ocultarPesoSignos ? 'col-span-2' : ''}>
                         <label className="block text-xs font-bold text-sky-800 mb-1">Diuresis (mL)</label>
                         <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
                       </div>
 
-                      {mostrarDrenaje && (
-                        <>
-                          <div>
-                            <label className="block text-xs font-bold text-orange-800 mb-1">Drenaje (mL)</label>
-                            <input name="drainage" type="number" inputMode="numeric" placeholder="Ej. 120" className={entradaVital} />
-                          </div>
-                          <div className="col-span-2">
-                            <label className="block text-xs font-medium text-slate-700 mb-1">Característica / Nota de drenaje (Opcional)</label>
-                            <input name="drainageNotes" placeholder="Ej. Serohemático, Penrose FID, Jackson-Pratt..." className={entradaVital} />
-                          </div>
-                        </>
-                      )}
+                      {mostrarDrenaje && <DrenajesMultiplesInput />}
                     </div>
                     <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2 cursor-pointer">
                       Guardar Signos
@@ -1221,7 +1213,12 @@ export default async function ExpedientePage({
                   </tr>
                 </thead>
                 <tbody>
-                  {episode.vitals.map((v) => (
+                  {episode.vitals.map((v) => {
+                    const listaDrenajes = mostrarDrenaje
+                      ? normalizarDrenajes(v.drainages, v.drainage, v.drainageNotes)
+                      : []
+
+                    return (
                     <tr key={v.id} className="border-b hover:bg-slate-50">
                       <td className="px-3 py-2 text-slate-500 whitespace-nowrap">{fechaCorta(v.createdAt)}</td>
                       {!soloDiuresisInterconsulta && (
@@ -1241,13 +1238,24 @@ export default async function ExpedientePage({
                         {v.diuresis !== null && v.diuresis !== undefined ? `${v.diuresis} mL` : '—'}
                       </td>
                       {mostrarDrenaje && (
-                        <td className="px-3 py-2 font-bold text-orange-800">
-                          {v.drainage !== null && v.drainage !== undefined ? (
-                            <div>
-                              <span>{v.drainage} mL</span>
-                              {v.drainageNotes && (
-                                <span className="block text-[10px] font-normal text-slate-500">
-                                  {v.drainageNotes}
+                        <td className="px-3 py-2 font-bold text-orange-800 min-w-36">
+                          {listaDrenajes.length > 0 ? (
+                            <div className="space-y-0.5">
+                              {listaDrenajes.map((d, dIdx) => (
+                                <div key={dIdx} className="text-[11px] leading-snug">
+                                  <span className="font-bold text-orange-900">{d.name}:</span>{' '}
+                                  <span>{d.volumeMl !== null ? `${d.volumeMl} mL` : '—'}</span>
+                                  {d.notes && (
+                                    <span className="text-[10px] font-normal text-slate-500">
+                                      {' '}
+                                      ({d.notes})
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                              {listaDrenajes.length > 1 && v.drainage !== null && v.drainage !== undefined && (
+                                <span className="inline-block text-[10px] bg-orange-100 text-orange-900 px-1.5 py-0.2 rounded font-extrabold mt-0.5">
+                                  Total: {v.drainage} mL
                                 </span>
                               )}
                             </div>
@@ -1272,7 +1280,7 @@ export default async function ExpedientePage({
                             <summary className="list-none cursor-pointer text-blue-600 hover:text-blue-800 font-semibold">
                               ✏️
                             </summary>
-                            <div className="absolute right-0 mt-1 w-64 bg-white p-3 rounded-xl border border-slate-300 shadow-xl z-30">
+                            <div className={`absolute right-0 mt-1 ${mostrarDrenaje ? 'w-80' : 'w-64'} bg-white p-3 rounded-xl border border-slate-300 shadow-xl z-30`}>
                               <p className="text-xs font-bold text-slate-800 mb-2 border-b pb-1">
                                 Corregir toma de signos:
                               </p>
@@ -1311,21 +1319,12 @@ export default async function ExpedientePage({
                                       </div>
                                     </>
                                   )}
-                                  <div className={mostrarDrenaje ? '' : 'col-span-2'}>
+                                  <div className={ocultarPesoSignos ? 'col-span-2' : ''}>
                                     <label className="block text-[10px] text-slate-500">Diuresis (mL):</label>
                                     <input name="diuresis" defaultValue={v.diuresis ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
                                   </div>
                                   {mostrarDrenaje && (
-                                    <>
-                                      <div>
-                                        <label className="block text-[10px] text-slate-500">Drenaje (mL):</label>
-                                        <input name="drainage" defaultValue={v.drainage ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
-                                      </div>
-                                      <div className="col-span-2">
-                                        <label className="block text-[10px] text-slate-500">Nota de drenaje:</label>
-                                        <input name="drainageNotes" defaultValue={v.drainageNotes ?? ''} className="w-full px-1.5 py-1 border rounded text-xs" />
-                                      </div>
-                                    </>
+                                    <DrenajesMultiplesInput compact initialDrainages={listaDrenajes} />
                                   )}
                                 </div>
                                 <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1 rounded font-bold hover:bg-slate-900 mt-1 cursor-pointer">
@@ -1337,7 +1336,8 @@ export default async function ExpedientePage({
                         </td>
                       )}
                     </tr>
-                  ))}
+                    )
+                  })}
                   {episode.vitals.length === 0 && (
                     <tr>
                       <td

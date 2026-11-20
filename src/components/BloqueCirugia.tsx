@@ -1,4 +1,7 @@
-import { Scissors, Droplets, Calendar, Users, Stethoscope, Plus, X } from 'lucide-react'
+'use client'
+
+import { useState } from 'react'
+import { Scissors, Droplets, Calendar, Users, Stethoscope, Plus, X, AlertTriangle } from 'lucide-react'
 import {
   CATEGORIAS_DISPOSITIVOS_CIRUGIA,
   ESPECIALIDADES_QUIRURGICAS,
@@ -20,6 +23,7 @@ type PerfilQuirurgico = {
   surgicalSpecialty: string | null
   surgeonAndAssistants: string | null
   surgeryStatus: string
+  suspensionReason?: string | null
   updatedBy: string
   updatedAt: Date
 }
@@ -89,6 +93,11 @@ export function BloqueCirugia({
   roles: Record<string, string>
   puedeRegistrar: boolean
 }) {
+  const [editandoQx, setEditandoQx] = useState(false)
+  const [estadoQxForm, setEstadoQxForm] = useState<string>(
+    perfilQuirurgico?.surgeryStatus ?? 'pendiente'
+  )
+
   const estadoMeta =
     ESTADOS_CIRUGIA.find((e) => e.value === (perfilQuirurgico?.surgeryStatus ?? 'pendiente')) ??
     ESTADOS_CIRUGIA[0]
@@ -99,16 +108,93 @@ export function BloqueCirugia({
 
   return (
     <>
-      <AntropometriaCard
-        episodeId={episodeId}
-        initialWeight={antropometria.weight}
-        initialWeightUnit={antropometria.weightUnit}
-        initialHeightCm={antropometria.heightCm}
-        updatedBy={antropometria.updatedBy}
-        updatedAt={antropometria.updatedAt}
-        nombres={nombres}
-        puedeRegistrar={puedeRegistrar}
-      />
+      {/* ANTROPOMETRÍA COMPACTA + TIPIFICACIÓN SANGUÍNEA EN LA MISMA LÍNEA */}
+      <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 mb-6 print:hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AntropometriaCard
+            compact
+            episodeId={episodeId}
+            initialWeight={antropometria.weight}
+            initialWeightUnit={antropometria.weightUnit}
+            initialHeightCm={antropometria.heightCm}
+            updatedBy={antropometria.updatedBy}
+            updatedAt={antropometria.updatedAt}
+            nombres={nombres}
+            puedeRegistrar={puedeRegistrar}
+          />
+
+          {/* TIPIFICACIÓN SANGUÍNEA AL LADO DE PESO/TALLA/IMC */}
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
+            <div>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                <Droplets className="w-3.5 h-3.5 text-rose-600" />
+                <span>Tipificación (Grupo y Rh)</span>
+              </span>
+              {tipificacion.bloodType ? (
+                <div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xl">🩸</span>
+                    <span className="text-2xl font-black text-rose-700">
+                      {tipificacion.bloodType}
+                    </span>
+                  </div>
+                  {tipificacion.recordedBy && (
+                    <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
+                      <span>Registró: </span>
+                      <strong className="text-slate-700">
+                        {nombres[tipificacion.recordedBy] ?? tipificacion.recordedBy}
+                      </strong>
+                      {roles[tipificacion.recordedBy] && (
+                        <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1 rounded">
+                          {ETIQUETA_ROL[roles[tipificacion.recordedBy]] ??
+                            roles[tipificacion.recordedBy]}
+                        </span>
+                      )}
+                      {tipificacion.updatedAt && (
+                        <span className="block text-[10px] text-slate-400">
+                          {fmtFechaHora(tipificacion.updatedAt)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400 italic mt-1">Sin tipificación registrada.</p>
+              )}
+            </div>
+
+            {puedeRegistrar && (
+              <details className="mt-2 pt-2 border-t border-slate-200">
+                <summary className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
+                  {tipificacion.bloodType ? 'Actualizar Grupo y Rh' : '+ Registrar Grupo y Rh'}
+                </summary>
+                <form action={guardarTipificacion} className="space-y-2 mt-2">
+                  <input type="hidden" name="episodeId" value={episodeId} />
+                  <select
+                    name="bloodType"
+                    required
+                    defaultValue={tipificacion.bloodType ?? ''}
+                    className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-900"
+                  >
+                    <option value="">Seleccione grupo...</option>
+                    <option value="O+">O Positivo (O+)</option>
+                    <option value="O-">O Negativo (O-)</option>
+                    <option value="A+">A Positivo (A+)</option>
+                    <option value="A-">A Negativo (A-)</option>
+                    <option value="B+">B Positivo (B+)</option>
+                    <option value="B-">B Negativo (B-)</option>
+                    <option value="AB+">AB Positivo (AB+)</option>
+                    <option value="AB-">AB Negativo (AB-)</option>
+                  </select>
+                  <button className="w-full bg-rose-700 text-white text-xs py-1.5 rounded font-medium hover:bg-rose-800 cursor-pointer">
+                    Guardar Tipificación
+                  </button>
+                </form>
+              </details>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* INFORMACIÓN QUIRÚRGICA */}
       <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 mb-6 print:hidden">
@@ -120,10 +206,14 @@ export function BloqueCirugia({
             </h2>
             {perfilQuirurgico && (
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Actualizó: <strong className="text-slate-700 dark:text-slate-200">{nombres[perfilQuirurgico.updatedBy] ?? perfilQuirurgico.updatedBy}</strong>
+                Actualizó:{' '}
+                <strong className="text-slate-700 dark:text-slate-200">
+                  {nombres[perfilQuirurgico.updatedBy] ?? perfilQuirurgico.updatedBy}
+                </strong>
                 {roles[perfilQuirurgico.updatedBy] && (
                   <span className="ml-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold px-1 rounded">
-                    {ETIQUETA_ROL[roles[perfilQuirurgico.updatedBy]] ?? roles[perfilQuirurgico.updatedBy]}
+                    {ETIQUETA_ROL[roles[perfilQuirurgico.updatedBy]] ??
+                      roles[perfilQuirurgico.updatedBy]}
                   </span>
                 )}{' '}
                 · {fmtFechaHora(perfilQuirurgico.updatedAt)}
@@ -132,117 +222,152 @@ export function BloqueCirugia({
           </div>
 
           {puedeRegistrar && (
-            <details className="relative">
-              <summary className="list-none cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap">
-                {perfilQuirurgico ? 'Editar Información Quirúrgica' : '+ Registrar Cirugía'}
-              </summary>
-              <div className="mt-2 sm:absolute sm:right-0 w-full sm:w-120 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-300 dark:border-slate-700 shadow-2xl z-30 text-left">
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2 mb-3">
-                  Datos del Procedimiento Quirúrgico
-                </p>
-                <form action={guardarInfoQuirurgica} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input type="hidden" name="episodeId" value={episodeId} />
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                      Procedimiento quirúrgico realizado o programado *
-                    </label>
-                    <input
-                      name="procedureName"
-                      required
-                      defaultValue={perfilQuirurgico?.procedureName ?? ''}
-                      placeholder="Ej. Apendicectomía laparoscópica, Colecistectomía..."
-                      className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                      Fecha y hora de cirugía
-                    </label>
-                    <input
-                      name="surgeryDate"
-                      type="datetime-local"
-                      defaultValue={fmtFechaInput(perfilQuirurgico?.surgeryDate)}
-                      className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                      Tipo de cirugía
-                    </label>
-                    <select
-                      name="surgeryType"
-                      defaultValue={perfilQuirurgico?.surgeryType ?? 'electiva'}
-                      className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    >
-                      <option value="electiva">Electiva</option>
-                      <option value="emergencia">Emergencia</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                      Especialidad quirúrgica
-                    </label>
-                    <select
-                      name="surgicalSpecialty"
-                      defaultValue={perfilQuirurgico?.surgicalSpecialty ?? 'Cirugía General'}
-                      className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    >
-                      {ESPECIALIDADES_QUIRURGICAS.map((esp) => (
-                        <option key={esp} value={esp}>
-                          {esp}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                      Estado
-                    </label>
-                    <select
-                      name="surgeryStatus"
-                      defaultValue={perfilQuirurgico?.surgeryStatus ?? 'pendiente'}
-                      className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
-                    >
-                      {ESTADOS_CIRUGIA.map((st) => (
-                        <option key={st.value} value={st.value}>
-                          {st.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                      Cirujano y ayudantes
-                    </label>
-                    <input
-                      name="surgeonAndAssistants"
-                      defaultValue={perfilQuirurgico?.surgeonAndAssistants ?? ''}
-                      placeholder="Ej. Dr. Morales (MA) / Dra. López (R3), Dr. Pérez (R1)"
-                      className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2 pt-1">
-                    <button
-                      type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg cursor-pointer"
-                    >
-                      Guardar Información Quirúrgica
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </details>
+            <button
+              type="button"
+              onClick={() => {
+                setEstadoQxForm(perfilQuirurgico?.surgeryStatus ?? 'pendiente')
+                setEditandoQx((v) => !v)
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap cursor-pointer"
+            >
+              {editandoQx
+                ? 'Cerrar formulario'
+                : perfilQuirurgico
+                  ? 'Editar Información Quirúrgica'
+                  : '+ Registrar Cirugía'}
+            </button>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {puedeRegistrar && editandoQx && (
+          <div className="bg-slate-50 dark:bg-slate-900/60 p-4 rounded-xl border border-blue-200 dark:border-slate-700 mb-4">
+            <p className="text-xs font-bold text-slate-800 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2 mb-3">
+              Datos del Procedimiento Quirúrgico
+            </p>
+            <form
+              action={async (formData) => {
+                await guardarInfoQuirurgica(formData)
+                setEditandoQx(false)
+              }}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
+              <input type="hidden" name="episodeId" value={episodeId} />
+
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Procedimiento quirúrgico realizado o programado *
+                </label>
+                <input
+                  name="procedureName"
+                  required
+                  defaultValue={perfilQuirurgico?.procedureName ?? ''}
+                  placeholder="Ej. Apendicectomía laparoscópica, Colecistectomía..."
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Fecha y hora de cirugía
+                </label>
+                <input
+                  name="surgeryDate"
+                  type="datetime-local"
+                  defaultValue={fmtFechaInput(perfilQuirurgico?.surgeryDate)}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Tipo de cirugía
+                </label>
+                <select
+                  name="surgeryType"
+                  defaultValue={perfilQuirurgico?.surgeryType ?? 'electiva'}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                >
+                  <option value="electiva">Electiva</option>
+                  <option value="emergencia">Emergencia</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Especialidad quirúrgica
+                </label>
+                <select
+                  name="surgicalSpecialty"
+                  defaultValue={perfilQuirurgico?.surgicalSpecialty ?? 'Cirugía General'}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                >
+                  {ESPECIALIDADES_QUIRURGICAS.map((esp) => (
+                    <option key={esp} value={esp}>
+                      {esp}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Estado
+                </label>
+                <select
+                  name="surgeryStatus"
+                  value={estadoQxForm}
+                  onChange={(e) => setEstadoQxForm(e.target.value)}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
+                >
+                  {ESTADOS_CIRUGIA.map((st) => (
+                    <option key={st.value} value={st.value}>
+                      {st.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {estadoQxForm === 'suspendida' && (
+                <div className="sm:col-span-2 bg-red-50 border border-red-200 rounded-lg p-3">
+                  <label className="block text-[11px] font-bold text-red-900 mb-1">
+                    Motivo de suspensión (¿Por qué se suspendió?) *
+                  </label>
+                  <textarea
+                    name="suspensionReason"
+                    required
+                    rows={2}
+                    defaultValue={perfilQuirurgico?.suspensionReason ?? ''}
+                    placeholder="Ej. Falta de hemoderivados, infección respiratoria aguda, paciente no en ayuno, falta de turno en quirófano..."
+                    className="w-full px-2.5 py-1.5 border border-red-300 rounded-lg text-xs bg-white text-slate-900"
+                  />
+                </div>
+              )}
+
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Cirujano y ayudantes
+                </label>
+                <input
+                  name="surgeonAndAssistants"
+                  defaultValue={perfilQuirurgico?.surgeonAndAssistants ?? ''}
+                  placeholder="Ej. Dr. Morales (MA) / Dra. López (R3), Dr. Pérez (R1)"
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="sm:col-span-2 pt-1">
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg cursor-pointer"
+                >
+                  Guardar Información Quirúrgica
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3.5 space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
@@ -267,6 +392,16 @@ export function BloqueCirugia({
                 Tipo: {perfilQuirurgico?.surgeryType === 'emergencia' ? 'Emergencia' : 'Electiva'}
               </span>
             </div>
+
+            {perfilQuirurgico?.surgeryStatus === 'suspendida' && (
+              <div className="mt-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-900 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold">Motivo de suspensión: </span>
+                  <span>{perfilQuirurgico.suspensionReason || 'No especificado'}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3.5 space-y-2">
@@ -285,52 +420,6 @@ export function BloqueCirugia({
                 {perfilQuirurgico?.surgeonAndAssistants || 'Sin asignar'}
               </p>
             </div>
-          </div>
-
-          {/* TIPIFICACIÓN SANGUÍNEA */}
-          <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3.5 flex flex-col justify-between gap-2">
-            <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                <Droplets className="w-3.5 h-3.5 text-rose-600" />
-                Tipificación Sanguínea
-              </span>
-              {tipificacion.bloodType ? (
-                <p className="text-2xl font-black text-rose-700 dark:text-rose-400 mt-1">
-                  {tipificacion.bloodType}
-                </p>
-              ) : (
-                <p className="text-xs text-slate-400 italic mt-1">Sin tipificación</p>
-              )}
-            </div>
-
-            {puedeRegistrar && (
-              <details className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                <summary className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
-                  {tipificacion.bloodType ? 'Actualizar Grupo y Rh' : '+ Registrar Grupo y Rh'}
-                </summary>
-                <form action={guardarTipificacion} className="space-y-2 mt-2">
-                  <input type="hidden" name="episodeId" value={episodeId} />
-                  <select
-                    name="bloodType"
-                    required
-                    className="w-full px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                  >
-                    <option value="">Seleccione grupo...</option>
-                    <option value="O+">O Positivo (O+)</option>
-                    <option value="O-">O Negativo (O-)</option>
-                    <option value="A+">A Positivo (A+)</option>
-                    <option value="A-">A Negativo (A-)</option>
-                    <option value="B+">B Positivo (B+)</option>
-                    <option value="B-">B Negativo (B-)</option>
-                    <option value="AB+">AB Positivo (AB+)</option>
-                    <option value="AB-">AB Negativo (AB-)</option>
-                  </select>
-                  <button className="w-full bg-rose-700 text-white text-xs py-1.5 rounded font-medium hover:bg-rose-800 cursor-pointer">
-                    Guardar Tipificación
-                  </button>
-                </form>
-              </details>
-            )}
           </div>
         </div>
 

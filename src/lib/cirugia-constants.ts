@@ -175,3 +175,55 @@ export function resolverTeamAutomatico({
 
   return { ma, r4, r3, r2, r1 }
 }
+
+export type DrainageItem = {
+  name: string
+  volumeMl: number | null
+  notes: string | null
+}
+
+export function normalizarDrenajes(
+  drainagesJson: unknown,
+  legacyVolume?: number | null,
+  legacyNotes?: string | null
+): DrainageItem[] {
+  if (Array.isArray(drainagesJson) && drainagesJson.length > 0) {
+    const parsed: DrainageItem[] = []
+    for (const item of drainagesJson) {
+      if (!item || typeof item !== 'object') continue
+      const obj = item as Record<string, unknown>
+      const name = String(obj.name ?? '').trim() || 'Drenaje'
+      const rawVol = obj.volumeMl
+      const volNum =
+        typeof rawVol === 'number' && Number.isFinite(rawVol)
+          ? Math.max(0, Math.round(rawVol))
+          : typeof rawVol === 'string' && rawVol.trim() !== '' && Number.isFinite(Number(rawVol))
+            ? Math.max(0, Math.round(Number(rawVol)))
+            : null
+      const notes = String(obj.notes ?? '').trim() || null
+      if (name || volNum !== null || notes) {
+        parsed.push({ name, volumeMl: volNum, notes })
+      }
+    }
+    if (parsed.length > 0) return parsed
+  }
+
+  if (
+    (legacyVolume !== null && legacyVolume !== undefined) ||
+    (legacyNotes && legacyNotes.trim() !== '')
+  ) {
+    return [
+      {
+        name: 'Drenaje',
+        volumeMl:
+          legacyVolume !== null && legacyVolume !== undefined && Number.isFinite(Number(legacyVolume))
+            ? Math.max(0, Math.round(Number(legacyVolume)))
+            : null,
+        notes: legacyNotes?.trim() || null,
+      },
+    ]
+  }
+
+  return []
+}
+

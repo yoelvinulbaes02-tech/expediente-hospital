@@ -1200,6 +1200,59 @@ export async function guardarPerfilMedicinaInterna(formData: FormData): Promise<
   revalidatePath('/dashboard')
 }
 
+export async function actualizarCampoMedicinaInterna(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '').trim()
+  const field = String(formData.get('field') ?? '').trim()
+  const value = String(formData.get('value') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const camposPermitidos = ['oxygenSupport', 'dietType', 'fluidBalance24h', 'dischargeGoal'] as const
+  if (!camposPermitidos.includes(field as (typeof camposPermitidos)[number])) return
+
+  const previo = await prisma.internalMedicineProfile.findUnique({
+    where: { episodeId },
+  })
+
+  const valorFinal =
+    field === 'oxygenSupport'
+      ? value || 'Aire ambiente'
+      : field === 'dietType'
+        ? value || 'Dieta corriente'
+        : value || null
+
+  await prisma.internalMedicineProfile.upsert({
+    where: { episodeId },
+    update: {
+      [field]: valorFinal,
+      updatedBy: email,
+    },
+    create: {
+      episodeId,
+      oxygenSupport: field === 'oxygenSupport' ? String(valorFinal) : 'Aire ambiente',
+      dietType: field === 'dietType' ? String(valorFinal) : 'Dieta corriente',
+      fluidBalance24h: field === 'fluidBalance24h' ? (valorFinal as string | null) : null,
+      dischargeGoal: field === 'dischargeGoal' ? (valorFinal as string | null) : null,
+      updatedBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'internal_medicine_profile',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: { [field]: previo ? (previo as Record<string, unknown>)[field] ?? null : null },
+    newValue: { [field]: valorFinal, actualizadoPor: email },
+    reason: `Actualización individual de Medicina Interna (${field})`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
 // ─── 17. ANTROPOMETRÍA (PESO, TALLA E IMC AUTOMÁTICO) ───
 export async function guardarAntropometria(formData: FormData): Promise<void> {
   const episodeId = String(formData.get('episodeId') ?? '')
@@ -1271,6 +1324,12 @@ export async function guardarInfoQuirurgica(formData: FormData): Promise<void> {
   const surgeryStatus = ['pendiente', 'en_quirofano', 'realizada', 'suspendida'].includes(statusRaw)
     ? statusRaw
     : 'pendiente'
+  const suspensionReasonRaw = String(formData.get('suspensionReason') ?? '').trim()
+  const suspensionReason = surgeryStatus === 'suspendida' ? suspensionReasonRaw || null : null
+
+  if (surgeryStatus === 'suspendida' && !suspensionReason) {
+    volverAlExpediente(episodeId, 'Indica el motivo por el cual se suspendió la cirugía')
+  }
 
   const surgeryDate = surgeryDateStr ? new Date(`${surgeryDateStr}:00-04:00`) : null
   if (surgeryDate && Number.isNaN(surgeryDate.getTime())) {
@@ -1286,6 +1345,7 @@ export async function guardarInfoQuirurgica(formData: FormData): Promise<void> {
       surgicalSpecialty,
       surgeonAndAssistants,
       surgeryStatus,
+      suspensionReason,
       updatedBy: email,
     },
     create: {
@@ -1296,6 +1356,7 @@ export async function guardarInfoQuirurgica(formData: FormData): Promise<void> {
       surgicalSpecialty,
       surgeonAndAssistants,
       surgeryStatus,
+      suspensionReason,
       updatedBy: email,
     },
   })
@@ -1315,8 +1376,12 @@ export async function guardarInfoQuirurgica(formData: FormData): Promise<void> {
       surgicalSpecialty,
       surgeonAndAssistants,
       surgeryStatus,
+      suspensionReason,
     },
-    reason: 'Actualización de información quirúrgica del paciente',
+    reason:
+      surgeryStatus === 'suspendida' && suspensionReason
+        ? `Cirugía suspendida: ${suspensionReason}`
+        : 'Actualización de información quirúrgica del paciente',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

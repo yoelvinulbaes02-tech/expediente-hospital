@@ -278,21 +278,21 @@ export function ListaPacientes({
 
   return (
     <>
-      {/* PANELES INICIALES DE CIRUGÍA: RESUMEN + DISPOSITIVOS */}
+      {/* TEAM DE SERVICIO ARRIBA ANTES QUE RESUMEN DEL SERVICIO (MEDICINA INTERNA Y CIRUGÍA) */}
+      {(esMedicinaInterna || esCirugia) && teamData && sugerenciaAutoTeam && (
+        <TeamServicioCard
+          team={teamData}
+          sugerenciaAuto={sugerenciaAutoTeam}
+          puedeEditar={puedeEditarServicio}
+        />
+      )}
+
+      {/* PANELES INICIALES DE CIRUGÍA: RESUMEN + DISPOSITIVOS (RETRAÍBLES) */}
       {esCirugia && resumenCirugiaAuto && conteosDispositivosCirugia && (
         <CirugiaResumenPanel
           resumenAuto={resumenCirugiaAuto}
           resumenGuardado={resumenCirugiaGuardado}
           conteosDispositivos={conteosDispositivosCirugia}
-          puedeEditar={puedeEditarServicio}
-        />
-      )}
-
-      {/* TEAM DE SERVICIO (MEDICINA INTERNA Y CIRUGÍA) */}
-      {(esMedicinaInterna || esCirugia) && teamData && sugerenciaAutoTeam && (
-        <TeamServicioCard
-          team={teamData}
-          sugerenciaAuto={sugerenciaAutoTeam}
           puedeEditar={puedeEditarServicio}
         />
       )}
@@ -575,38 +575,16 @@ export function ListaPacientes({
                     )
                   )}
 
-                  {!soloPendientes && esMedicinaInterna && episode.internalMedicineProfile && (
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                          episode.internalMedicineProfile.clinicalStatus === 'Crítico'
-                            ? 'bg-red-100 text-red-800 border-red-200'
-                            : episode.internalMedicineProfile.clinicalStatus === 'Delicado'
-                              ? 'bg-amber-100 text-amber-900 border-amber-200'
-                              : episode.internalMedicineProfile.clinicalStatus === 'Cuidado Intermedio'
-                                ? 'bg-orange-100 text-orange-900 border-orange-200'
-                                : 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                        }`}
-                      >
-                        {episode.internalMedicineProfile.clinicalStatus}
-                      </span>
-                      {episode.internalMedicineProfile.isolationType !== 'Sin aislamiento' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-red-50 text-red-700 border-red-200">
-                          ⚠️ Aislamiento: {episode.internalMedicineProfile.isolationType}
-                        </span>
-                      )}
-                      {episode.internalMedicineProfile.oxygenSupport !== 'Aire ambiente' && (
+                  {!soloPendientes &&
+                    esMedicinaInterna &&
+                    episode.internalMedicineProfile &&
+                    episode.internalMedicineProfile.oxygenSupport !== 'Aire ambiente' && (
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1">
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-sky-50 text-sky-800 border-sky-200">
                           🫁 {episode.internalMedicineProfile.oxygenSupport}
                         </span>
-                      )}
-                      {episode.internalMedicineProfile.codeStatus !== 'Full Code' && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-purple-100 text-purple-900 border-purple-200">
-                          {episode.internalMedicineProfile.codeStatus}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
 
                   {!soloPendientes && esCirugia && episode.surgicalProfile && (
                     <div className="flex flex-wrap items-center gap-1.5 pt-1">

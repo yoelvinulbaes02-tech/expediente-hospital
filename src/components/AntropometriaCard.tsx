@@ -24,6 +24,7 @@ export function AntropometriaCard({
   updatedAt,
   nombres,
   puedeRegistrar,
+  compact = false,
 }: {
   episodeId: string
   initialWeight: number | null
@@ -33,6 +34,7 @@ export function AntropometriaCard({
   updatedAt: Date | string | null
   nombres: Record<string, string>
   puedeRegistrar: boolean
+  compact?: boolean
 }) {
   const [pesoInput, setPesoInput] = useState<string>(
     initialWeight !== null && initialWeight !== undefined ? String(initialWeight) : ''
@@ -53,6 +55,139 @@ export function AntropometriaCard({
     unidadInput,
     tallaPreview && Number.isFinite(tallaPreview) ? tallaPreview : null
   )
+
+  if (compact) {
+    return (
+      <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
+        <div>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+            <Scale className="w-3.5 h-3.5 text-teal-600" />
+            <span>Antropometría (Peso, Talla e IMC)</span>
+          </span>
+
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-white border border-slate-200 rounded-md px-2 py-1.5">
+              <p className="text-[10px] font-semibold text-slate-500">Peso</p>
+              <p className="text-sm font-black text-slate-900 tabular-nums mt-0.5">
+                {initialWeight ? `${initialWeight} ${initialWeightUnit ?? 'kg'}` : '—'}
+              </p>
+              {initialWeight && initialWeightUnit === 'lb' && guardado.pesoKg !== null && (
+                <p className="text-[10px] text-slate-400 tabular-nums">
+                  {guardado.pesoKg.toFixed(1)} kg
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-md px-2 py-1.5">
+              <p className="text-[10px] font-semibold text-slate-500">Talla</p>
+              <p className="text-sm font-black text-slate-900 tabular-nums mt-0.5">
+                {initialHeightCm ? `${initialHeightCm} cm` : '—'}
+              </p>
+              {initialHeightCm && (
+                <p className="text-[10px] text-slate-400 tabular-nums">
+                  {(initialHeightCm / 100).toFixed(2)} m
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-md px-2 py-1.5">
+              <p className="text-[10px] font-semibold text-slate-500">IMC</p>
+              <p className="text-sm font-black text-teal-800 tabular-nums mt-0.5">
+                {guardado.imc !== null ? guardado.imc.toFixed(1) : '—'}
+              </p>
+              {guardado.imc !== null && (
+                <span
+                  className={`inline-block text-[9px] font-bold px-1.5 py-0.2 rounded border mt-0.5 ${guardado.clase}`}
+                >
+                  {guardado.categoria}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {updatedBy && updatedAt && (
+            <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
+              <span>Registró: </span>
+              <strong className="text-slate-700">{nombres[updatedBy] ?? updatedBy}</strong>
+              <span className="block text-[10px] text-slate-400">{fmtFechaHora(updatedAt)}</span>
+            </div>
+          )}
+        </div>
+
+        {puedeRegistrar && (
+          <div className="mt-2 pt-2 border-t border-slate-200">
+            <button
+              type="button"
+              onClick={() => setEditando((v) => !v)}
+              className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
+            >
+              {editando
+                ? 'Cerrar'
+                : initialWeight || initialHeightCm
+                  ? 'Actualizar'
+                  : '+ Registrar peso y talla'}
+            </button>
+
+            {editando && (
+              <form
+                action={async (formData) => {
+                  await guardarAntropometria(formData)
+                  setEditando(false)
+                }}
+                className="space-y-2 mt-2"
+              >
+                <input type="hidden" name="episodeId" value={episodeId} />
+                <div className="flex gap-1.5">
+                  <input
+                    name="anthropometryWeight"
+                    type="number"
+                    step="0.1"
+                    min="1"
+                    max="500"
+                    value={pesoInput}
+                    onChange={(e) => setPesoInput(e.target.value)}
+                    placeholder="Peso"
+                    className="flex-1 min-w-0 px-2 py-1.5 border rounded text-xs bg-white text-slate-900 tabular-nums"
+                  />
+                  <select
+                    name="anthropometryWeightUnit"
+                    value={unidadInput}
+                    onChange={(e) => setUnidadInput(e.target.value as 'kg' | 'lb')}
+                    className="w-14 px-1 py-1.5 border rounded text-xs font-bold bg-white text-slate-900"
+                  >
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                  </select>
+                </div>
+                <input
+                  name="anthropometryHeightCm"
+                  type="number"
+                  step="0.5"
+                  min="30"
+                  max="260"
+                  value={tallaInput}
+                  onChange={(e) => setTallaInput(e.target.value)}
+                  placeholder="Talla en cm (ej. 170)"
+                  className="w-full px-2 py-1.5 border rounded text-xs bg-white text-slate-900 tabular-nums"
+                />
+                {preview.imc !== null && (
+                  <p className="text-[11px] font-bold text-teal-800 bg-teal-50 border border-teal-200 rounded px-2 py-1 tabular-nums">
+                    IMC: {preview.imc.toFixed(1)} kg/m² · {preview.categoria}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  className="w-full bg-teal-700 text-white text-xs py-1.5 rounded font-medium hover:bg-teal-800 cursor-pointer"
+                >
+                  Guardar Antropometría
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 mb-6 print:hidden">

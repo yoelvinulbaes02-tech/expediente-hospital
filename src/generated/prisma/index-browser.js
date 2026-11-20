@@ -313,6 +313,7 @@ exports.Prisma.SurgicalProfileScalarFieldEnum = {
   surgicalSpecialty: 'surgicalSpecialty',
   surgeonAndAssistants: 'surgeonAndAssistants',
   surgeryStatus: 'surgeryStatus',
+  suspensionReason: 'suspensionReason',
   updatedBy: 'updatedBy',
   updatedAt: 'updatedAt'
 };
@@ -506,6 +507,7 @@ exports.Prisma.VitalSignScalarFieldEnum = {
   diuresis: 'diuresis',
   drainage: 'drainage',
   drainageNotes: 'drainageNotes',
+  drainages: 'drainages',
   recordedBy: 'recordedBy',
   updatedBy: 'updatedBy',
   updatedAt: 'updatedAt',
