@@ -152,14 +152,112 @@ export function BloqueCirugia({
 
   return (
     <>
-      {/* 4 CUADRITOS LINEALES IGUAL QUE NEFROLOGÍA: ANTROPOMETRÍA · TIPIFICACIÓN · ALERGIAS · CATÉTERES/ACCESOS */}
+      {/* 4 CUADRITOS LINEALES: 1. CATÉTERES Y ACCESOS · 2. ANTROPOMETRÍA · 3. TIPIFICACIÓN · 4. ALERGIAS */}
       <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6 print:hidden">
         <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2 mb-4">
-          🩺 Antropometría, Tipificación, Alergias y Catéteres / Accesos
+          🩺 Catéteres y Accesos, Antropometría, Tipificación y Alergias
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* 1. ANTROPOMETRÍA */}
+          {/* 1. CATÉTERES Y ACCESOS */}
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
+            <div>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                <Syringe className="w-3.5 h-3.5 text-blue-600" />
+                <span>Catéteres y Accesos ({dispositivos.length})</span>
+              </span>
+
+              {dispositivos.length > 0 ? (
+                <div className="space-y-1.5 mt-1.5 max-h-40 overflow-y-auto pr-0.5">
+                  {dispositivos.map((d) => (
+                    <div
+                      key={d.id}
+                      className="bg-white border border-slate-200 rounded px-2 py-1.5 flex items-start justify-between gap-1.5 text-xs"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-800 leading-snug">
+                          {mapaEtiquetaCat.get(d.category) ?? d.category}
+                        </p>
+                        {d.notes && (
+                          <p className="text-[11px] text-slate-600 truncate">{d.notes}</p>
+                        )}
+                        <p className="text-[10px] text-slate-400 tabular-nums mt-0.5">
+                          {nombres[d.createdBy] ?? d.createdBy} · {fmtFechaHora(d.createdAt)}
+                        </p>
+                      </div>
+                      {puedeRegistrar && (
+                        <form action={retirarDispositivoQuirurgico} className="shrink-0">
+                          <input type="hidden" name="episodeId" value={episodeId} />
+                          <input type="hidden" name="deviceId" value={d.id} />
+                          <button
+                            type="submit"
+                            title="Marcar como retirado"
+                            className="text-red-500 hover:text-red-700 p-0.5 rounded cursor-pointer"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400 italic mt-1">
+                  Sin catéteres o accesos activos.
+                </p>
+              )}
+            </div>
+
+            {puedeRegistrar && (
+              <div className="mt-2 pt-2 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setAgregandoDispositivo((v) => !v)}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
+                >
+                  {agregandoDispositivo ? 'Cerrar' : '+ Agregar catéter / acceso'}
+                </button>
+
+                {agregandoDispositivo && (
+                  <form
+                    action={async (formData) => {
+                      await agregarDispositivoQuirurgico(formData)
+                      setAgregandoDispositivo(false)
+                    }}
+                    className="space-y-1.5 mt-2"
+                  >
+                    <input type="hidden" name="episodeId" value={episodeId} />
+                    <select
+                      name="category"
+                      required
+                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-900"
+                    >
+                      <option value="">Seleccione catéter o acceso...</option>
+                      {CATEGORIAS_DISPOSITIVOS_CIRUGIA.map((cat) => (
+                        <option key={cat.key} value={cat.key}>
+                          {cat.label}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      name="notes"
+                      placeholder="Nota opcional (ej. lado der.)"
+                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-900"
+                    />
+                    <button
+                      type="submit"
+                      className="w-full inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white text-xs py-1.5 rounded font-medium cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Agregar</span>
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 2. ANTROPOMETRÍA */}
           <AntropometriaCard
             compact
             episodeId={episodeId}
@@ -172,7 +270,7 @@ export function BloqueCirugia({
             puedeRegistrar={puedeRegistrar}
           />
 
-          {/* 2. TIPIFICACIÓN SANGUÍNEA */}
+          {/* 3. TIPIFICACIÓN SANGUÍNEA */}
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
             <div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-1">
@@ -226,7 +324,7 @@ export function BloqueCirugia({
             )}
           </div>
 
-          {/* 3. ALERGIAS (AL LADO DE TIPIFICACIÓN) */}
+          {/* 4. ALERGIAS */}
           <div
             className={`rounded-lg p-3 flex flex-col justify-between border ${
               tieneAlergias
@@ -345,104 +443,6 @@ export function BloqueCirugia({
                       </button>
                     </form>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* 4. CATÉTERES, ACCESOS Y DRENAJES ACTIVOS */}
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                <Syringe className="w-3.5 h-3.5 text-blue-600" />
-                <span>Catéteres y Accesos ({dispositivos.length})</span>
-              </span>
-
-              {dispositivos.length > 0 ? (
-                <div className="space-y-1.5 mt-1.5 max-h-40 overflow-y-auto pr-0.5">
-                  {dispositivos.map((d) => (
-                    <div
-                      key={d.id}
-                      className="bg-white border border-slate-200 rounded px-2 py-1.5 flex items-start justify-between gap-1.5 text-xs"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-bold text-slate-800 leading-snug">
-                          {mapaEtiquetaCat.get(d.category) ?? d.category}
-                        </p>
-                        {d.notes && (
-                          <p className="text-[11px] text-slate-600 truncate">{d.notes}</p>
-                        )}
-                        <p className="text-[10px] text-slate-400 tabular-nums mt-0.5">
-                          {nombres[d.createdBy] ?? d.createdBy} · {fmtFechaHora(d.createdAt)}
-                        </p>
-                      </div>
-                      {puedeRegistrar && (
-                        <form action={retirarDispositivoQuirurgico} className="shrink-0">
-                          <input type="hidden" name="episodeId" value={episodeId} />
-                          <input type="hidden" name="deviceId" value={d.id} />
-                          <button
-                            type="submit"
-                            title="Marcar como retirado"
-                            className="text-red-500 hover:text-red-700 p-0.5 rounded cursor-pointer"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </form>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-slate-400 italic mt-1">
-                  Sin catéteres o accesos activos.
-                </p>
-              )}
-            </div>
-
-            {puedeRegistrar && (
-              <div className="mt-2 pt-2 border-t border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setAgregandoDispositivo((v) => !v)}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
-                >
-                  {agregandoDispositivo ? 'Cerrar' : '+ Agregar catéter / acceso'}
-                </button>
-
-                {agregandoDispositivo && (
-                  <form
-                    action={async (formData) => {
-                      await agregarDispositivoQuirurgico(formData)
-                      setAgregandoDispositivo(false)
-                    }}
-                    className="space-y-1.5 mt-2"
-                  >
-                    <input type="hidden" name="episodeId" value={episodeId} />
-                    <select
-                      name="category"
-                      required
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-900"
-                    >
-                      <option value="">Seleccione catéter o acceso...</option>
-                      {CATEGORIAS_DISPOSITIVOS_CIRUGIA.map((cat) => (
-                        <option key={cat.key} value={cat.key}>
-                          {cat.label}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      name="notes"
-                      placeholder="Nota opcional (ej. lado der.)"
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-900"
-                    />
-                    <button
-                      type="submit"
-                      className="w-full inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white text-xs py-1.5 rounded font-medium cursor-pointer"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Agregar</span>
-                    </button>
-                  </form>
                 )}
               </div>
             )}

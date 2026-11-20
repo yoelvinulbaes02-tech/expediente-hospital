@@ -103,12 +103,12 @@ const fmtHoraCorta = (iso: string) =>
   })
 
 const COLORES_SERIE = [
-  '#ea580c',
-  '#2563eb',
-  '#059669',
-  '#7c3aed',
-  '#dc2626',
-  '#0891b2',
+  '#fb923c',
+  '#3b82f6',
+  '#10b981',
+  '#8b5cf6',
+  '#f43f5e',
+  '#06b6d4',
 ]
 
 type TendenciaInfo = {
@@ -181,10 +181,10 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
 
   if (conDatos.length === 0) {
     return (
-      <div className="bg-orange-50/40 border border-dashed border-orange-200 rounded-lg p-3 flex items-center gap-2 text-[11px] text-slate-600 h-full">
-        <BarChart3 className="w-4 h-4 text-orange-500 shrink-0" />
+      <div className="bg-orange-50/30 border border-dashed border-orange-200/80 rounded-lg p-4 flex items-center gap-2 text-xs text-slate-600">
+        <BarChart3 className="w-4 h-4 text-orange-400 shrink-0" />
         <span>
-          La gráfica de tendencia aparecerá aquí al registrar al menos un débito en mL.
+          La gráfica de tendencia aparecerá aquí al registrar al menos un débito en mL para ver si aumenta o disminuye.
         </span>
       </div>
     )
@@ -298,12 +298,12 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
     [...todosPuntos].sort((a, b) => a.xTs - b.xTs)[todosPuntos.length - 1]?.label ?? ''
 
   return (
-    <div className="bg-slate-50/70 border border-orange-200 rounded-lg p-3 space-y-2.5 h-full flex flex-col justify-between">
+    <div className="bg-orange-50/30 border border-orange-100 rounded-lg p-3.5 space-y-2.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5">
-          <BarChart3 className="w-3.5 h-3.5 text-orange-600" />
-          <h3 className="text-xs font-bold text-slate-900">
-            Tendencia (mL)
+          <BarChart3 className="w-3.5 h-3.5 text-orange-400" />
+          <h3 className="text-xs font-bold text-slate-800">
+            Tendencia de Drenajes (mL)
           </h3>
           <BadgeTendencia tendencia={tendenciaPrincipal} />
         </div>
@@ -315,7 +315,7 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
               onClick={() => setModo('registro')}
               className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
                 modo === 'registro'
-                  ? 'bg-orange-600 text-white'
+                  ? 'bg-orange-400 text-white'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -326,7 +326,7 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
               onClick={() => setModo('diario')}
               className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
                 modo === 'diario'
-                  ? 'bg-orange-600 text-white'
+                  ? 'bg-orange-400 text-white'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -533,6 +533,7 @@ export function ControlDrenajes({
   const [editCaract, setEditCaract] = useState('')
   const [confirmRetiroId, setConfirmRetiroId] = useState<string | null>(null)
   const [verRetirados, setVerRetirados] = useState(false)
+  const [vistaDrenaje, setVistaDrenaje] = useState<'drenajes' | 'tendencia'>('drenajes')
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
 
   const corte24hMs = new Date(ahoraIso).getTime() - 24 * 60 * 60 * 1000
@@ -653,37 +654,67 @@ export function ControlDrenajes({
   }
 
   return (
-    <section className="bg-white p-4 rounded-xl shadow-sm border border-orange-200 space-y-3 print:hidden">
-      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-orange-100 pb-2.5">
+    <section className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3 print:hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-200 pb-2.5">
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex items-center gap-1.5">
-            <Droplets className="w-4 h-4 text-orange-600" />
+            <Droplets className="w-4 h-4 text-orange-400" />
             <h2 className="text-sm sm:text-base font-bold text-slate-800">
               Control de Drenajes ({activos.length})
             </h2>
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5 text-[11px] tabular-nums">
-            <span className="bg-orange-50 border border-orange-200 text-orange-950 font-bold px-2 py-0.5 rounded">
+            <span className="bg-orange-50/70 border border-orange-100 text-orange-800 font-bold px-2 py-0.5 rounded">
               24h: {total24hActivosMl} mL
             </span>
-            <span className="bg-slate-100 border border-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">
+            <span className="bg-slate-100 border border-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">
               Acumulado: {totalActivosMl} mL
               {retirados.length > 0 ? ` (${totalGeneralMl} hist.)` : ''}
             </span>
           </div>
         </div>
 
-        {puedeRegistrar && (
-          <button
-            type="button"
-            onClick={() => setMostrarNuevo((v) => !v)}
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>{mostrarNuevo ? 'Cerrar' : 'Agregar Drenaje'}</span>
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* SELECTOR DE VISTA IGUAL QUE SIGNOS VITALES (DRENAJES | TENDENCIA) */}
+          <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5">
+            <button
+              type="button"
+              onClick={() => setVistaDrenaje('drenajes')}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold cursor-pointer transition-colors ${
+                vistaDrenaje === 'drenajes'
+                  ? 'bg-white text-orange-700 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Droplets className="w-3.5 h-3.5" />
+              <span>Drenajes</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setVistaDrenaje('tendencia')}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold cursor-pointer transition-colors ${
+                vistaDrenaje === 'tendencia'
+                  ? 'bg-white text-orange-700 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>Tendencia</span>
+            </button>
+          </div>
+
+          {puedeRegistrar && (
+            <button
+              type="button"
+              onClick={() => setMostrarNuevo((v) => !v)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{mostrarNuevo ? 'Cerrar' : 'Agregar Drenaje'}</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {mensaje && (
@@ -705,9 +736,9 @@ export function ControlDrenajes({
       {puedeRegistrar && mostrarNuevo && (
         <form
           onSubmit={handleAgregarDrenaje}
-          className="bg-orange-50/50 border border-orange-200 rounded-xl p-4 space-y-3"
+          className="bg-orange-50/40 border border-orange-100 rounded-xl p-4 space-y-3"
         >
-          <p className="text-xs font-bold text-orange-950">Nuevo drenaje o sonda</p>
+          <p className="text-xs font-bold text-slate-800">Nuevo drenaje o sonda</p>
 
           <div className="flex flex-wrap gap-1.5">
             {PRESETS_DRENAJES.map((preset) => (
@@ -717,8 +748,8 @@ export function ControlDrenajes({
                 onClick={() => setNombreNuevo(preset)}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border cursor-pointer transition-colors ${
                   nombreNuevo === preset
-                    ? 'bg-orange-600 text-white border-orange-700'
-                    : 'bg-white text-slate-700 border-slate-300 hover:bg-orange-100'
+                    ? 'bg-orange-100 text-orange-900 border-orange-300'
+                    : 'bg-white text-slate-700 border-slate-300 hover:bg-orange-50'
                 }`}
               >
                 {preset}
@@ -791,7 +822,7 @@ export function ControlDrenajes({
             <button
               type="submit"
               disabled={isPending}
-              className="px-4 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold cursor-pointer"
+              className="px-4 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold cursor-pointer"
             >
               {isPending ? 'Guardando...' : 'Crear Drenaje'}
             </button>
@@ -799,35 +830,30 @@ export function ControlDrenajes({
         </form>
       )}
 
-      {/* TARJETAS DE DRENAJES ACTIVOS + GRÁFICA LADO A LADO EN PC */}
-      {activos.length === 0 && drenajes.every((d) => d.entries.length === 0) ? (
+      {/* VISTA 1: DRENAJES VISIBLES (POR DEFECTO) · VISTA 2: TENDENCIA (OPCIONAL AL LADO) */}
+      {vistaDrenaje === 'tendencia' ? (
+        <GraficaDrenajes drenajes={drenajes} />
+      ) : activos.length === 0 ? (
         <p className="text-xs text-slate-500 italic py-1">
           No hay drenajes activos registrados. Usa &quot;Agregar Drenaje&quot; para llevar el conteo independiente en mL de cada sonda o drenaje.
         </p>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
-          <div className={activos.length === 0 ? 'lg:col-span-5' : 'lg:col-span-7'}>
-            {activos.length === 0 ? (
-              <div className="text-center py-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-xs text-slate-500">
-                Sin drenajes activos actualmente (consulta el historial de retirados o la gráfica).
-              </div>
-            ) : (
-              <div className={`grid grid-cols-1 ${activos.length > 1 ? 'sm:grid-cols-2' : ''} gap-3`}>
-                {activos.map((drain) => {
-                  const totalMl = sumarTotal(drain.entries)
-                  const total24hMl = sumar24h(drain.entries)
-                  const cronologicos = [...drain.entries].sort(
-                    (a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()
-                  )
-                  const tend = calcularTendencia(cronologicos.map((e) => e.volumeMl))
-                  const expandido = !!historialExpandido[drain.id]
-                  const visibles = expandido ? drain.entries : drain.entries.slice(0, 2)
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {activos.map((drain) => {
+            const totalMl = sumarTotal(drain.entries)
+            const total24hMl = sumar24h(drain.entries)
+            const cronologicos = [...drain.entries].sort(
+              (a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()
+            )
+            const tend = calcularTendencia(cronologicos.map((e) => e.volumeMl))
+            const expandido = !!historialExpandido[drain.id]
+            const visibles = expandido ? drain.entries : drain.entries.slice(0, 2)
 
-                  return (
-                    <div
-                      key={drain.id}
-                      className="bg-slate-50/70 border border-orange-200 rounded-lg p-3 space-y-2.5"
-                    >
+            return (
+              <div
+                key={drain.id}
+                className="bg-slate-50/70 border border-orange-100 rounded-lg p-3 space-y-2.5"
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5">
@@ -844,10 +870,10 @@ export function ControlDrenajes({
                   </div>
 
                   <div className="text-right shrink-0">
-                    <div className="bg-orange-600 text-white px-2.5 py-1 rounded-lg text-xs font-black tabular-nums">
+                    <div className="bg-orange-100 border border-orange-200 text-orange-900 px-2.5 py-1 rounded-lg text-xs font-black tabular-nums">
                       Total: {totalMl} mL
                     </div>
-                    <p className="text-[11px] font-bold text-orange-800 mt-1 tabular-nums">
+                    <p className="text-[11px] font-semibold text-orange-700 mt-1 tabular-nums">
                       24h: {total24hMl} mL · {drain.entries.length} reg.
                     </p>
                     {tend && tend.estado !== 'unico' && (
@@ -872,7 +898,7 @@ export function ControlDrenajes({
 
                 {/* AGREGAR DÉBITO INDEPENDIENTE A ESTE DRENAJE */}
                 {puedeRegistrar && (
-                  <div className="bg-white border border-orange-200/80 rounded-lg p-2.5 space-y-2">
+                  <div className="bg-white border border-orange-100 rounded-lg p-2.5 space-y-2">
                     <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5">
                       <input
                         type="number"
@@ -899,7 +925,7 @@ export function ControlDrenajes({
                         type="button"
                         disabled={isPending}
                         onClick={() => handleRegistrarDebito(drain.id, drain.name)}
-                        className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold whitespace-nowrap cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold whitespace-nowrap cursor-pointer"
                       >
                         + Sumar mL
                       </button>
@@ -921,7 +947,7 @@ export function ControlDrenajes({
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-1.5">
-                                  <span className="font-extrabold text-orange-800 tabular-nums">
+                                  <span className="font-extrabold text-orange-700 tabular-nums">
                                     +{entry.volumeMl} mL
                                   </span>
                                   {entry.characteristic && (
@@ -1060,15 +1086,8 @@ export function ControlDrenajes({
                     ))}
                 </div>
               </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-
-          <div className={activos.length === 0 ? 'lg:col-span-7' : 'lg:col-span-5'}>
-            <GraficaDrenajes drenajes={drenajes} />
-          </div>
+            )
+          })}
         </div>
       )}
 
