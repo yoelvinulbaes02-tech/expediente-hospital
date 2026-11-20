@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
           periodMonths,
           method: metodoPago,
           reference: captureRef,
-          notes: `Pago en línea ${customScope === 'INDIVIDUAL' ? 'individual' : 'grupal'} ${metodoPago} (Orden ${orderID})`,
+          notes: `Pago en línea ${customScope === 'INDIVIDUAL' ? 'individual' : 'grupal'} ${metodoPago} · ${ctx.user.fullName} (Orden ${orderID})`,
           status: 'APROBADO',
           requestedBy: userEmail,
           reviewedBy: 'paypal-automatico',

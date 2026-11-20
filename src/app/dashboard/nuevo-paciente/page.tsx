@@ -245,6 +245,7 @@ export default function NuevoPacientePage() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Forma de Ingreso *</label>
                   <select name="admissionType" required className="w-full px-3 py-2 border rounded-lg bg-white text-slate-900">
                     <option value="Consulta">Consulta</option>
+                    <option value="Electiva">Electiva</option>
                     <option value="Emergencia">Emergencia</option>
                     <option value="Referido">Referido</option>
                     <option value="Propios medios">Por sus propios medios</option>

@@ -775,33 +775,255 @@ export async function finalizarInterconsulta(formData: FormData): Promise<void> 
   redirect('/dashboard')
 }
 
-export async function guardarPlanDepartamentoBase(formData: FormData): Promise<void> {
-  const episodeId = String(formData.get('episodeId') ?? '')
-  const { userId, role, episode } = await exigirPermiso(episodeId, 'registrar')
+async function sincronizarResumenPlanBase(episodeId: string) {
+  const activas = await prisma.baseDepartmentPlanEntry.findMany({
+    where: { episodeId, isActive: true },
+    orderBy: { createdAt: 'asc' },
+    select: { content: true },
+  })
+  const resumen =
+    activas.length > 0 ? activas.map((a) => a.content).join('\n\n') : null
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: { baseDepartmentPlan: resumen },
+  })
+}
 
-  const baseDepartmentPlan = String(formData.get('baseDepartmentPlan') ?? '').trim()
+export async function agregarPlanDepartamentoBase(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const content = String(formData.get('content') ?? '').trim()
+  if (!content) return
 
   const previo = await prisma.episode.findUnique({
     where: { id: episodeId },
     select: { baseDepartmentPlan: true },
   })
+  const existentesCount = await prisma.baseDepartmentPlanEntry
+    .count({ where: { episodeId } })
+    .catch(() => 0)
 
-  await prisma.episode.update({
-    where: { id: episodeId },
-    data: { baseDepartmentPlan: baseDepartmentPlan || null },
+  // Si había un plan legado sin entradas en BaseDepartmentPlanEntry, lo migramos primero para no perderlo
+  if (existentesCount === 0 && previo?.baseDepartmentPlan?.trim()) {
+    const legadoAudit = await prisma.auditLog
+      .findFirst({
+        where: {
+          episodeId,
+          reason: { contains: 'plan del departamento base', mode: 'insensitive' },
+        },
+        orderBy: { serverTs: 'desc' },
+        include: { actor: { select: { email: true } } },
+      })
+      .catch(() => null)
+
+    await prisma.baseDepartmentPlanEntry.create({
+      data: {
+        episodeId,
+        content: previo.baseDepartmentPlan.trim(),
+        createdBy: legadoAudit?.actor?.email ?? email,
+        createdAt: legadoAudit?.serverTs ?? new Date(),
+      },
+    })
+  }
+
+  const creada = await prisma.baseDepartmentPlanEntry.create({
+    data: {
+      episodeId,
+      content,
+      createdBy: email,
+    },
   })
+
+  await sincronizarResumenPlanBase(episodeId)
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'create',
+    entity: 'base_department_plan',
+    entityId: creada.id,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: { contenido: content, registradoPor: email },
+    reason: 'Nueva indicación agregada al plan del departamento base',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+export async function editarPlanDepartamentoBase(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '').trim()
+  const entryId = String(formData.get('entryId') ?? '').trim()
+  const content = String(formData.get('content') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  if (!content || !entryId) return
+
+  if (entryId === 'legacy') {
+    const previo = await prisma.episode.findUnique({
+      where: { id: episodeId },
+      select: { baseDepartmentPlan: true },
+    })
+    const legadoAudit = await prisma.auditLog
+      .findFirst({
+        where: {
+          episodeId,
+          reason: { contains: 'plan del departamento base', mode: 'insensitive' },
+        },
+        orderBy: { serverTs: 'desc' },
+        include: { actor: { select: { email: true } } },
+      })
+      .catch(() => null)
+
+    const creada = await prisma.baseDepartmentPlanEntry.create({
+      data: {
+        episodeId,
+        content,
+        createdBy: legadoAudit?.actor?.email ?? email,
+        createdAt: legadoAudit?.serverTs ?? new Date(),
+        updatedBy: email,
+        updatedAt: new Date(),
+      },
+    })
+
+    await sincronizarResumenPlanBase(episodeId)
+
+    await logAudit({
+      actorId: userId,
+      actorRole: role,
+      action: 'update',
+      entity: 'base_department_plan',
+      entityId: creada.id,
+      patientId: episode.patientId,
+      episodeId,
+      oldValue: { contenido: previo?.baseDepartmentPlan ?? null },
+      newValue: { contenido: content, editadoPor: email },
+      reason: 'Indicación del plan del departamento base actualizada',
+    })
+
+    revalidatePath(`/dashboard/paciente/${episodeId}`)
+    return
+  }
+
+  const actual = await prisma.baseDepartmentPlanEntry.findFirst({
+    where: { id: entryId, episodeId },
+  })
+  if (!actual) return
+
+  await prisma.baseDepartmentPlanEntry.update({
+    where: { id: actual.id },
+    data: {
+      content,
+      updatedBy: email,
+      updatedAt: new Date(),
+    },
+  })
+
+  await sincronizarResumenPlanBase(episodeId)
 
   await logAudit({
     actorId: userId,
     actorRole: role,
     action: 'update',
-    entity: 'episode',
-    entityId: episodeId,
+    entity: 'base_department_plan',
+    entityId: actual.id,
     patientId: episode.patientId,
     episodeId,
-    oldValue: { planDepartamentoBase: previo?.baseDepartmentPlan ?? null },
-    newValue: { planDepartamentoBase: baseDepartmentPlan || null },
-    reason: 'Actualización de plan del departamento base en interconsulta',
+    oldValue: { contenido: actual.content },
+    newValue: { contenido: content, editadoPor: email },
+    reason: 'Indicación del plan del departamento base editada',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+export async function archivarPlanDepartamentoBase(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '').trim()
+  const entryId = String(formData.get('entryId') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  if (!entryId) return
+
+  if (entryId === 'legacy') {
+    const previo = await prisma.episode.findUnique({
+      where: { id: episodeId },
+      select: { baseDepartmentPlan: true },
+    })
+    if (previo?.baseDepartmentPlan?.trim()) {
+      const legadoAudit = await prisma.auditLog
+        .findFirst({
+          where: {
+            episodeId,
+            reason: { contains: 'plan del departamento base', mode: 'insensitive' },
+          },
+          orderBy: { serverTs: 'desc' },
+          include: { actor: { select: { email: true } } },
+        })
+        .catch(() => null)
+
+      const archivada = await prisma.baseDepartmentPlanEntry.create({
+        data: {
+          episodeId,
+          content: previo.baseDepartmentPlan.trim(),
+          isActive: false,
+          createdBy: legadoAudit?.actor?.email ?? email,
+          createdAt: legadoAudit?.serverTs ?? new Date(),
+          updatedBy: email,
+          updatedAt: new Date(),
+        },
+      })
+
+      await prisma.episode.update({
+        where: { id: episodeId },
+        data: { baseDepartmentPlan: null },
+      })
+
+      await logAudit({
+        actorId: userId,
+        actorRole: role,
+        action: 'update',
+        entity: 'base_department_plan',
+        entityId: archivada.id,
+        patientId: episode.patientId,
+        episodeId,
+        oldValue: { contenido: previo.baseDepartmentPlan, isActive: true },
+        newValue: { contenido: previo.baseDepartmentPlan, isActive: false, archivadoPor: email },
+        reason: 'Indicación del plan del departamento base archivada',
+      })
+    }
+
+    revalidatePath(`/dashboard/paciente/${episodeId}`)
+    return
+  }
+
+  const actual = await prisma.baseDepartmentPlanEntry.findFirst({
+    where: { id: entryId, episodeId },
+  })
+  if (!actual) return
+
+  await prisma.baseDepartmentPlanEntry.update({
+    where: { id: actual.id },
+    data: {
+      isActive: false,
+      updatedBy: email,
+      updatedAt: new Date(),
+    },
+  })
+
+  await sincronizarResumenPlanBase(episodeId)
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'base_department_plan',
+    entityId: actual.id,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: { contenido: actual.content, isActive: true },
+    newValue: { contenido: actual.content, isActive: false, archivadoPor: email },
+    reason: 'Indicación del plan del departamento base archivada',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
@@ -972,6 +1194,282 @@ export async function guardarPerfilMedicinaInterna(formData: FormData): Promise<
       dischargeGoal,
     },
     reason: 'Actualización de seguimiento clínico de Medicina Interna',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+// ─── 17. ANTROPOMETRÍA (PESO, TALLA E IMC AUTOMÁTICO) ───
+export async function guardarAntropometria(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const weightStr = String(formData.get('anthropometryWeight') ?? '').trim()
+  const weightUnit = String(formData.get('anthropometryWeightUnit') ?? 'kg').trim() === 'lb' ? 'lb' : 'kg'
+  const heightStr = String(formData.get('anthropometryHeightCm') ?? '').trim()
+
+  const anthropometryWeight = weightStr ? parseFloat(weightStr) : null
+  const anthropometryHeightCm = heightStr ? parseFloat(heightStr) : null
+
+  if (
+    anthropometryWeight !== null &&
+    (!Number.isFinite(anthropometryWeight) || anthropometryWeight <= 0 || anthropometryWeight > 500)
+  ) {
+    volverAlExpediente(episodeId, 'El peso debe ser un número válido mayor que 0')
+  }
+
+  if (
+    anthropometryHeightCm !== null &&
+    (!Number.isFinite(anthropometryHeightCm) || anthropometryHeightCm < 30 || anthropometryHeightCm > 260)
+  ) {
+    volverAlExpediente(episodeId, 'La talla debe estar entre 30 y 260 cm')
+  }
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: {
+      anthropometryWeight,
+      anthropometryWeightUnit: weightUnit,
+      anthropometryHeightCm,
+      anthropometryUpdatedBy: email,
+      anthropometryUpdatedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode_anthropometry',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: {
+      peso: anthropometryWeight ? `${anthropometryWeight} ${weightUnit}` : null,
+      tallaCm: anthropometryHeightCm,
+    },
+    reason: 'Actualización de antropometría (Peso, Talla e IMC)',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+// ─── 18. INFORMACIÓN QUIRÚRGICA (INTERFAZ DE CIRUGÍA) ───
+export async function guardarInfoQuirurgica(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const procedureName = String(formData.get('procedureName') ?? '').trim() || null
+  const surgeryDateStr = String(formData.get('surgeryDate') ?? '').trim()
+  const surgeryTypeRaw = String(formData.get('surgeryType') ?? 'electiva').trim()
+  const surgeryType = surgeryTypeRaw === 'emergencia' ? 'emergencia' : 'electiva'
+  const surgicalSpecialty = String(formData.get('surgicalSpecialty') ?? '').trim() || null
+  const surgeonAndAssistants = String(formData.get('surgeonAndAssistants') ?? '').trim() || null
+  const statusRaw = String(formData.get('surgeryStatus') ?? 'pendiente').trim()
+  const surgeryStatus = ['pendiente', 'en_quirofano', 'realizada', 'suspendida'].includes(statusRaw)
+    ? statusRaw
+    : 'pendiente'
+
+  const surgeryDate = surgeryDateStr ? new Date(`${surgeryDateStr}:00-04:00`) : null
+  if (surgeryDate && Number.isNaN(surgeryDate.getTime())) {
+    volverAlExpediente(episodeId, 'La fecha de cirugía no es válida')
+  }
+
+  await prisma.surgicalProfile.upsert({
+    where: { episodeId },
+    update: {
+      procedureName,
+      surgeryDate,
+      surgeryType,
+      surgicalSpecialty,
+      surgeonAndAssistants,
+      surgeryStatus,
+      updatedBy: email,
+    },
+    create: {
+      episodeId,
+      procedureName,
+      surgeryDate,
+      surgeryType,
+      surgicalSpecialty,
+      surgeonAndAssistants,
+      surgeryStatus,
+      updatedBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'surgical_profile',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: {
+      procedureName,
+      surgeryDate: surgeryDate?.toISOString() ?? null,
+      surgeryType,
+      surgicalSpecialty,
+      surgeonAndAssistants,
+      surgeryStatus,
+    },
+    reason: 'Actualización de información quirúrgica del paciente',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+// ─── 19. ANTIBIÓTICOS CON CONTEO AUTOMÁTICO DE DÍAS ───
+export async function agregarAntibiotico(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const name = String(formData.get('name') ?? '').trim()
+  const dose = String(formData.get('dose') ?? '').trim() || null
+  const route = String(formData.get('route') ?? 'IV').trim() || null
+  const startedAtStr = String(formData.get('startedAt') ?? '').trim()
+
+  if (!name) volverAlExpediente(episodeId, 'Escribe el nombre del antibiótico')
+
+  const startedAt = startedAtStr ? new Date(`${startedAtStr}T08:00:00-04:00`) : new Date()
+  if (Number.isNaN(startedAt.getTime())) {
+    volverAlExpediente(episodeId, 'La fecha de inicio del antibiótico no es válida')
+  }
+
+  const abx = await prisma.episodeAntibiotic.create({
+    data: {
+      episodeId,
+      name,
+      dose,
+      route,
+      startedAt,
+      isActive: true,
+      createdBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'create',
+    entity: 'episode_antibiotic',
+    entityId: abx.id,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: { name, dose, route, startedAt: startedAt.toISOString() },
+    reason: `Inicio de esquema antibiótico (${name})`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+export async function suspenderAntibiotico(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const antibioticId = String(formData.get('antibioticId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  if (!antibioticId) return
+
+  const previo = await prisma.episodeAntibiotic.findFirst({
+    where: { id: antibioticId, episodeId, isActive: true },
+  })
+  if (!previo) return
+
+  await prisma.episodeAntibiotic.update({
+    where: { id: antibioticId },
+    data: {
+      isActive: false,
+      stoppedAt: new Date(),
+      stoppedBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'episode_antibiotic',
+    entityId: antibioticId,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: { isActive: false, stoppedBy: email },
+    reason: `Antibiótico suspendido/completado (${previo.name})`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+// ─── 20. DISPOSITIVOS / CATÉTERES QUIRÚRGICOS EN EXPEDIENTE ───
+export async function agregarDispositivoQuirurgico(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const category = String(formData.get('category') ?? '').trim()
+  const notes = String(formData.get('notes') ?? '').trim() || null
+  if (!category || !episode.residencyId) return
+
+  const dispositivo = await prisma.surgicalDevice.create({
+    data: {
+      residencyId: episode.residencyId,
+      episodeId,
+      category,
+      notes,
+      isActive: true,
+      createdBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'create',
+    entity: 'surgical_device',
+    entityId: dispositivo.id,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: { category, notes },
+    reason: `Dispositivo/acceso registrado en cirugía (${category})`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+export async function retirarDispositivoQuirurgico(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const deviceId = String(formData.get('deviceId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  if (!deviceId) return
+
+  const previo = await prisma.surgicalDevice.findFirst({
+    where: { id: deviceId, episodeId, isActive: true },
+  })
+  if (!previo) return
+
+  await prisma.surgicalDevice.update({
+    where: { id: deviceId },
+    data: {
+      isActive: false,
+      removedBy: email,
+      removedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'surgical_device',
+    entityId: deviceId,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: { isActive: false, removedBy: email },
+    reason: `Dispositivo/acceso retirado (${previo.category})`,
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

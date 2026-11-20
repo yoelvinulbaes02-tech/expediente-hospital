@@ -22,6 +22,7 @@ enum InterfaceMode {
   HOSPITALIZACION
   CONSULTAS
   MEDICINA_INTERNA
+  CIRUGIA
 }
 
 enum PlanStatus {
@@ -52,14 +53,25 @@ model Residency {
   billingContactEmail String?
   lastPaymentNote     String?
   isActive            Boolean       @default(true)
+  teamMa              String?
+  teamR4              String?
+  teamR3              String?
+  teamR2              String?
+  teamR1              String?
+  teamAutoMode        Boolean       @default(false)
+  teamUpdatedBy       String?
+  teamUpdatedAt       DateTime?     @db.Timestamptz
+  surgicalStatsExtra  Json?
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 
-  users         User[]
-  patients      Patient[]
-  episodes      Episode[]
-  consultations Consultation[]
-  payments      SubscriptionPayment[]
+  users           User[]
+  patients        Patient[]
+  episodes        Episode[]
+  consultations   Consultation[]
+  payments        SubscriptionPayment[]
+  surgicalDevices SurgicalDevice[]
+  woundCares      WoundCare[]
 }
 
 model SubscriptionPayment {
@@ -188,9 +200,16 @@ model Episode {
   treatmentUpdatedBy String?
   treatmentUpdatedAt DateTime? @db.Timestamptz
 
-  // EGRESO Y PLAN DE DEPARTAMENTO BASE (INTERCONSULTAS)
+  // EGRESO Y PLAN DE DEPARTAMENTO BASE (INTERCONSULTAS Y CIRUGÍA)
   dischargeType      String?
   baseDepartmentPlan String?
+
+  // ANTROPOMETRÍA (MEDICINA INTERNA Y CIRUGÍA)
+  anthropometryWeight     Float?
+  anthropometryWeightUnit String?   @default("kg")
+  anthropometryHeightCm   Float?
+  anthropometryUpdatedBy  String?
+  anthropometryUpdatedAt  DateTime? @db.Timestamptz
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -206,13 +225,17 @@ model Episode {
   responsible      User?       @relation("EpisodeResponsible", fields: [responsibleId], references: [id])
   tasks            Task[]
 
-  importantAlerts         ImportantAlert[]
-  gfrRecords              GfrRecord[]
-  labReports              LabReport[]
-  studyReports            StudyReport[]
-  viralSerologies         ViralSerology[]
-  vascularAccesses        VascularAccess[]
-  internalMedicineProfile InternalMedicineProfile?
+  importantAlerts           ImportantAlert[]
+  gfrRecords                GfrRecord[]
+  labReports                LabReport[]
+  studyReports              StudyReport[]
+  viralSerologies           ViralSerology[]
+  vascularAccesses          VascularAccess[]
+  internalMedicineProfile   InternalMedicineProfile?
+  surgicalProfile           SurgicalProfile?
+  antibiotics               EpisodeAntibiotic[]
+  surgicalDevices           SurgicalDevice[]
+  baseDepartmentPlanEntries BaseDepartmentPlanEntry[]
 
   @@index([residencyId, status])
   @@index([responsibleId])
@@ -276,6 +299,112 @@ model InternalMedicineProfile {
   updatedAt          DateTime @updatedAt
 
   episode Episode @relation(fields: [episodeId], references: [id])
+}
+
+// ─── PERFIL QUIRÚRGICO (INTERFAZ DE CIRUGÍA) ───
+model SurgicalProfile {
+  id                   String    @id @default(cuid())
+  episodeId            String    @unique
+  procedureName        String?
+  surgeryDate          DateTime? @db.Timestamptz
+  surgeryType          String    @default("electiva") // electiva | emergencia
+  surgicalSpecialty    String?
+  surgeonAndAssistants String?
+  surgeryStatus        String    @default("pendiente") // pendiente | en_quirofano | realizada | suspendida
+  updatedBy            String
+  updatedAt            DateTime  @updatedAt
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+}
+
+// ─── ANTIBIÓTICOS CON CONTEO DE DÍAS ───
+model EpisodeAntibiotic {
+  id        String    @id @default(cuid())
+  episodeId String
+  name      String
+  dose      String?
+  route     String?
+  startedAt DateTime  @db.Timestamptz
+  stoppedAt DateTime? @db.Timestamptz
+  isActive  Boolean   @default(true)
+  createdBy String
+  stoppedBy String?
+  createdAt DateTime  @default(now()) @db.Timestamptz
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId, isActive])
+}
+
+// ─── DISPOSITIVOS / ACCESOS / PROCEDIMIENTOS QUIRÚRGICOS ───
+model SurgicalDevice {
+  id          String    @id @default(cuid())
+  residencyId String
+  episodeId   String?
+  category    String
+  notes       String?
+  isActive    Boolean   @default(true)
+  createdBy   String
+  removedBy   String?
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  removedAt   DateTime? @db.Timestamptz
+
+  residency Residency @relation(fields: [residencyId], references: [id])
+  episode   Episode?  @relation(fields: [episodeId], references: [id])
+
+  @@index([residencyId, isActive])
+  @@index([episodeId, isActive])
+}
+
+// ─── CURAS QUIRÚRGICAS Y CHECKLIST DE EVIDENCIA ───
+model WoundCare {
+  id             String   @id @default(cuid())
+  residencyId    String
+  roomBed        String
+  patientName    String
+  age            Int?
+  diagnosis      String
+  patientStatus  String   @default("Estable")
+  careFrequency  String   @default("c/24h")
+  baseDepartment String
+  isActive       Boolean  @default(true)
+  createdBy      String
+  createdAt      DateTime @default(now()) @db.Timestamptz
+  updatedAt      DateTime @updatedAt
+
+  residency Residency      @relation(fields: [residencyId], references: [id])
+  logs      WoundCareLog[]
+
+  @@index([residencyId, isActive])
+}
+
+model WoundCareLog {
+  id          String   @id @default(cuid())
+  woundCareId String
+  performedBy String
+  performedAt DateTime @default(now()) @db.Timestamptz
+  notes       String?
+
+  woundCare WoundCare @relation(fields: [woundCareId], references: [id], onDelete: Cascade)
+
+  @@index([woundCareId, performedAt])
+}
+
+// ─── PLAN DEL DEPARTAMENTO BASE (HISTORIAL MÚLTIPLE AUDITADO) ───
+model BaseDepartmentPlanEntry {
+  id        String    @id @default(cuid())
+  episodeId String
+  content   String
+  isActive  Boolean   @default(true)
+  createdBy String
+  createdAt DateTime  @default(now()) @db.Timestamptz
+  updatedBy String?
+  updatedAt DateTime? @db.Timestamptz
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+
+  @@index([episodeId, isActive])
+  @@index([episodeId, createdAt])
 }
 
 // ─── ANTECEDENTES DEL PACIENTE ───
@@ -448,6 +577,8 @@ model VitalSign {
   weightUnit      String?   @default("kg")
   painScale       Int?
   diuresis        Int?
+  drainage        Int?
+  drainageNotes   String?
   recordedBy      String
   updatedBy       String?
   updatedAt       DateTime? @db.Timestamptz

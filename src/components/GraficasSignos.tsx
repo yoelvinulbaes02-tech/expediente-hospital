@@ -13,6 +13,7 @@ export type RegistroVital = {
   glucose: number | null
   weight: number | null
   diuresis: number | null
+  drainage?: number | null
 }
 
 type Campo = Exclude<keyof RegistroVital, 'fecha'>
@@ -36,6 +37,7 @@ const PARAMETROS: ParametroConfig[] = [
   { id: 'glucose', etiqueta: 'Glucosa', unidad: 'mg/dL', color: '#ca8a04', minNormal: 70, maxNormal: 140 },
   { id: 'weight', etiqueta: 'Peso Corporal', unidad: 'kg', color: '#059669', minNormal: null, maxNormal: null },
   { id: 'diuresis', etiqueta: 'Diuresis', unidad: 'mL', color: '#0891b2', minNormal: 400, maxNormal: null },
+  { id: 'drainage', etiqueta: 'Drenaje', unidad: 'mL', color: '#ea580c', minNormal: null, maxNormal: null },
 ]
 
 function esAnormal(v: number | null, p: ParametroConfig) {
@@ -70,7 +72,15 @@ const fmtFechaCorta = (iso: string) =>
   })
 
 // ─── 1. HOJA DE CONSTANTES CLÍNICA (FLOWSHEET) ───
-function HojaConstantes({ registros }: { registros: RegistroVital[] }) {
+function HojaConstantes({
+  registros,
+  hideWeight = false,
+  showDrainage = false,
+}: {
+  registros: RegistroVital[]
+  hideWeight?: boolean
+  showDrainage?: boolean
+}) {
   const tomas = [...registros].reverse()
 
   return (
@@ -217,29 +227,45 @@ function HojaConstantes({ registros }: { registros: RegistroVital[] }) {
             })}
           </tr>
 
-          {/* Peso */}
-          <tr className="border-b hover:bg-slate-50/60">
-            <td className="p-2.5 font-semibold text-slate-800 sticky left-0 bg-white border-r">
-              Peso Corporal <span className="text-[10px] text-slate-400 font-normal">(kg)</span>
-            </td>
-            {tomas.map((t, idx) => (
-              <td key={idx} className="p-2 text-center font-bold text-emerald-800 border-r last:border-0">
-                {t.weight ? `${t.weight} kg` : '—'}
+          {/* Peso (oculto en Medicina Interna y Cirugía) */}
+          {!hideWeight && (
+            <tr className="border-b hover:bg-slate-50/60">
+              <td className="p-2.5 font-semibold text-slate-800 sticky left-0 bg-white border-r">
+                Peso Corporal <span className="text-[10px] text-slate-400 font-normal">(kg)</span>
               </td>
-            ))}
-          </tr>
+              {tomas.map((t, idx) => (
+                <td key={idx} className="p-2 text-center font-bold text-emerald-800 border-r last:border-0">
+                  {t.weight ? `${t.weight} kg` : '—'}
+                </td>
+              ))}
+            </tr>
+          )}
 
           {/* Diuresis */}
-          <tr className="hover:bg-slate-50/60">
+          <tr className={`${showDrainage ? 'border-b ' : ''}hover:bg-slate-50/60`}>
             <td className="p-2.5 font-semibold text-slate-800 sticky left-0 bg-white border-r">
               Diuresis <span className="text-[10px] text-slate-400 font-normal">(mL)</span>
             </td>
             {tomas.map((t, idx) => (
               <td key={idx} className="p-2 text-center font-bold text-sky-800 border-r last:border-0">
-                {t.diuresis ? `${t.diuresis} mL` : '—'}
+                {t.diuresis !== null && t.diuresis !== undefined ? `${t.diuresis} mL` : '—'}
               </td>
             ))}
           </tr>
+
+          {/* Drenaje (solo Cirugía) */}
+          {showDrainage && (
+            <tr className="hover:bg-slate-50/60">
+              <td className="p-2.5 font-semibold text-slate-800 sticky left-0 bg-white border-r">
+                Drenaje <span className="text-[10px] text-slate-400 font-normal">(mL)</span>
+              </td>
+              {tomas.map((t, idx) => (
+                <td key={idx} className="p-2 text-center font-bold text-orange-700 border-r last:border-0">
+                  {t.drainage !== null && t.drainage !== undefined ? `${t.drainage} mL` : '—'}
+                </td>
+              ))}
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
@@ -456,7 +482,15 @@ function GraficaClinica({
 }
 
 // ─── 3. COMPONENTE PRINCIPAL CON DESPLEGABLE INDIVIDUAL ───
-export function GraficasSignos({ registros }: { registros: RegistroVital[] }) {
+export function GraficasSignos({
+  registros,
+  hideWeight = false,
+  showDrainage = false,
+}: {
+  registros: RegistroVital[]
+  hideWeight?: boolean
+  showDrainage?: boolean
+}) {
   const [modo, setModo] = useState<'sabana' | 'grafica'>('sabana')
   const [graficaSeleccionada, setGraficaSeleccionada] = useState<string>('todas')
 
@@ -513,8 +547,9 @@ export function GraficasSignos({ registros }: { registros: RegistroVital[] }) {
               <option value="fc">❤️ Frecuencia Cardíaca (FC)</option>
               <option value="temp">🌡️ Temperatura Corporal</option>
               <option value="spo2">💨 Saturación de Oxígeno (SpO2)</option>
-              <option value="peso">⚖️ Peso Corporal (kg)</option>
+              {!hideWeight && <option value="peso">⚖️ Peso Corporal (kg)</option>}
               <option value="diuresis">💧 Diuresis (mL)</option>
+              {showDrainage && <option value="drenaje">🩹 Drenaje (mL)</option>}
             </select>
           </div>
         )}
@@ -526,7 +561,7 @@ export function GraficasSignos({ registros }: { registros: RegistroVital[] }) {
           <p className="text-xs text-slate-500 mb-2">
             Vista horizontal de enfermería y pase de visita. Las casillas en <strong className="text-red-600">rojo</strong> indican valores fuera de rango fisiológico.
           </p>
-          <HojaConstantes registros={registros} />
+          <HojaConstantes registros={registros} hideWeight={hideWeight} showDrainage={showDrainage} />
         </div>
       )}
 
@@ -596,7 +631,7 @@ export function GraficasSignos({ registros }: { registros: RegistroVital[] }) {
                 />
               )}
 
-              {graficaSeleccionada === 'peso' && (
+              {!hideWeight && graficaSeleccionada === 'peso' && (
                 <GraficaClinica
                   titulo="Peso Corporal"
                   unidad="kg"
@@ -617,6 +652,19 @@ export function GraficasSignos({ registros }: { registros: RegistroVital[] }) {
                   expandida
                   series={[
                     { campo: 'diuresis', etiqueta: 'Diuresis', color: '#0891b2' },
+                  ]}
+                />
+              )}
+
+              {showDrainage && graficaSeleccionada === 'drenaje' && (
+                <GraficaClinica
+                  titulo="Drenaje Quirúrgico"
+                  unidad="mL"
+                  filas={ordenCronologico}
+                  escalaMin={0}
+                  expandida
+                  series={[
+                    { campo: 'drainage', etiqueta: 'Drenaje', color: '#ea580c' },
                   ]}
                 />
               )}
@@ -672,14 +720,16 @@ export function GraficasSignos({ registros }: { registros: RegistroVital[] }) {
                 ]}
               />
 
-              <GraficaClinica
-                titulo="Peso Corporal"
-                unidad="kg"
-                filas={ordenCronologico}
-                series={[
-                  { campo: 'weight', etiqueta: 'Peso', color: '#059669' },
-                ]}
-              />
+              {!hideWeight && (
+                <GraficaClinica
+                  titulo="Peso Corporal"
+                  unidad="kg"
+                  filas={ordenCronologico}
+                  series={[
+                    { campo: 'weight', etiqueta: 'Peso', color: '#059669' },
+                  ]}
+                />
+              )}
 
               <GraficaClinica
                 titulo="Diuresis"
@@ -690,6 +740,18 @@ export function GraficasSignos({ registros }: { registros: RegistroVital[] }) {
                   { campo: 'diuresis', etiqueta: 'Diuresis', color: '#0891b2' },
                 ]}
               />
+
+              {showDrainage && (
+                <GraficaClinica
+                  titulo="Drenaje Quirúrgico"
+                  unidad="mL"
+                  filas={ordenCronologico}
+                  escalaMin={0}
+                  series={[
+                    { campo: 'drainage', etiqueta: 'Drenaje', color: '#ea580c' },
+                  ]}
+                />
+              )}
             </div>
           )}
         </div>

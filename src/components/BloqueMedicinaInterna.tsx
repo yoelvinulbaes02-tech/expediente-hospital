@@ -2,6 +2,7 @@ import {
   guardarPerfilMedicinaInterna,
   guardarTipificacion,
 } from '@/app/dashboard/paciente/[id]/actions-clinicas'
+import { AntropometriaCard } from '@/components/AntropometriaCard'
 
 type PerfilMedicinaInterna = {
   id: string
@@ -55,6 +56,7 @@ export function BloqueMedicinaInterna({
   episodeId,
   perfil,
   tipificacion,
+  antropometria,
   nombres,
   roles,
   puedeRegistrar,
@@ -62,6 +64,13 @@ export function BloqueMedicinaInterna({
   episodeId: string
   perfil: PerfilMedicinaInterna | null
   tipificacion: Tipificacion
+  antropometria: {
+    weight: number | null
+    weightUnit: string | null
+    heightCm: number | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
   nombres: Record<string, string>
   roles: Record<string, string>
   puedeRegistrar: boolean
@@ -78,7 +87,19 @@ export function BloqueMedicinaInterna({
   const claseEstado = ESTILO_ESTADO[estado] ?? ESTILO_ESTADO.Estable
 
   return (
-    <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6 print:hidden">
+    <>
+      <AntropometriaCard
+        episodeId={episodeId}
+        initialWeight={antropometria.weight}
+        initialWeightUnit={antropometria.weightUnit}
+        initialHeightCm={antropometria.heightCm}
+        updatedBy={antropometria.updatedBy}
+        updatedAt={antropometria.updatedAt}
+        nombres={nombres}
+        puedeRegistrar={puedeRegistrar}
+      />
+
+      <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6 print:hidden">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3 mb-4">
         <div>
           <h2 className="text-base font-bold text-slate-800">
@@ -406,6 +427,7 @@ export function BloqueMedicinaInterna({
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

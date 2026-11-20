@@ -25,7 +25,12 @@ const INTERFACES_DISPONIBLES = [
   {
     id: 'MEDICINA_INTERNA',
     nombre: 'Medicina Interna',
-    descripcion: 'Hospitalización con perfil clínico MI (código, aislamiento, dieta, balance).',
+    descripcion: 'Hospitalización con perfil clínico MI, antropometría (IMC), equipo de guardia y pase clínico.',
+  },
+  {
+    id: 'CIRUGIA',
+    nombre: 'Cirugía',
+    descripcion: 'Quirúrgica: información operatoria, drenajes, antibióticos por días, catéteres, curas y censos.',
   },
   {
     id: 'CONSULTAS',
@@ -219,9 +224,9 @@ export default async function ControlResidenciaSuperAdminPage({
               Interfaz Clínica y Tarifas Base de {residency.name}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Interfaces clínicas disponibles actualmente en NEXO: 3 módulos completos. Selecciona cuál usa esta residencia.
+              Interfaces clínicas disponibles actualmente en NEXO: 4 módulos completos. Selecciona cuál usa esta residencia.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mt-3">
               {INTERFACES_DISPONIBLES.map((iface) => {
                 const activa = residency.interfaceMode === iface.id
                 return (
@@ -280,6 +285,7 @@ export default async function ControlResidenciaSuperAdminPage({
               >
                 <option value="HOSPITALIZACION">Hospitalización / Nefrología</option>
                 <option value="MEDICINA_INTERNA">Medicina Interna</option>
+                <option value="CIRUGIA">Cirugía</option>
                 <option value="CONSULTAS">Consultas Externas</option>
               </select>
             </div>
@@ -664,48 +670,65 @@ export default async function ControlResidenciaSuperAdminPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-              {pagos.map((p) => (
-                <tr key={p.id}>
-                  <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums">
-                    {fmtFechaHora(p.createdAt)}
-                  </td>
-                  <td className="px-4 py-3 text-xs">
-                    {p.billingScope === 'INDIVIDUAL' ? (
-                      <div>
-                        <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-bold text-[10px]">
-                          Individual
-                        </span>
-                        <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
-                          {p.user?.fullName ?? p.requestedBy}
-                        </p>
-                      </div>
-                    ) : (
-                      <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[10px]">
-                        Grupal (Residencia)
+              {pagos.map((p) => {
+                const nombrePagadorGrupal =
+                  usuarios.find((u) => u.email.toLowerCase() === p.requestedBy.toLowerCase())
+                    ?.fullName ?? p.requestedBy
+
+                return (
+                  <tr key={p.id}>
+                    <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums">
+                      {fmtFechaHora(p.createdAt)}
+                    </td>
+                    <td className="px-4 py-3 text-xs">
+                      {p.billingScope === 'INDIVIDUAL' ? (
+                        <div>
+                          <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-bold text-[10px]">
+                            Individual
+                          </span>
+                          <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+                            {p.user?.fullName ?? p.requestedBy}
+                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            {p.requestedBy}
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[10px]">
+                            Grupal (Residencia)
+                          </span>
+                          <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+                            {nombrePagadorGrupal}
+                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            {p.requestedBy}
+                          </p>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs tabular-nums">{p.periodMonths} mes(es)</td>
+                    <td className="px-4 py-3 text-xs font-bold tabular-nums">
+                      ${p.amountUsd.toFixed(2)} USD
+                    </td>
+                    <td className="px-4 py-3 text-xs capitalize">{p.method}</td>
+                    <td className="px-4 py-3 text-xs font-mono">{p.reference ?? '—'}</td>
+                    <td className="px-4 py-3 text-xs">
+                      <span
+                        className={`px-2 py-0.5 rounded font-bold ${
+                          p.status === 'APROBADO'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : p.status === 'RECHAZADO'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {p.status}
                       </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-xs tabular-nums">{p.periodMonths} mes(es)</td>
-                  <td className="px-4 py-3 text-xs font-bold tabular-nums">
-                    ${p.amountUsd.toFixed(2)} USD
-                  </td>
-                  <td className="px-4 py-3 text-xs capitalize">{p.method}</td>
-                  <td className="px-4 py-3 text-xs font-mono">{p.reference ?? '—'}</td>
-                  <td className="px-4 py-3 text-xs">
-                    <span
-                      className={`px-2 py-0.5 rounded font-bold ${
-                        p.status === 'APROBADO'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : p.status === 'RECHAZADO'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-amber-100 text-amber-800'
-                      }`}
-                    >
-                      {p.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                )
+              })}
               {pagos.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">

@@ -110,7 +110,9 @@ export default async function SuscripcionPage({
                 ? 'Consultas Externas'
                 : interfaceModeStr === 'MEDICINA_INTERNA'
                   ? 'Medicina Interna'
-                  : 'Hospitalización / Nefrología'}
+                  : interfaceModeStr === 'CIRUGIA'
+                    ? 'Cirugía'
+                    : 'Hospitalización / Nefrología'}
             </p>
           </div>
 

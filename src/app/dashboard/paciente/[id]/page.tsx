@@ -14,7 +14,6 @@ import {
   transferirAPropio,
   finalizarInterconsulta,
   transferirAInterconsulta,
-  guardarPlanDepartamentoBase,
 } from './actions-clinicas'
 import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
@@ -23,6 +22,7 @@ import { calcularPermisos } from '@/lib/permisos'
 import { NotasImportantes } from '@/components/NotasImportantes'
 import { BloqueNefrologico } from '@/components/BloqueNefrologico'
 import { BloqueMedicinaInterna } from '@/components/BloqueMedicinaInterna'
+import { BloqueCirugia } from '@/components/BloqueCirugia'
 import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
 import { ReportesLaboratorio } from '@/components/ReportesLaboratorio'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
@@ -30,6 +30,7 @@ import { FormularioNotaEvolucion } from '@/components/FormularioNotaEvolucion'
 import { ListaEvoluciones } from '@/components/ListaEvoluciones'
 import { BotonImprimirSignos } from '@/components/BotonImprimirSignos'
 import { TratamientoActual } from '@/components/TratamientoActual'
+import { PlanDepartamentoBase, type PlanBaseEntryItem } from '@/components/PlanDepartamentoBase'
 
 const ETIQUETA_ROL: Record<string, string> = {
   SUPERADMIN: 'Propietario Plataforma',
@@ -115,6 +116,11 @@ export default async function ExpedientePage({
       treatmentUpdatedAt: true,
       dischargeType: true,
       baseDepartmentPlan: true,
+      anthropometryWeight: true,
+      anthropometryWeightUnit: true,
+      anthropometryHeightCm: true,
+      anthropometryUpdatedBy: true,
+      anthropometryUpdatedAt: true,
       room: true,
       bed: true,
       patient: {
@@ -168,12 +174,92 @@ export default async function ExpedientePage({
   const entregaPendiente = episode.handoffs[0]
   const esInterconsulta = episode.serviceType === 'interconsulta'
   const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
-  const internalMedicineProfile = esModoMedicinaInterna
-    ? await prisma.internalMedicineProfile
-        .findUnique({ where: { episodeId: episode.id } })
-        .catch(() => null)
-    : null
-  const soloDiuresisInterconsulta = esInterconsulta && !esModoMedicinaInterna
+  const esModoCirugia = ctx.interfaceMode === 'CIRUGIA'
+  const ocultarPesoSignos = esModoMedicinaInterna || esModoCirugia
+  const mostrarDrenaje = esModoCirugia
+
+  const [
+    internalMedicineProfile,
+    surgicalProfile,
+    antibiotics,
+    surgicalDevices,
+    basePlanEntriesDb,
+  ] = await Promise.all([
+    esModoMedicinaInterna
+      ? prisma.internalMedicineProfile
+          .findUnique({ where: { episodeId: episode.id } })
+          .catch(() => null)
+      : Promise.resolve(null),
+    esModoCirugia
+      ? prisma.surgicalProfile
+          .findUnique({ where: { episodeId: episode.id } })
+          .catch(() => null)
+      : Promise.resolve(null),
+    esModoCirugia
+      ? prisma.episodeAntibiotic
+          .findMany({
+            where: { episodeId: episode.id },
+            orderBy: [{ isActive: 'desc' }, { startedAt: 'desc' }],
+          })
+          .catch(() => [])
+      : Promise.resolve([]),
+    esModoCirugia
+      ? prisma.surgicalDevice
+          .findMany({
+            where: { episodeId: episode.id, isActive: true },
+            orderBy: { createdAt: 'desc' },
+          })
+          .catch(() => [])
+      : Promise.resolve([]),
+    esInterconsulta || esModoCirugia
+      ? prisma.baseDepartmentPlanEntry
+          .findMany({
+            where: { episodeId: episode.id },
+            orderBy: { createdAt: 'asc' },
+          })
+          .catch(() => [])
+      : Promise.resolve([]),
+  ])
+
+  let basePlanEntries: PlanBaseEntryItem[] = basePlanEntriesDb.map((e) => ({
+    id: e.id,
+    content: e.content,
+    isActive: e.isActive,
+    createdBy: e.createdBy,
+    createdAt: e.createdAt,
+    updatedBy: e.updatedBy,
+    updatedAt: e.updatedAt,
+  }))
+
+  if (
+    (esInterconsulta || esModoCirugia) &&
+    basePlanEntries.length === 0 &&
+    episode.baseDepartmentPlan?.trim()
+  ) {
+    const legadoAudit = await prisma.auditLog
+      .findFirst({
+        where: {
+          episodeId: episode.id,
+          reason: { contains: 'plan del departamento base', mode: 'insensitive' },
+        },
+        orderBy: { serverTs: 'desc' },
+        include: { actor: { select: { email: true } } },
+      })
+      .catch(() => null)
+
+    basePlanEntries = [
+      {
+        id: 'legacy',
+        content: episode.baseDepartmentPlan.trim(),
+        isActive: true,
+        createdBy: legadoAudit?.actor?.email ?? '',
+        createdAt: legadoAudit?.serverTs ?? episode.admissionDate,
+        esLegado: true,
+      },
+    ]
+  }
+
+  const soloDiuresisInterconsulta = esInterconsulta && !esModoMedicinaInterna && !esModoCirugia
   const volverHref =
     vista === 'interconsulta' || (!vista && esInterconsulta)
       ? '/dashboard?vista=interconsulta'
@@ -227,6 +313,21 @@ export default async function ExpedientePage({
   if (internalMedicineProfile?.updatedBy) {
     emails.add(internalMedicineProfile.updatedBy)
   }
+  if (episode.anthropometryUpdatedBy) {
+    emails.add(episode.anthropometryUpdatedBy)
+  }
+  if (surgicalProfile?.updatedBy) {
+    emails.add(surgicalProfile.updatedBy)
+  }
+  antibiotics.forEach((a) => {
+    emails.add(a.createdBy)
+    if (a.stoppedBy) emails.add(a.stoppedBy)
+  })
+  surgicalDevices.forEach((d) => emails.add(d.createdBy))
+  basePlanEntries.forEach((p) => {
+    if (p.createdBy) emails.add(p.createdBy)
+    if (p.updatedBy) emails.add(p.updatedBy)
+  })
 
   if (entregaPendiente) {
     emails.add(entregaPendiente.entregadoPor)
@@ -265,6 +366,7 @@ export default async function ExpedientePage({
     glucose: num(v.glucose),
     weight: num(v.weight),
     diuresis: num(v.diuresis),
+    drainage: num(v.drainage),
   }))
 
   const entradaVital =
@@ -724,7 +826,7 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* TRATAMIENTO MÉDICO ACTUAL CON TEXTO LIBRE Y FIRMA */}
+        {/* TRATAMIENTO MÉDICO ACTUAL CON TEXTO LIBRE, FIRMA Y ANTIBIÓTICOS (CIRUGÍA) */}
         <TratamientoActual
           episodeId={episode.id}
           tratamiento={episode.currentTreatment}
@@ -733,57 +835,24 @@ export default async function ExpedientePage({
           nombres={nombres}
           roles={roles}
           puedeRegistrar={permisos.puedeRegistrar}
+          esCirugia={esModoCirugia}
+          antibioticos={antibiotics}
         />
 
-        {/* PLAN DEL DEPARTAMENTO BASE (SOLO INTERCONSULTAS) */}
-        {esInterconsulta && (
-          <div className="bg-purple-50/70 border border-purple-200 rounded-xl p-5 shadow-sm mb-6 print:hidden">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-purple-200 pb-2 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🗂️</span>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-purple-900">
-                  Plan del Departamento Base ({episode.consultingDepartment || 'Servicio tratante'})
-                </h2>
-              </div>
-              {permisos.puedeRegistrar && (
-                <details className="relative">
-                  <summary className="list-none cursor-pointer text-xs bg-white text-purple-800 px-3 py-1 rounded-lg border border-purple-300 hover:bg-purple-100 font-bold">
-                    ✏️ {episode.baseDepartmentPlan ? 'Editar Plan Base' : '+ Registrar Plan Base'}
-                  </summary>
-                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white p-4 rounded-xl border border-purple-300 shadow-2xl z-30 text-left">
-                    <p className="text-xs font-bold text-purple-900 mb-2">
-                      Indicaciones / Plan del Departamento Base:
-                    </p>
-                    <form action={guardarPlanDepartamentoBase} className="space-y-2">
-                      <input type="hidden" name="episodeId" value={episode.id} />
-                      <textarea
-                        name="baseDepartmentPlan"
-                        rows={4}
-                        defaultValue={episode.baseDepartmentPlan ?? ''}
-                        placeholder="Ej. Plan quirúrgico pendiente, cobertura antibiótica actual, meta de reposición..."
-                        className="w-full px-2.5 py-2 border rounded-lg text-xs text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none"
-                      />
-                      <button
-                        type="submit"
-                        className="w-full bg-purple-700 text-white text-xs py-2 rounded-lg font-bold hover:bg-purple-800 cursor-pointer"
-                      >
-                        Guardar Plan del Departamento Base
-                      </button>
-                    </form>
-                  </div>
-                </details>
-              )}
-            </div>
-            {episode.baseDepartmentPlan ? (
-              <p className="text-sm text-slate-800 whitespace-pre-line bg-white border border-purple-200/70 rounded-lg p-3 leading-relaxed">
-                {episode.baseDepartmentPlan}
-              </p>
-            ) : (
-              <p className="text-xs text-purple-700 italic">
-                No se ha registrado aún el plan del departamento base.
-              </p>
-            )}
-          </div>
+        {/* PLAN DEL DEPARTAMENTO BASE (INTERCONSULTAS Y PACIENTES PROPIOS DE CIRUGÍA) */}
+        {(esInterconsulta || esModoCirugia) && (
+          <PlanDepartamentoBase
+            episodeId={episode.id}
+            departamentoLabel={
+              esInterconsulta
+                ? episode.consultingDepartment || 'Servicio tratante'
+                : surgicalProfile?.surgicalSpecialty || 'Cirugía'
+            }
+            entradas={basePlanEntries}
+            nombres={nombres}
+            roles={roles}
+            puedeRegistrar={permisos.puedeRegistrar}
+          />
         )}
 
         {/* 1. NOTAS IMPORTANTES */}
@@ -797,7 +866,7 @@ export default async function ExpedientePage({
           />
         </div>
 
-        {/* 2. BLOQUE CLÍNICO DE ESPECIALIDAD (MEDICINA INTERNA O NEFROLOGÍA) */}
+        {/* 2. BLOQUE CLÍNICO DE ESPECIALIDAD (MEDICINA INTERNA, CIRUGÍA O NEFROLOGÍA) */}
         <div className="print:hidden">
           {esModoMedicinaInterna ? (
             <BloqueMedicinaInterna
@@ -807,6 +876,34 @@ export default async function ExpedientePage({
                 bloodType: episode.patient.bloodType,
                 recordedBy: episode.patient.bloodTypeRecordedBy,
                 updatedAt: episode.patient.bloodTypeUpdatedAt,
+              }}
+              antropometria={{
+                weight: episode.anthropometryWeight,
+                weightUnit: episode.anthropometryWeightUnit,
+                heightCm: episode.anthropometryHeightCm,
+                updatedBy: episode.anthropometryUpdatedBy,
+                updatedAt: episode.anthropometryUpdatedAt,
+              }}
+              nombres={nombres}
+              roles={roles}
+              puedeRegistrar={permisos.puedeRegistrar}
+            />
+          ) : esModoCirugia ? (
+            <BloqueCirugia
+              episodeId={episode.id}
+              perfilQuirurgico={surgicalProfile}
+              dispositivos={surgicalDevices}
+              tipificacion={{
+                bloodType: episode.patient.bloodType,
+                recordedBy: episode.patient.bloodTypeRecordedBy,
+                updatedAt: episode.patient.bloodTypeUpdatedAt,
+              }}
+              antropometria={{
+                weight: episode.anthropometryWeight,
+                weightUnit: episode.anthropometryWeightUnit,
+                heightCm: episode.anthropometryHeightCm,
+                updatedBy: episode.anthropometryUpdatedBy,
+                updatedAt: episode.anthropometryUpdatedAt,
               }}
               nombres={nombres}
               roles={roles}
@@ -981,22 +1078,37 @@ export default async function ExpedientePage({
                         <input name="glucose" type="number" inputMode="numeric" placeholder="100" className={entradaVital} />
                       </div>
 
-                      {/* PESO CON SELECTOR KG / LB */}
-                      <div>
-                        <label className="block text-xs font-bold text-emerald-800 mb-1">Peso</label>
-                        <div className="flex gap-1">
-                          <input name="weight" type="number" inputMode="decimal" step="0.1" placeholder="70.5" className="flex-1 px-2 py-1 border rounded text-xs text-slate-900" />
-                          <select name="weightUnit" className="px-1.5 py-1 border rounded text-xs bg-slate-100 font-bold">
-                            <option value="kg">kg</option>
-                            <option value="lb">lb</option>
-                          </select>
+                      {/* PESO CON SELECTOR KG / LB (SOLO NEFROLOGÍA / HOSPITALIZACIÓN) */}
+                      {!ocultarPesoSignos && (
+                        <div>
+                          <label className="block text-xs font-bold text-emerald-800 mb-1">Peso</label>
+                          <div className="flex gap-1">
+                            <input name="weight" type="number" inputMode="decimal" step="0.1" placeholder="70.5" className="flex-1 px-2 py-1 border rounded text-xs text-slate-900" />
+                            <select name="weightUnit" className="px-1.5 py-1 border rounded text-xs bg-slate-100 font-bold">
+                              <option value="kg">kg</option>
+                              <option value="lb">lb</option>
+                            </select>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
-                      <div className="col-span-2">
+                      <div className={ocultarPesoSignos && !mostrarDrenaje ? 'col-span-2' : ''}>
                         <label className="block text-xs font-bold text-sky-800 mb-1">Diuresis (mL)</label>
                         <input name="diuresis" type="number" inputMode="numeric" placeholder="Ej. 600" className={entradaVital} />
                       </div>
+
+                      {mostrarDrenaje && (
+                        <>
+                          <div>
+                            <label className="block text-xs font-bold text-orange-800 mb-1">Drenaje (mL)</label>
+                            <input name="drainage" type="number" inputMode="numeric" placeholder="Ej. 120" className={entradaVital} />
+                          </div>
+                          <div className="col-span-2">
+                            <label className="block text-xs font-medium text-slate-700 mb-1">Característica / Nota de drenaje (Opcional)</label>
+                            <input name="drainageNotes" placeholder="Ej. Serohemático, Penrose FID, Jackson-Pratt..." className={entradaVital} />
+                          </div>
+                        </>
+                      )}
                     </div>
                     <button type="submit" className="w-full bg-emerald-600 text-white px-4 py-3 md:py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors mt-2 cursor-pointer">
                       Guardar Signos
@@ -1069,9 +1181,19 @@ export default async function ExpedientePage({
             {/* Tendencia */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:hidden">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
-                {soloDiuresisInterconsulta ? 'Control y Tendencia de Diuresis' : 'Tendencia de Signos Vitales, Peso y Diuresis'}
+                {soloDiuresisInterconsulta
+                  ? 'Control y Tendencia de Diuresis'
+                  : mostrarDrenaje
+                    ? 'Tendencia de Signos Vitales, Diuresis y Drenaje'
+                    : ocultarPesoSignos
+                      ? 'Tendencia de Signos Vitales y Diuresis'
+                      : 'Tendencia de Signos Vitales, Peso y Diuresis'}
               </h2>
-              <GraficasSignos registros={registrosGrafica} />
+              <GraficasSignos
+                registros={registrosGrafica}
+                hideWeight={ocultarPesoSignos}
+                showDrainage={mostrarDrenaje}
+              />
             </div>
 
             {/* TABLA DE SIGNOS VITALES */}
@@ -1091,8 +1213,9 @@ export default async function ExpedientePage({
                     {!soloDiuresisInterconsulta && <th className="px-3 py-2">FC</th>}
                     {!soloDiuresisInterconsulta && <th className="px-3 py-2">Temp</th>}
                     {!soloDiuresisInterconsulta && <th className="px-3 py-2">SpO2</th>}
-                    <th className="px-3 py-2">Peso</th>
+                    {!ocultarPesoSignos && <th className="px-3 py-2">Peso</th>}
                     <th className="px-3 py-2 font-bold text-sky-800">Diuresis</th>
+                    {mostrarDrenaje && <th className="px-3 py-2 font-bold text-orange-800">Drenaje</th>}
                     <th className="px-3 py-2">Registró</th>
                     {permisos.puedeRegistrar && <th className="px-3 py-2 text-right print:hidden">Editar</th>}
                   </tr>
@@ -1109,10 +1232,30 @@ export default async function ExpedientePage({
                       {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.heartRate ?? '—'}</td>}
                       {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.temperature ?? '—'}</td>}
                       {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.oxygenSat ?? '—'}</td>}
-                      <td className="px-3 py-2 font-bold text-emerald-700">
-                        {v.weight ? `${v.weight} ${v.weightUnit ?? 'kg'}` : '—'}
+                      {!ocultarPesoSignos && (
+                        <td className="px-3 py-2 font-bold text-emerald-700">
+                          {v.weight ? `${v.weight} ${v.weightUnit ?? 'kg'}` : '—'}
+                        </td>
+                      )}
+                      <td className="px-3 py-2 font-bold text-sky-800">
+                        {v.diuresis !== null && v.diuresis !== undefined ? `${v.diuresis} mL` : '—'}
                       </td>
-                      <td className="px-3 py-2 font-bold text-sky-800">{v.diuresis ? `${v.diuresis} mL` : '—'}</td>
+                      {mostrarDrenaje && (
+                        <td className="px-3 py-2 font-bold text-orange-800">
+                          {v.drainage !== null && v.drainage !== undefined ? (
+                            <div>
+                              <span>{v.drainage} mL</span>
+                              {v.drainageNotes && (
+                                <span className="block text-[10px] font-normal text-slate-500">
+                                  {v.drainageNotes}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                      )}
                       <td className="px-3 py-2 text-slate-500 whitespace-nowrap">
                         <span>{nombres[v.recordedBy] ?? v.recordedBy}</span>
                         {v.updatedBy && (
@@ -1153,21 +1296,37 @@ export default async function ExpedientePage({
                                     <label className="block text-[10px] text-slate-500">Temp:</label>
                                     <input name="temperature" defaultValue={v.temperature ?? ''} type="number" step="0.1" className="w-full px-1.5 py-1 border rounded text-xs" />
                                   </div>
-                                  <div>
-                                    <label className="block text-[10px] text-slate-500">Peso:</label>
-                                    <input name="weight" defaultValue={v.weight ?? ''} type="number" step="0.1" className="w-full px-1.5 py-1 border rounded text-xs" />
-                                  </div>
-                                  <div>
-                                    <label className="block text-[10px] text-slate-500">Unidad:</label>
-                                    <select name="weightUnit" defaultValue={v.weightUnit ?? 'kg'} className="w-full px-1 py-1 border rounded text-xs bg-white">
-                                      <option value="kg">kg</option>
-                                      <option value="lb">lb</option>
-                                    </select>
-                                  </div>
-                                  <div className="col-span-2">
+                                  {!ocultarPesoSignos && (
+                                    <>
+                                      <div>
+                                        <label className="block text-[10px] text-slate-500">Peso:</label>
+                                        <input name="weight" defaultValue={v.weight ?? ''} type="number" step="0.1" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                      </div>
+                                      <div>
+                                        <label className="block text-[10px] text-slate-500">Unidad:</label>
+                                        <select name="weightUnit" defaultValue={v.weightUnit ?? 'kg'} className="w-full px-1 py-1 border rounded text-xs bg-white">
+                                          <option value="kg">kg</option>
+                                          <option value="lb">lb</option>
+                                        </select>
+                                      </div>
+                                    </>
+                                  )}
+                                  <div className={mostrarDrenaje ? '' : 'col-span-2'}>
                                     <label className="block text-[10px] text-slate-500">Diuresis (mL):</label>
                                     <input name="diuresis" defaultValue={v.diuresis ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
                                   </div>
+                                  {mostrarDrenaje && (
+                                    <>
+                                      <div>
+                                        <label className="block text-[10px] text-slate-500">Drenaje (mL):</label>
+                                        <input name="drainage" defaultValue={v.drainage ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                      </div>
+                                      <div className="col-span-2">
+                                        <label className="block text-[10px] text-slate-500">Nota de drenaje:</label>
+                                        <input name="drainageNotes" defaultValue={v.drainageNotes ?? ''} className="w-full px-1.5 py-1 border rounded text-xs" />
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                                 <button type="submit" className="w-full bg-slate-800 text-white text-xs py-1 rounded font-bold hover:bg-slate-900 mt-1 cursor-pointer">
                                   Guardar Corrección
@@ -1180,7 +1339,18 @@ export default async function ExpedientePage({
                     </tr>
                   ))}
                   {episode.vitals.length === 0 && (
-                    <tr><td colSpan={soloDiuresisInterconsulta ? 5 : 9} className="text-center py-4 text-slate-400">No hay registros aún.</td></tr>
+                    <tr>
+                      <td
+                        colSpan={
+                          soloDiuresisInterconsulta
+                            ? 5
+                            : 9 - (ocultarPesoSignos ? 1 : 0) + (mostrarDrenaje ? 1 : 0)
+                        }
+                        className="text-center py-4 text-slate-400"
+                      >
+                        No hay registros aún.
+                      </td>
+                    </tr>
                   )}
                 </tbody>
               </table>

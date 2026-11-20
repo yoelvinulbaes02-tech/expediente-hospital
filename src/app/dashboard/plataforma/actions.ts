@@ -31,6 +31,7 @@ function crearSlug(texto: string): string {
 function parseInterfaceMode(raw: string): InterfaceMode {
   if (raw === 'HOSPITALIZACION') return 'HOSPITALIZACION'
   if (raw === 'MEDICINA_INTERNA') return 'MEDICINA_INTERNA'
+  if (raw === 'CIRUGIA') return 'CIRUGIA'
   return 'CONSULTAS'
 }
 
@@ -181,35 +182,48 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
 
   if (!residencyId) return
 
-  await prisma.residency.update({
-    where: { id: residencyId },
-    data: {
-      interfaceMode,
-      billingMode,
-      planStatus,
-      monthlyPriceUsd,
-      individualPriceUsd,
-      maxActiveUsers,
-      isActive: planStatus !== 'SUSPENDED',
-    },
-  })
+  const targetErrorUrl = redirectTo.startsWith('/dashboard/plataforma')
+    ? redirectTo
+    : '/dashboard/plataforma'
 
-  await logAudit({
-    actorId: superAdmin.id,
-    actorRole: 'SUPERADMIN',
-    action: 'update',
-    entity: 'residency',
-    entityId: residencyId,
-    newValue: {
-      interfaceMode,
-      billingMode,
-      planStatus,
-      monthlyPriceUsd,
-      individualPriceUsd,
-      maxActiveUsers,
-    },
-    reason: 'Configuración de residencia actualizada desde plataforma',
-  })
+  try {
+    await prisma.residency.update({
+      where: { id: residencyId },
+      data: {
+        interfaceMode,
+        billingMode,
+        planStatus,
+        monthlyPriceUsd,
+        individualPriceUsd,
+        maxActiveUsers,
+        isActive: planStatus !== 'SUSPENDED',
+      },
+    })
+
+    await logAudit({
+      actorId: superAdmin.id,
+      actorRole: 'SUPERADMIN',
+      action: 'update',
+      entity: 'residency',
+      entityId: residencyId,
+      newValue: {
+        interfaceMode,
+        billingMode,
+        planStatus,
+        monthlyPriceUsd,
+        individualPriceUsd,
+        maxActiveUsers,
+      },
+      reason: 'Configuración de residencia actualizada desde plataforma',
+    })
+  } catch (err) {
+    console.error('Error al actualizar residencia:', err)
+    redirect(
+      `${targetErrorUrl}?error=${encodeURIComponent(
+        'No se pudo guardar la configuración. Si elegiste Cirugía o Medicina Interna, verifica haber ejecutado el SQL de migración en Neon (ALTER TYPE "InterfaceMode" ADD VALUE \'CIRUGIA\').'
+      )}`
+    )
+  }
 
   revalidatePath('/dashboard/plataforma')
   revalidatePath(`/dashboard/plataforma/residencia/${residencyId}`)
@@ -219,7 +233,7 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
 
   if (redirectTo.startsWith('/dashboard/plataforma')) {
     redirect(
-      `${redirectTo}?ok=${encodeURIComponent('Configuración de cobro y plan de la residencia actualizada.')}`
+      `${redirectTo}?ok=${encodeURIComponent('Configuración de cobro, interfaz y plan de la residencia actualizada.')}`
     )
   }
 }

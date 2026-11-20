@@ -6,6 +6,13 @@ import { ListaPacientes } from '@/components/ListaPacientes'
 import { ConsultasDashboard } from '@/components/ConsultasDashboard'
 import { ROLES_CLINICOS } from '@/lib/permisos'
 import { obtenerContextoResidencia } from '@/lib/tenant'
+import {
+  CATEGORIAS_DISPOSITIVOS_CIRUGIA,
+  resolverTeamAutomatico,
+  type TeamServicioData,
+} from '@/lib/cirugia-constants'
+import type { ResumenCirugiaStats } from '@/components/CirugiaResumenPanel'
+import type { CuraPacienteItem } from '@/components/CurasPanel'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -35,7 +42,17 @@ export default async function DashboardPage({
 
   const { doc, vista } = await searchParams
   const filtroDoc = doc || ''
-  const vistaInicial = vista === 'interconsulta' ? 'interconsulta' : 'propio'
+  const esModoConsultas = ctx.interfaceMode === 'CONSULTAS'
+  const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
+  const esModoCirugia = ctx.interfaceMode === 'CIRUGIA'
+  const requiereTeamServicio = esModoMedicinaInterna || esModoCirugia
+
+  const vistaInicial: 'propio' | 'interconsulta' | 'curas' =
+    vista === 'curas' && esModoCirugia
+      ? 'curas'
+      : vista === 'interconsulta'
+        ? 'interconsulta'
+        : 'propio'
 
   const userId = ctx.user.id
   const userRole = String(ctx.user.role)
@@ -45,7 +62,7 @@ export default async function DashboardPage({
   const esPagoIndividual = residency.billingMode === 'INDIVIDUAL'
   const puedeVerSuscripcion = esAdmin || esPagoIndividual
   const puedeRegistrar = ROLES_CLINICOS.includes(userRole) && !suscripcionBloqueada
-  const esModoConsultas = ctx.interfaceMode === 'CONSULTAS'
+  const puedeEditarServicio = (ROLES_CLINICOS.includes(userRole) || esAdmin) && !suscripcionBloqueada
 
   const [episodesBase, doctores, turnosPendientes, consultas, pacientesClinica] = await Promise.all([
     esModoConsultas
@@ -140,7 +157,7 @@ export default async function DashboardPage({
       oxygenSupport: string
     }
   >()
-  if (ctx.interfaceMode === 'MEDICINA_INTERNA' && episodesBase.length > 0) {
+  if (esModoMedicinaInterna && episodesBase.length > 0) {
     const listaPerfiles = await prisma.internalMedicineProfile
       .findMany({
         where: { episodeId: { in: episodesBase.map((e) => e.id) } },
@@ -166,9 +183,193 @@ export default async function DashboardPage({
     )
   }
 
+  let perfilesCirugia = new Map<
+    string,
+    {
+      procedureName: string | null
+      surgeryDate: Date | null
+      surgeryType: string
+      surgicalSpecialty: string | null
+      surgeryStatus: string
+    }
+  >()
+
+  let teamData: TeamServicioData | undefined
+  let sugerenciaAutoTeam: { ma: string; r4: string; r3: string; r2: string; r1: string } | undefined
+  let resumenCirugiaAuto: Omit<ResumenCirugiaStats, 'mode'> | undefined
+  let resumenCirugiaGuardado: ResumenCirugiaStats | null = null
+  let conteosDispositivosCirugia: Record<string, number> | undefined
+  let curasSerializadas: CuraPacienteItem[] = []
+
+  if (requiereTeamServicio) {
+    const [usuariosTeam, dispositivosActivos, curasDb, perfilesQ] = await Promise.all([
+      prisma.user.findMany({
+        where: {
+          residencyId: residency.id,
+          isActive: true,
+          role: { in: ['DOCTOR', 'RESIDENT'] },
+        },
+        select: { fullName: true, role: true },
+        orderBy: { fullName: 'asc' },
+      }),
+      esModoCirugia
+        ? prisma.surgicalDevice
+            .findMany({
+              where: { residencyId: residency.id, isActive: true },
+              select: { category: true },
+            })
+            .catch(() => [])
+        : Promise.resolve([]),
+      esModoCirugia
+        ? prisma.woundCare
+            .findMany({
+              where: { residencyId: residency.id, isActive: true },
+              include: {
+                logs: { orderBy: { performedAt: 'desc' }, take: 30 },
+              },
+              orderBy: { createdAt: 'desc' },
+            })
+            .catch(() => [])
+        : Promise.resolve([]),
+      esModoCirugia && episodesBase.length > 0
+        ? prisma.surgicalProfile
+            .findMany({
+              where: { episodeId: { in: episodesBase.map((e) => e.id) } },
+              select: {
+                episodeId: true,
+                procedureName: true,
+                surgeryDate: true,
+                surgeryType: true,
+                surgicalSpecialty: true,
+                surgeryStatus: true,
+              },
+            })
+            .catch(() => [])
+        : Promise.resolve([]),
+    ])
+
+    sugerenciaAutoTeam = resolverTeamAutomatico({
+      usuarios: usuariosTeam,
+      episodios: episodesBase.map((ep) => ({
+        admittingDoctor: ep.admittingDoctor,
+        attendingDoctor: ep.attendingDoctor,
+      })),
+    })
+
+    const emailsResolver = new Set<string>()
+    if (residency.teamUpdatedBy) emailsResolver.add(residency.teamUpdatedBy)
+    curasDb.forEach((c) => {
+      emailsResolver.add(c.createdBy)
+      c.logs.forEach((l) => emailsResolver.add(l.performedBy))
+    })
+
+    const usuariosNombres =
+      emailsResolver.size > 0
+        ? await prisma.user.findMany({
+            where: {
+              residencyId: residency.id,
+              email: { in: Array.from(emailsResolver) },
+            },
+            select: { email: true, fullName: true },
+          })
+        : []
+    const mapaNombres = Object.fromEntries(usuariosNombres.map((u) => [u.email, u.fullName]))
+
+    teamData = {
+      ma: residency.teamMa ?? '',
+      r4: residency.teamR4 ?? '',
+      r3: residency.teamR3 ?? '',
+      r2: residency.teamR2 ?? '',
+      r1: residency.teamR1 ?? '',
+      autoMode: residency.teamAutoMode ?? false,
+      updatedBy: residency.teamUpdatedBy ? mapaNombres[residency.teamUpdatedBy] ?? residency.teamUpdatedBy : null,
+      updatedAt: residency.teamUpdatedAt ? residency.teamUpdatedAt.toISOString() : null,
+    }
+
+    if (esModoCirugia) {
+      perfilesCirugia = new Map(
+        perfilesQ.map((p) => [
+          p.episodeId,
+          {
+            procedureName: p.procedureName,
+            surgeryDate: p.surgeryDate,
+            surgeryType: p.surgeryType,
+            surgicalSpecialty: p.surgicalSpecialty,
+            surgeryStatus: p.surgeryStatus,
+          },
+        ])
+      )
+
+      const propios = episodesBase.filter((e) => (e.serviceType ?? 'propio') === 'propio')
+      const esEmergenciaEp = (ep: (typeof episodesBase)[number]) => {
+        const tipoIng = (ep.admissionType ?? '').toLowerCase()
+        const tipoQx = perfilesCirugia.get(ep.id)?.surgeryType
+        const depto = (ep.consultingDepartment ?? '').toLowerCase()
+        return tipoIng.includes('emergencia') || tipoQx === 'emergencia' || depto.includes('emergencia')
+      }
+
+      const ingresosEmergencias = propios.filter((ep) => esEmergenciaEp(ep)).length
+      const ingresosElectivos = propios.filter((ep) => !esEmergenciaEp(ep)).length
+      const emergencias = episodesBase.filter((ep) => esEmergenciaEp(ep)).length
+      const cirugias = Array.from(perfilesCirugia.values()).filter(
+        (p) => p.procedureName || p.surgeryStatus !== 'suspendida'
+      ).length
+
+      resumenCirugiaAuto = {
+        emergencias,
+        ingresosElectivos,
+        ingresosEmergencias,
+        totalIngresos: propios.length,
+        cirugias,
+      }
+
+      const extraRaw = residency.surgicalStatsExtra as Record<string, unknown> | null
+      if (extraRaw && typeof extraRaw === 'object' && extraRaw.mode === 'manual') {
+        resumenCirugiaGuardado = {
+          mode: 'manual',
+          emergencias: Number(extraRaw.emergencias ?? 0),
+          ingresosElectivos: Number(extraRaw.ingresosElectivos ?? 0),
+          ingresosEmergencias: Number(extraRaw.ingresosEmergencias ?? 0),
+          totalIngresos: Number(extraRaw.totalIngresos ?? 0),
+          cirugias: Number(extraRaw.cirugias ?? 0),
+        }
+      }
+
+      const conteoInicial: Record<string, number> = {}
+      for (const cat of CATEGORIAS_DISPOSITIVOS_CIRUGIA) {
+        conteoInicial[cat.key] = 0
+      }
+      for (const dev of dispositivosActivos) {
+        conteoInicial[dev.category] = (conteoInicial[dev.category] ?? 0) + 1
+      }
+      conteosDispositivosCirugia = conteoInicial
+
+      curasSerializadas = curasDb.map((c) => ({
+        id: c.id,
+        roomBed: c.roomBed,
+        patientName: c.patientName,
+        age: c.age,
+        diagnosis: c.diagnosis,
+        patientStatus: c.patientStatus,
+        careFrequency: c.careFrequency,
+        baseDepartment: c.baseDepartment,
+        createdBy: mapaNombres[c.createdBy] ?? c.createdBy,
+        createdAt: c.createdAt.toISOString(),
+        logs: c.logs.map((l) => ({
+          id: l.id,
+          performedBy: l.performedBy,
+          performedByName: mapaNombres[l.performedBy] ?? l.performedBy,
+          performedAt: l.performedAt.toISOString(),
+          notes: l.notes,
+        })),
+      }))
+    }
+  }
+
   const episodes = episodesBase.map((ep) => ({
     ...ep,
     internalMedicineProfile: perfilesMI.get(ep.id) ?? null,
+    surgicalProfile: perfilesCirugia.get(ep.id) ?? null,
   }))
 
   const textoBadge = turnosPendientes > 9 ? '+9' : String(turnosPendientes)
@@ -387,9 +588,20 @@ export default async function DashboardPage({
             doctores={doctores}
             vistaInicial={vistaInicial}
             puedeMarcarTareas={puedeRegistrar}
+            puedeEditarServicio={puedeEditarServicio}
             interfaceMode={
-              ctx.interfaceMode === 'MEDICINA_INTERNA' ? 'MEDICINA_INTERNA' : 'HOSPITALIZACION'
+              esModoMedicinaInterna
+                ? 'MEDICINA_INTERNA'
+                : esModoCirugia
+                  ? 'CIRUGIA'
+                  : 'HOSPITALIZACION'
             }
+            teamData={teamData}
+            sugerenciaAutoTeam={sugerenciaAutoTeam}
+            resumenCirugiaAuto={resumenCirugiaAuto}
+            resumenCirugiaGuardado={resumenCirugiaGuardado}
+            conteosDispositivosCirugia={conteosDispositivosCirugia}
+            curas={curasSerializadas}
           />
         )}
       </main>

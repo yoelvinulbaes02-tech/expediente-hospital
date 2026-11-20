@@ -28,6 +28,7 @@ const ENTIDADES: Record<string, string> = {
   patient: 'un paciente',
   task: 'una tarea',
   user: 'un usuario',
+  base_department_plan: 'un plan del departamento base',
 }
 
 export function describirRegistro(log: {
@@ -137,6 +138,25 @@ export function describirRegistro(log: {
         ),
       }
     }
+
+    case 'base_department_plan:create':
+      return {
+        que: 'Agregó una indicación al Plan del Departamento Base',
+        detalle: lleno(n.contenido) ? cortar(String(n.contenido)) : '',
+      }
+
+    case 'base_department_plan:update':
+      return {
+        que:
+          n.isActive === false
+            ? 'Archivó una indicación del Plan del Departamento Base'
+            : 'Editó una indicación del Plan del Departamento Base',
+        detalle: log.reason
+          ? log.reason
+          : lleno(n.contenido)
+            ? cortar(String(n.contenido))
+            : '',
+      }
 
     default: {
       const que = `${ACCIONES[log.action] ?? log.action} ${ENTIDADES[log.entity] ?? log.entity}`

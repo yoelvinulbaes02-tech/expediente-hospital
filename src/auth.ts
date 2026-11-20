@@ -37,6 +37,13 @@ function obtenerUserAgent(req?: Request): string | undefined {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
+  secret:
+    process.env.AUTH_SECRET ||
+    process.env.NEXTAUTH_SECRET ||
+    (process.env.NODE_ENV !== 'production'
+      ? 'nexo-dev-preview-secret-do-not-use-in-production'
+      : undefined),
   session: {
     strategy: 'jwt',
     maxAge: 12 * 60 * 60, // 12 horas (duración máxima de turno clínico)

@@ -106,6 +106,14 @@ export async function crearPaciente(formData: FormData) {
           secondaryDiagnoses: secondaryDiagnoses || null,
           initialWeight,
           initialWeightUnit,
+          ...(initialWeight !== null && !isNaN(initialWeight)
+            ? {
+                anthropometryWeight: initialWeight,
+                anthropometryWeightUnit: initialWeightUnit,
+                anthropometryUpdatedBy: ctx.user.email,
+                anthropometryUpdatedAt: admissionDate,
+              }
+            : {}),
         },
       },
     },
@@ -114,7 +122,11 @@ export async function crearPaciente(formData: FormData) {
 
   const episodeId = nuevoPaciente.episodes[0].id
 
-  if (initialWeight !== null && !isNaN(initialWeight)) {
+  if (
+    initialWeight !== null &&
+    !isNaN(initialWeight) &&
+    ctx.interfaceMode === 'HOSPITALIZACION'
+  ) {
     await prisma.vitalSign.create({
       data: {
         episodeId,

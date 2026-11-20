@@ -136,6 +136,15 @@ exports.Prisma.ResidencyScalarFieldEnum = {
   billingContactEmail: 'billingContactEmail',
   lastPaymentNote: 'lastPaymentNote',
   isActive: 'isActive',
+  teamMa: 'teamMa',
+  teamR4: 'teamR4',
+  teamR3: 'teamR3',
+  teamR2: 'teamR2',
+  teamR1: 'teamR1',
+  teamAutoMode: 'teamAutoMode',
+  teamUpdatedBy: 'teamUpdatedBy',
+  teamUpdatedAt: 'teamUpdatedAt',
+  surgicalStatsExtra: 'surgicalStatsExtra',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -237,6 +246,11 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   treatmentUpdatedAt: 'treatmentUpdatedAt',
   dischargeType: 'dischargeType',
   baseDepartmentPlan: 'baseDepartmentPlan',
+  anthropometryWeight: 'anthropometryWeight',
+  anthropometryWeightUnit: 'anthropometryWeightUnit',
+  anthropometryHeightCm: 'anthropometryHeightCm',
+  anthropometryUpdatedBy: 'anthropometryUpdatedBy',
+  anthropometryUpdatedAt: 'anthropometryUpdatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   responsibleId: 'responsibleId',
@@ -286,6 +300,81 @@ exports.Prisma.InternalMedicineProfileScalarFieldEnum = {
   invasiveDevices: 'invasiveDevices',
   fluidBalance24h: 'fluidBalance24h',
   dischargeGoal: 'dischargeGoal',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SurgicalProfileScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  procedureName: 'procedureName',
+  surgeryDate: 'surgeryDate',
+  surgeryType: 'surgeryType',
+  surgicalSpecialty: 'surgicalSpecialty',
+  surgeonAndAssistants: 'surgeonAndAssistants',
+  surgeryStatus: 'surgeryStatus',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.EpisodeAntibioticScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  name: 'name',
+  dose: 'dose',
+  route: 'route',
+  startedAt: 'startedAt',
+  stoppedAt: 'stoppedAt',
+  isActive: 'isActive',
+  createdBy: 'createdBy',
+  stoppedBy: 'stoppedBy',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SurgicalDeviceScalarFieldEnum = {
+  id: 'id',
+  residencyId: 'residencyId',
+  episodeId: 'episodeId',
+  category: 'category',
+  notes: 'notes',
+  isActive: 'isActive',
+  createdBy: 'createdBy',
+  removedBy: 'removedBy',
+  createdAt: 'createdAt',
+  removedAt: 'removedAt'
+};
+
+exports.Prisma.WoundCareScalarFieldEnum = {
+  id: 'id',
+  residencyId: 'residencyId',
+  roomBed: 'roomBed',
+  patientName: 'patientName',
+  age: 'age',
+  diagnosis: 'diagnosis',
+  patientStatus: 'patientStatus',
+  careFrequency: 'careFrequency',
+  baseDepartment: 'baseDepartment',
+  isActive: 'isActive',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WoundCareLogScalarFieldEnum = {
+  id: 'id',
+  woundCareId: 'woundCareId',
+  performedBy: 'performedBy',
+  performedAt: 'performedAt',
+  notes: 'notes'
+};
+
+exports.Prisma.BaseDepartmentPlanEntryScalarFieldEnum = {
+  id: 'id',
+  episodeId: 'episodeId',
+  content: 'content',
+  isActive: 'isActive',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
   updatedBy: 'updatedBy',
   updatedAt: 'updatedAt'
 };
@@ -415,6 +504,8 @@ exports.Prisma.VitalSignScalarFieldEnum = {
   weightUnit: 'weightUnit',
   painScale: 'painScale',
   diuresis: 'diuresis',
+  drainage: 'drainage',
+  drainageNotes: 'drainageNotes',
   recordedBy: 'recordedBy',
   updatedBy: 'updatedBy',
   updatedAt: 'updatedAt',
@@ -461,20 +552,21 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
 exports.InterfaceMode = exports.$Enums.InterfaceMode = {
   HOSPITALIZACION: 'HOSPITALIZACION',
   CONSULTAS: 'CONSULTAS',
-  MEDICINA_INTERNA: 'MEDICINA_INTERNA'
+  MEDICINA_INTERNA: 'MEDICINA_INTERNA',
+  CIRUGIA: 'CIRUGIA'
 };
 
 exports.BillingMode = exports.$Enums.BillingMode = {
@@ -513,6 +605,12 @@ exports.Prisma.ModelName = {
   Episode: 'Episode',
   Consultation: 'Consultation',
   InternalMedicineProfile: 'InternalMedicineProfile',
+  SurgicalProfile: 'SurgicalProfile',
+  EpisodeAntibiotic: 'EpisodeAntibiotic',
+  SurgicalDevice: 'SurgicalDevice',
+  WoundCare: 'WoundCare',
+  WoundCareLog: 'WoundCareLog',
+  BaseDepartmentPlanEntry: 'BaseDepartmentPlanEntry',
   MedicalHistory: 'MedicalHistory',
   ImportantAlert: 'ImportantAlert',
   GfrRecord: 'GfrRecord',

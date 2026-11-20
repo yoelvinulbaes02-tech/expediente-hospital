@@ -5,6 +5,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { BannerAlergias } from '@/components/BannerAlergias'
 import { completarTareaDesdeDashboard, entregarLote } from '@/app/dashboard/actions-lote'
+import { TeamServicioCard } from '@/components/TeamServicioCard'
+import { CirugiaResumenPanel, type ResumenCirugiaStats } from '@/components/CirugiaResumenPanel'
+import { CurasPanel, type CuraPacienteItem } from '@/components/CurasPanel'
+import { ESTADOS_CIRUGIA, type TeamServicioData } from '@/lib/cirugia-constants'
 
 type TareaPendienteResumen = {
   id: string
@@ -37,6 +41,13 @@ type Episodio = {
     codeStatus: string
     isolationType: string
     oxygenSupport: string
+  } | null
+  surgicalProfile?: {
+    procedureName: string | null
+    surgeryDate: Date | string | null
+    surgeryType: string
+    surgicalSpecialty: string | null
+    surgeryStatus: string
   } | null
   _count: { tasks: number }
   handoffs: { recibidoPor: string }[]
@@ -109,19 +120,36 @@ export function ListaPacientes({
   doctores,
   vistaInicial = 'propio',
   puedeMarcarTareas = false,
+  puedeEditarServicio = false,
   interfaceMode = 'HOSPITALIZACION',
+  teamData,
+  sugerenciaAutoTeam,
+  resumenCirugiaAuto,
+  resumenCirugiaGuardado = null,
+  conteosDispositivosCirugia,
+  curas = [],
 }: {
   episodes: Episodio[]
   userId: string
   miEmail: string
   doctores: Doctor[]
-  vistaInicial?: 'propio' | 'interconsulta'
+  vistaInicial?: 'propio' | 'interconsulta' | 'curas'
   puedeMarcarTareas?: boolean
-  interfaceMode?: 'HOSPITALIZACION' | 'MEDICINA_INTERNA'
+  puedeEditarServicio?: boolean
+  interfaceMode?: 'HOSPITALIZACION' | 'MEDICINA_INTERNA' | 'CIRUGIA'
+  teamData?: TeamServicioData
+  sugerenciaAutoTeam?: { ma: string; r4: string; r3: string; r2: string; r1: string }
+  resumenCirugiaAuto?: Omit<ResumenCirugiaStats, 'mode'>
+  resumenCirugiaGuardado?: ResumenCirugiaStats | null
+  conteosDispositivosCirugia?: Record<string, number>
+  curas?: CuraPacienteItem[]
 }) {
   const esMedicinaInterna = interfaceMode === 'MEDICINA_INTERNA'
+  const esCirugia = interfaceMode === 'CIRUGIA'
   const router = useRouter()
-  const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta'>(vistaInicial)
+  const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta' | 'curas'>(
+    vistaInicial === 'curas' && !esCirugia ? 'propio' : vistaInicial
+  )
   const [busqueda, setBusqueda] = useState('')
   const [soloPendientes, setSoloPendientes] = useState(false)
   const [pendientesExpandidos, setPendientesExpandidos] = useState<Record<string, boolean>>({})
@@ -132,13 +160,15 @@ export function ListaPacientes({
   const [enviando, setEnviando] = useState(false)
   const [mensaje, setMensaje] = useState<Mensaje | null>(null)
 
-  const cambiarArea = (nuevaArea: 'propio' | 'interconsulta') => {
+  const cambiarArea = (nuevaArea: 'propio' | 'interconsulta' | 'curas') => {
     setAreaGuardia(nuevaArea)
     setSeleccionados([])
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href)
       if (nuevaArea === 'interconsulta') {
         url.searchParams.set('vista', 'interconsulta')
+      } else if (nuevaArea === 'curas') {
+        url.searchParams.set('vista', 'curas')
       } else {
         url.searchParams.delete('vista')
       }
@@ -248,9 +278,28 @@ export function ListaPacientes({
 
   return (
     <>
+      {/* PANELES INICIALES DE CIRUGÍA: RESUMEN + DISPOSITIVOS */}
+      {esCirugia && resumenCirugiaAuto && conteosDispositivosCirugia && (
+        <CirugiaResumenPanel
+          resumenAuto={resumenCirugiaAuto}
+          resumenGuardado={resumenCirugiaGuardado}
+          conteosDispositivos={conteosDispositivosCirugia}
+          puedeEditar={puedeEditarServicio}
+        />
+      )}
+
+      {/* TEAM DE SERVICIO (MEDICINA INTERNA Y CIRUGÍA) */}
+      {(esMedicinaInterna || esCirugia) && teamData && sugerenciaAutoTeam && (
+        <TeamServicioCard
+          team={teamData}
+          sugerenciaAuto={sugerenciaAutoTeam}
+          puedeEditar={puedeEditarServicio}
+        />
+      )}
+
       {/* SELECTOR DE GUARDIA */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-        <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
+        <div className={`grid gap-2 w-full sm:w-auto ${esCirugia ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <button
             type="button"
             onClick={() => cambiarArea('propio')}
@@ -260,7 +309,7 @@ export function ListaPacientes({
                 : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
             }`}
           >
-            <span>🏥</span> Pacientes Propios (Sala)
+            <span>🏥</span> Propios
             <span className={`px-2 py-0.2 rounded-full text-xs font-bold ${areaGuardia === 'propio' ? 'bg-blue-800 text-white' : 'bg-slate-200 text-slate-700'}`}>
               {totalPropios}
             </span>
@@ -280,6 +329,23 @@ export function ListaPacientes({
               {totalInterconsultas}
             </span>
           </button>
+
+          {esCirugia && (
+            <button
+              type="button"
+              onClick={() => cambiarArea('curas')}
+              className={`py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                areaGuardia === 'curas'
+                  ? 'bg-teal-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              <span>🩹</span> Curas
+              <span className={`px-2 py-0.2 rounded-full text-xs font-bold ${areaGuardia === 'curas' ? 'bg-teal-800 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                {curas.length}
+              </span>
+            </button>
+          )}
         </div>
 
         <Link
@@ -292,15 +358,23 @@ export function ListaPacientes({
         </Link>
       </div>
 
+      {esCirugia && areaGuardia === 'curas' ? (
+        <CurasPanel curas={curas} puedeRegistrar={puedeMarcarTareas} />
+      ) : (
+        <>
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          {esMedicinaInterna
+          {esCirugia
             ? areaGuardia === 'propio'
-              ? '🩺 Sala de Medicina Interna'
-              : '📋 Interconsultas a Medicina Interna'
-            : areaGuardia === 'propio'
-              ? '🏥 Sala de Hospitalización'
-              : '📋 Pacientes de Interconsulta'}
+              ? '🔪 Sala de Cirugía'
+              : '📋 Interconsultas a Cirugía'
+            : esMedicinaInterna
+              ? areaGuardia === 'propio'
+                ? '🩺 Sala de Medicina Interna'
+                : '📋 Interconsultas a Medicina Interna'
+              : areaGuardia === 'propio'
+                ? '🏥 Sala de Hospitalización'
+                : '📋 Pacientes de Interconsulta'}
         </h2>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -534,6 +608,31 @@ export function ListaPacientes({
                     </div>
                   )}
 
+                  {!soloPendientes && esCirugia && episode.surgicalProfile && (
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      {(() => {
+                        const st =
+                          ESTADOS_CIRUGIA.find((s) => s.value === episode.surgicalProfile?.surgeryStatus) ??
+                          ESTADOS_CIRUGIA[0]
+                        return (
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${st.badge}`}>
+                            {st.label}
+                          </span>
+                        )
+                      })()}
+                      {episode.surgicalProfile.procedureName && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-blue-50 text-blue-900 border-blue-200">
+                          {episode.surgicalProfile.procedureName}
+                        </span>
+                      )}
+                      {episode.surgicalProfile.surgicalSpecialty && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded border bg-slate-100 text-slate-700 border-slate-200">
+                          {episode.surgicalProfile.surgicalSpecialty}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {/* PENDIENTES CLICABLES SIN ABRIR EL EXPEDIENTE */}
                   {pendientes.length > 0 && (
                     <div className="mt-2">
@@ -688,6 +787,8 @@ export function ListaPacientes({
             </button>
           </form>
         </div>
+      )}
+        </>
       )}
     </>
   )

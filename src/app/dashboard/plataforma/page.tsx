@@ -20,46 +20,122 @@ const fmtFecha = (d: Date) =>
     year: 'numeric',
   })
 
+const fmtFechaHora = (d: Date) =>
+  d.toLocaleString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
 export default async function PlataformaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ok?: string; error?: string }>
+  searchParams: Promise<{
+    ok?: string
+    error?: string
+    resId?: string
+    alcance?: string
+    pq?: string
+  }>
 }) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
   if (ctx.user.mustChangePassword) redirect('/dashboard/perfil?force=true')
   if (ctx.user.role !== 'SUPERADMIN') redirect('/dashboard')
 
-  const { ok, error } = await searchParams
+  const { ok, error, resId, alcance, pq } = await searchParams
+  const filtroResidencia = (resId ?? '').trim()
+  const filtroAlcance = alcance === 'INDIVIDUAL' || alcance === 'RESIDENCY' ? alcance : ''
+  const filtroTextoPago = (pq ?? '').trim()
 
-  const [residencias, pagosPendientes] = await Promise.all([
-    prisma.residency.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        users: {
-          where: { isActive: true, role: { not: 'SUPERADMIN' } },
-          select: { id: true, planStatus: true, individualPriceUsd: true },
-        },
-        _count: {
-          select: {
-            users: { where: { isActive: true, role: { not: 'SUPERADMIN' } } },
-            patients: true,
-            episodes: true,
-            consultations: true,
-            payments: { where: { status: 'APROBADO' } },
+  const inicioMes = new Date()
+  inicioMes.setDate(1)
+  inicioMes.setHours(0, 0, 0, 0)
+
+  const [residencias, pagosPendientes, historialPagos, resumenIngresos, ingresosMes, todosUsuariosEmail] =
+    await Promise.all([
+      prisma.residency.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          users: {
+            where: { isActive: true, role: { not: 'SUPERADMIN' } },
+            select: { id: true, planStatus: true, individualPriceUsd: true },
+          },
+          payments: {
+            where: { status: 'APROBADO' },
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            include: {
+              user: { select: { fullName: true } },
+            },
+          },
+          _count: {
+            select: {
+              users: { where: { isActive: true, role: { not: 'SUPERADMIN' } } },
+              patients: true,
+              episodes: true,
+              consultations: true,
+              payments: { where: { status: 'APROBADO' } },
+            },
           },
         },
-      },
-    }),
-    prisma.subscriptionPayment.findMany({
-      where: { status: 'PENDIENTE' },
-      include: {
-        residency: { select: { name: true, slug: true } },
-        user: { select: { fullName: true, email: true } },
-      },
-      orderBy: { createdAt: 'asc' },
-    }),
-  ])
+      }),
+      prisma.subscriptionPayment.findMany({
+        where: { status: 'PENDIENTE' },
+        include: {
+          residency: { select: { name: true, slug: true } },
+          user: { select: { fullName: true, email: true } },
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
+      prisma.subscriptionPayment.findMany({
+        where: {
+          ...(filtroResidencia ? { residencyId: filtroResidencia } : {}),
+          ...(filtroAlcance ? { billingScope: filtroAlcance } : {}),
+          ...(filtroTextoPago
+            ? {
+                OR: [
+                  { requestedBy: { contains: filtroTextoPago, mode: 'insensitive' } },
+                  { reference: { contains: filtroTextoPago, mode: 'insensitive' } },
+                  { notes: { contains: filtroTextoPago, mode: 'insensitive' } },
+                  { user: { fullName: { contains: filtroTextoPago, mode: 'insensitive' } } },
+                  { residency: { name: { contains: filtroTextoPago, mode: 'insensitive' } } },
+                ],
+              }
+            : {}),
+        },
+        include: {
+          residency: { select: { id: true, name: true, slug: true } },
+          user: { select: { id: true, fullName: true, email: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 60,
+      }),
+      prisma.subscriptionPayment.aggregate({
+        where: { status: 'APROBADO' },
+        _sum: { amountUsd: true },
+        _count: { _all: true },
+      }),
+      prisma.subscriptionPayment.aggregate({
+        where: { status: 'APROBADO', createdAt: { gte: inicioMes } },
+        _sum: { amountUsd: true },
+        _count: { _all: true },
+      }),
+      prisma.user.findMany({
+        select: { email: true, fullName: true },
+      }),
+    ])
+
+  const mapaNombrePorEmail = new Map(
+    todosUsuariosEmail.map((u) => [u.email.toLowerCase(), u.fullName])
+  )
+  const totalIngresosUsd = resumenIngresos._sum.amountUsd ?? 0
+  const totalPagosAprobados = resumenIngresos._count._all ?? 0
+  const ingresosMesUsd = ingresosMes._sum.amountUsd ?? 0
+  const pagosMesCount = ingresosMes._count._all ?? 0
 
   const residenciasActivas = residencias.filter(
     (r) => r.isActive && r.planStatus !== 'SUSPENDED'
@@ -129,7 +205,7 @@ export default async function PlataformaPage({
         )}
 
         {/* METRICAS DE PLATAFORMA */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
             <p className="text-xs text-slate-500 dark:text-slate-400">Residencias activas</p>
             <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tabular-nums">
@@ -142,6 +218,15 @@ export default async function PlataformaPage({
               ${mrrEstimado} USD
             </p>
           </div>
+          <div className="bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
+            <p className="text-xs text-slate-500 dark:text-slate-400">Pagos recibidos (este mes)</p>
+            <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1 tabular-nums">
+              ${ingresosMesUsd.toFixed(2)} USD
+            </p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
+              {pagosMesCount} pago(s) · Histórico: ${totalIngresosUsd.toFixed(2)} ({totalPagosAprobados})
+            </p>
+          </div>
           <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
             <p className="text-xs text-slate-500 dark:text-slate-400">Usuarios activos totales</p>
             <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tabular-nums">
@@ -149,7 +234,7 @@ export default async function PlataformaPage({
             </p>
           </div>
           <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Residencias en cobro individual</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Residencias cobro individual</p>
             <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1 tabular-nums">
               {residencias.filter((r) => r.billingMode === 'INDIVIDUAL').length}
             </p>
@@ -212,6 +297,165 @@ export default async function PlataformaPage({
           </div>
         )}
 
+        {/* HISTORIAL GLOBAL DE PAGOS RECIBIDOS (VISIBLE SIEMPRE EN SUPERADMIN) */}
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                💳 Pagos Recibidos en la Plataforma ({historialPagos.length})
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Registro automático en tiempo real de quién pagó, en qué residencia, cuánto, método (PayPal/Tarjeta) y fecha exacta.
+              </p>
+            </div>
+
+            <form method="get" action="/dashboard/plataforma" className="flex flex-wrap items-center gap-2">
+              <select
+                name="resId"
+                defaultValue={filtroResidencia}
+                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+              >
+                <option value="">Todas las residencias</option>
+                {residencias.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                name="alcance"
+                defaultValue={filtroAlcance}
+                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+              >
+                <option value="">Todos los alcances</option>
+                <option value="INDIVIDUAL">Solo Individual</option>
+                <option value="RESIDENCY">Solo Grupal</option>
+              </select>
+
+              <input
+                name="pq"
+                defaultValue={filtroTextoPago}
+                placeholder="Buscar usuario, correo o ref..."
+                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white w-48"
+              />
+
+              <button
+                type="submit"
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold cursor-pointer"
+              >
+                Filtrar
+              </button>
+              {(filtroResidencia || filtroAlcance || filtroTextoPago) && (
+                <Link
+                  href="/dashboard/plataforma"
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+                  Limpiar
+                </Link>
+              )}
+            </form>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs">
+                <tr>
+                  <th className="px-4 py-3">Fecha y Hora</th>
+                  <th className="px-4 py-3">Residencia</th>
+                  <th className="px-4 py-3">Quién Pagó / Alcance</th>
+                  <th className="px-4 py-3">Período</th>
+                  <th className="px-4 py-3">Monto</th>
+                  <th className="px-4 py-3">Método y Referencia</th>
+                  <th className="px-4 py-3">Estado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                {historialPagos.map((p) => {
+                  const nombrePagador =
+                    p.user?.fullName ??
+                    mapaNombrePorEmail.get(p.requestedBy.toLowerCase()) ??
+                    p.requestedBy
+
+                  return (
+                    <tr key={p.id}>
+                      <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums whitespace-nowrap">
+                        {fmtFechaHora(p.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        <Link
+                          href={`/dashboard/plataforma/residencia/${p.residency.id}`}
+                          className="font-bold text-blue-700 dark:text-blue-400 hover:underline"
+                        >
+                          {p.residency.name}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span
+                            className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
+                              p.billingScope === 'INDIVIDUAL'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            {p.billingScope === 'INDIVIDUAL' ? 'Individual' : 'Grupal'}
+                          </span>
+                          <span className="font-bold text-slate-900 dark:text-white">
+                            {nombrePagador}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          {p.requestedBy}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3 text-xs tabular-nums whitespace-nowrap">
+                        {p.periodMonths} mes(es)
+                      </td>
+                      <td className="px-4 py-3 text-xs font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums whitespace-nowrap">
+                        ${p.amountUsd.toFixed(2)} USD
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        <span className="capitalize font-semibold text-slate-800 dark:text-slate-200">
+                          {p.method}
+                        </span>
+                        <span className="block font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                          {p.reference ?? '—'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        <span
+                          className={`px-2 py-0.5 rounded font-bold ${
+                            p.status === 'APROBADO'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : p.status === 'RECHAZADO'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-amber-100 text-amber-800'
+                          }`}
+                        >
+                          {p.status}
+                        </span>
+                        {p.reviewedBy === 'paypal-automatico' && (
+                          <span className="block text-[10px] text-slate-400 mt-0.5">
+                            Automático
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+                {historialPagos.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
+                      No hay pagos registrados con los filtros actuales.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* DAR DE ALTA NUEVA RESIDENCIA + ADMIN INICIAL */}
         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 space-y-4">
           <div>
@@ -260,6 +504,7 @@ export default async function PlataformaPage({
                 <option value="CONSULTAS">Interfaz de Consultas (Ambulatorio)</option>
                 <option value="HOSPITALIZACION">Interfaz de Hospitalización / Nefrología</option>
                 <option value="MEDICINA_INTERNA">Interfaz de Medicina Interna (Hospitalización)</option>
+                <option value="CIRUGIA">Interfaz de Cirugía (Quirúrgico y Curas)</option>
               </select>
             </div>
 
@@ -469,8 +714,13 @@ export default async function PlataformaPage({
                     </td>
 
                     <td className="px-4 py-3">
-                      <form action={actualizarResidencia} className="flex flex-wrap items-center gap-1.5">
+                      <form
+                        key={`${r.id}-${r.interfaceMode}-${r.billingMode}-${r.planStatus}-${r.monthlyPriceUsd}-${r.individualPriceUsd}-${r.maxActiveUsers}`}
+                        action={actualizarResidencia}
+                        className="flex flex-wrap items-center gap-1.5"
+                      >
                         <input type="hidden" name="residencyId" value={r.id} />
+                        <input type="hidden" name="redirectTo" value="/dashboard/plataforma" />
                         <select
                           name="interfaceMode"
                           defaultValue={r.interfaceMode}
@@ -479,6 +729,7 @@ export default async function PlataformaPage({
                         >
                           <option value="HOSPITALIZACION">Hospitalización / Nefrología</option>
                           <option value="MEDICINA_INTERNA">Medicina Interna</option>
+                          <option value="CIRUGIA">Cirugía</option>
                           <option value="CONSULTAS">Consultas Externas</option>
                         </select>
                         <select
@@ -536,13 +787,22 @@ export default async function PlataformaPage({
 
                     <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums">
                       {esIndividual ? (
-                        <span className="text-blue-700 dark:text-blue-300 font-semibold">
+                        <span className="text-blue-700 dark:text-blue-300 font-semibold block">
                           Por cada usuario
                         </span>
                       ) : r.subscriptionEndsAt ? (
-                        fmtFecha(r.subscriptionEndsAt)
+                        <span className="font-semibold block">{fmtFecha(r.subscriptionEndsAt)}</span>
                       ) : (
-                        'Sin fecha'
+                        <span className="block">Sin fecha</span>
+                      )}
+                      {r.payments[0] && (
+                        <span className="block text-[10px] text-emerald-700 dark:text-emerald-400 mt-1">
+                          Últ. pago: ${r.payments[0].amountUsd.toFixed(2)} (
+                          {r.payments[0].user?.fullName ??
+                            mapaNombrePorEmail.get(r.payments[0].requestedBy.toLowerCase()) ??
+                            r.payments[0].requestedBy}
+                          ) · {fmtFecha(r.payments[0].createdAt)}
+                        </span>
                       )}
                     </td>
 
