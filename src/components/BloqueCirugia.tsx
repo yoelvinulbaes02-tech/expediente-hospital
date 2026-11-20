@@ -1,7 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { Scissors, Droplets, Calendar, Users, Stethoscope, Plus, X, AlertTriangle } from 'lucide-react'
+import {
+  Scissors,
+  Droplets,
+  Calendar,
+  Users,
+  Stethoscope,
+  Plus,
+  X,
+  AlertTriangle,
+  ShieldAlert,
+  Syringe,
+} from 'lucide-react'
 import {
   CATEGORIAS_DISPOSITIVOS_CIRUGIA,
   ESPECIALIDADES_QUIRURGICAS,
@@ -13,6 +24,7 @@ import {
   guardarTipificacion,
   retirarDispositivoQuirurgico,
 } from '@/app/dashboard/paciente/[id]/actions-clinicas'
+import { agregarAlergia, marcarSinAlergias } from '@/app/dashboard/paciente/[id]/actions'
 import { AntropometriaCard } from '@/components/AntropometriaCard'
 
 type PerfilQuirurgico = {
@@ -42,7 +54,17 @@ type Tipificacion = {
   updatedAt: Date | null
 }
 
+type AlergiaItem = {
+  id: string
+  allergen: string
+  reaction: string | null
+  status: string
+  createdBy: string
+  createdAt: Date
+}
+
 const ETIQUETA_ROL: Record<string, string> = {
+  SUPERADMIN: 'SuperAdmin',
   ADMIN: 'Admin',
   DOCTOR: 'Médico',
   RESIDENT: 'Residente',
@@ -73,6 +95,7 @@ export function BloqueCirugia({
   perfilQuirurgico,
   dispositivos,
   tipificacion,
+  alergias,
   antropometria,
   nombres,
   roles,
@@ -82,6 +105,7 @@ export function BloqueCirugia({
   perfilQuirurgico: PerfilQuirurgico | null
   dispositivos: DispositivoQuirurgico[]
   tipificacion: Tipificacion
+  alergias: AlergiaItem[]
   antropometria: {
     weight: number | null
     weightUnit: string | null
@@ -97,6 +121,8 @@ export function BloqueCirugia({
   const [estadoQxForm, setEstadoQxForm] = useState<string>(
     perfilQuirurgico?.surgeryStatus ?? 'pendiente'
   )
+  const [editandoAlergia, setEditandoAlergia] = useState(false)
+  const [agregandoDispositivo, setAgregandoDispositivo] = useState(false)
 
   const estadoMeta =
     ESTADOS_CIRUGIA.find((e) => e.value === (perfilQuirurgico?.surgeryStatus ?? 'pendiente')) ??
@@ -106,11 +132,34 @@ export function BloqueCirugia({
     CATEGORIAS_DISPOSITIVOS_CIRUGIA.map((c) => [c.key, c.label])
   )
 
+  const sinEvaluarAlergias = !alergias || alergias.length === 0 || alergias[0].status === 'no_evaluada'
+  const niegaAlergias = !sinEvaluarAlergias && alergias[0].status === 'sin_alergias'
+  const tieneAlergias = !sinEvaluarAlergias && !niegaAlergias
+  const ultimaAlergia = alergias?.[0] ?? null
+
+  const renderAutor = (email: string, fecha?: Date | null) => (
+    <div className="mt-2 pt-1.5 border-t border-slate-200/80 text-[11px] text-slate-500">
+      <span>Registró: </span>
+      <strong className="text-slate-700">{nombres[email] ?? email}</strong>
+      {roles[email] && (
+        <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1 rounded">
+          {ETIQUETA_ROL[roles[email]] ?? roles[email]}
+        </span>
+      )}
+      {fecha && <span className="block text-[10px] text-slate-400 tabular-nums">{fmtFechaHora(fecha)}</span>}
+    </div>
+  )
+
   return (
     <>
-      {/* ANTROPOMETRÍA COMPACTA + TIPIFICACIÓN SANGUÍNEA EN LA MISMA LÍNEA */}
-      <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 mb-6 print:hidden">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* 4 CUADRITOS LINEALES IGUAL QUE NEFROLOGÍA: ANTROPOMETRÍA · TIPIFICACIÓN · ALERGIAS · CATÉTERES/ACCESOS */}
+      <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6 print:hidden">
+        <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2 mb-4">
+          🩺 Antropometría, Tipificación, Alergias y Catéteres / Accesos
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* 1. ANTROPOMETRÍA */}
           <AntropometriaCard
             compact
             episodeId={episodeId}
@@ -123,7 +172,7 @@ export function BloqueCirugia({
             puedeRegistrar={puedeRegistrar}
           />
 
-          {/* TIPIFICACIÓN SANGUÍNEA AL LADO DE PESO/TALLA/IMC */}
+          {/* 2. TIPIFICACIÓN SANGUÍNEA */}
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
             <div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-1">
@@ -138,25 +187,8 @@ export function BloqueCirugia({
                       {tipificacion.bloodType}
                     </span>
                   </div>
-                  {tipificacion.recordedBy && (
-                    <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
-                      <span>Registró: </span>
-                      <strong className="text-slate-700">
-                        {nombres[tipificacion.recordedBy] ?? tipificacion.recordedBy}
-                      </strong>
-                      {roles[tipificacion.recordedBy] && (
-                        <span className="ml-1 bg-slate-200 text-slate-700 text-[10px] font-bold px-1 rounded">
-                          {ETIQUETA_ROL[roles[tipificacion.recordedBy]] ??
-                            roles[tipificacion.recordedBy]}
-                        </span>
-                      )}
-                      {tipificacion.updatedAt && (
-                        <span className="block text-[10px] text-slate-400">
-                          {fmtFechaHora(tipificacion.updatedAt)}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  {tipificacion.recordedBy &&
+                    renderAutor(tipificacion.recordedBy, tipificacion.updatedAt)}
                 </div>
               ) : (
                 <p className="text-xs text-slate-400 italic mt-1">Sin tipificación registrada.</p>
@@ -166,7 +198,7 @@ export function BloqueCirugia({
             {puedeRegistrar && (
               <details className="mt-2 pt-2 border-t border-slate-200">
                 <summary className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
-                  {tipificacion.bloodType ? 'Actualizar Grupo y Rh' : '+ Registrar Grupo y Rh'}
+                  {tipificacion.bloodType ? 'Actualizar' : '+ Registrar grupo'}
                 </summary>
                 <form action={guardarTipificacion} className="space-y-2 mt-2">
                   <input type="hidden" name="episodeId" value={episodeId} />
@@ -193,11 +225,233 @@ export function BloqueCirugia({
               </details>
             )}
           </div>
+
+          {/* 3. ALERGIAS (AL LADO DE TIPIFICACIÓN) */}
+          <div
+            className={`rounded-lg p-3 flex flex-col justify-between border ${
+              tieneAlergias
+                ? 'bg-red-50/80 border-red-300'
+                : niegaAlergias
+                  ? 'bg-emerald-50/60 border-emerald-200'
+                  : 'bg-amber-50/60 border-amber-200'
+            }`}
+          >
+            <div>
+              <span className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                <ShieldAlert
+                  className={`w-3.5 h-3.5 ${
+                    tieneAlergias
+                      ? 'text-red-600'
+                      : niegaAlergias
+                        ? 'text-emerald-600'
+                        : 'text-amber-600'
+                  }`}
+                />
+                <span>Alergias</span>
+              </span>
+
+              {sinEvaluarAlergias && (
+                <div>
+                  <p className="text-sm font-bold text-amber-900 mt-1">⚠️ No evaluadas</p>
+                  <p className="text-[11px] text-amber-700">Requiere confirmación clínica.</p>
+                </div>
+              )}
+
+              {niegaAlergias && (
+                <div>
+                  <p className="text-sm font-bold text-emerald-800 mt-1">✅ Niega alergias</p>
+                  <p className="text-[11px] text-emerald-700">Sin antecedentes conocidos.</p>
+                  {ultimaAlergia?.createdBy &&
+                    renderAutor(ultimaAlergia.createdBy, ultimaAlergia.createdAt)}
+                </div>
+              )}
+
+              {tieneAlergias && (
+                <div>
+                  <p className="text-xs font-extrabold text-red-800 mt-1">🚨 Alergias conocidas:</p>
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {alergias.map((al) => (
+                      <span
+                        key={al.id}
+                        title={al.reaction ? `Reacción: ${al.reaction}` : undefined}
+                        className="bg-white text-red-800 border border-red-200 px-2 py-0.5 rounded text-xs font-bold"
+                      >
+                        {al.allergen}
+                        {al.reaction ? ` (${al.reaction})` : ''}
+                      </span>
+                    ))}
+                  </div>
+                  {ultimaAlergia?.createdBy &&
+                    renderAutor(ultimaAlergia.createdBy, ultimaAlergia.createdAt)}
+                </div>
+              )}
+            </div>
+
+            {puedeRegistrar && (
+              <div className="mt-2 pt-2 border-t border-slate-200/80">
+                <button
+                  type="button"
+                  onClick={() => setEditandoAlergia((v) => !v)}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
+                >
+                  {editandoAlergia
+                    ? 'Cerrar'
+                    : sinEvaluarAlergias
+                      ? '+ Evaluar alergias'
+                      : 'Actualizar / + Agregar'}
+                </button>
+
+                {editandoAlergia && (
+                  <div className="space-y-2 mt-2">
+                    <form
+                      action={async (formData) => {
+                        await marcarSinAlergias(formData)
+                        setEditandoAlergia(false)
+                      }}
+                    >
+                      <input type="hidden" name="episodeId" value={episodeId} />
+                      <button
+                        type="submit"
+                        className="w-full bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-1.5 rounded text-[11px] font-bold hover:bg-emerald-100 cursor-pointer"
+                      >
+                        ✅ Marcar: Niega Alergias
+                      </button>
+                    </form>
+
+                    <form
+                      action={async (formData) => {
+                        await agregarAlergia(formData)
+                        setEditandoAlergia(false)
+                      }}
+                      className="space-y-1.5 pt-1.5 border-t border-slate-200"
+                    >
+                      <input type="hidden" name="episodeId" value={episodeId} />
+                      <input
+                        name="allergen"
+                        required
+                        placeholder="Alérgeno (Ej. Penicilina)"
+                        className="w-full px-2 py-1 border border-slate-300 rounded text-xs bg-white text-slate-900"
+                      />
+                      <input
+                        name="reaction"
+                        placeholder="Reacción (opcional)"
+                        className="w-full px-2 py-1 border border-slate-300 rounded text-xs bg-white text-slate-900"
+                      />
+                      <button
+                        type="submit"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white text-xs py-1.5 rounded font-medium cursor-pointer"
+                      >
+                        Guardar Alergia
+                      </button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 4. CATÉTERES, ACCESOS Y DRENAJES ACTIVOS */}
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between">
+            <div>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                <Syringe className="w-3.5 h-3.5 text-blue-600" />
+                <span>Catéteres y Accesos ({dispositivos.length})</span>
+              </span>
+
+              {dispositivos.length > 0 ? (
+                <div className="space-y-1.5 mt-1.5 max-h-40 overflow-y-auto pr-0.5">
+                  {dispositivos.map((d) => (
+                    <div
+                      key={d.id}
+                      className="bg-white border border-slate-200 rounded px-2 py-1.5 flex items-start justify-between gap-1.5 text-xs"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-800 leading-snug">
+                          {mapaEtiquetaCat.get(d.category) ?? d.category}
+                        </p>
+                        {d.notes && (
+                          <p className="text-[11px] text-slate-600 truncate">{d.notes}</p>
+                        )}
+                        <p className="text-[10px] text-slate-400 tabular-nums mt-0.5">
+                          {nombres[d.createdBy] ?? d.createdBy} · {fmtFechaHora(d.createdAt)}
+                        </p>
+                      </div>
+                      {puedeRegistrar && (
+                        <form action={retirarDispositivoQuirurgico} className="shrink-0">
+                          <input type="hidden" name="episodeId" value={episodeId} />
+                          <input type="hidden" name="deviceId" value={d.id} />
+                          <button
+                            type="submit"
+                            title="Marcar como retirado"
+                            className="text-red-500 hover:text-red-700 p-0.5 rounded cursor-pointer"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400 italic mt-1">
+                  Sin catéteres o accesos activos.
+                </p>
+              )}
+            </div>
+
+            {puedeRegistrar && (
+              <div className="mt-2 pt-2 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setAgregandoDispositivo((v) => !v)}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
+                >
+                  {agregandoDispositivo ? 'Cerrar' : '+ Agregar catéter / acceso'}
+                </button>
+
+                {agregandoDispositivo && (
+                  <form
+                    action={async (formData) => {
+                      await agregarDispositivoQuirurgico(formData)
+                      setAgregandoDispositivo(false)
+                    }}
+                    className="space-y-1.5 mt-2"
+                  >
+                    <input type="hidden" name="episodeId" value={episodeId} />
+                    <select
+                      name="category"
+                      required
+                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-900"
+                    >
+                      <option value="">Seleccione catéter o acceso...</option>
+                      {CATEGORIAS_DISPOSITIVOS_CIRUGIA.map((cat) => (
+                        <option key={cat.key} value={cat.key}>
+                          {cat.label}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      name="notes"
+                      placeholder="Nota opcional (ej. lado der.)"
+                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-900"
+                    />
+                    <button
+                      type="submit"
+                      className="w-full inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white text-xs py-1.5 rounded font-medium cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Agregar</span>
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* INFORMACIÓN QUIRÚRGICA */}
-      <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 mb-6 print:hidden">
+      <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 mb-6 print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">
           <div>
             <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
@@ -421,88 +675,6 @@ export function BloqueCirugia({
               </p>
             </div>
           </div>
-        </div>
-
-        {/* DISPOSITIVOS / CATÉTERES / PROCEDIMIENTOS DE ESTE PACIENTE */}
-        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-            <div>
-              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                Catéteres, Accesos y Drenajes Activos ({dispositivos.length})
-              </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Los dispositivos activos aquí se suman automáticamente al panel general de Cirugía.
-              </p>
-            </div>
-
-            {puedeRegistrar && (
-              <form action={agregarDispositivoQuirurgico} className="flex flex-wrap items-center gap-2">
-                <input type="hidden" name="episodeId" value={episodeId} />
-                <select
-                  name="category"
-                  required
-                  className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                >
-                  <option value="">+ Agregar catéter o acceso...</option>
-                  {CATEGORIAS_DISPOSITIVOS_CIRUGIA.map((cat) => (
-                    <option key={cat.key} value={cat.key}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  name="notes"
-                  placeholder="Nota opcional (ej. lado der.)"
-                  className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white w-44"
-                />
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Agregar</span>
-                </button>
-              </form>
-            )}
-          </div>
-
-          {dispositivos.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {dispositivos.map((d) => (
-                <div
-                  key={d.id}
-                  className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs"
-                >
-                  <span className="font-bold text-slate-800 dark:text-slate-100">
-                    {mapaEtiquetaCat.get(d.category) ?? d.category}
-                  </span>
-                  {d.notes && (
-                    <span className="text-slate-500 dark:text-slate-400">· {d.notes}</span>
-                  )}
-                  <span className="text-[10px] text-slate-400 tabular-nums">
-                    ({fmtFechaHora(d.createdAt)})
-                  </span>
-                  {puedeRegistrar && (
-                    <form action={retirarDispositivoQuirurgico} className="inline">
-                      <input type="hidden" name="episodeId" value={episodeId} />
-                      <input type="hidden" name="deviceId" value={d.id} />
-                      <button
-                        type="submit"
-                        title="Marcar como retirado"
-                        className="text-red-600 hover:text-red-800 p-0.5 rounded cursor-pointer"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </form>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-slate-400 italic">
-              Sin catéteres, accesos ni drenajes pleurales/SPBSA registrados en este paciente.
-            </p>
-          )}
         </div>
       </div>
     </>

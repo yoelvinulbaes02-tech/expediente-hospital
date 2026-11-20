@@ -181,10 +181,10 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
 
   if (conDatos.length === 0) {
     return (
-      <div className="bg-orange-50/40 border border-dashed border-orange-200 rounded-xl p-4 flex items-center gap-2.5 text-xs text-slate-600">
+      <div className="bg-orange-50/40 border border-dashed border-orange-200 rounded-lg p-3 flex items-center gap-2 text-[11px] text-slate-600 h-full">
         <BarChart3 className="w-4 h-4 text-orange-500 shrink-0" />
         <span>
-          La gráfica de tendencia de drenajes aparecerá automáticamente cuando registres al menos un débito en mL para ver si aumenta o disminuye.
+          La gráfica de tendencia aparecerá aquí al registrar al menos un débito en mL.
         </span>
       </div>
     )
@@ -268,12 +268,12 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
   const minTs = Math.min(...allTs)
   const maxTs = Math.max(...allTs)
 
-  const W = 680
-  const H = 220
-  const padIzq = 54
-  const padDer = 28
-  const padArr = 28
-  const padAba = 32
+  const W = 520
+  const H = 148
+  const padIzq = 42
+  const padDer = 20
+  const padArr = 24
+  const padAba = 26
   const innerW = W - padIzq - padDer
   const innerH = H - padArr - padAba
 
@@ -288,7 +288,7 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
   const getY = (val: number) =>
     padArr + ((maxVal - val) / (maxVal - minVal)) * innerH
 
-  const ticksY = [0, Math.round(maxVal * 0.33), Math.round(maxVal * 0.66), maxVal]
+  const ticksY = [0, Math.round(maxVal * 0.5), maxVal]
   const todosValores = todosPuntos.map((p) => p.valor)
   const minDato = Math.min(...todosValores)
   const maxDato = Math.max(...todosValores)
@@ -298,39 +298,39 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
     [...todosPuntos].sort((a, b) => a.xTs - b.xTs)[todosPuntos.length - 1]?.label ?? ''
 
   return (
-    <div className="bg-slate-50/70 border border-orange-200 rounded-xl p-4 space-y-3">
+    <div className="bg-slate-50/70 border border-orange-200 rounded-lg p-3 space-y-2.5 h-full flex flex-col justify-between">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-orange-600" />
-          <h3 className="text-sm font-bold text-slate-900">
-            Gráfica de Tendencia de Drenajes (mL)
+        <div className="flex flex-wrap items-center gap-1.5">
+          <BarChart3 className="w-3.5 h-3.5 text-orange-600" />
+          <h3 className="text-xs font-bold text-slate-900">
+            Tendencia (mL)
           </h3>
           <BadgeTendencia tendencia={tendenciaPrincipal} />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <div className="inline-flex rounded-md border border-slate-200 bg-white p-0.5">
             <button
               type="button"
               onClick={() => setModo('registro')}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-bold cursor-pointer transition-colors ${
+              className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
                 modo === 'registro'
                   ? 'bg-orange-600 text-white'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              Por registro
+              Por toma
             </button>
             <button
               type="button"
               onClick={() => setModo('diario')}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-bold cursor-pointer transition-colors ${
+              className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
                 modo === 'diario'
                   ? 'bg-orange-600 text-white'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              Total por día
+              Por día
             </button>
           </div>
 
@@ -338,9 +338,9 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
             <select
               value={filtroActivo}
               onChange={(e) => setSeleccion(e.target.value)}
-              className="px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] font-bold bg-white text-slate-800"
+              className="px-2 py-1 border border-slate-300 rounded-md text-[10px] font-bold bg-white text-slate-800 max-w-36"
             >
-              <option value="todos">Todos los drenajes ({conDatos.length})</option>
+              <option value="todos">Todos ({conDatos.length})</option>
               {conDatos.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
@@ -352,12 +352,10 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-lg p-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 mb-2">
+      <div className="bg-white border border-slate-200 rounded-md p-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500 mb-1">
           <span>
-            {modo === 'registro'
-              ? 'Evolución cronológica de cada registro (mL)'
-              : 'Débito acumulado por día calendario (mL/día)'}
+            {modo === 'registro' ? 'Evolución por registro' : 'Total diario (mL/día)'}
           </span>
           <span className="tabular-nums">
             Mín: <strong className="text-slate-800">{minDato} mL</strong> · Máx:{' '}
@@ -365,7 +363,7 @@ function GraficaDrenajes({ drenajes }: { drenajes: EpisodeDrainItem[] }) {
           </span>
         </div>
 
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto select-none overflow-visible" role="img">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-h-36 select-none overflow-visible" role="img">
           {ticksY.map((t, idx) => (
             <g key={idx}>
               <line
@@ -655,25 +653,32 @@ export function ControlDrenajes({
   }
 
   return (
-    <section className="bg-white p-5 sm:p-6 rounded-xl shadow-sm border border-orange-200 space-y-4 print:hidden">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-orange-100 pb-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <Droplets className="w-5 h-5 text-orange-600" />
-            <h2 className="text-lg font-bold text-slate-800">
-              Control Independiente de Drenajes ({activos.length})
+    <section className="bg-white p-4 rounded-xl shadow-sm border border-orange-200 space-y-3 print:hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-orange-100 pb-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-1.5">
+            <Droplets className="w-4 h-4 text-orange-600" />
+            <h2 className="text-sm sm:text-base font-bold text-slate-800">
+              Control de Drenajes ({activos.length})
             </h2>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Contabilidad independiente en mL por cada sonda o drenaje quirúrgico, separado de los signos vitales.
-          </p>
+
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px] tabular-nums">
+            <span className="bg-orange-50 border border-orange-200 text-orange-950 font-bold px-2 py-0.5 rounded">
+              24h: {total24hActivosMl} mL
+            </span>
+            <span className="bg-slate-100 border border-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">
+              Acumulado: {totalActivosMl} mL
+              {retirados.length > 0 ? ` (${totalGeneralMl} hist.)` : ''}
+            </span>
+          </div>
         </div>
 
         {puedeRegistrar && (
           <button
             type="button"
             onClick={() => setMostrarNuevo((v) => !v)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold cursor-pointer"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>{mostrarNuevo ? 'Cerrar' : 'Agregar Drenaje'}</span>
@@ -681,39 +686,9 @@ export function ControlDrenajes({
         )}
       </div>
 
-      {/* RESUMEN GENERAL DE DRENAJES */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-orange-50/70 border border-orange-200 rounded-lg px-3.5 py-2.5">
-          <p className="text-[11px] font-semibold text-orange-900">Drenajes activos</p>
-          <p className="text-xl font-black text-orange-950 tabular-nums mt-0.5">{activos.length}</p>
-        </div>
-        <div className="bg-orange-50/70 border border-orange-200 rounded-lg px-3.5 py-2.5">
-          <p className="text-[11px] font-semibold text-orange-900">Débito últimas 24h (activos)</p>
-          <p className="text-xl font-black text-orange-950 tabular-nums mt-0.5">
-            {total24hActivosMl} mL
-          </p>
-        </div>
-        <div className="bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5">
-          <p className="text-[11px] font-semibold text-slate-600">
-            Acumulado {retirados.length > 0 ? 'activos / total episodio' : 'total del episodio'}
-          </p>
-          <p className="text-xl font-black text-slate-900 tabular-nums mt-0.5">
-            {totalActivosMl} mL
-            {retirados.length > 0 && (
-              <span className="text-xs font-semibold text-slate-500 ml-1.5">
-                ({totalGeneralMl} mL hist.)
-              </span>
-            )}
-          </p>
-        </div>
-      </div>
-
-      {/* GRÁFICA DE TENDENCIA DE DRENAJES (AUMENTA / DISMINUYE) */}
-      <GraficaDrenajes drenajes={drenajes} />
-
       {mensaje && (
         <div
-          className={`px-3.5 py-2 rounded-lg border text-xs font-medium flex items-center justify-between gap-2 ${
+          className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center justify-between gap-2 ${
             mensaje.tipo === 'ok'
               ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
               : 'bg-red-50 border-red-200 text-red-800'
@@ -824,28 +799,35 @@ export function ControlDrenajes({
         </form>
       )}
 
-      {/* TARJETAS INDEPENDIENTES POR CADA DRENAJE ACTIVO */}
-      {activos.length === 0 ? (
-        <div className="text-center py-6 bg-slate-50 border border-dashed border-slate-300 rounded-xl text-xs text-slate-500">
-          No hay drenajes activos registrados en este paciente. Usa &quot;Agregar Drenaje&quot; para llevar el conteo independiente en mL de cada sonda o drenaje.
-        </div>
+      {/* TARJETAS DE DRENAJES ACTIVOS + GRÁFICA LADO A LADO EN PC */}
+      {activos.length === 0 && drenajes.every((d) => d.entries.length === 0) ? (
+        <p className="text-xs text-slate-500 italic py-1">
+          No hay drenajes activos registrados. Usa &quot;Agregar Drenaje&quot; para llevar el conteo independiente en mL de cada sonda o drenaje.
+        </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {activos.map((drain) => {
-            const totalMl = sumarTotal(drain.entries)
-            const total24hMl = sumar24h(drain.entries)
-            const cronologicos = [...drain.entries].sort(
-              (a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()
-            )
-            const tend = calcularTendencia(cronologicos.map((e) => e.volumeMl))
-            const expandido = !!historialExpandido[drain.id]
-            const visibles = expandido ? drain.entries : drain.entries.slice(0, 3)
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+          <div className={activos.length === 0 ? 'lg:col-span-5' : 'lg:col-span-7'}>
+            {activos.length === 0 ? (
+              <div className="text-center py-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-xs text-slate-500">
+                Sin drenajes activos actualmente (consulta el historial de retirados o la gráfica).
+              </div>
+            ) : (
+              <div className={`grid grid-cols-1 ${activos.length > 1 ? 'sm:grid-cols-2' : ''} gap-3`}>
+                {activos.map((drain) => {
+                  const totalMl = sumarTotal(drain.entries)
+                  const total24hMl = sumar24h(drain.entries)
+                  const cronologicos = [...drain.entries].sort(
+                    (a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()
+                  )
+                  const tend = calcularTendencia(cronologicos.map((e) => e.volumeMl))
+                  const expandido = !!historialExpandido[drain.id]
+                  const visibles = expandido ? drain.entries : drain.entries.slice(0, 2)
 
-            return (
-              <div
-                key={drain.id}
-                className="bg-slate-50/70 border border-orange-200 rounded-xl p-4 space-y-3"
-              >
+                  return (
+                    <div
+                      key={drain.id}
+                      className="bg-slate-50/70 border border-orange-200 rounded-lg p-3 space-y-2.5"
+                    >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5">
@@ -1024,7 +1006,7 @@ export function ControlDrenajes({
                 )}
 
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200">
-                  {drain.entries.length > 3 ? (
+                  {drain.entries.length > 2 ? (
                     <button
                       type="button"
                       onClick={() =>
@@ -1078,8 +1060,15 @@ export function ControlDrenajes({
                     ))}
                 </div>
               </div>
-            )
-          })}
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className={activos.length === 0 ? 'lg:col-span-7' : 'lg:col-span-5'}>
+            <GraficaDrenajes drenajes={drenajes} />
+          </div>
         </div>
       )}
 

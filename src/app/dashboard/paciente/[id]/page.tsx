@@ -31,6 +31,7 @@ import { ListaEvoluciones } from '@/components/ListaEvoluciones'
 import { BotonImprimirSignos } from '@/components/BotonImprimirSignos'
 import { TratamientoActual } from '@/components/TratamientoActual'
 import { PlanDepartamentoBase, type PlanBaseEntryItem } from '@/components/PlanDepartamentoBase'
+import { CirugiaTratamientoPlanBloque } from '@/components/CirugiaTratamientoPlanBloque'
 import { ControlDrenajes, type EpisodeDrainItem } from '@/components/ControlDrenajes'
 
 const ETIQUETA_ROL: Record<string, string> = {
@@ -345,6 +346,9 @@ export default async function ExpedientePage({
       emails.add(ent.recordedBy)
       if (ent.updatedBy) emails.add(ent.updatedBy)
     })
+  })
+  episode.allergies.forEach((al) => {
+    if (al.createdBy) emails.add(al.createdBy)
   })
 
   const drenajesSerializados: EpisodeDrainItem[] = episodeDrainsDb.map((dr) => ({
@@ -865,33 +869,49 @@ export default async function ExpedientePage({
           </div>
         </div>
 
-        {/* TRATAMIENTO MÉDICO ACTUAL CON TEXTO LIBRE, FIRMA Y ANTIBIÓTICOS (CIRUGÍA) */}
-        <TratamientoActual
-          episodeId={episode.id}
-          tratamiento={episode.currentTreatment}
-          actualizadoPor={episode.treatmentUpdatedBy}
-          actualizadoAt={episode.treatmentUpdatedAt}
-          nombres={nombres}
-          roles={roles}
-          puedeRegistrar={permisos.puedeRegistrar}
-          esCirugia={esModoCirugia}
-          antibioticos={antibiotics}
-        />
-
-        {/* PLAN DEL DEPARTAMENTO BASE (INTERCONSULTAS Y PACIENTES PROPIOS DE CIRUGÍA) */}
-        {(esInterconsulta || esModoCirugia) && (
-          <PlanDepartamentoBase
+        {/* TRATAMIENTO MÉDICO ACTUAL, ANTIBIÓTICOS Y PLAN DEL DEPARTAMENTO BASE */}
+        {esModoCirugia ? (
+          <CirugiaTratamientoPlanBloque
             episodeId={episode.id}
+            tratamiento={episode.currentTreatment}
+            actualizadoPor={episode.treatmentUpdatedBy}
+            actualizadoAt={episode.treatmentUpdatedAt}
+            antibioticos={antibiotics}
             departamentoLabel={
               esInterconsulta
                 ? episode.consultingDepartment || 'Servicio tratante'
                 : surgicalProfile?.surgicalSpecialty || 'Cirugía'
             }
-            entradas={basePlanEntries}
+            entradasPlan={basePlanEntries}
             nombres={nombres}
             roles={roles}
             puedeRegistrar={permisos.puedeRegistrar}
           />
+        ) : (
+          <>
+            <TratamientoActual
+              episodeId={episode.id}
+              tratamiento={episode.currentTreatment}
+              actualizadoPor={episode.treatmentUpdatedBy}
+              actualizadoAt={episode.treatmentUpdatedAt}
+              nombres={nombres}
+              roles={roles}
+              puedeRegistrar={permisos.puedeRegistrar}
+              esCirugia={false}
+              antibioticos={[]}
+            />
+
+            {esInterconsulta && (
+              <PlanDepartamentoBase
+                episodeId={episode.id}
+                departamentoLabel={episode.consultingDepartment || 'Servicio tratante'}
+                entradas={basePlanEntries}
+                nombres={nombres}
+                roles={roles}
+                puedeRegistrar={permisos.puedeRegistrar}
+              />
+            )}
+          </>
         )}
 
         {/* 1. NOTAS IMPORTANTES */}
@@ -938,6 +958,7 @@ export default async function ExpedientePage({
                 recordedBy: episode.patient.bloodTypeRecordedBy,
                 updatedAt: episode.patient.bloodTypeUpdatedAt,
               }}
+              alergias={episode.allergies}
               antropometria={{
                 weight: episode.anthropometryWeight,
                 weightUnit: episode.anthropometryWeightUnit,
@@ -968,9 +989,11 @@ export default async function ExpedientePage({
           )}
         </div>
 
-        <div className="print:hidden">
-          <BannerAlergias alergias={episode.allergies} />
-        </div>
+        {!esModoCirugia && (
+          <div className="print:hidden">
+            <BannerAlergias alergias={episode.allergies} />
+          </div>
+        )}
 
         {/* CONTROL INDEPENDIENTE DE DRENAJES (CIRUGÍA) — PRIMERO QUE SIGNOS VITALES */}
         {esModoCirugia && (
@@ -1159,8 +1182,8 @@ export default async function ExpedientePage({
               )
             )}
 
-            {/* Alergias */}
-            {permisos.puedeRegistrar && (
+            {/* Alergias (en Cirugía ya está integrada en los 4 cuadritos lineales superiores) */}
+            {permisos.puedeRegistrar && !esModoCirugia && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2">Gestión de Alergias</h2>
                 
