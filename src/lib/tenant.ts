@@ -1,4 +1,4 @@
-import { auth } from '@/auth'
+import { obtenerSesionSegura } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import type { BillingMode, InterfaceMode, PlanStatus, Residency, User } from '@/generated/prisma'
 
@@ -206,7 +206,7 @@ export async function asegurarResidenciaPrincipal(): Promise<Residency> {
 }
 
 export async function obtenerContextoResidencia(): Promise<ContextoResidencia | null> {
-  const session = await auth()
+  const session = await obtenerSesionSegura()
   if (!session?.user?.id) return null
 
   const user = await prisma.user.findUnique({
@@ -266,7 +266,7 @@ export async function verificarEscrituraResidencia(
 
     let targetUserId = userId ?? null
     if (!targetUserId) {
-      const session = await auth()
+      const session = await obtenerSesionSegura()
       targetUserId = session?.user?.id ?? null
     }
     if (!targetUserId) {

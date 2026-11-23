@@ -24,6 +24,7 @@ const ETIQUETA_ACCION: Record<string, { label: string; color: string }> = {
   update: { label: 'Modificación', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' },
   delete: { label: 'Eliminación', color: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' },
   discharge: { label: 'Alta Médica', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' },
+  consent: { label: 'Consentimiento Legal', color: 'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300' },
 }
 
 const fmtFechaHora = (iso: string) => {

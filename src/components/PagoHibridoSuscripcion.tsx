@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 type PayPalButtonsInstance = {
   render: (container: HTMLElement) => Promise<void>
@@ -47,13 +48,18 @@ export function PagoHibridoSuscripcion({
   const [procesando, setProcesando] = useState(false)
   const [estadoPago, setEstadoPago] = useState<{ tipo: 'ok' | 'error' | 'info'; texto: string } | null>(null)
   const [sdkEstado, setSdkEstado] = useState<'idle' | 'loading' | 'ready'>('idle')
+  const [acceptTerms, setAcceptTerms] = useState(false)
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false)
 
   const periodMonthsRef = useRef(periodMonths)
+  const acceptTermsRef = useRef(acceptTerms)
+  const acceptPrivacyRef = useRef(acceptPrivacy)
   const contenedorPayPalRef = useRef<HTMLDivElement | null>(null)
 
   const esIndividual = billingMode === 'INDIVIDUAL'
   const montoTotal = (monthlyPriceUsd * periodMonths).toFixed(2)
   const paypalHabilitado = paypalConfigurado && paypalClientId.length > 0 && monthlyPriceUsd > 0
+  const consentimientoCompleto = acceptTerms && acceptPrivacy
 
   useEffect(() => {
     if (!paypalHabilitado) {
@@ -86,11 +92,20 @@ export function PagoHibridoSuscripcion({
             height: 45,
           },
           createOrder: async () => {
+            if (!acceptTermsRef.current || !acceptPrivacyRef.current) {
+              const msg = 'Marca ambas casillas de aceptación legal antes de continuar con el pago.'
+              setEstadoPago({ tipo: 'error', texto: msg })
+              throw new Error(msg)
+            }
             setEstadoPago(null)
             const res = await fetch('/api/paypal/create-order', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ periodMonths: periodMonthsRef.current }),
+              body: JSON.stringify({
+                periodMonths: periodMonthsRef.current,
+                acceptTerms: acceptTermsRef.current,
+                acceptPrivacy: acceptPrivacyRef.current,
+              }),
             })
             const json = (await res.json()) as { orderID?: string; error?: string }
             if (!res.ok || !json.orderID) {
@@ -327,13 +342,100 @@ export function PagoHibridoSuscripcion({
               : 'Esta residencia tiene configurada una tarifa mensual de $0 USD, por lo que no requiere cobro en línea.'}
           </div>
         ) : paypalHabilitado ? (
-          <div className="max-w-md mx-auto pt-1">
-            {sdkEstado === 'loading' && (
-              <p className="text-center text-xs text-slate-500 py-4">
-                Cargando pasarela segura de PayPal y Tarjetas...
+          <div className="space-y-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 p-4 space-y-2.5">
+              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                Confirmación previa al pago
               </p>
-            )}
-            <div ref={contenedorPayPalRef} className="min-h-14" />
+
+              <label className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptTerms}
+                  disabled={procesando}
+                  onChange={(e) => {
+                    acceptTermsRef.current = e.target.checked
+                    setAcceptTerms(e.target.checked)
+                  }}
+                  className="mt-0.5 rounded border-slate-300 dark:border-slate-600"
+                />
+                <span>
+                  Acepto los{' '}
+                  <Link
+                    href="/terminos"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+                  >
+                    Términos y Condiciones de Uso
+                  </Link>{' '}
+                  y la{' '}
+                  <Link
+                    href="/reembolso"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+                  >
+                    Política de Reembolso y Cancelación
+                  </Link>{' '}
+                  para esta suscripción.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptPrivacy}
+                  disabled={procesando}
+                  onChange={(e) => {
+                    acceptPrivacyRef.current = e.target.checked
+                    setAcceptPrivacy(e.target.checked)
+                  }}
+                  className="mt-0.5 rounded border-slate-300 dark:border-slate-600"
+                />
+                <span>
+                  Acepto la{' '}
+                  <Link
+                    href="/privacidad"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+                  >
+                    Política de Privacidad
+                  </Link>{' '}
+                  y el uso de{' '}
+                  <Link
+                    href="/cookies"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+                  >
+                    Cookies técnicas esenciales
+                  </Link>{' '}
+                  para procesar este pago con seguridad.
+                </span>
+              </label>
+
+              {!consentimientoCompleto && (
+                <p className="text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                  Marca ambas casillas para habilitar los botones de PayPal y tarjeta.
+                </p>
+              )}
+            </div>
+
+            <div className="max-w-md mx-auto pt-1 relative">
+              {sdkEstado === 'loading' && (
+                <p className="text-center text-xs text-slate-500 py-4">
+                  Cargando pasarela segura de PayPal y Tarjetas...
+                </p>
+              )}
+              <div
+                ref={contenedorPayPalRef}
+                className={`min-h-14 transition-opacity ${
+                  consentimientoCompleto ? 'opacity-100' : 'opacity-40 pointer-events-none select-none'
+                }`}
+              />
+            </div>
           </div>
         ) : (
           <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4 text-xs text-amber-900 dark:text-amber-200 space-y-1.5">

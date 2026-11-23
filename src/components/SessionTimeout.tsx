@@ -46,10 +46,17 @@ export function SessionTimeout() {
     }
   }, [])
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     clearAllTimers()
     limpiarBorradoresClinicos()
-    signOut({ callbackUrl: '/login' })
+    try {
+      await signOut({ redirect: false })
+    } catch {
+      // Continuar con limpieza directa de cookies en el servidor
+    }
+    if (typeof window !== 'undefined') {
+      window.location.href = `${window.location.origin}/api/auth/limpiar-sesion`
+    }
   }, [clearAllTimers])
 
   const startInactivityTimer = useCallback(() => {

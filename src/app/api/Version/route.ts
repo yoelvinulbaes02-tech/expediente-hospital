@@ -1,9 +1,9 @@
-import { auth } from '@/auth'
+import { obtenerSesionSegura } from '@/auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const session = await auth()
+  const session = await obtenerSesionSegura()
   if (!session?.user?.id) {
     return Response.json({ error: 'No autorizado' }, { status: 401 })
   }

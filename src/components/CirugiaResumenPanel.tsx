@@ -9,6 +9,7 @@ import {
   Plus,
   Minus,
   Syringe,
+  Bone,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react'
@@ -17,9 +18,12 @@ import {
   guardarResumenCirugiaConfig,
 } from '@/app/dashboard/actions-servicio'
 import { CATEGORIAS_DISPOSITIVOS_CIRUGIA } from '@/lib/cirugia-constants'
+import { CATEGORIAS_DISPOSITIVOS_ORTOPEDIA } from '@/lib/ortopedia-constants'
 
-const STORAGE_RESUMEN_KEY = 'nexo_cirugia_resumen_open'
-const STORAGE_CATETERES_KEY = 'nexo_cirugia_cateteres_open'
+const STORAGE_RESUMEN_KEY_CIRUGIA = 'nexo_cirugia_resumen_open'
+const STORAGE_CATETERES_KEY_CIRUGIA = 'nexo_cirugia_cateteres_open'
+const STORAGE_RESUMEN_KEY_ORTOPEDIA = 'nexo_ortopedia_resumen_open'
+const STORAGE_CATETERES_KEY_ORTOPEDIA = 'nexo_ortopedia_dispositivos_open'
 const PANEL_TOGGLE_EVENT = 'nexo:cirugia-panel-toggle'
 
 function suscribirPanelStorage(callback: () => void) {
@@ -66,25 +70,36 @@ export function CirugiaResumenPanel({
   resumenGuardado,
   conteosDispositivos,
   puedeEditar,
+  interfaceMode = 'CIRUGIA',
 }: {
   resumenAuto: Omit<ResumenCirugiaStats, 'mode'>
   resumenGuardado: ResumenCirugiaStats | null
   conteosDispositivos: Record<string, number>
   puedeEditar: boolean
+  interfaceMode?: 'CIRUGIA' | 'ORTOPEDIA'
 }) {
+  const esOrtopedia = interfaceMode === 'ORTOPEDIA'
+  const storageResumenKey = esOrtopedia ? STORAGE_RESUMEN_KEY_ORTOPEDIA : STORAGE_RESUMEN_KEY_CIRUGIA
+  const storageDispositivosKey = esOrtopedia
+    ? STORAGE_CATETERES_KEY_ORTOPEDIA
+    : STORAGE_CATETERES_KEY_CIRUGIA
+  const categoriasDispositivos = esOrtopedia
+    ? CATEGORIAS_DISPOSITIVOS_ORTOPEDIA
+    : CATEGORIAS_DISPOSITIVOS_CIRUGIA
+
   const router = useRouter()
   const resumenAbierto = useSyncExternalStore(
     suscribirPanelStorage,
-    () => leerEstadoPanel(STORAGE_RESUMEN_KEY),
+    () => leerEstadoPanel(storageResumenKey),
     () => false
   )
   const cateteresAbierto = useSyncExternalStore(
     suscribirPanelStorage,
-    () => leerEstadoPanel(STORAGE_CATETERES_KEY),
+    () => leerEstadoPanel(storageDispositivosKey),
     () => false
   )
-  const setResumenAbierto = (next: boolean) => escribirEstadoPanel(STORAGE_RESUMEN_KEY, next)
-  const setCateteresAbierto = (next: boolean) => escribirEstadoPanel(STORAGE_CATETERES_KEY, next)
+  const setResumenAbierto = (next: boolean) => escribirEstadoPanel(storageResumenKey, next)
+  const setCateteresAbierto = (next: boolean) => escribirEstadoPanel(storageDispositivosKey, next)
   const [editandoResumen, setEditandoResumen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -153,14 +168,34 @@ export function CirugiaResumenPanel({
   }
 
   const itemsResumen = [
-    { label: 'Emergencias', value: mostrado.emergencias, accent: 'text-red-700 dark:text-red-400' },
-    { label: 'Ingresos electivos', value: mostrado.ingresosElectivos, accent: 'text-blue-700 dark:text-blue-400' },
-    { label: 'Ingresos emergencias', value: mostrado.ingresosEmergencias, accent: 'text-amber-700 dark:text-amber-400' },
-    { label: 'Total de ingresos', value: mostrado.totalIngresos, accent: 'text-slate-900 dark:text-white' },
-    { label: 'Cirugías', value: mostrado.cirugias, accent: 'text-teal-700 dark:text-teal-400' },
+    {
+      label: esOrtopedia ? 'Trauma / Emerg.' : 'Emergencias',
+      value: mostrado.emergencias,
+      accent: 'text-red-700 dark:text-red-400',
+    },
+    {
+      label: 'Ingresos electivos',
+      value: mostrado.ingresosElectivos,
+      accent: 'text-blue-700 dark:text-blue-400',
+    },
+    {
+      label: esOrtopedia ? 'Ingresos trauma / urg.' : 'Ingresos emergencias',
+      value: mostrado.ingresosEmergencias,
+      accent: 'text-amber-700 dark:text-amber-400',
+    },
+    {
+      label: 'Total de ingresos',
+      value: mostrado.totalIngresos,
+      accent: 'text-slate-900 dark:text-white',
+    },
+    {
+      label: esOrtopedia ? 'Procedimientos / Qx' : 'Cirugías',
+      value: mostrado.cirugias,
+      accent: 'text-teal-700 dark:text-teal-400',
+    },
   ]
 
-  const totalDispositivos = CATEGORIAS_DISPOSITIVOS_CIRUGIA.reduce(
+  const totalDispositivos = categoriasDispositivos.reduce(
     (acc, cat) => acc + (conteosDispositivos[cat.key] ?? 0),
     0
   )
@@ -173,7 +208,7 @@ export function CirugiaResumenPanel({
         </div>
       )}
 
-      {/* APARTADO 1: RESUMEN INICIAL DEL SERVICIO DE CIRUGÍA (RETRAÍBLE) */}
+      {/* APARTADO 1: RESUMEN INICIAL DEL SERVICIO (RETRAÍBLE) */}
       <section className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 sm:p-5">
         <div
           className={`flex flex-wrap items-center justify-between gap-2 ${
@@ -185,11 +220,15 @@ export function CirugiaResumenPanel({
           <div className="flex flex-wrap items-center gap-2">
             <Activity className="w-4 h-4 text-teal-600 dark:text-teal-400" />
             <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-              Resumen Inicial del Servicio · Cirugía
+              {esOrtopedia
+                ? 'Resumen Inicial del Servicio · Ortopedia y Traumatología'
+                : 'Resumen Inicial del Servicio · Cirugía'}
             </h2>
             {!resumenAbierto ? (
               <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded tabular-nums">
-                Emerg: {mostrado.emergencias} · Ingresos: {mostrado.totalIngresos} · Cx: {mostrado.cirugias}
+                {esOrtopedia
+                  ? `Trauma: ${mostrado.emergencias} · Ingresos: ${mostrado.totalIngresos} · Qx: ${mostrado.cirugias}`
+                  : `Emerg: ${mostrado.emergencias} · Ingresos: ${mostrado.totalIngresos} · Cx: ${mostrado.cirugias}`}
               </span>
             ) : (
               <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -273,7 +312,7 @@ export function CirugiaResumenPanel({
             <form onSubmit={guardarManual} className="grid grid-cols-2 sm:grid-cols-6 gap-3 items-end">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Emergencias
+                  {esOrtopedia ? 'Trauma / Emerg.' : 'Emergencias'}
                 </label>
                 <input
                   type="number"
@@ -304,7 +343,7 @@ export function CirugiaResumenPanel({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Ingresos emergencias
+                  {esOrtopedia ? 'Ingresos trauma / urg.' : 'Ingresos emergencias'}
                 </label>
                 <input
                   type="number"
@@ -338,7 +377,7 @@ export function CirugiaResumenPanel({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Cirugías
+                  {esOrtopedia ? 'Procedimientos / Qx' : 'Cirugías'}
                 </label>
                 <input
                   type="number"
@@ -371,9 +410,15 @@ export function CirugiaResumenPanel({
           }`}
         >
           <div className="flex flex-wrap items-center gap-2">
-            <Syringe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            {esOrtopedia ? (
+              <Bone className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            ) : (
+              <Syringe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            )}
             <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-              Control de Catéteres, Accesos y Drenajes
+              {esOrtopedia
+                ? 'Control de Inmovilizaciones, Tracciones y Fijadores'
+                : 'Control de Catéteres, Accesos y Drenajes'}
             </h2>
             {!cateteresAbierto ? (
               <span className="text-xs font-semibold text-blue-800 dark:text-blue-200 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded tabular-nums">
@@ -407,7 +452,7 @@ export function CirugiaResumenPanel({
 
         {cateteresAbierto && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {CATEGORIAS_DISPOSITIVOS_CIRUGIA.map((cat) => {
+            {categoriasDispositivos.map((cat) => {
               const count = conteosDispositivos[cat.key] ?? 0
               return (
                 <div

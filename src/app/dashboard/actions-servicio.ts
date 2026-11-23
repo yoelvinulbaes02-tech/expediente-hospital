@@ -8,6 +8,8 @@ import {
   CATEGORIAS_DISPOSITIVOS_CIRUGIA,
   resolverTeamAutomatico,
 } from '@/lib/cirugia-constants'
+import { CATEGORIAS_DISPOSITIVOS_ORTOPEDIA } from '@/lib/ortopedia-constants'
+import { componerTituloAtb, parsearEsquemaDosis } from '@/lib/hemodialisis-atb'
 import { revalidatePath } from 'next/cache'
 
 async function exigirEscrituraDashboard() {
@@ -172,6 +174,7 @@ export async function guardarResumenCirugiaConfig(formData: FormData): Promise<{
     data: { surgicalStatsExtra: payload },
   })
 
+  const esOrtopedia = ctx.interfaceMode === 'ORTOPEDIA'
   await logAudit({
     actorId: ctx.user.id,
     actorRole: String(ctx.user.role),
@@ -179,7 +182,9 @@ export async function guardarResumenCirugiaConfig(formData: FormData): Promise<{
     entity: 'surgical_stats',
     entityId: residency.id,
     newValue: payload,
-    reason: 'Actualización de resumen de guardia en Cirugía',
+    reason: esOrtopedia
+      ? 'Actualización de resumen de guardia en Ortopedia y Traumatología'
+      : 'Actualización de resumen de guardia en Cirugía',
   })
 
   revalidatePath('/dashboard')
@@ -199,7 +204,12 @@ export async function ajustarDispositivoCirugiaDashboard(formData: FormData): Pr
   const category = String(formData.get('category') ?? '').trim()
   const delta = String(formData.get('delta') ?? '1') === '-1' ? -1 : 1
 
-  const valido = CATEGORIAS_DISPOSITIVOS_CIRUGIA.some((c) => c.key === category)
+  const esOrtopedia = ctx.interfaceMode === 'ORTOPEDIA'
+  const categoriasPermitidas = esOrtopedia
+    ? CATEGORIAS_DISPOSITIVOS_ORTOPEDIA
+    : CATEGORIAS_DISPOSITIVOS_CIRUGIA
+
+  const valido = categoriasPermitidas.some((c) => c.key === category)
   if (!valido) return { ok: false, error: 'Categoría de dispositivo no válida.' }
 
   if (delta === 1) {
@@ -219,7 +229,9 @@ export async function ajustarDispositivoCirugiaDashboard(formData: FormData): Pr
       entity: 'surgical_device',
       entityId: dev.id,
       newValue: { category, origen: 'dashboard' },
-      reason: `Incremento de conteo quirúrgico (${category})`,
+      reason: esOrtopedia
+        ? `Incremento de conteo ortopédico (${category})`
+        : `Incremento de conteo quirúrgico (${category})`,
     })
   } else {
     // Priorizar dispositivos generales sin episodio específico antes de retirar uno ligado a expediente
@@ -251,7 +263,9 @@ export async function ajustarDispositivoCirugiaDashboard(formData: FormData): Pr
       entity: 'surgical_device',
       entityId: objetivo.id,
       newValue: { category, isActive: false },
-      reason: `Retiro / decremento de conteo quirúrgico (${category})`,
+      reason: esOrtopedia
+        ? `Retiro / decremento de conteo ortopédico (${category})`
+        : `Retiro / decremento de conteo quirúrgico (${category})`,
     })
   }
 
@@ -472,9 +486,15 @@ export async function crearItemHemodialisis(formData: FormData): Promise<{
   if (!section) return { ok: false, error: 'Sección de Hemodiálisis inválida.' }
 
   const patientNameRaw = String(formData.get('patientName') ?? '').trim()
-  const title = String(formData.get('title') ?? '').trim()
+  const rawTitle = String(formData.get('title') ?? '').trim()
+  const intervalDose =
+    section === 'antibiotico' ? String(formData.get('intervalDose') ?? '').trim() : ''
+  const title =
+    section === 'antibiotico' ? componerTituloAtb(rawTitle, intervalDose) : rawTitle
   const details = String(formData.get('details') ?? '').trim() || null
-  const shiftLabel = String(formData.get('shiftLabel') ?? '').trim() || null
+  const rawShift = String(formData.get('shiftLabel') ?? '').trim()
+  const customShift = String(formData.get('customShiftLabel') ?? '').trim()
+  const shiftLabel = (rawShift === 'otra' ? customShift : rawShift) || null
   const eventDateRaw = String(formData.get('eventDate') ?? '').trim()
   const durationRaw = String(formData.get('durationDays') ?? '').trim()
   const isPriority = String(formData.get('isPriority') ?? '') === 'true'
@@ -482,7 +502,7 @@ export async function crearItemHemodialisis(formData: FormData): Promise<{
   const patientName =
     patientNameRaw || (section === 'nota' && isPriority ? 'Servicio de Hemodiálisis' : '')
 
-  if (!patientName || !title) {
+  if (!patientName || !rawTitle) {
     return {
       ok: false,
       error: 'Completa el paciente/referencia y el detalle principal.',
@@ -558,14 +578,20 @@ export async function editarItemHemodialisis(formData: FormData): Promise<{
   if (!existente) return { ok: false, error: 'Registro de Hemodiálisis no encontrado.' }
 
   const patientName = String(formData.get('patientName') ?? '').trim()
-  const title = String(formData.get('title') ?? '').trim()
+  const rawTitle = String(formData.get('title') ?? '').trim()
+  const intervalDose =
+    existente.section === 'antibiotico' ? String(formData.get('intervalDose') ?? '').trim() : ''
+  const title =
+    existente.section === 'antibiotico' ? componerTituloAtb(rawTitle, intervalDose) : rawTitle
   const details = String(formData.get('details') ?? '').trim() || null
-  const shiftLabel = String(formData.get('shiftLabel') ?? '').trim() || null
+  const rawShift = String(formData.get('shiftLabel') ?? '').trim()
+  const customShift = String(formData.get('customShiftLabel') ?? '').trim()
+  const shiftLabel = (rawShift === 'otra' ? customShift : rawShift) || null
   const eventDateRaw = String(formData.get('eventDate') ?? '').trim()
   const durationRaw = String(formData.get('durationDays') ?? '').trim()
   const isPriority = String(formData.get('isPriority') ?? '') === 'true'
 
-  if (!patientName || !title) {
+  if (!patientName || !rawTitle) {
     return { ok: false, error: 'El paciente/referencia y la descripción no pueden quedar vacíos.' }
   }
 
@@ -640,6 +666,26 @@ export async function registrarDosisHemodialisis(formData: FormData): Promise<{
   })
   if (!existente) return { ok: false, error: 'Esquema antibiótico no encontrado.' }
 
+  const dosisAplicadaRaw = String(formData.get('dosisAplicada') ?? '').trim()
+  const nuevaDosisIntervaloRaw = String(formData.get('nuevaDosisIntervalo') ?? '').trim()
+  const actualizarEsquema = String(formData.get('actualizarEsquema') ?? '') === 'true'
+  const doseNote = String(formData.get('doseNote') ?? '').trim() || null
+
+  const esquemaActual = parsearEsquemaDosis(existente.title)
+  const dosisAnterior = esquemaActual.dosisIntervalo ?? esquemaActual.dosisInicial
+  const dosisAplicada = dosisAplicadaRaw || dosisAnterior
+
+  let nuevoTitle = existente.title
+  if (actualizarEsquema && (nuevaDosisIntervaloRaw || dosisAplicadaRaw)) {
+    const dosisParaIntervalo = nuevaDosisIntervaloRaw || dosisAplicadaRaw
+    if (dosisParaIntervalo && dosisParaIntervalo !== esquemaActual.dosisInicial) {
+      nuevoTitle = componerTituloAtb(esquemaActual.dosisInicial, dosisParaIntervalo)
+    } else if (dosisParaIntervalo) {
+      nuevoTitle = dosisParaIntervalo
+    }
+  }
+
+  const esquemaActualizado = nuevoTitle !== existente.title
   const actorName = ctx.user.fullName || ctx.user.email
   const actorRole = String(ctx.user.role)
   const ahora = new Date()
@@ -647,6 +693,15 @@ export async function registrarDosisHemodialisis(formData: FormData): Promise<{
   await prisma.hemodialysisItem.update({
     where: { id: existente.id },
     data: {
+      ...(esquemaActualizado
+        ? {
+            title: nuevoTitle,
+            updatedBy: ctx.user.email,
+            updatedByName: actorName,
+            updatedByRole: actorRole,
+            updatedAt: ahora,
+          }
+        : {}),
       lastCheckAt: ahora,
       lastCheckBy: ctx.user.email,
       lastCheckByName: actorName,
@@ -660,15 +715,28 @@ export async function registrarDosisHemodialisis(formData: FormData): Promise<{
     action: 'update',
     entity: 'hemodialysis_item',
     entityId: existente.id,
+    oldValue: esquemaActualizado
+      ? {
+          title: existente.title,
+          dosisAnterior,
+        }
+      : undefined,
     newValue: {
       accion: 'dosis',
       patientName: existente.patientName,
-      title: existente.title,
+      title: nuevoTitle,
+      dosisAnterior,
+      dosisAplicada,
+      esquemaActualizado,
+      frecuencia: existente.shiftLabel,
+      doseNote,
       lastCheckByName: actorName,
       lastCheckByRole: actorRole,
       lastCheckAt: ahora.toISOString(),
     },
-    reason: `Dosis registrada en Hemodiálisis para ${existente.patientName}: ${existente.title}`,
+    reason: esquemaActualizado
+      ? `Dosis y ajuste en intervalo (${existente.shiftLabel ?? 'HD'}) para ${existente.patientName}: ${dosisAplicada}`
+      : `Dosis registrada en Hemodiálisis para ${existente.patientName}: ${dosisAplicada}`,
   })
 
   revalidatePath('/dashboard')

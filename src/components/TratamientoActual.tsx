@@ -4,6 +4,8 @@ import {
   suspenderAntibiotico,
 } from '@/app/dashboard/paciente/[id]/actions-clinicas'
 import { calcularDiasAntibiotico } from '@/lib/cirugia-constants'
+import { TextareaTratamiento } from '@/components/TextareaTratamiento'
+import { renderTextoClinico } from '@/lib/texto-clinico'
 
 export type AntibioticoResumen = {
   id: string
@@ -97,7 +99,7 @@ export function TratamientoActual({
               </p>
               <form action={guardarTratamiento} className="space-y-3">
                 <input type="hidden" name="episodeId" value={episodeId} />
-                <textarea
+                <TextareaTratamiento
                   name="currentTreatment"
                   rows={6}
                   defaultValue={tratamiento ?? ''}
@@ -123,7 +125,7 @@ export function TratamientoActual({
         <div className="space-y-3">
           <div className="bg-slate-50 dark:bg-slate-900/40 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
             <p className="font-mono text-xs sm:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">
-              {tratamiento}
+              {renderTextoClinico(tratamiento)}
             </p>
           </div>
 

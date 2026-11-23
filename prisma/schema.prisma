@@ -23,6 +23,7 @@ enum InterfaceMode {
   CONSULTAS
   MEDICINA_INTERNA
   CIRUGIA
+  ORTOPEDIA
 }
 
 enum PlanStatus {
@@ -307,19 +308,32 @@ model InternalMedicineProfile {
   episode Episode @relation(fields: [episodeId], references: [id])
 }
 
-// ─── PERFIL QUIRÚRGICO (INTERFAZ DE CIRUGÍA) ───
+// ─── PERFIL QUIRÚRGICO Y ORTOPÉDICO (INTERFAZ DE CIRUGÍA / ORTOPEDIA) ───
 model SurgicalProfile {
-  id                   String    @id @default(cuid())
-  episodeId            String    @unique
-  procedureName        String?
-  surgeryDate          DateTime? @db.Timestamptz
-  surgeryType          String    @default("electiva") // electiva | emergencia
-  surgicalSpecialty    String?
-  surgeonAndAssistants String?
-  surgeryStatus        String    @default("pendiente") // pendiente | en_quirofano | realizada | suspendida
-  suspensionReason     String?
-  updatedBy            String
-  updatedAt            DateTime  @updatedAt
+  id                     String    @id @default(cuid())
+  episodeId              String    @unique
+  procedureName          String?
+  surgeryDate            DateTime? @db.Timestamptz
+  surgeryType            String    @default("electiva") // electiva | emergencia | conservador
+  surgicalSpecialty      String?
+  surgeonAndAssistants   String?
+  surgeryStatus          String    @default("pendiente") // pendiente | en_quirofano | realizada | manejo_conservador | suspendida
+  suspensionReason       String?
+  affectedLimb           String?
+  managementType         String?
+  neurovascularStatus    String?
+  capillaryRefill        String?
+  distalPulses           String?
+  distalSensitivity      String?
+  distalMotility         String?
+  compartmentAlert       Boolean   @default(false)
+  painScaleEva           Int?
+  weightBearingPlan      String?
+  orthopedicNotes        String?
+  neurovascularUpdatedBy String?
+  neurovascularUpdatedAt DateTime? @db.Timestamptz
+  updatedBy              String
+  updatedAt              DateTime  @updatedAt
 
   episode Episode @relation(fields: [episodeId], references: [id])
 }

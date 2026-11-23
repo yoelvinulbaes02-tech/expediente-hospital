@@ -5,6 +5,7 @@ import { logAudit } from '@/lib/audit'
 import { exigirPermiso, volverAlExpediente } from '@/lib/permisos'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { marcarResultadoLab, parseResultadoLab } from '@/lib/texto-clinico'
 
 // ─── 1. ANTECEDENTES ───
 export async function guardarAntecedentes(formData: FormData): Promise<void> {
@@ -225,11 +226,14 @@ export async function guardarReporteLaboratorio(formData: FormData): Promise<voi
   const category = String(formData.get('category') ?? 'Laboratorio').trim()
   const fechaStr = String(formData.get('sampleDate') ?? '').trim()
   const result = String(formData.get('result') ?? '').trim()
+  const isImportant = formData.get('isImportant') === 'on'
 
   const nombreFinal = testName === 'OTRO' || testName === 'OTRO_CULTIVO' ? customTest : testName
 
   if (!nombreFinal) volverAlExpediente(episodeId, 'Selecciona o escribe el nombre de la analítica')
   if (!result) volverAlExpediente(episodeId, 'Escribe el resultado de la analítica')
+
+  const resultFinal = marcarResultadoLab(result, isImportant)
 
   const sampleDate = fechaStr ? new Date(`${fechaStr}T12:00:00-04:00`) : new Date()
   if (Number.isNaN(sampleDate.getTime())) {
@@ -242,7 +246,7 @@ export async function guardarReporteLaboratorio(formData: FormData): Promise<voi
       category,
       testName: nombreFinal,
       sampleDate,
-      result,
+      result: resultFinal,
       createdBy: email,
     },
   })
@@ -255,8 +259,10 @@ export async function guardarReporteLaboratorio(formData: FormData): Promise<voi
     entityId: reporte.id,
     patientId: episode.patientId,
     episodeId,
-    newValue: { analitica: nombreFinal, categoria: category, resultado: result },
-    reason: 'Reporte de laboratorio registrado',
+    newValue: { analitica: nombreFinal, categoria: category, resultado: resultFinal, importante: isImportant },
+    reason: isImportant
+      ? 'Reporte de laboratorio registrado (marcado como alterado/importante)'
+      : 'Reporte de laboratorio registrado',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
@@ -272,6 +278,7 @@ export async function editarReporteLaboratorio(formData: FormData): Promise<void
   const category = String(formData.get('category') ?? 'OTRAS ANALÍTICAS').trim()
   const fechaStr = String(formData.get('sampleDate') ?? '').trim()
   const result = String(formData.get('result') ?? '').trim()
+  const isImportant = formData.get('isImportant') === 'on'
 
   const nombreFinal = testName === 'OTRO' || testName === 'OTRO_CULTIVO' ? customTest : testName
   if (!reportId || !nombreFinal || !result) {
@@ -290,13 +297,15 @@ export async function editarReporteLaboratorio(formData: FormData): Promise<void
     volverAlExpediente(episodeId, 'La fecha de la muestra no es válida')
   }
 
+  const resultFinal = marcarResultadoLab(result, isImportant)
+
   await prisma.labReport.update({
     where: { id: reportId },
     data: {
       category,
       testName: nombreFinal,
       sampleDate,
-      result,
+      result: resultFinal,
       updatedBy: email,
       updatedAt: new Date(),
     },
@@ -319,11 +328,55 @@ export async function editarReporteLaboratorio(formData: FormData): Promise<void
     newValue: {
       analitica: nombreFinal,
       categoria: category,
-      resultado: result,
+      resultado: resultFinal,
+      importante: isImportant,
       fechaMuestra: sampleDate?.toISOString() ?? null,
       updatedBy: email,
     },
     reason: 'Reporte de laboratorio editado',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+}
+
+export async function toggleResalteReporteLaboratorio(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const reportId = String(formData.get('reportId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  if (!reportId) return
+
+  const previo = await prisma.labReport.findFirst({
+    where: { id: reportId, episodeId, isDeleted: false },
+  })
+  if (!previo) return
+
+  const { esImportante, texto } = parseResultadoLab(previo.result)
+  const nuevoEstado = !esImportante
+  const resultFinal = marcarResultadoLab(texto, nuevoEstado)
+
+  await prisma.labReport.update({
+    where: { id: reportId },
+    data: {
+      result: resultFinal,
+      updatedBy: email,
+      updatedAt: new Date(),
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'lab_report',
+    entityId: reportId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: { importante: esImportante, resultado: previo.result },
+    newValue: { importante: nuevoEstado, resultado: resultFinal, updatedBy: email },
+    reason: nuevoEstado
+      ? `Analítica resaltada como importante/alterada (${previo.testName})`
+      : `Resalte retirado de analítica (${previo.testName})`,
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
@@ -1382,6 +1435,194 @@ export async function guardarInfoQuirurgica(formData: FormData): Promise<void> {
       surgeryStatus === 'suspendida' && suspensionReason
         ? `Cirugía suspendida: ${suspensionReason}`
         : 'Actualización de información quirúrgica del paciente',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+// ─── 18B. INFORMACIÓN ORTOPÉDICA / TRAUMA Y EVALUACIÓN NEUROVASCULAR (ORTOPEDIA) ───
+export async function guardarInfoOrtopedica(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const procedureName = String(formData.get('procedureName') ?? '').trim() || null
+  const affectedLimb = String(formData.get('affectedLimb') ?? '').trim() || null
+  const managementType = String(formData.get('managementType') ?? '').trim() || null
+  const surgeryDateStr = String(formData.get('surgeryDate') ?? '').trim()
+  const surgeryTypeRaw = String(formData.get('surgeryType') ?? 'electiva').trim()
+  const surgeryType = ['electiva', 'emergencia', 'conservador'].includes(surgeryTypeRaw)
+    ? surgeryTypeRaw
+    : 'electiva'
+  const surgicalSpecialty = String(formData.get('surgicalSpecialty') ?? '').trim() || null
+  const surgeonAndAssistants = String(formData.get('surgeonAndAssistants') ?? '').trim() || null
+  const weightBearingPlan = String(formData.get('weightBearingPlan') ?? '').trim() || null
+  const statusRaw = String(formData.get('surgeryStatus') ?? 'pendiente').trim()
+  const surgeryStatus = [
+    'pendiente',
+    'en_quirofano',
+    'realizada',
+    'manejo_conservador',
+    'suspendida',
+  ].includes(statusRaw)
+    ? statusRaw
+    : 'pendiente'
+  const suspensionReasonRaw = String(formData.get('suspensionReason') ?? '').trim()
+  const suspensionReason = surgeryStatus === 'suspendida' ? suspensionReasonRaw || null : null
+
+  if (surgeryStatus === 'suspendida' && !suspensionReason) {
+    volverAlExpediente(episodeId, 'Indica el motivo por el cual se suspendió la intervención')
+  }
+
+  const surgeryDate = surgeryDateStr ? new Date(`${surgeryDateStr}:00-04:00`) : null
+  if (surgeryDate && Number.isNaN(surgeryDate.getTime())) {
+    volverAlExpediente(episodeId, 'La fecha del procedimiento no es válida')
+  }
+
+  await prisma.surgicalProfile.upsert({
+    where: { episodeId },
+    update: {
+      procedureName,
+      affectedLimb,
+      managementType,
+      surgeryDate,
+      surgeryType,
+      surgicalSpecialty,
+      surgeonAndAssistants,
+      weightBearingPlan,
+      surgeryStatus,
+      suspensionReason,
+      updatedBy: email,
+    },
+    create: {
+      episodeId,
+      procedureName,
+      affectedLimb,
+      managementType,
+      surgeryDate,
+      surgeryType,
+      surgicalSpecialty,
+      surgeonAndAssistants,
+      weightBearingPlan,
+      surgeryStatus,
+      suspensionReason,
+      updatedBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'surgical_profile',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: {
+      procedureName,
+      affectedLimb,
+      managementType,
+      surgeryDate: surgeryDate?.toISOString() ?? null,
+      surgeryType,
+      surgicalSpecialty,
+      surgeonAndAssistants,
+      weightBearingPlan,
+      surgeryStatus,
+      suspensionReason,
+    },
+    reason:
+      surgeryStatus === 'suspendida' && suspensionReason
+        ? `Intervención ortopédica suspendida: ${suspensionReason}`
+        : 'Actualización de plan y procedimiento de Ortopedia y Traumatología',
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+export async function guardarEvaluacionNeurovascularOrtopedia(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  const nvRaw = String(formData.get('neurovascularStatus') ?? 'conservado').trim()
+  const neurovascularStatus = nvRaw === 'alerta_alterado' ? 'alerta_alterado' : 'conservado'
+  const capillaryRefill = String(formData.get('capillaryRefill') ?? '').trim() || null
+  const distalPulses = String(formData.get('distalPulses') ?? '').trim() || null
+  const distalSensitivity = String(formData.get('distalSensitivity') ?? '').trim() || null
+  const distalMotility = String(formData.get('distalMotility') ?? '').trim() || null
+  const compRaw = formData.get('compartmentAlert')
+  const compartmentAlert = compRaw === 'true' || compRaw === 'on'
+  const evaStr = String(formData.get('painScaleEva') ?? '').trim()
+  const weightBearingPlan = String(formData.get('weightBearingPlan') ?? '').trim() || null
+  const orthopedicNotes = String(formData.get('orthopedicNotes') ?? '').trim() || null
+
+  let painScaleEva: number | null = null
+  if (evaStr !== '') {
+    const parsed = Number(evaStr)
+    if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0 || parsed > 10) {
+      volverAlExpediente(episodeId, 'La escala de dolor EVA debe ser un número entero entre 0 y 10')
+    }
+    painScaleEva = parsed
+  }
+
+  const now = new Date()
+
+  await prisma.surgicalProfile.upsert({
+    where: { episodeId },
+    update: {
+      neurovascularStatus,
+      capillaryRefill,
+      distalPulses,
+      distalSensitivity,
+      distalMotility,
+      compartmentAlert,
+      painScaleEva,
+      weightBearingPlan,
+      orthopedicNotes,
+      neurovascularUpdatedBy: email,
+      neurovascularUpdatedAt: now,
+      updatedBy: email,
+    },
+    create: {
+      episodeId,
+      neurovascularStatus,
+      capillaryRefill,
+      distalPulses,
+      distalSensitivity,
+      distalMotility,
+      compartmentAlert,
+      painScaleEva,
+      weightBearingPlan,
+      orthopedicNotes,
+      neurovascularUpdatedBy: email,
+      neurovascularUpdatedAt: now,
+      updatedBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'surgical_profile',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    newValue: {
+      neurovascularStatus,
+      capillaryRefill,
+      distalPulses,
+      distalSensitivity,
+      distalMotility,
+      compartmentAlert,
+      painScaleEva,
+      weightBearingPlan,
+      orthopedicNotes,
+    },
+    reason:
+      compartmentAlert || neurovascularStatus === 'alerta_alterado'
+        ? 'Alerta neurovascular / compartimental registrada en Ortopedia'
+        : 'Evaluación neurovascular distal, dolor (EVA) y pauta de carga actualizada',
   })
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)

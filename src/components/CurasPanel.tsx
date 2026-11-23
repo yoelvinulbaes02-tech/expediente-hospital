@@ -45,10 +45,13 @@ const fmtFechaHora = (iso: string) =>
 export function CurasPanel({
   curas,
   puedeRegistrar,
+  interfaceMode = 'CIRUGIA',
 }: {
   curas: CuraPacienteItem[]
   puedeRegistrar: boolean
+  interfaceMode?: 'CIRUGIA' | 'ORTOPEDIA'
 }) {
+  const esOrtopedia = interfaceMode === 'ORTOPEDIA'
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [busqueda, setBusqueda] = useState('')
@@ -147,10 +150,14 @@ export function CurasPanel({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-            Curas Quirúrgicas ({curas.length})
+            {esOrtopedia
+              ? `Curas Ortopédicas, Heridas y Pines (${curas.length})`
+              : `Curas Quirúrgicas (${curas.length})`}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Listado de pacientes en seguimiento de curas con checklist de curas realizadas (fecha, hora y responsable).
+            {esOrtopedia
+              ? 'Seguimiento de curas de heridas quirúrgicas, fracturas expuestas y sitios de pines de fijadores externos (fecha, hora y responsable).'
+              : 'Listado de pacientes en seguimiento de curas con checklist de curas realizadas (fecha, hora y responsable).'}
           </p>
         </div>
 
@@ -267,7 +274,11 @@ export function CurasPanel({
             <input
               name="diagnosis"
               required
-              placeholder="Ej. Pie diabético infectado / Dehiscencia de herida abdominal"
+              placeholder={
+                esOrtopedia
+                  ? 'Ej. Fractura expuesta tibia Gustilo II / Sitio de pines fijador externo'
+                  : 'Ej. Pie diabético infectado / Dehiscencia de herida abdominal'
+              }
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
             />
           </div>
@@ -292,7 +303,11 @@ export function CurasPanel({
             <input
               name="baseDepartment"
               required
-              placeholder="Ej. Cirugía General, Medicina Interna, Ortopedia..."
+              placeholder={
+                esOrtopedia
+                  ? 'Ej. Ortopedia y Traumatología, Emergencia Trauma...'
+                  : 'Ej. Cirugía General, Medicina Interna, Ortopedia...'
+              }
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
             />
           </div>
@@ -416,7 +431,11 @@ export function CurasPanel({
                     onChange={(e) =>
                       setNotasPorCura((prev) => ({ ...prev, [cura.id]: e.target.value }))
                     }
-                    placeholder="Observación de la cura (opcional, ej. herida limpia)"
+                    placeholder={
+                      esOrtopedia
+                        ? 'Observación (ej. pines limpios sin eritema ni secreción)'
+                        : 'Observación de la cura (opcional, ej. herida limpia)'
+                    }
                     className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
                   />
                   <button

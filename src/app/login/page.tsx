@@ -1,19 +1,38 @@
-import { auth, signIn } from '@/auth'
+import { obtenerSesionSegura, signIn } from '@/auth'
+import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { AuthError } from 'next-auth'
 import Image from 'next/image'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { InputPassword } from '@/components/InputPassword'
+import { LegalFooter } from '@/components/LegalFooter'
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ error?: string; reset?: string }>
 }) {
-  const session = await auth()
-  if (session) redirect('/dashboard')
+  const session = await obtenerSesionSegura()
+  if (session?.user?.id) {
+    let usuarioActivo = false
+    try {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { isActive: true },
+      })
+      usuarioActivo = Boolean(dbUser?.isActive)
+    } catch (err) {
+      console.error('[login] Error verificando usuario activo:', err)
+    }
 
-  const { error } = await searchParams
+    if (usuarioActivo) {
+      redirect('/dashboard')
+    } else {
+      redirect('/api/auth/limpiar-sesion')
+    }
+  }
+
+  const { error, reset } = await searchParams
 
   async function loginAction(formData: FormData) {
     'use server'
@@ -72,6 +91,12 @@ export default async function LoginPage({
           </p>
         </div>
 
+        {reset === '1' && !error && (
+          <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 px-4 py-2.5 rounded-lg text-xs font-medium text-center">
+            Tu sesión anterior caducó o fue reiniciada. Inicia sesión nuevamente.
+          </div>
+        )}
+
         {error && (
           <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-2.5 rounded-lg text-xs font-semibold text-center">
             ⚠️ {error}
@@ -113,8 +138,11 @@ export default async function LoginPage({
         </form>
 
         <p className="text-center text-[11px] text-slate-400 dark:text-slate-500">
-          Acceso exclusivo para personal médico y de enfermería autorizado.
+          Acceso exclusivo para personal médico y de enfermería autorizado. Utilizamos únicamente cookies
+          técnicas esenciales de sesión.
         </p>
+
+        <LegalFooter compact />
       </div>
     </div>
   )

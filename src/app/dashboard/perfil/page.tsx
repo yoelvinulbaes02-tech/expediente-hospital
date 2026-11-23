@@ -2,9 +2,11 @@ import {
   obtenerContextoResidencia,
   obtenerTarifaIndividualUsuario,
 } from '@/lib/tenant'
+import { obtenerUltimaAceptacionLegal } from '@/lib/legal'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { FormularioCambiarPassword } from '@/components/FormularioCambiarPassword'
+import { LegalFooter } from '@/components/LegalFooter'
 
 const fmtFecha = (d: Date) =>
   d.toLocaleDateString('es-DO', {
@@ -12,6 +14,16 @@ const fmtFecha = (d: Date) =>
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+  })
+
+const fmtFechaHora = (iso: string) =>
+  new Date(iso).toLocaleString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   })
 
 export default async function PerfilPage({
@@ -22,8 +34,12 @@ export default async function PerfilPage({
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
 
-  const { force } = await searchParams
-  const cambioObligatorio = force === 'true' || ctx.user.mustChangePassword
+  const [{ force }, aceptacionLegal] = await Promise.all([
+    searchParams,
+    obtenerUltimaAceptacionLegal(ctx.user.id),
+  ])
+  const cambioObligatorio = ctx.user.mustChangePassword
+  const recienActualizada = force === 'true' && !ctx.user.mustChangePassword
 
   const esIndividual = ctx.residency?.billingMode === 'INDIVIDUAL'
   const tarifaPersonal = ctx.residency
@@ -35,13 +51,35 @@ export default async function PerfilPage({
       <div className="max-w-md mx-auto space-y-5">
         <div>
           {!cambioObligatorio && (
-            <Link href="/dashboard" className="text-sm text-blue-600 hover:underline mb-2 inline-block">
-              ← Volver al Dashboard
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline mb-2"
+            >
+              ← Volver a la Página Principal
             </Link>
           )}
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Mi Perfil</h1>
           <p className="text-sm text-slate-500">Configuración de cuenta y suscripción</p>
         </div>
+
+        {recienActualizada && (
+          <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-300 dark:border-emerald-700 rounded-xl flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold text-emerald-900 dark:text-emerald-200">
+                Contraseña actualizada
+              </p>
+              <p className="text-xs text-emerald-800 dark:text-emerald-300 mt-0.5">
+                Ya puedes ingresar a la página principal de tu servicio.
+              </p>
+            </div>
+            <Link
+              href="/dashboard"
+              className="shrink-0 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors"
+            >
+              Ir al Inicio →
+            </Link>
+          </div>
+        )}
 
         {cambioObligatorio && (
           <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-xl">
@@ -49,7 +87,7 @@ export default async function PerfilPage({
               Cambio de contraseña obligatorio
             </p>
             <p className="text-xs text-amber-800 dark:text-amber-300 mt-1">
-              Tu cuenta utiliza una contraseña temporal o recién asignada. Debes establecer una nueva contraseña personal antes de acceder a los expedientes clínicos.
+              Tu cuenta utiliza una contraseña temporal o recién asignada. Debes establecer una nueva contraseña personal y confirmar las condiciones legales antes de acceder a los expedientes clínicos.
             </p>
           </div>
         )}
@@ -123,11 +161,17 @@ export default async function PerfilPage({
             <p className="text-sm font-medium text-slate-500">Usuario</p>
             <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{ctx.user.fullName}</p>
             <p className="text-sm text-slate-500">{ctx.user.email}</p>
+            {aceptacionLegal.aceptada && aceptacionLegal.fechaIso && (
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 mt-1.5 tabular-nums">
+                Términos y Privacidad (v{aceptacionLegal.version ?? '2026-11'}) aceptados el{' '}
+                {fmtFechaHora(aceptacionLegal.fechaIso)}
+              </p>
+            )}
           </div>
 
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Cambiar Contraseña</h2>
 
-          <FormularioCambiarPassword />
+          <FormularioCambiarPassword requiereAceptacionLegal={!aceptacionLegal.aceptada} />
 
           {/* AVISO DE CONTRASEÑA OLVIDADA */}
           <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -136,6 +180,8 @@ export default async function PerfilPage({
             </p>
           </div>
         </div>
+
+        <LegalFooter compact />
       </div>
     </div>
   )

@@ -547,6 +547,7 @@ export function GraficasSignos({
               <option value="fc">❤️ Frecuencia Cardíaca (FC)</option>
               <option value="temp">🌡️ Temperatura Corporal</option>
               <option value="spo2">💨 Saturación de Oxígeno (SpO2)</option>
+              <option value="glicemia">🩸 Glicemia / Glucosa (mg/dL)</option>
               {!hideWeight && <option value="peso">⚖️ Peso Corporal (kg)</option>}
               <option value="diuresis">💧 Diuresis (mL)</option>
               {showDrainage && <option value="drenaje">🩹 Drenaje (mL)</option>}
@@ -627,6 +628,19 @@ export function GraficasSignos({
                   lineaAlerta={{ valor: 95, etiqueta: 'Límite normal (95%)' }}
                   series={[
                     { campo: 'oxygenSat', etiqueta: 'SpO2', color: '#0284c7', alerta: (v) => v < 95 },
+                  ]}
+                />
+              )}
+
+              {graficaSeleccionada === 'glicemia' && (
+                <GraficaClinica
+                  titulo="Glicemia / Glucosa"
+                  unidad="mg/dL"
+                  filas={ordenCronologico}
+                  expandida
+                  lineaAlerta={{ valor: 140, etiqueta: 'Hiperglicemia (>140)' }}
+                  series={[
+                    { campo: 'glucose', etiqueta: 'Glicemia', color: '#ca8a04', alerta: (v) => v > 140 || v < 70 },
                   ]}
                 />
               )}
@@ -717,6 +731,16 @@ export function GraficasSignos({
                 lineaAlerta={{ valor: 95, etiqueta: 'Límite normal (95%)' }}
                 series={[
                   { campo: 'oxygenSat', etiqueta: 'SpO2', color: '#0284c7', alerta: (v) => v < 95 },
+                ]}
+              />
+
+              <GraficaClinica
+                titulo="Glicemia / Glucosa"
+                unidad="mg/dL"
+                filas={ordenCronologico}
+                lineaAlerta={{ valor: 140, etiqueta: 'Hiperglicemia (>140)' }}
+                series={[
+                  { campo: 'glucose', etiqueta: 'Glicemia', color: '#ca8a04', alerta: (v) => v > 140 || v < 70 },
                 ]}
               />
 

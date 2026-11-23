@@ -1,7 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { obtenerSesionSegura } from '@/auth'
 import { logAudit } from '@/lib/audit'
 import { calcularPermisos, ROLES_CLINICOS, ROLES_MEDICOS } from '@/lib/permisos'
 import { obtenerContextoResidencia, verificarEscrituraResidencia } from '@/lib/tenant'
@@ -114,7 +114,7 @@ export async function entregarLote(formData: FormData): Promise<ResultadoLote> {
 export async function completarTareaDesdeDashboard(
   taskId: string
 ): Promise<{ ok: boolean; error?: string }> {
-  const session = await auth()
+  const session = await obtenerSesionSegura()
   const user = session?.user
   if (!user?.id) {
     return { ok: false, error: 'Tu sesión venció. Vuelve a iniciar sesión.' }

@@ -317,6 +317,19 @@ exports.Prisma.SurgicalProfileScalarFieldEnum = {
   surgeonAndAssistants: 'surgeonAndAssistants',
   surgeryStatus: 'surgeryStatus',
   suspensionReason: 'suspensionReason',
+  affectedLimb: 'affectedLimb',
+  managementType: 'managementType',
+  neurovascularStatus: 'neurovascularStatus',
+  capillaryRefill: 'capillaryRefill',
+  distalPulses: 'distalPulses',
+  distalSensitivity: 'distalSensitivity',
+  distalMotility: 'distalMotility',
+  compartmentAlert: 'compartmentAlert',
+  painScaleEva: 'painScaleEva',
+  weightBearingPlan: 'weightBearingPlan',
+  orthopedicNotes: 'orthopedicNotes',
+  neurovascularUpdatedBy: 'neurovascularUpdatedBy',
+  neurovascularUpdatedAt: 'neurovascularUpdatedAt',
   updatedBy: 'updatedBy',
   updatedAt: 'updatedAt'
 };
@@ -628,7 +641,8 @@ exports.InterfaceMode = exports.$Enums.InterfaceMode = {
   HOSPITALIZACION: 'HOSPITALIZACION',
   CONSULTAS: 'CONSULTAS',
   MEDICINA_INTERNA: 'MEDICINA_INTERNA',
-  CIRUGIA: 'CIRUGIA'
+  CIRUGIA: 'CIRUGIA',
+  ORTOPEDIA: 'ORTOPEDIA'
 };
 
 exports.BillingMode = exports.$Enums.BillingMode = {

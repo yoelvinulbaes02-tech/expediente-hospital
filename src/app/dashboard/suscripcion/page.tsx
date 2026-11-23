@@ -7,6 +7,7 @@ import { estaPayPalConfigurado, obtenerPayPalClientId } from '@/lib/paypal'
 import { PagoHibridoSuscripcion } from '@/components/PagoHibridoSuscripcion'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { LegalFooter } from '@/components/LegalFooter'
 
 const ETIQUETA_PLAN: Record<string, { texto: string; clase: string }> = {
   ACTIVE: { texto: 'Activa', clase: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
@@ -15,13 +16,17 @@ const ETIQUETA_PLAN: Record<string, { texto: string; clase: string }> = {
   SUSPENDED: { texto: 'Suspendida (Solo lectura)', clase: 'bg-red-100 text-red-800 border-red-200' },
 }
 
-const fmtFecha = (d: Date) =>
-  d.toLocaleDateString('es-DO', {
+const fmtFecha = (d: Date | string | null | undefined) => {
+  if (!d) return '—'
+  const fecha = d instanceof Date ? d : new Date(d)
+  if (Number.isNaN(fecha.getTime())) return '—'
+  return fecha.toLocaleDateString('es-DO', {
     timeZone: 'America/Santo_Domingo',
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   })
+}
 
 export default async function SuscripcionPage({
   searchParams,
@@ -112,7 +117,9 @@ export default async function SuscripcionPage({
                   ? 'Medicina Interna'
                   : interfaceModeStr === 'CIRUGIA'
                     ? 'Cirugía'
-                    : 'Hospitalización / Nefrología'}
+                    : interfaceModeStr === 'ORTOPEDIA'
+                      ? 'Ortopedia y Traumatología'
+                      : 'Hospitalización / Nefrología'}
             </p>
           </div>
 
@@ -235,7 +242,7 @@ export default async function SuscripcionPage({
                       {p.periodMonths} mes(es)
                     </td>
                     <td className="px-4 py-3 text-xs font-bold text-slate-900 dark:text-white tabular-nums">
-                      ${p.amountUsd.toFixed(2)} USD
+                      ${Number(p.amountUsd ?? 0).toFixed(2)} USD
                     </td>
                     <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 capitalize">
                       {p.method}
@@ -271,6 +278,8 @@ export default async function SuscripcionPage({
             </table>
           </div>
         )}
+
+        <LegalFooter compact />
       </div>
     </div>
   )

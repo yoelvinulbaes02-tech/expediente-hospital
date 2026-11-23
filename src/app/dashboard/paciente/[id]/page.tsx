@@ -23,6 +23,7 @@ import { NotasImportantes } from '@/components/NotasImportantes'
 import { BloqueNefrologico } from '@/components/BloqueNefrologico'
 import { BloqueMedicinaInterna } from '@/components/BloqueMedicinaInterna'
 import { BloqueCirugia } from '@/components/BloqueCirugia'
+import { BloqueOrtopedia } from '@/components/BloqueOrtopedia'
 import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
 import { ReportesLaboratorio } from '@/components/ReportesLaboratorio'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
@@ -177,7 +178,9 @@ export default async function ExpedientePage({
   const esInterconsulta = episode.serviceType === 'interconsulta'
   const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
   const esModoCirugia = ctx.interfaceMode === 'CIRUGIA'
-  const ocultarPesoSignos = esModoMedicinaInterna || esModoCirugia
+  const esModoOrtopedia = ctx.interfaceMode === 'ORTOPEDIA'
+  const esModoQuirurgicoBase = esModoCirugia || esModoOrtopedia
+  const ocultarPesoSignos = esModoMedicinaInterna || esModoQuirurgicoBase
 
   const [
     internalMedicineProfile,
@@ -192,12 +195,12 @@ export default async function ExpedientePage({
           .findUnique({ where: { episodeId: episode.id } })
           .catch(() => null)
       : Promise.resolve(null),
-    esModoCirugia
+    esModoQuirurgicoBase
       ? prisma.surgicalProfile
           .findUnique({ where: { episodeId: episode.id } })
           .catch(() => null)
       : Promise.resolve(null),
-    esModoCirugia
+    esModoQuirurgicoBase
       ? prisma.episodeAntibiotic
           .findMany({
             where: { episodeId: episode.id },
@@ -205,7 +208,7 @@ export default async function ExpedientePage({
           })
           .catch(() => [])
       : Promise.resolve([]),
-    esModoCirugia
+    esModoQuirurgicoBase
       ? prisma.surgicalDevice
           .findMany({
             where: { episodeId: episode.id, isActive: true },
@@ -213,7 +216,7 @@ export default async function ExpedientePage({
           })
           .catch(() => [])
       : Promise.resolve([]),
-    esInterconsulta || esModoCirugia
+    esInterconsulta || esModoQuirurgicoBase
       ? prisma.baseDepartmentPlanEntry
           .findMany({
             where: { episodeId: episode.id },
@@ -221,7 +224,7 @@ export default async function ExpedientePage({
           })
           .catch(() => [])
       : Promise.resolve([]),
-    esModoCirugia
+    esModoQuirurgicoBase
       ? prisma.episodeDrain
           .findMany({
             where: { episodeId: episode.id },
@@ -243,7 +246,7 @@ export default async function ExpedientePage({
   }))
 
   if (
-    (esInterconsulta || esModoCirugia) &&
+    (esInterconsulta || esModoQuirurgicoBase) &&
     basePlanEntries.length === 0 &&
     episode.baseDepartmentPlan?.trim()
   ) {
@@ -270,7 +273,7 @@ export default async function ExpedientePage({
     ]
   }
 
-  const soloDiuresisInterconsulta = esInterconsulta && !esModoMedicinaInterna && !esModoCirugia
+  const soloDiuresisInterconsulta = esInterconsulta && !esModoMedicinaInterna && !esModoQuirurgicoBase
   const volverHref =
     vista === 'interconsulta' || (!vista && esInterconsulta)
       ? '/dashboard?vista=interconsulta#lista-pacientes'
@@ -329,6 +332,9 @@ export default async function ExpedientePage({
   }
   if (surgicalProfile?.updatedBy) {
     emails.add(surgicalProfile.updatedBy)
+  }
+  if (surgicalProfile?.neurovascularUpdatedBy) {
+    emails.add(surgicalProfile.neurovascularUpdatedBy)
   }
   antibiotics.forEach((a) => {
     emails.add(a.createdBy)
@@ -870,7 +876,7 @@ export default async function ExpedientePage({
         </div>
 
         {/* TRATAMIENTO MÉDICO ACTUAL, ANTIBIÓTICOS Y PLAN DEL DEPARTAMENTO BASE */}
-        {esModoCirugia ? (
+        {esModoQuirurgicoBase ? (
           <CirugiaTratamientoPlanBloque
             episodeId={episode.id}
             tratamiento={episode.currentTreatment}
@@ -880,12 +886,15 @@ export default async function ExpedientePage({
             departamentoLabel={
               esInterconsulta
                 ? episode.consultingDepartment || 'Servicio tratante'
-                : surgicalProfile?.surgicalSpecialty || 'Cirugía'
+                : esModoOrtopedia
+                  ? surgicalProfile?.surgicalSpecialty || 'Ortopedia y Traumatología'
+                  : surgicalProfile?.surgicalSpecialty || 'Cirugía'
             }
             entradasPlan={basePlanEntries}
             nombres={nombres}
             roles={roles}
             puedeRegistrar={permisos.puedeRegistrar}
+            modoOrtopedia={esModoOrtopedia}
           />
         ) : (
           <>
@@ -948,6 +957,28 @@ export default async function ExpedientePage({
               roles={roles}
               puedeRegistrar={permisos.puedeRegistrar}
             />
+          ) : esModoOrtopedia ? (
+            <BloqueOrtopedia
+              episodeId={episode.id}
+              perfilOrtopedico={surgicalProfile}
+              dispositivos={surgicalDevices}
+              tipificacion={{
+                bloodType: episode.patient.bloodType,
+                recordedBy: episode.patient.bloodTypeRecordedBy,
+                updatedAt: episode.patient.bloodTypeUpdatedAt,
+              }}
+              alergias={episode.allergies}
+              antropometria={{
+                weight: episode.anthropometryWeight,
+                weightUnit: episode.anthropometryWeightUnit,
+                heightCm: episode.anthropometryHeightCm,
+                updatedBy: episode.anthropometryUpdatedBy,
+                updatedAt: episode.anthropometryUpdatedAt,
+              }}
+              nombres={nombres}
+              roles={roles}
+              puedeRegistrar={permisos.puedeRegistrar}
+            />
           ) : esModoCirugia ? (
             <BloqueCirugia
               episodeId={episode.id}
@@ -989,14 +1020,14 @@ export default async function ExpedientePage({
           )}
         </div>
 
-        {!esModoCirugia && (
+        {!esModoQuirurgicoBase && (
           <div className="print:hidden">
             <BannerAlergias alergias={episode.allergies} />
           </div>
         )}
 
-        {/* CONTROL INDEPENDIENTE DE DRENAJES (CIRUGÍA) — PRIMERO QUE SIGNOS VITALES */}
-        {esModoCirugia && (
+        {/* CONTROL INDEPENDIENTE DE DRENAJES (CIRUGÍA / ORTOPEDIA) — PRIMERO QUE SIGNOS VITALES */}
+        {esModoQuirurgicoBase && (
           <div className="mt-6">
             <ControlDrenajes
               episodeId={episode.id}
@@ -1005,6 +1036,7 @@ export default async function ExpedientePage({
               roles={roles}
               puedeRegistrar={permisos.puedeRegistrar}
               ahoraIso={ahoraIso}
+              modoOrtopedia={esModoOrtopedia}
             />
           </div>
         )}
@@ -1182,8 +1214,8 @@ export default async function ExpedientePage({
               )
             )}
 
-            {/* Alergias (en Cirugía ya está integrada en los 4 cuadritos lineales superiores) */}
-            {permisos.puedeRegistrar && !esModoCirugia && (
+            {/* Alergias (en Cirugía y Ortopedia ya está integrada en los 4 cuadritos lineales superiores) */}
+            {permisos.puedeRegistrar && !esModoQuirurgicoBase && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
                 <h2 className="text-lg font-bold text-slate-800 border-b pb-2">Gestión de Alergias</h2>
                 
@@ -1275,6 +1307,7 @@ export default async function ExpedientePage({
                     {!soloDiuresisInterconsulta && <th className="px-3 py-2">FC</th>}
                     {!soloDiuresisInterconsulta && <th className="px-3 py-2">Temp</th>}
                     {!soloDiuresisInterconsulta && <th className="px-3 py-2">SpO2</th>}
+                    {!soloDiuresisInterconsulta && <th className="px-3 py-2">Glucosa</th>}
                     {!ocultarPesoSignos && <th className="px-3 py-2">Peso</th>}
                     <th className="px-3 py-2 font-bold text-sky-800">Diuresis</th>
                     <th className="px-3 py-2">Registró</th>
@@ -1294,6 +1327,17 @@ export default async function ExpedientePage({
                       {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.heartRate ?? '—'}</td>}
                       {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.temperature ?? '—'}</td>}
                       {!soloDiuresisInterconsulta && <td className="px-3 py-2 text-slate-800">{v.oxygenSat ?? '—'}</td>}
+                      {!soloDiuresisInterconsulta && (
+                        <td
+                          className={`px-3 py-2 font-medium tabular-nums ${
+                            v.glucose !== null && v.glucose !== undefined && (v.glucose > 140 || v.glucose < 70)
+                              ? 'text-amber-800 bg-amber-50 font-bold'
+                              : 'text-slate-800'
+                          }`}
+                        >
+                          {v.glucose !== null && v.glucose !== undefined ? `${v.glucose}` : '—'}
+                        </td>
+                      )}
                       {!ocultarPesoSignos && (
                         <td className="px-3 py-2 font-bold text-emerald-700">
                           {v.weight ? `${v.weight} ${v.weightUnit ?? 'kg'}` : '—'}
@@ -1342,6 +1386,12 @@ export default async function ExpedientePage({
                                     <label className="block text-[10px] text-slate-500">Temp:</label>
                                     <input name="temperature" defaultValue={v.temperature ?? ''} type="number" step="0.1" className="w-full px-1.5 py-1 border rounded text-xs" />
                                   </div>
+                                  {!soloDiuresisInterconsulta && (
+                                    <div>
+                                      <label className="block text-[10px] text-slate-500">Glucosa:</label>
+                                      <input name="glucose" defaultValue={v.glucose ?? ''} type="number" className="w-full px-1.5 py-1 border rounded text-xs" />
+                                    </div>
+                                  )}
                                   {!ocultarPesoSignos && (
                                     <>
                                       <div>
@@ -1379,7 +1429,7 @@ export default async function ExpedientePage({
                         colSpan={
                           soloDiuresisInterconsulta
                             ? 5
-                            : 9 - (ocultarPesoSignos ? 1 : 0)
+                            : 10 - (ocultarPesoSignos ? 1 : 0)
                         }
                         className="text-center py-4 text-slate-400"
                       >

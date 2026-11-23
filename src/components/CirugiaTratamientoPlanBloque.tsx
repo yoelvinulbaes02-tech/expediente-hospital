@@ -23,6 +23,8 @@ import {
 import { calcularDiasAntibiotico } from '@/lib/cirugia-constants'
 import type { AntibioticoResumen } from '@/components/TratamientoActual'
 import type { PlanBaseEntryItem } from '@/components/PlanDepartamentoBase'
+import { TextareaTratamiento } from '@/components/TextareaTratamiento'
+import { renderTextoClinico } from '@/lib/texto-clinico'
 
 const ETIQUETA_ROL: Record<string, string> = {
   SUPERADMIN: 'SuperAdmin',
@@ -65,6 +67,7 @@ export function CirugiaTratamientoPlanBloque({
   nombres,
   roles,
   puedeRegistrar,
+  modoOrtopedia = false,
 }: {
   episodeId: string
   tratamiento: string | null
@@ -76,6 +79,7 @@ export function CirugiaTratamientoPlanBloque({
   nombres: Record<string, string>
   roles: Record<string, string>
   puedeRegistrar: boolean
+  modoOrtopedia?: boolean
 }) {
   const [editandoTratamiento, setEditandoTratamiento] = useState(false)
   const [agregandoAbx, setAgregandoAbx] = useState(false)
@@ -134,7 +138,7 @@ export function CirugiaTratamientoPlanBloque({
               <div>
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md p-2.5 max-h-40 overflow-y-auto">
                   <p className="font-mono text-xs text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">
-                    {tratamiento}
+                    {renderTextoClinico(tratamiento)}
                   </p>
                 </div>
                 {actualizadoPor && (
@@ -177,11 +181,15 @@ export function CirugiaTratamientoPlanBloque({
                   className="space-y-2 mt-2"
                 >
                   <input type="hidden" name="episodeId" value={episodeId} />
-                  <textarea
+                  <TextareaTratamiento
                     name="currentTreatment"
                     rows={4}
                     defaultValue={tratamiento ?? ''}
-                    placeholder={'1. Omeprazol 40mg IV c/24h\n2. Analgesia / hidratación...'}
+                    placeholder={
+                      modoOrtopedia
+                        ? '1. Analgesia escalonada / Paracetamol 1g IV c/8h\n2. Enoxaparina 40mg SC c/24h (tromboprofilaxis)\n3. Elevación de extremidad + crioterapia local'
+                        : '1. Omeprazol 40mg IV c/24h\n2. Analgesia / hidratación...'
+                    }
                     className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono"
                   />
                   <button
@@ -541,7 +549,11 @@ export function CirugiaTratamientoPlanBloque({
                     name="content"
                     required
                     rows={3}
-                    placeholder="Ej. NPO, hidratación parenteral, control c/8h..."
+                    placeholder={
+                      modoOrtopedia
+                        ? 'Ej. Control radiográfico postoperatorio, mantener férula en posición funcional, fisioterapia...'
+                        : 'Ej. NPO, hidratación parenteral, control c/8h...'
+                    }
                     className="w-full px-2.5 py-1.5 border border-purple-300 rounded text-xs bg-white text-slate-900"
                   />
                   <button

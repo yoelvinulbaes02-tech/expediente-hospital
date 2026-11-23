@@ -707,7 +707,7 @@ export default async function PlataformaPage({
               <input
                 name="specialty"
                 required
-                placeholder="Ej. Consulta Externa, Nefrología, Cirugía..."
+                placeholder="Ej. Consulta Externa, Nefrología, Ortopedia..."
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
               />
             </div>
@@ -725,6 +725,7 @@ export default async function PlataformaPage({
                 <option value="HOSPITALIZACION">Interfaz de Hospitalización / Nefrología</option>
                 <option value="MEDICINA_INTERNA">Interfaz de Medicina Interna (Hospitalización)</option>
                 <option value="CIRUGIA">Interfaz de Cirugía (Quirúrgico y Curas)</option>
+                <option value="ORTOPEDIA">Interfaz de Ortopedia y Traumatología</option>
               </select>
             </div>
 
@@ -950,6 +951,7 @@ export default async function PlataformaPage({
                           <option value="HOSPITALIZACION">Hospitalización / Nefrología</option>
                           <option value="MEDICINA_INTERNA">Medicina Interna</option>
                           <option value="CIRUGIA">Cirugía</option>
+                          <option value="ORTOPEDIA">Ortopedia y Traumatología</option>
                           <option value="CONSULTAS">Consultas Externas</option>
                         </select>
                         <select

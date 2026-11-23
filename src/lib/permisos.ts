@@ -1,4 +1,4 @@
-import { auth } from '@/auth'
+import { obtenerSesionSegura } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { verificarEscrituraResidencia } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
@@ -62,7 +62,7 @@ export async function exigirPermiso(
   episodeId: string,
   accion: 'registrar' | 'editar' | 'tareas' | 'alta' | 'tomar' | string
 ) {
-  const session = await auth()
+  const session = await obtenerSesionSegura()
   if (!session?.user?.id) redirect('/login')
 
   const userId = session.user.id

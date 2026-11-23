@@ -32,6 +32,7 @@ function parseInterfaceMode(raw: string): InterfaceMode {
   if (raw === 'HOSPITALIZACION') return 'HOSPITALIZACION'
   if (raw === 'MEDICINA_INTERNA') return 'MEDICINA_INTERNA'
   if (raw === 'CIRUGIA') return 'CIRUGIA'
+  if (raw === 'ORTOPEDIA') return 'ORTOPEDIA'
   return 'CONSULTAS'
 }
 
@@ -220,7 +221,7 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
     console.error('Error al actualizar residencia:', err)
     redirect(
       `${targetErrorUrl}?error=${encodeURIComponent(
-        'No se pudo guardar la configuración. Si elegiste Cirugía o Medicina Interna, verifica haber ejecutado el SQL de migración en Neon (ALTER TYPE "InterfaceMode" ADD VALUE \'CIRUGIA\').'
+        'No se pudo guardar la configuración. Si elegiste Ortopedia, Cirugía o Medicina Interna, verifica haber ejecutado el SQL de migración en Neon (ALTER TYPE "InterfaceMode" ADD VALUE \'ORTOPEDIA\').'
       )}`
     )
   }

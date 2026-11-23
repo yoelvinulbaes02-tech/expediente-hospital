@@ -10,6 +10,7 @@ import { CirugiaResumenPanel, type ResumenCirugiaStats } from '@/components/Ciru
 import { CurasPanel, type CuraPacienteItem } from '@/components/CurasPanel'
 import { HemodialisisPanel, type HemodialisisItemData } from '@/components/HemodialisisPanel'
 import { ESTADOS_CIRUGIA, type TeamServicioData } from '@/lib/cirugia-constants'
+import { ESTADOS_ORTOPEDIA } from '@/lib/ortopedia-constants'
 
 type TareaPendienteResumen = {
   id: string
@@ -49,6 +50,10 @@ type Episodio = {
     surgeryType: string
     surgicalSpecialty: string | null
     surgeryStatus: string
+    affectedLimb?: string | null
+    neurovascularStatus?: string | null
+    compartmentAlert?: boolean
+    weightBearingPlan?: string | null
   } | null
   _count: { tasks: number }
   handoffs: { recibidoPor: string }[]
@@ -139,7 +144,7 @@ export function ListaPacientes({
   vistaInicial?: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis'
   puedeMarcarTareas?: boolean
   puedeEditarServicio?: boolean
-  interfaceMode?: 'HOSPITALIZACION' | 'MEDICINA_INTERNA' | 'CIRUGIA'
+  interfaceMode?: 'HOSPITALIZACION' | 'MEDICINA_INTERNA' | 'CIRUGIA' | 'ORTOPEDIA'
   teamData?: TeamServicioData
   sugerenciaAutoTeam?: { ma: string; r4: string; r3: string; r2: string; r1: string }
   resumenCirugiaAuto?: Omit<ResumenCirugiaStats, 'mode'>
@@ -151,10 +156,12 @@ export function ListaPacientes({
 }) {
   const esMedicinaInterna = interfaceMode === 'MEDICINA_INTERNA'
   const esCirugia = interfaceMode === 'CIRUGIA'
+  const esOrtopedia = interfaceMode === 'ORTOPEDIA'
+  const esCirugiaBase = esCirugia || esOrtopedia
   const esNefrologia = interfaceMode === 'HOSPITALIZACION'
   const router = useRouter()
   const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta' | 'curas' | 'hemodialisis'>(
-    vistaInicial === 'curas' && !esCirugia
+    vistaInicial === 'curas' && !esCirugiaBase
       ? 'propio'
       : vistaInicial === 'hemodialisis' && !esNefrologia
         ? 'propio'
@@ -295,22 +302,30 @@ export function ListaPacientes({
 
   return (
     <>
-      {/* TEAM DE SERVICIO ARRIBA ANTES QUE RESUMEN DEL SERVICIO (MEDICINA INTERNA Y CIRUGÍA) */}
-      {(esMedicinaInterna || esCirugia) && teamData && sugerenciaAutoTeam && (
+      {/* TEAM DE SERVICIO ARRIBA ANTES QUE RESUMEN DEL SERVICIO (MEDICINA INTERNA, CIRUGÍA Y ORTOPEDIA) */}
+      {(esMedicinaInterna || esCirugiaBase) && teamData && sugerenciaAutoTeam && (
         <TeamServicioCard
           team={teamData}
           sugerenciaAuto={sugerenciaAutoTeam}
           puedeEditar={puedeEditarServicio}
+          servicioLabel={
+            esOrtopedia
+              ? 'Ortopedia y Traumatología'
+              : esCirugia
+                ? 'Cirugía'
+                : 'Medicina Interna'
+          }
         />
       )}
 
-      {/* PANELES INICIALES DE CIRUGÍA: RESUMEN + DISPOSITIVOS (RETRAÍBLES) */}
-      {esCirugia && resumenCirugiaAuto && conteosDispositivosCirugia && (
+      {/* PANELES INICIALES DE CIRUGÍA / ORTOPEDIA: RESUMEN + DISPOSITIVOS (RETRAÍBLES) */}
+      {esCirugiaBase && resumenCirugiaAuto && conteosDispositivosCirugia && (
         <CirugiaResumenPanel
           resumenAuto={resumenCirugiaAuto}
           resumenGuardado={resumenCirugiaGuardado}
           conteosDispositivos={conteosDispositivosCirugia}
           puedeEditar={puedeEditarServicio}
+          interfaceMode={esOrtopedia ? 'ORTOPEDIA' : 'CIRUGIA'}
         />
       )}
 
@@ -319,7 +334,7 @@ export function ListaPacientes({
         id="lista-pacientes"
         className="scroll-mt-20 flex flex-wrap items-center justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
       >
-        <div className={`grid gap-2 w-full sm:w-auto ${esCirugia || esNefrologia ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        <div className={`grid gap-2 w-full sm:w-auto ${esCirugiaBase || esNefrologia ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <button
             type="button"
             onClick={() => cambiarArea('propio')}
@@ -350,7 +365,7 @@ export function ListaPacientes({
             </span>
           </button>
 
-          {esCirugia && (
+          {esCirugiaBase && (
             <button
               type="button"
               onClick={() => cambiarArea('curas')}
@@ -360,7 +375,7 @@ export function ListaPacientes({
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
-              <span>🩹</span> Curas
+              <span>{esOrtopedia ? '🦴' : '🩹'}</span> {esOrtopedia ? 'Curas / Pines' : 'Curas'}
               <span className={`px-2 py-0.2 rounded-full text-xs font-bold ${areaGuardia === 'curas' ? 'bg-teal-800 text-white' : 'bg-slate-200 text-slate-700'}`}>
                 {curas.length}
               </span>
@@ -395,8 +410,12 @@ export function ListaPacientes({
         </Link>
       </div>
 
-      {esCirugia && areaGuardia === 'curas' ? (
-        <CurasPanel curas={curas} puedeRegistrar={puedeMarcarTareas} />
+      {esCirugiaBase && areaGuardia === 'curas' ? (
+        <CurasPanel
+          curas={curas}
+          puedeRegistrar={puedeMarcarTareas}
+          interfaceMode={esOrtopedia ? 'ORTOPEDIA' : 'CIRUGIA'}
+        />
       ) : esNefrologia && areaGuardia === 'hemodialisis' ? (
         <HemodialisisPanel
           items={hemodialisisItems}
@@ -407,17 +426,21 @@ export function ListaPacientes({
         <>
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          {esCirugia
+          {esOrtopedia
             ? areaGuardia === 'propio'
-              ? '🔪 Sala de Cirugía'
-              : '📋 Interconsultas a Cirugía'
-            : esMedicinaInterna
+              ? '🦴 Sala de Ortopedia y Traumatología'
+              : '📋 Interconsultas a Ortopedia'
+            : esCirugia
               ? areaGuardia === 'propio'
-                ? '🩺 Sala de Medicina Interna'
-                : '📋 Interconsultas a Medicina Interna'
-              : areaGuardia === 'propio'
-                ? '🏥 Sala de Hospitalización'
-                : '📋 Pacientes de Interconsulta'}
+                ? '🔪 Sala de Cirugía'
+                : '📋 Interconsultas a Cirugía'
+              : esMedicinaInterna
+                ? areaGuardia === 'propio'
+                  ? '🩺 Sala de Medicina Interna'
+                  : '📋 Interconsultas a Medicina Interna'
+                : areaGuardia === 'propio'
+                  ? '🏥 Sala de Hospitalización'
+                  : '📋 Pacientes de Interconsulta'}
         </h2>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -629,21 +652,39 @@ export function ListaPacientes({
                       </div>
                     )}
 
-                  {!soloPendientes && esCirugia && episode.surgicalProfile && (
+                  {!soloPendientes && esCirugiaBase && episode.surgicalProfile && (
                     <div className="flex flex-wrap items-center gap-1.5 pt-1">
                       {(() => {
+                        const listaEstados = esOrtopedia ? ESTADOS_ORTOPEDIA : ESTADOS_CIRUGIA
                         const st =
-                          ESTADOS_CIRUGIA.find((s) => s.value === episode.surgicalProfile?.surgeryStatus) ??
-                          ESTADOS_CIRUGIA[0]
+                          listaEstados.find((s) => s.value === episode.surgicalProfile?.surgeryStatus) ??
+                          listaEstados[0]
                         return (
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${st.badge}`}>
                             {st.label}
                           </span>
                         )
                       })()}
+                      {esOrtopedia &&
+                        (episode.surgicalProfile.compartmentAlert ||
+                          episode.surgicalProfile.neurovascularStatus === 'alerta_alterado') && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-red-100 text-red-900 border-red-300">
+                            ⚠ Alerta Neurovascular / Compartimental
+                          </span>
+                        )}
+                      {esOrtopedia && episode.surgicalProfile.affectedLimb && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-teal-50 text-teal-900 border-teal-200">
+                          {episode.surgicalProfile.affectedLimb}
+                        </span>
+                      )}
                       {episode.surgicalProfile.procedureName && (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-blue-50 text-blue-900 border-blue-200">
                           {episode.surgicalProfile.procedureName}
+                        </span>
+                      )}
+                      {esOrtopedia && episode.surgicalProfile.weightBearingPlan && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded border bg-amber-50 text-amber-900 border-amber-200">
+                          {episode.surgicalProfile.weightBearingPlan}
                         </span>
                       )}
                       {episode.surgicalProfile.surgicalSpecialty && (

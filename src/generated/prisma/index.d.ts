@@ -180,7 +180,8 @@ export const InterfaceMode: {
   HOSPITALIZACION: 'HOSPITALIZACION',
   CONSULTAS: 'CONSULTAS',
   MEDICINA_INTERNA: 'MEDICINA_INTERNA',
-  CIRUGIA: 'CIRUGIA'
+  CIRUGIA: 'CIRUGIA',
+  ORTOPEDIA: 'ORTOPEDIA'
 };
 
 export type InterfaceMode = (typeof InterfaceMode)[keyof typeof InterfaceMode]
@@ -15400,8 +15401,18 @@ export namespace Prisma {
 
   export type AggregateSurgicalProfile = {
     _count: SurgicalProfileCountAggregateOutputType | null
+    _avg: SurgicalProfileAvgAggregateOutputType | null
+    _sum: SurgicalProfileSumAggregateOutputType | null
     _min: SurgicalProfileMinAggregateOutputType | null
     _max: SurgicalProfileMaxAggregateOutputType | null
+  }
+
+  export type SurgicalProfileAvgAggregateOutputType = {
+    painScaleEva: number | null
+  }
+
+  export type SurgicalProfileSumAggregateOutputType = {
+    painScaleEva: number | null
   }
 
   export type SurgicalProfileMinAggregateOutputType = {
@@ -15414,6 +15425,19 @@ export namespace Prisma {
     surgeonAndAssistants: string | null
     surgeryStatus: string | null
     suspensionReason: string | null
+    affectedLimb: string | null
+    managementType: string | null
+    neurovascularStatus: string | null
+    capillaryRefill: string | null
+    distalPulses: string | null
+    distalSensitivity: string | null
+    distalMotility: string | null
+    compartmentAlert: boolean | null
+    painScaleEva: number | null
+    weightBearingPlan: string | null
+    orthopedicNotes: string | null
+    neurovascularUpdatedBy: string | null
+    neurovascularUpdatedAt: Date | null
     updatedBy: string | null
     updatedAt: Date | null
   }
@@ -15428,6 +15452,19 @@ export namespace Prisma {
     surgeonAndAssistants: string | null
     surgeryStatus: string | null
     suspensionReason: string | null
+    affectedLimb: string | null
+    managementType: string | null
+    neurovascularStatus: string | null
+    capillaryRefill: string | null
+    distalPulses: string | null
+    distalSensitivity: string | null
+    distalMotility: string | null
+    compartmentAlert: boolean | null
+    painScaleEva: number | null
+    weightBearingPlan: string | null
+    orthopedicNotes: string | null
+    neurovascularUpdatedBy: string | null
+    neurovascularUpdatedAt: Date | null
     updatedBy: string | null
     updatedAt: Date | null
   }
@@ -15442,11 +15479,32 @@ export namespace Prisma {
     surgeonAndAssistants: number
     surgeryStatus: number
     suspensionReason: number
+    affectedLimb: number
+    managementType: number
+    neurovascularStatus: number
+    capillaryRefill: number
+    distalPulses: number
+    distalSensitivity: number
+    distalMotility: number
+    compartmentAlert: number
+    painScaleEva: number
+    weightBearingPlan: number
+    orthopedicNotes: number
+    neurovascularUpdatedBy: number
+    neurovascularUpdatedAt: number
     updatedBy: number
     updatedAt: number
     _all: number
   }
 
+
+  export type SurgicalProfileAvgAggregateInputType = {
+    painScaleEva?: true
+  }
+
+  export type SurgicalProfileSumAggregateInputType = {
+    painScaleEva?: true
+  }
 
   export type SurgicalProfileMinAggregateInputType = {
     id?: true
@@ -15458,6 +15516,19 @@ export namespace Prisma {
     surgeonAndAssistants?: true
     surgeryStatus?: true
     suspensionReason?: true
+    affectedLimb?: true
+    managementType?: true
+    neurovascularStatus?: true
+    capillaryRefill?: true
+    distalPulses?: true
+    distalSensitivity?: true
+    distalMotility?: true
+    compartmentAlert?: true
+    painScaleEva?: true
+    weightBearingPlan?: true
+    orthopedicNotes?: true
+    neurovascularUpdatedBy?: true
+    neurovascularUpdatedAt?: true
     updatedBy?: true
     updatedAt?: true
   }
@@ -15472,6 +15543,19 @@ export namespace Prisma {
     surgeonAndAssistants?: true
     surgeryStatus?: true
     suspensionReason?: true
+    affectedLimb?: true
+    managementType?: true
+    neurovascularStatus?: true
+    capillaryRefill?: true
+    distalPulses?: true
+    distalSensitivity?: true
+    distalMotility?: true
+    compartmentAlert?: true
+    painScaleEva?: true
+    weightBearingPlan?: true
+    orthopedicNotes?: true
+    neurovascularUpdatedBy?: true
+    neurovascularUpdatedAt?: true
     updatedBy?: true
     updatedAt?: true
   }
@@ -15486,6 +15570,19 @@ export namespace Prisma {
     surgeonAndAssistants?: true
     surgeryStatus?: true
     suspensionReason?: true
+    affectedLimb?: true
+    managementType?: true
+    neurovascularStatus?: true
+    capillaryRefill?: true
+    distalPulses?: true
+    distalSensitivity?: true
+    distalMotility?: true
+    compartmentAlert?: true
+    painScaleEva?: true
+    weightBearingPlan?: true
+    orthopedicNotes?: true
+    neurovascularUpdatedBy?: true
+    neurovascularUpdatedAt?: true
     updatedBy?: true
     updatedAt?: true
     _all?: true
@@ -15529,6 +15626,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: SurgicalProfileAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SurgicalProfileSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SurgicalProfileMinAggregateInputType
@@ -15559,6 +15668,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: SurgicalProfileCountAggregateInputType | true
+    _avg?: SurgicalProfileAvgAggregateInputType
+    _sum?: SurgicalProfileSumAggregateInputType
     _min?: SurgicalProfileMinAggregateInputType
     _max?: SurgicalProfileMaxAggregateInputType
   }
@@ -15573,9 +15684,24 @@ export namespace Prisma {
     surgeonAndAssistants: string | null
     surgeryStatus: string
     suspensionReason: string | null
+    affectedLimb: string | null
+    managementType: string | null
+    neurovascularStatus: string | null
+    capillaryRefill: string | null
+    distalPulses: string | null
+    distalSensitivity: string | null
+    distalMotility: string | null
+    compartmentAlert: boolean
+    painScaleEva: number | null
+    weightBearingPlan: string | null
+    orthopedicNotes: string | null
+    neurovascularUpdatedBy: string | null
+    neurovascularUpdatedAt: Date | null
     updatedBy: string
     updatedAt: Date
     _count: SurgicalProfileCountAggregateOutputType | null
+    _avg: SurgicalProfileAvgAggregateOutputType | null
+    _sum: SurgicalProfileSumAggregateOutputType | null
     _min: SurgicalProfileMinAggregateOutputType | null
     _max: SurgicalProfileMaxAggregateOutputType | null
   }
@@ -15604,6 +15730,19 @@ export namespace Prisma {
     surgeonAndAssistants?: boolean
     surgeryStatus?: boolean
     suspensionReason?: boolean
+    affectedLimb?: boolean
+    managementType?: boolean
+    neurovascularStatus?: boolean
+    capillaryRefill?: boolean
+    distalPulses?: boolean
+    distalSensitivity?: boolean
+    distalMotility?: boolean
+    compartmentAlert?: boolean
+    painScaleEva?: boolean
+    weightBearingPlan?: boolean
+    orthopedicNotes?: boolean
+    neurovascularUpdatedBy?: boolean
+    neurovascularUpdatedAt?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -15619,6 +15758,19 @@ export namespace Prisma {
     surgeonAndAssistants?: boolean
     surgeryStatus?: boolean
     suspensionReason?: boolean
+    affectedLimb?: boolean
+    managementType?: boolean
+    neurovascularStatus?: boolean
+    capillaryRefill?: boolean
+    distalPulses?: boolean
+    distalSensitivity?: boolean
+    distalMotility?: boolean
+    compartmentAlert?: boolean
+    painScaleEva?: boolean
+    weightBearingPlan?: boolean
+    orthopedicNotes?: boolean
+    neurovascularUpdatedBy?: boolean
+    neurovascularUpdatedAt?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -15634,6 +15786,19 @@ export namespace Prisma {
     surgeonAndAssistants?: boolean
     surgeryStatus?: boolean
     suspensionReason?: boolean
+    affectedLimb?: boolean
+    managementType?: boolean
+    neurovascularStatus?: boolean
+    capillaryRefill?: boolean
+    distalPulses?: boolean
+    distalSensitivity?: boolean
+    distalMotility?: boolean
+    compartmentAlert?: boolean
+    painScaleEva?: boolean
+    weightBearingPlan?: boolean
+    orthopedicNotes?: boolean
+    neurovascularUpdatedBy?: boolean
+    neurovascularUpdatedAt?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -15649,11 +15814,24 @@ export namespace Prisma {
     surgeonAndAssistants?: boolean
     surgeryStatus?: boolean
     suspensionReason?: boolean
+    affectedLimb?: boolean
+    managementType?: boolean
+    neurovascularStatus?: boolean
+    capillaryRefill?: boolean
+    distalPulses?: boolean
+    distalSensitivity?: boolean
+    distalMotility?: boolean
+    compartmentAlert?: boolean
+    painScaleEva?: boolean
+    weightBearingPlan?: boolean
+    orthopedicNotes?: boolean
+    neurovascularUpdatedBy?: boolean
+    neurovascularUpdatedAt?: boolean
     updatedBy?: boolean
     updatedAt?: boolean
   }
 
-  export type SurgicalProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "procedureName" | "surgeryDate" | "surgeryType" | "surgicalSpecialty" | "surgeonAndAssistants" | "surgeryStatus" | "suspensionReason" | "updatedBy" | "updatedAt", ExtArgs["result"]["surgicalProfile"]>
+  export type SurgicalProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "procedureName" | "surgeryDate" | "surgeryType" | "surgicalSpecialty" | "surgeonAndAssistants" | "surgeryStatus" | "suspensionReason" | "affectedLimb" | "managementType" | "neurovascularStatus" | "capillaryRefill" | "distalPulses" | "distalSensitivity" | "distalMotility" | "compartmentAlert" | "painScaleEva" | "weightBearingPlan" | "orthopedicNotes" | "neurovascularUpdatedBy" | "neurovascularUpdatedAt" | "updatedBy" | "updatedAt", ExtArgs["result"]["surgicalProfile"]>
   export type SurgicalProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
   }
@@ -15679,6 +15857,19 @@ export namespace Prisma {
       surgeonAndAssistants: string | null
       surgeryStatus: string
       suspensionReason: string | null
+      affectedLimb: string | null
+      managementType: string | null
+      neurovascularStatus: string | null
+      capillaryRefill: string | null
+      distalPulses: string | null
+      distalSensitivity: string | null
+      distalMotility: string | null
+      compartmentAlert: boolean
+      painScaleEva: number | null
+      weightBearingPlan: string | null
+      orthopedicNotes: string | null
+      neurovascularUpdatedBy: string | null
+      neurovascularUpdatedAt: Date | null
       updatedBy: string
       updatedAt: Date
     }, ExtArgs["result"]["surgicalProfile"]>
@@ -16114,6 +16305,19 @@ export namespace Prisma {
     readonly surgeonAndAssistants: FieldRef<"SurgicalProfile", 'String'>
     readonly surgeryStatus: FieldRef<"SurgicalProfile", 'String'>
     readonly suspensionReason: FieldRef<"SurgicalProfile", 'String'>
+    readonly affectedLimb: FieldRef<"SurgicalProfile", 'String'>
+    readonly managementType: FieldRef<"SurgicalProfile", 'String'>
+    readonly neurovascularStatus: FieldRef<"SurgicalProfile", 'String'>
+    readonly capillaryRefill: FieldRef<"SurgicalProfile", 'String'>
+    readonly distalPulses: FieldRef<"SurgicalProfile", 'String'>
+    readonly distalSensitivity: FieldRef<"SurgicalProfile", 'String'>
+    readonly distalMotility: FieldRef<"SurgicalProfile", 'String'>
+    readonly compartmentAlert: FieldRef<"SurgicalProfile", 'Boolean'>
+    readonly painScaleEva: FieldRef<"SurgicalProfile", 'Int'>
+    readonly weightBearingPlan: FieldRef<"SurgicalProfile", 'String'>
+    readonly orthopedicNotes: FieldRef<"SurgicalProfile", 'String'>
+    readonly neurovascularUpdatedBy: FieldRef<"SurgicalProfile", 'String'>
+    readonly neurovascularUpdatedAt: FieldRef<"SurgicalProfile", 'DateTime'>
     readonly updatedBy: FieldRef<"SurgicalProfile", 'String'>
     readonly updatedAt: FieldRef<"SurgicalProfile", 'DateTime'>
   }
@@ -39892,6 +40096,19 @@ export namespace Prisma {
     surgeonAndAssistants: 'surgeonAndAssistants',
     surgeryStatus: 'surgeryStatus',
     suspensionReason: 'suspensionReason',
+    affectedLimb: 'affectedLimb',
+    managementType: 'managementType',
+    neurovascularStatus: 'neurovascularStatus',
+    capillaryRefill: 'capillaryRefill',
+    distalPulses: 'distalPulses',
+    distalSensitivity: 'distalSensitivity',
+    distalMotility: 'distalMotility',
+    compartmentAlert: 'compartmentAlert',
+    painScaleEva: 'painScaleEva',
+    weightBearingPlan: 'weightBearingPlan',
+    orthopedicNotes: 'orthopedicNotes',
+    neurovascularUpdatedBy: 'neurovascularUpdatedBy',
+    neurovascularUpdatedAt: 'neurovascularUpdatedAt',
     updatedBy: 'updatedBy',
     updatedAt: 'updatedAt'
   };
@@ -41644,6 +41861,19 @@ export namespace Prisma {
     surgeonAndAssistants?: StringNullableFilter<"SurgicalProfile"> | string | null
     surgeryStatus?: StringFilter<"SurgicalProfile"> | string
     suspensionReason?: StringNullableFilter<"SurgicalProfile"> | string | null
+    affectedLimb?: StringNullableFilter<"SurgicalProfile"> | string | null
+    managementType?: StringNullableFilter<"SurgicalProfile"> | string | null
+    neurovascularStatus?: StringNullableFilter<"SurgicalProfile"> | string | null
+    capillaryRefill?: StringNullableFilter<"SurgicalProfile"> | string | null
+    distalPulses?: StringNullableFilter<"SurgicalProfile"> | string | null
+    distalSensitivity?: StringNullableFilter<"SurgicalProfile"> | string | null
+    distalMotility?: StringNullableFilter<"SurgicalProfile"> | string | null
+    compartmentAlert?: BoolFilter<"SurgicalProfile"> | boolean
+    painScaleEva?: IntNullableFilter<"SurgicalProfile"> | number | null
+    weightBearingPlan?: StringNullableFilter<"SurgicalProfile"> | string | null
+    orthopedicNotes?: StringNullableFilter<"SurgicalProfile"> | string | null
+    neurovascularUpdatedBy?: StringNullableFilter<"SurgicalProfile"> | string | null
+    neurovascularUpdatedAt?: DateTimeNullableFilter<"SurgicalProfile"> | Date | string | null
     updatedBy?: StringFilter<"SurgicalProfile"> | string
     updatedAt?: DateTimeFilter<"SurgicalProfile"> | Date | string
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
@@ -41659,6 +41889,19 @@ export namespace Prisma {
     surgeonAndAssistants?: SortOrderInput | SortOrder
     surgeryStatus?: SortOrder
     suspensionReason?: SortOrderInput | SortOrder
+    affectedLimb?: SortOrderInput | SortOrder
+    managementType?: SortOrderInput | SortOrder
+    neurovascularStatus?: SortOrderInput | SortOrder
+    capillaryRefill?: SortOrderInput | SortOrder
+    distalPulses?: SortOrderInput | SortOrder
+    distalSensitivity?: SortOrderInput | SortOrder
+    distalMotility?: SortOrderInput | SortOrder
+    compartmentAlert?: SortOrder
+    painScaleEva?: SortOrderInput | SortOrder
+    weightBearingPlan?: SortOrderInput | SortOrder
+    orthopedicNotes?: SortOrderInput | SortOrder
+    neurovascularUpdatedBy?: SortOrderInput | SortOrder
+    neurovascularUpdatedAt?: SortOrderInput | SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
     episode?: EpisodeOrderByWithRelationInput
@@ -41677,6 +41920,19 @@ export namespace Prisma {
     surgeonAndAssistants?: StringNullableFilter<"SurgicalProfile"> | string | null
     surgeryStatus?: StringFilter<"SurgicalProfile"> | string
     suspensionReason?: StringNullableFilter<"SurgicalProfile"> | string | null
+    affectedLimb?: StringNullableFilter<"SurgicalProfile"> | string | null
+    managementType?: StringNullableFilter<"SurgicalProfile"> | string | null
+    neurovascularStatus?: StringNullableFilter<"SurgicalProfile"> | string | null
+    capillaryRefill?: StringNullableFilter<"SurgicalProfile"> | string | null
+    distalPulses?: StringNullableFilter<"SurgicalProfile"> | string | null
+    distalSensitivity?: StringNullableFilter<"SurgicalProfile"> | string | null
+    distalMotility?: StringNullableFilter<"SurgicalProfile"> | string | null
+    compartmentAlert?: BoolFilter<"SurgicalProfile"> | boolean
+    painScaleEva?: IntNullableFilter<"SurgicalProfile"> | number | null
+    weightBearingPlan?: StringNullableFilter<"SurgicalProfile"> | string | null
+    orthopedicNotes?: StringNullableFilter<"SurgicalProfile"> | string | null
+    neurovascularUpdatedBy?: StringNullableFilter<"SurgicalProfile"> | string | null
+    neurovascularUpdatedAt?: DateTimeNullableFilter<"SurgicalProfile"> | Date | string | null
     updatedBy?: StringFilter<"SurgicalProfile"> | string
     updatedAt?: DateTimeFilter<"SurgicalProfile"> | Date | string
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
@@ -41692,11 +41948,26 @@ export namespace Prisma {
     surgeonAndAssistants?: SortOrderInput | SortOrder
     surgeryStatus?: SortOrder
     suspensionReason?: SortOrderInput | SortOrder
+    affectedLimb?: SortOrderInput | SortOrder
+    managementType?: SortOrderInput | SortOrder
+    neurovascularStatus?: SortOrderInput | SortOrder
+    capillaryRefill?: SortOrderInput | SortOrder
+    distalPulses?: SortOrderInput | SortOrder
+    distalSensitivity?: SortOrderInput | SortOrder
+    distalMotility?: SortOrderInput | SortOrder
+    compartmentAlert?: SortOrder
+    painScaleEva?: SortOrderInput | SortOrder
+    weightBearingPlan?: SortOrderInput | SortOrder
+    orthopedicNotes?: SortOrderInput | SortOrder
+    neurovascularUpdatedBy?: SortOrderInput | SortOrder
+    neurovascularUpdatedAt?: SortOrderInput | SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
     _count?: SurgicalProfileCountOrderByAggregateInput
+    _avg?: SurgicalProfileAvgOrderByAggregateInput
     _max?: SurgicalProfileMaxOrderByAggregateInput
     _min?: SurgicalProfileMinOrderByAggregateInput
+    _sum?: SurgicalProfileSumOrderByAggregateInput
   }
 
   export type SurgicalProfileScalarWhereWithAggregatesInput = {
@@ -41712,6 +41983,19 @@ export namespace Prisma {
     surgeonAndAssistants?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
     surgeryStatus?: StringWithAggregatesFilter<"SurgicalProfile"> | string
     suspensionReason?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    affectedLimb?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    managementType?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    neurovascularStatus?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    capillaryRefill?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    distalPulses?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    distalSensitivity?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    distalMotility?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    compartmentAlert?: BoolWithAggregatesFilter<"SurgicalProfile"> | boolean
+    painScaleEva?: IntNullableWithAggregatesFilter<"SurgicalProfile"> | number | null
+    weightBearingPlan?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    orthopedicNotes?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    neurovascularUpdatedBy?: StringNullableWithAggregatesFilter<"SurgicalProfile"> | string | null
+    neurovascularUpdatedAt?: DateTimeNullableWithAggregatesFilter<"SurgicalProfile"> | Date | string | null
     updatedBy?: StringWithAggregatesFilter<"SurgicalProfile"> | string
     updatedAt?: DateTimeWithAggregatesFilter<"SurgicalProfile"> | Date | string
   }
@@ -44873,6 +45157,19 @@ export namespace Prisma {
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
     suspensionReason?: string | null
+    affectedLimb?: string | null
+    managementType?: string | null
+    neurovascularStatus?: string | null
+    capillaryRefill?: string | null
+    distalPulses?: string | null
+    distalSensitivity?: string | null
+    distalMotility?: string | null
+    compartmentAlert?: boolean
+    painScaleEva?: number | null
+    weightBearingPlan?: string | null
+    orthopedicNotes?: string | null
+    neurovascularUpdatedBy?: string | null
+    neurovascularUpdatedAt?: Date | string | null
     updatedBy: string
     updatedAt?: Date | string
     episode: EpisodeCreateNestedOneWithoutSurgicalProfileInput
@@ -44888,6 +45185,19 @@ export namespace Prisma {
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
     suspensionReason?: string | null
+    affectedLimb?: string | null
+    managementType?: string | null
+    neurovascularStatus?: string | null
+    capillaryRefill?: string | null
+    distalPulses?: string | null
+    distalSensitivity?: string | null
+    distalMotility?: string | null
+    compartmentAlert?: boolean
+    painScaleEva?: number | null
+    weightBearingPlan?: string | null
+    orthopedicNotes?: string | null
+    neurovascularUpdatedBy?: string | null
+    neurovascularUpdatedAt?: Date | string | null
     updatedBy: string
     updatedAt?: Date | string
   }
@@ -44901,6 +45211,19 @@ export namespace Prisma {
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
     suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    affectedLimb?: NullableStringFieldUpdateOperationsInput | string | null
+    managementType?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    capillaryRefill?: NullableStringFieldUpdateOperationsInput | string | null
+    distalPulses?: NullableStringFieldUpdateOperationsInput | string | null
+    distalSensitivity?: NullableStringFieldUpdateOperationsInput | string | null
+    distalMotility?: NullableStringFieldUpdateOperationsInput | string | null
+    compartmentAlert?: BoolFieldUpdateOperationsInput | boolean
+    painScaleEva?: NullableIntFieldUpdateOperationsInput | number | null
+    weightBearingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    orthopedicNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episode?: EpisodeUpdateOneRequiredWithoutSurgicalProfileNestedInput
@@ -44916,6 +45239,19 @@ export namespace Prisma {
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
     suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    affectedLimb?: NullableStringFieldUpdateOperationsInput | string | null
+    managementType?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    capillaryRefill?: NullableStringFieldUpdateOperationsInput | string | null
+    distalPulses?: NullableStringFieldUpdateOperationsInput | string | null
+    distalSensitivity?: NullableStringFieldUpdateOperationsInput | string | null
+    distalMotility?: NullableStringFieldUpdateOperationsInput | string | null
+    compartmentAlert?: BoolFieldUpdateOperationsInput | boolean
+    painScaleEva?: NullableIntFieldUpdateOperationsInput | number | null
+    weightBearingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    orthopedicNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -44930,6 +45266,19 @@ export namespace Prisma {
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
     suspensionReason?: string | null
+    affectedLimb?: string | null
+    managementType?: string | null
+    neurovascularStatus?: string | null
+    capillaryRefill?: string | null
+    distalPulses?: string | null
+    distalSensitivity?: string | null
+    distalMotility?: string | null
+    compartmentAlert?: boolean
+    painScaleEva?: number | null
+    weightBearingPlan?: string | null
+    orthopedicNotes?: string | null
+    neurovascularUpdatedBy?: string | null
+    neurovascularUpdatedAt?: Date | string | null
     updatedBy: string
     updatedAt?: Date | string
   }
@@ -44943,6 +45292,19 @@ export namespace Prisma {
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
     suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    affectedLimb?: NullableStringFieldUpdateOperationsInput | string | null
+    managementType?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    capillaryRefill?: NullableStringFieldUpdateOperationsInput | string | null
+    distalPulses?: NullableStringFieldUpdateOperationsInput | string | null
+    distalSensitivity?: NullableStringFieldUpdateOperationsInput | string | null
+    distalMotility?: NullableStringFieldUpdateOperationsInput | string | null
+    compartmentAlert?: BoolFieldUpdateOperationsInput | boolean
+    painScaleEva?: NullableIntFieldUpdateOperationsInput | number | null
+    weightBearingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    orthopedicNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -44957,6 +45319,19 @@ export namespace Prisma {
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
     suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    affectedLimb?: NullableStringFieldUpdateOperationsInput | string | null
+    managementType?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    capillaryRefill?: NullableStringFieldUpdateOperationsInput | string | null
+    distalPulses?: NullableStringFieldUpdateOperationsInput | string | null
+    distalSensitivity?: NullableStringFieldUpdateOperationsInput | string | null
+    distalMotility?: NullableStringFieldUpdateOperationsInput | string | null
+    compartmentAlert?: BoolFieldUpdateOperationsInput | boolean
+    painScaleEva?: NullableIntFieldUpdateOperationsInput | number | null
+    weightBearingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    orthopedicNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -48199,8 +48574,25 @@ export namespace Prisma {
     surgeonAndAssistants?: SortOrder
     surgeryStatus?: SortOrder
     suspensionReason?: SortOrder
+    affectedLimb?: SortOrder
+    managementType?: SortOrder
+    neurovascularStatus?: SortOrder
+    capillaryRefill?: SortOrder
+    distalPulses?: SortOrder
+    distalSensitivity?: SortOrder
+    distalMotility?: SortOrder
+    compartmentAlert?: SortOrder
+    painScaleEva?: SortOrder
+    weightBearingPlan?: SortOrder
+    orthopedicNotes?: SortOrder
+    neurovascularUpdatedBy?: SortOrder
+    neurovascularUpdatedAt?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type SurgicalProfileAvgOrderByAggregateInput = {
+    painScaleEva?: SortOrder
   }
 
   export type SurgicalProfileMaxOrderByAggregateInput = {
@@ -48213,6 +48605,19 @@ export namespace Prisma {
     surgeonAndAssistants?: SortOrder
     surgeryStatus?: SortOrder
     suspensionReason?: SortOrder
+    affectedLimb?: SortOrder
+    managementType?: SortOrder
+    neurovascularStatus?: SortOrder
+    capillaryRefill?: SortOrder
+    distalPulses?: SortOrder
+    distalSensitivity?: SortOrder
+    distalMotility?: SortOrder
+    compartmentAlert?: SortOrder
+    painScaleEva?: SortOrder
+    weightBearingPlan?: SortOrder
+    orthopedicNotes?: SortOrder
+    neurovascularUpdatedBy?: SortOrder
+    neurovascularUpdatedAt?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
   }
@@ -48227,8 +48632,25 @@ export namespace Prisma {
     surgeonAndAssistants?: SortOrder
     surgeryStatus?: SortOrder
     suspensionReason?: SortOrder
+    affectedLimb?: SortOrder
+    managementType?: SortOrder
+    neurovascularStatus?: SortOrder
+    capillaryRefill?: SortOrder
+    distalPulses?: SortOrder
+    distalSensitivity?: SortOrder
+    distalMotility?: SortOrder
+    compartmentAlert?: SortOrder
+    painScaleEva?: SortOrder
+    weightBearingPlan?: SortOrder
+    orthopedicNotes?: SortOrder
+    neurovascularUpdatedBy?: SortOrder
+    neurovascularUpdatedAt?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type SurgicalProfileSumOrderByAggregateInput = {
+    painScaleEva?: SortOrder
   }
 
   export type EpisodeAntibioticCountOrderByAggregateInput = {
@@ -54480,6 +54902,19 @@ export namespace Prisma {
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
     suspensionReason?: string | null
+    affectedLimb?: string | null
+    managementType?: string | null
+    neurovascularStatus?: string | null
+    capillaryRefill?: string | null
+    distalPulses?: string | null
+    distalSensitivity?: string | null
+    distalMotility?: string | null
+    compartmentAlert?: boolean
+    painScaleEva?: number | null
+    weightBearingPlan?: string | null
+    orthopedicNotes?: string | null
+    neurovascularUpdatedBy?: string | null
+    neurovascularUpdatedAt?: Date | string | null
     updatedBy: string
     updatedAt?: Date | string
   }
@@ -54493,6 +54928,19 @@ export namespace Prisma {
     surgeonAndAssistants?: string | null
     surgeryStatus?: string
     suspensionReason?: string | null
+    affectedLimb?: string | null
+    managementType?: string | null
+    neurovascularStatus?: string | null
+    capillaryRefill?: string | null
+    distalPulses?: string | null
+    distalSensitivity?: string | null
+    distalMotility?: string | null
+    compartmentAlert?: boolean
+    painScaleEva?: number | null
+    weightBearingPlan?: string | null
+    orthopedicNotes?: string | null
+    neurovascularUpdatedBy?: string | null
+    neurovascularUpdatedAt?: Date | string | null
     updatedBy: string
     updatedAt?: Date | string
   }
@@ -55215,6 +55663,19 @@ export namespace Prisma {
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
     suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    affectedLimb?: NullableStringFieldUpdateOperationsInput | string | null
+    managementType?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    capillaryRefill?: NullableStringFieldUpdateOperationsInput | string | null
+    distalPulses?: NullableStringFieldUpdateOperationsInput | string | null
+    distalSensitivity?: NullableStringFieldUpdateOperationsInput | string | null
+    distalMotility?: NullableStringFieldUpdateOperationsInput | string | null
+    compartmentAlert?: BoolFieldUpdateOperationsInput | boolean
+    painScaleEva?: NullableIntFieldUpdateOperationsInput | number | null
+    weightBearingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    orthopedicNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -55228,6 +55689,19 @@ export namespace Prisma {
     surgeonAndAssistants?: NullableStringFieldUpdateOperationsInput | string | null
     surgeryStatus?: StringFieldUpdateOperationsInput | string
     suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    affectedLimb?: NullableStringFieldUpdateOperationsInput | string | null
+    managementType?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    capillaryRefill?: NullableStringFieldUpdateOperationsInput | string | null
+    distalPulses?: NullableStringFieldUpdateOperationsInput | string | null
+    distalSensitivity?: NullableStringFieldUpdateOperationsInput | string | null
+    distalMotility?: NullableStringFieldUpdateOperationsInput | string | null
+    compartmentAlert?: BoolFieldUpdateOperationsInput | boolean
+    painScaleEva?: NullableIntFieldUpdateOperationsInput | number | null
+    weightBearingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    orthopedicNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    neurovascularUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

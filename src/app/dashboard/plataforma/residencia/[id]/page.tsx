@@ -33,6 +33,11 @@ const INTERFACES_DISPONIBLES = [
     descripcion: 'Quirúrgica: información operatoria, drenajes, antibióticos por días, catéteres, curas y censos.',
   },
   {
+    id: 'ORTOPEDIA',
+    nombre: 'Ortopedia y Traumatología',
+    descripcion: 'Trauma y ortopedia: lateralidad, osteosíntesis/manejo conservador, yesos/férulas/tracciones, neurovascular distal, carga y curas.',
+  },
+  {
     id: 'CONSULTAS',
     nombre: 'Consultas Externas',
     descripcion: 'Agenda ambulatoria, citas médicas, signos en consulta y recetas.',
@@ -224,9 +229,9 @@ export default async function ControlResidenciaSuperAdminPage({
               Interfaz Clínica y Tarifas Base de {residency.name}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Interfaces clínicas disponibles actualmente en NEXO: 4 módulos completos. Selecciona cuál usa esta residencia.
+              Interfaces clínicas disponibles actualmente en NEXO: 5 módulos completos. Selecciona cuál usa esta residencia.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 mt-3">
               {INTERFACES_DISPONIBLES.map((iface) => {
                 const activa = residency.interfaceMode === iface.id
                 return (
@@ -286,6 +291,7 @@ export default async function ControlResidenciaSuperAdminPage({
                 <option value="HOSPITALIZACION">Hospitalización / Nefrología</option>
                 <option value="MEDICINA_INTERNA">Medicina Interna</option>
                 <option value="CIRUGIA">Cirugía</option>
+                <option value="ORTOPEDIA">Ortopedia y Traumatología</option>
                 <option value="CONSULTAS">Consultas Externas</option>
               </select>
             </div>

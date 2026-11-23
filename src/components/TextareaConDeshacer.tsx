@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { Bold, Highlighter } from 'lucide-react'
 
 type Props = {
   name: string
@@ -11,6 +12,7 @@ type Props = {
   className?: string
   id?: string
   storageKey?: string
+  conFormatoClinico?: boolean
 }
 
 export function TextareaConDeshacer({
@@ -22,12 +24,14 @@ export function TextareaConDeshacer({
   className = '',
   id,
   storageKey,
+  conFormatoClinico = false,
 }: Props) {
   const [valor, setValor] = useState(defaultValue)
   const [historial, setHistorial] = useState<string[]>([defaultValue])
   const [indiceHistorial, setIndiceHistorial] = useState(0)
   const [ultimoBorrado, setUltimoBorrado] = useState<string | null>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   // Cargar borrador diferido para evitar renders en cascada y satisfacer a ESLint
   useEffect(() => {
@@ -83,6 +87,53 @@ export function TextareaConDeshacer({
     actualizarHistorial(nuevo)
   }
 
+  const aplicarFormato = (marcador: '==' | '**', textoBase: string) => {
+    const el = textareaRef.current
+    if (!el) return
+
+    const inicio = el.selectionStart ?? valor.length
+    const fin = el.selectionEnd ?? valor.length
+    const seleccionado = valor.slice(inicio, fin)
+    const len = marcador.length
+
+    let nuevo = valor
+    let selInicio = inicio
+    let selFin = fin
+
+    if (
+      seleccionado.startsWith(marcador) &&
+      seleccionado.endsWith(marcador) &&
+      seleccionado.length > len * 2
+    ) {
+      const sinMarcador = seleccionado.slice(len, -len)
+      nuevo = valor.slice(0, inicio) + sinMarcador + valor.slice(fin)
+      selInicio = inicio
+      selFin = inicio + sinMarcador.length
+    } else if (
+      inicio >= len &&
+      valor.slice(inicio - len, inicio) === marcador &&
+      valor.slice(fin, fin + len) === marcador
+    ) {
+      nuevo = valor.slice(0, inicio - len) + seleccionado + valor.slice(fin + len)
+      selInicio = inicio - len
+      selFin = fin - len
+    } else {
+      const textoInterior = seleccionado || textoBase
+      const envuelto = `${marcador}${textoInterior}${marcador}`
+      nuevo = valor.slice(0, inicio) + envuelto + valor.slice(fin)
+      selInicio = inicio + len
+      selFin = inicio + len + textoInterior.length
+    }
+
+    setValor(nuevo)
+    actualizarHistorial(nuevo)
+
+    requestAnimationFrame(() => {
+      el.focus()
+      el.setSelectionRange(selInicio, selFin)
+    })
+  }
+
   const deshacer = () => {
     if (indiceHistorial > 0) {
       const nuevoIndice = indiceHistorial - 1
@@ -130,28 +181,56 @@ export function TextareaConDeshacer({
 
   return (
     <div className="space-y-1">
-      <div className="flex justify-end gap-1.5 text-xs select-none">
-        <button
-          type="button"
-          onClick={deshacer}
-          disabled={!puedeDeshacer}
-          title="Deshacer cambio anterior"
-          className="px-2.5 py-1 rounded border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-semibold text-[11px] flex items-center gap-1 active:bg-slate-200"
-        >
-          <span>↶</span> Deshacer
-        </button>
-        <button
-          type="button"
-          onClick={rehacer}
-          disabled={!puedeRehacer}
-          title="Rehacer cambio"
-          className="px-2.5 py-1 rounded border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-semibold text-[11px] flex items-center gap-1 active:bg-slate-200"
-        >
-          <span>↷</span> Rehacer
-        </button>
+      <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs select-none">
+        {conFormatoClinico ? (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => aplicarFormato('==', 'valor alterado')}
+              title="Resaltar valor alterado o importante (==valor==)"
+              className="px-2 py-1 rounded border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer"
+            >
+              <Highlighter className="w-3 h-3" />
+              <span>Resaltar valor</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => aplicarFormato('**', 'texto')}
+              title="Poner en negrita (**texto**)"
+              className="px-2 py-1 rounded border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer"
+            >
+              <Bold className="w-3 h-3" />
+              <span>Negrita</span>
+            </button>
+          </div>
+        ) : (
+          <div />
+        )}
+
+        <div className="flex gap-1.5">
+          <button
+            type="button"
+            onClick={deshacer}
+            disabled={!puedeDeshacer}
+            title="Deshacer cambio anterior"
+            className="px-2.5 py-1 rounded border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-semibold text-[11px] flex items-center gap-1 active:bg-slate-200"
+          >
+            <span>↶</span> Deshacer
+          </button>
+          <button
+            type="button"
+            onClick={rehacer}
+            disabled={!puedeRehacer}
+            title="Rehacer cambio"
+            className="px-2.5 py-1 rounded border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-semibold text-[11px] flex items-center gap-1 active:bg-slate-200"
+          >
+            <span>↷</span> Rehacer
+          </button>
+        </div>
       </div>
 
       <textarea
+        ref={textareaRef}
         id={id}
         name={name}
         rows={rows}

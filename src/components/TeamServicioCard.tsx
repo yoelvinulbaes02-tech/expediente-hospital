@@ -18,10 +18,12 @@ export function TeamServicioCard({
   team,
   sugerenciaAuto,
   puedeEditar,
+  servicioLabel,
 }: {
   team: TeamServicioData
   sugerenciaAuto: { ma: string; r4: string; r3: string; r2: string; r1: string }
   puedeEditar: boolean
+  servicioLabel?: string
 }) {
   const router = useRouter()
   const [editando, setEditando] = useState(false)
@@ -100,7 +102,7 @@ export function TeamServicioCard({
           <div className="flex flex-wrap items-center gap-2">
             <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-              Team de Servicio (Guardia)
+              {servicioLabel ? `Team de Servicio · ${servicioLabel}` : 'Team de Servicio (Guardia)'}
             </h2>
             <span className="text-xs text-slate-500 dark:text-slate-400">
               · {team.autoMode ? 'Modo Automático (equipo activo)' : 'Modo Manual'}

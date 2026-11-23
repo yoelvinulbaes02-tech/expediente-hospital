@@ -162,25 +162,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       if (token?.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: String(token.id) },
-          select: { isActive: true, role: true, residencyId: true },
-        })
-        if (!dbUser || !dbUser.isActive) {
-          token.role = 'REVOKED'
-          token.residencyId = null
-        } else {
-          token.role = String(dbUser.role)
-          token.residencyId = dbUser.residencyId ?? null
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: String(token.id) },
+            select: { isActive: true, role: true, residencyId: true },
+          })
+          if (!dbUser || !dbUser.isActive) {
+            token.role = 'REVOKED'
+            token.residencyId = null
+          } else {
+            token.role = String(dbUser.role)
+            token.residencyId = dbUser.residencyId ?? null
+          }
+        } catch (err) {
+          console.error('[auth] Error transitorio consultando usuario en jwt():', err)
         }
       }
 
       return token
     },
     async session({ session, token }) {
-      if (token.role === 'REVOKED') {
-        // Invalidar datos de sesión si el usuario fue desactivado
-        return { ...session, user: undefined as unknown as typeof session.user }
+      if (!token?.id || token.role === 'REVOKED') {
+        // Invalidar datos de sesión si el usuario fue desactivado o el token es inválido
+        return { expires: session.expires } as typeof session
       }
       if (session.user) {
         session.user.id = token.id as string
@@ -191,3 +195,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
 })
+
+export async function obtenerSesionSegura() {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) return null
+    return session
+  } catch (err) {
+    console.error('[auth] Sesión inválida, expirada o corrupta:', err)
+    return null
+  }
+}

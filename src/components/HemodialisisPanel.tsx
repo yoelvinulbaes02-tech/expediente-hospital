@@ -28,8 +28,23 @@ import {
   registrarDosisHemodialisis,
   resolverItemHemodialisis,
 } from '@/app/dashboard/actions-servicio'
+import {
+  OPCIONES_FRECUENCIA_ATB_HD,
+  calcularConteoAntibiotico,
+  parsearEsquemaDosis,
+  parsearFrecuenciaAtb,
+} from '@/lib/hemodialisis-atb'
 
 export type SeccionHd = 'novedad' | 'predialisis' | 'antibiotico' | 'cultivo' | 'nota'
+
+export type HemodialisisDoseHistoryEntry = {
+  dose: string
+  byName: string
+  byRole: string
+  at: string
+  note: string | null
+  esquemaActualizado?: boolean
+}
 
 export type HemodialisisItemData = {
   id: string
@@ -59,6 +74,9 @@ export type HemodialisisItemData = {
   resolvedByName: string | null
   resolvedByRole: string | null
   resolvedAt: string | null
+  doseCount?: number
+  lastDoseApplied?: string | null
+  doseHistory?: HemodialisisDoseHistoryEntry[]
 }
 
 const ETIQUETAS_ROL: Record<string, string> = {
@@ -224,6 +242,11 @@ export function HemodialisisPanel({
   const [editandoId, setEditandoId] = useState<string | null>(null)
   const [resolviendoId, setResolviendoId] = useState<string | null>(null)
   const [notaResolucion, setNotaResolucion] = useState('')
+  const [registrandoDosisId, setRegistrandoDosisId] = useState<string | null>(null)
+  const [dosisAplicadaInput, setDosisAplicadaInput] = useState('')
+  const [actualizarEsquemaCheck, setActualizarEsquemaCheck] = useState(false)
+  const [notaDosisInput, setNotaDosisInput] = useState('')
+  const [historialDosisAbiertoId, setHistorialDosisAbiertoId] = useState<string | null>(null)
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
 
   // Estados de formularios de creación (controlados para presets rápidos)
@@ -233,6 +256,10 @@ export function HemodialisisPanel({
   const [diasNovedadCerrados, setDiasNovedadCerrados] = useState<Record<string, boolean>>({})
   const [cultivoTipoNuevo, setCultivoTipoNuevo] = useState('')
   const [notaEsServicio, setNotaEsServicio] = useState(false)
+  const [atbFreqNueva, setAtbFreqNueva] = useState('c/48h')
+  const [atbFreqCustomNueva, setAtbFreqCustomNueva] = useState('')
+  const [atbFreqEdit, setAtbFreqEdit] = useState('c/48h')
+  const [atbFreqCustomEdit, setAtbFreqCustomEdit] = useState('')
 
   // Estados retraíbles persistidos en localStorage
   const [openNovedades, setOpenNovedades] = useEstadoPanel(STORAGE_KEYS.novedad, true)
@@ -327,6 +354,10 @@ export function HemodialisisPanel({
       formEl.reset()
       if (section === 'cultivo') setCultivoTipoNuevo('')
       if (section === 'nota') setNotaEsServicio(false)
+      if (section === 'antibiotico') {
+        setAtbFreqNueva('c/48h')
+        setAtbFreqCustomNueva('')
+      }
       setFormAbierto(null)
       setMensaje({ tipo: 'ok', texto: `${ETIQUETAS_SECCION[section]} agregado con registro de firma.` })
       router.refresh()
@@ -350,17 +381,57 @@ export function HemodialisisPanel({
     })
   }
 
-  const handleRegistrarDosis = (itemId: string, patientName: string) => {
+  const abrirRegistroDosis = (item: HemodialisisItemData) => {
+    if (registrandoDosisId === item.id) {
+      setRegistrandoDosisId(null)
+      return
+    }
+    const calc = calcularConteoAntibiotico({
+      eventDateIso: item.eventDate,
+      durationDays: item.durationDays,
+      shiftLabel: item.shiftLabel,
+      title: item.title,
+      lastCheckAtIso: item.lastCheckAt,
+      ahoraIso,
+      dosisRegistradas: item.doseCount ?? (item.lastCheckAt ? 1 : 0),
+    })
+    setEditandoId(null)
+    setResolviendoId(null)
+    setRegistrandoDosisId(item.id)
+    setDosisAplicadaInput(calc.dosisVigente)
+    setActualizarEsquemaCheck(false)
+    setNotaDosisInput('')
+  }
+
+  const handleRegistrarDosisSubmit = (item: HemodialisisItemData) => {
     setMensaje(null)
     const fd = new FormData()
-    fd.set('itemId', itemId)
+    fd.set('itemId', item.id)
+    fd.set('dosisAplicada', dosisAplicadaInput.trim())
+    if (actualizarEsquemaCheck && dosisAplicadaInput.trim()) {
+      fd.set('actualizarEsquema', 'true')
+      fd.set('nuevaDosisIntervalo', dosisAplicadaInput.trim())
+    }
+    if (notaDosisInput.trim()) {
+      fd.set('doseNote', notaDosisInput.trim())
+    }
+
     startTransition(async () => {
       const res = await registrarDosisHemodialisis(fd)
       if (!res.ok) {
         setMensaje({ tipo: 'error', texto: res.error ?? 'No se pudo registrar la dosis.' })
         return
       }
-      setMensaje({ tipo: 'ok', texto: `Dosis registrada para ${patientName}.` })
+      setRegistrandoDosisId(null)
+      setDosisAplicadaInput('')
+      setActualizarEsquemaCheck(false)
+      setNotaDosisInput('')
+      setMensaje({
+        tipo: 'ok',
+        texto: actualizarEsquemaCheck
+          ? `Dosis registrada y esquema actualizado para ${item.patientName}.`
+          : `Dosis registrada para ${item.patientName}.`,
+      })
       router.refresh()
     })
   }
@@ -422,6 +493,9 @@ export function HemodialisisPanel({
     const esNota = item.section === 'nota'
     const esNovedad = item.section === 'novedad'
     const esPre = item.section === 'predialisis'
+    const esquemaEdit = esAntibiotico
+      ? parsearEsquemaDosis(item.title)
+      : { dosisInicial: item.title, dosisIntervalo: null }
 
     return (
       <form
@@ -445,7 +519,7 @@ export function HemodialisisPanel({
           <div>
             <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
               {esAntibiotico
-                ? 'Antibiótico y esquema *'
+                ? 'Antibiótico y dosis inicial *'
                 : esCultivo
                   ? 'Tipo de cultivo *'
                   : esPre
@@ -457,28 +531,69 @@ export function HemodialisisPanel({
             <input
               name="title"
               required
-              defaultValue={item.title}
+              defaultValue={esquemaEdit.dosisInicial}
               className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
 
-          <div>
-            <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              {esAntibiotico
-                ? 'Momento de dosis'
-                : esNovedad || esPre
+          {esAntibiotico ? (
+            <>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Dosis tras intervalo / 48h (opcional)
+                </label>
+                <input
+                  name="intervalDose"
+                  defaultValue={esquemaEdit.dosisIntervalo ?? ''}
+                  placeholder="Ej. 1.5 g post-HD"
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Frecuencia de administración
+                </label>
+                <select
+                  name="shiftLabel"
+                  value={atbFreqEdit}
+                  onChange={(e) => setAtbFreqEdit(e.target.value)}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                >
+                  {OPCIONES_FRECUENCIA_ATB_HD.map((op) => (
+                    <option key={op.codigo} value={op.codigo}>
+                      {op.label}
+                    </option>
+                  ))}
+                  <option value="otra">Otra frecuencia...</option>
+                </select>
+                {atbFreqEdit === 'otra' && (
+                  <input
+                    name="customShiftLabel"
+                    value={atbFreqCustomEdit}
+                    onChange={(e) => setAtbFreqCustomEdit(e.target.value)}
+                    placeholder="Ej. c/36h o L-M-V"
+                    className="mt-1.5 w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  />
+                )}
+              </div>
+            </>
+          ) : (
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                {esNovedad || esPre
                   ? 'Turno / Horario'
                   : esNota
                     ? 'Frecuencia / Área'
                     : 'Etiqueta / Turno'}
-            </label>
-            <input
-              name="shiftLabel"
-              defaultValue={item.shiftLabel ?? ''}
-              placeholder={esAntibiotico ? 'Ej. Post-HD, C/48h' : 'Ej. 1er Turno, M-J-S'}
-              className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-            />
-          </div>
+              </label>
+              <input
+                name="shiftLabel"
+                defaultValue={item.shiftLabel ?? ''}
+                placeholder="Ej. 1er Turno, M-J-S"
+                className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              />
+            </div>
+          )}
 
           <div className="sm:col-span-2">
             <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -570,6 +685,20 @@ export function HemodialisisPanel({
     if (!puedeRegistrar) return null
     const editando = editandoId === item.id
     const resolviendo = resolviendoId === item.id
+    const registrandoDosis = registrandoDosisId === item.id
+
+    const calcAtb =
+      item.section === 'antibiotico'
+        ? calcularConteoAntibiotico({
+            eventDateIso: item.eventDate,
+            durationDays: item.durationDays,
+            shiftLabel: item.shiftLabel,
+            title: item.title,
+            lastCheckAtIso: item.lastCheckAt,
+            ahoraIso,
+            dosisRegistradas: item.doseCount ?? (item.lastCheckAt ? 1 : 0),
+          })
+        : null
 
     return (
       <div className="space-y-2">
@@ -578,11 +707,17 @@ export function HemodialisisPanel({
             <button
               type="button"
               disabled={isPending}
-              onClick={() => handleRegistrarDosis(item.id, item.patientName)}
+              onClick={() => abrirRegistroDosis(item)}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold cursor-pointer"
             >
               <Syringe className="w-3 h-3" />
-              <span>Registrar dosis</span>
+              <span>
+                {registrandoDosis
+                  ? 'Cerrar dosis'
+                  : calcAtb?.freq.es48Horas
+                    ? 'Aplicar / Cambiar dosis'
+                    : 'Registrar dosis'}
+              </span>
             </button>
           )}
 
@@ -590,7 +725,23 @@ export function HemodialisisPanel({
             type="button"
             onClick={() => {
               setResolviendoId(null)
-              setEditandoId(editando ? null : item.id)
+              setRegistrandoDosisId(null)
+              if (editando) {
+                setEditandoId(null)
+              } else {
+                if (item.section === 'antibiotico') {
+                  const f = parsearFrecuenciaAtb(item.shiftLabel, item.title)
+                  const matchPre = OPCIONES_FRECUENCIA_ATB_HD.some((o) => o.codigo === f.codigo)
+                  if (matchPre) {
+                    setAtbFreqEdit(f.codigo)
+                    setAtbFreqCustomEdit('')
+                  } else {
+                    setAtbFreqEdit('otra')
+                    setAtbFreqCustomEdit(item.shiftLabel ?? f.codigo)
+                  }
+                }
+                setEditandoId(item.id)
+              }
             }}
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold cursor-pointer"
           >
@@ -602,6 +753,7 @@ export function HemodialisisPanel({
             type="button"
             onClick={() => {
               setEditandoId(null)
+              setRegistrandoDosisId(null)
               if (resolviendo) {
                 setResolviendoId(null)
                 setNotaResolucion('')
@@ -616,6 +768,80 @@ export function HemodialisisPanel({
             <span>{resolveLabel}</span>
           </button>
         </div>
+
+        {registrandoDosis && calcAtb && (
+          <div className="bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-blue-900 dark:text-blue-200">
+              <span className="font-bold">
+                Registro de dosis · {calcAtb.freq.etiqueta}
+              </span>
+              <span className="tabular-nums font-semibold">
+                Dosis #{(calcAtb.dosisRegistradas ?? 0) + 1}
+              </span>
+            </div>
+
+            {calcAtb.freq.es48Horas && (
+              <p className="text-[11px] text-blue-800 dark:text-blue-300 leading-relaxed">
+                En esquema de <strong>48 horas</strong>, confirma la dosis del intervalo o escribe el nuevo ajuste de dosis y marca actualizar esquema.
+              </p>
+            )}
+
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Dosis administrada en este intervalo
+              </label>
+              <input
+                value={dosisAplicadaInput}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setDosisAplicadaInput(val)
+                  if (val.trim() && val.trim() !== calcAtb.dosisVigente.trim()) {
+                    setActualizarEsquemaCheck(true)
+                  }
+                }}
+                placeholder={calcAtb.dosisVigente}
+                className="w-full px-2.5 py-1.5 border border-blue-200 dark:border-blue-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+              />
+            </div>
+
+            <label className="inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={actualizarEsquemaCheck}
+                onChange={(e) => setActualizarEsquemaCheck(e.target.checked)}
+                className="rounded border-slate-300"
+              />
+              <span>Actualizar la dosis vigente del esquema con este valor</span>
+            </label>
+
+            <div>
+              <input
+                value={notaDosisInput}
+                onChange={(e) => setNotaDosisInput(e.target.value)}
+                placeholder="Observación opcional (ej. Ajuste c/48h, administrado post-HD)"
+                className="w-full px-2.5 py-1.5 border border-blue-200 dark:border-blue-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setRegistrandoDosisId(null)}
+                className="px-2.5 py-1 rounded border border-slate-300 dark:border-slate-600 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={isPending || !dosisAplicadaInput.trim()}
+                onClick={() => handleRegistrarDosisSubmit(item)}
+                className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold cursor-pointer"
+              >
+                {isPending ? 'Registrando...' : 'Confirmar dosis'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {resolviendo && (
           <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-2.5 space-y-2">
@@ -1307,25 +1533,52 @@ export function HemodialisisPanel({
                       className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     />
                   </div>
-                  <div className="sm:col-span-2">
+                  <div>
                     <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Antibiótico y esquema de dosis *
+                      Frecuencia *
+                    </label>
+                    <select
+                      name="shiftLabel"
+                      value={atbFreqNueva}
+                      onChange={(e) => setAtbFreqNueva(e.target.value)}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                    >
+                      {OPCIONES_FRECUENCIA_ATB_HD.map((op) => (
+                        <option key={op.codigo} value={op.codigo}>
+                          {op.label}
+                        </option>
+                      ))}
+                      <option value="otra">Otra frecuencia...</option>
+                    </select>
+                    {atbFreqNueva === 'otra' && (
+                      <input
+                        name="customShiftLabel"
+                        required
+                        value={atbFreqCustomNueva}
+                        onChange={(e) => setAtbFreqCustomNueva(e.target.value)}
+                        placeholder="Ej. c/36h o L-M-V"
+                        className="mt-1.5 w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                      />
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Antibiótico y dosis inicial *
                     </label>
                     <input
                       name="title"
                       required
-                      placeholder="Ej. Vancomicina 2.5 g inicio, luego 1.5 g post-HD"
+                      placeholder="Ej. Vancomicina 2.5 g inicio"
                       className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     />
                   </div>
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Momento / Frecuencia
+                      Cambio dosis en intervalo (c/48h, opc.)
                     </label>
                     <input
-                      name="shiftLabel"
-                      defaultValue="Post-HD"
-                      placeholder="Ej. Post-HD, C/48h, C/24h"
+                      name="intervalDose"
+                      placeholder="Ej. Vancomicina 1.5 g post-HD"
                       className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     />
                   </div>
@@ -1335,7 +1588,7 @@ export function HemodialisisPanel({
                     </label>
                     <input
                       name="details"
-                      placeholder="Ej. Celulitis antebrazo izq / S. haemolyticus / Pseudomonas"
+                      placeholder="Ej. Bacteriemia por catéter / S. haemolyticus / Pseudomonas"
                       className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     />
                   </div>
@@ -1365,6 +1618,9 @@ export function HemodialisisPanel({
                     />
                   </div>
                 </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  El sistema contabiliza automáticamente los ciclos según la frecuencia seleccionada (ej. c/48h, c/24h, c/12h, c/8h). Si indicas una dosis de intervalo, cambiará automáticamente al cumplirse el intervalo o tras la 1.ª dosis.
+                </p>
                 <div className="flex justify-end gap-2">
                   <button
                     type="button"
@@ -1391,11 +1647,23 @@ export function HemodialisisPanel({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {porSeccion.antibioticos.map((item) => {
-                  const dias = calcularDiasDesde(item.eventDate, ahoraIso)
+                  const dosisRegistradas = item.doseCount ?? (item.lastCheckAt ? 1 : 0)
+                  const calc = calcularConteoAntibiotico({
+                    eventDateIso: item.eventDate,
+                    durationDays: item.durationDays,
+                    shiftLabel: item.shiftLabel,
+                    title: item.title,
+                    lastCheckAtIso: item.lastCheckAt,
+                    ahoraIso,
+                    dosisRegistradas,
+                  })
+                  const historialAbierto = historialDosisAbiertoId === item.id
+                  const historialLista = item.doseHistory ?? []
+
                   return (
                     <div
                       key={item.id}
-                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3.5 space-y-2"
+                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3.5 space-y-2.5"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -1403,22 +1671,71 @@ export function HemodialisisPanel({
                             {item.patientName}
                           </h4>
                           <p className="text-[11px] text-slate-500 dark:text-slate-400 tabular-nums">
-                            {item.shiftLabel || 'Esquema HD'}
+                            {calc.freq.etiqueta}
                             {item.eventDate ? ` · Inicio ${fmtFechaCorta(item.eventDate)}` : ''}
                           </p>
                         </div>
 
-                        {dias !== null && (
-                          <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 tabular-nums shrink-0">
-                            Día {dias}
-                            {item.durationDays ? ` / ${item.durationDays}` : ''}
-                          </span>
+                        {calc.diasTranscurridos !== null && (
+                          <div className="text-right shrink-0 tabular-nums">
+                            <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 block">
+                              Día {calc.diasTranscurridos}
+                              {item.durationDays ? ` / ${item.durationDays}` : ''}
+                            </span>
+                            {calc.dosisSegunFrecuencia !== null && (
+                              <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                                {calc.freq.codigo}: Dosis #{calc.dosisSegunFrecuencia}
+                                {calc.totalDosisPlanificadas ? ` de ${calc.totalDosisPlanificadas}` : ''}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
 
-                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">
-                        {item.title}
-                      </p>
+                      <div className="rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700/80 px-3 py-2 space-y-1">
+                        <div className="flex flex-wrap items-baseline justify-between gap-2">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white">
+                            {calc.esquema.dosisIntervalo ? (
+                              <>
+                                Dosis vigente ({calc.enFaseIntervalo ? `fase ${calc.freq.codigo}` : 'inicio'}):{' '}
+                                <span className="text-indigo-700 dark:text-indigo-300">
+                                  {calc.dosisVigente}
+                                </span>
+                              </>
+                            ) : (
+                              calc.dosisVigente
+                            )}
+                          </p>
+                          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 tabular-nums">
+                            Aplicadas: {calc.dosisRegistradas}
+                          </span>
+                        </div>
+
+                        {calc.esquema.dosisIntervalo && (
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            {calc.enFaseIntervalo
+                              ? `Inicio previo: ${calc.esquema.dosisInicial}`
+                              : `Cambio programado en ${calc.freq.codigo}: ${calc.esquema.dosisIntervalo}`}
+                          </p>
+                        )}
+
+                        {calc.freq.intervalHours !== null && (
+                          <p
+                            className={`text-[11px] font-semibold tabular-nums ${
+                              calc.tocaNuevaDosis
+                                ? 'text-amber-700 dark:text-amber-300'
+                                : 'text-slate-600 dark:text-slate-300'
+                            }`}
+                          >
+                            {calc.tocaNuevaDosis
+                              ? item.lastCheckAt
+                                ? `Intervalo ${calc.freq.codigo} cumplido (${calc.horasTranscurridasDesdeUltima}h) · Corresponde dosis`
+                                : `Dosis inicial pendiente (${calc.freq.codigo})`
+                              : `Próxima dosis en ${calc.horasRestantesProxima}h (${calc.freq.codigo})`}
+                          </p>
+                        )}
+                      </div>
+
                       {item.details && (
                         <p className="text-xs text-slate-600 dark:text-slate-300">
                           Foco / Germen: {item.details}
@@ -1426,10 +1743,46 @@ export function HemodialisisPanel({
                       )}
 
                       {item.lastCheckAt && item.lastCheckByName && (
-                        <p className="text-[11px] text-blue-700 dark:text-blue-300 font-medium tabular-nums">
-                          Última dosis aplicada: {item.lastCheckByName} ({rolLegible(item.lastCheckByRole ?? '')}) ·{' '}
-                          {fmtFechaHora(item.lastCheckAt)}
-                        </p>
+                        <div className="text-[11px] text-blue-700 dark:text-blue-300 font-medium tabular-nums flex flex-wrap items-center justify-between gap-2">
+                          <span>
+                            Última dosis{item.lastDoseApplied ? ` (${item.lastDoseApplied})` : ''}:{' '}
+                            {item.lastCheckByName} ({rolLegible(item.lastCheckByRole ?? '')}) ·{' '}
+                            {fmtFechaHora(item.lastCheckAt)}
+                          </span>
+                          {historialLista.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setHistorialDosisAbiertoId(historialAbierto ? null : item.id)
+                              }
+                              className="text-indigo-700 dark:text-indigo-300 hover:underline font-semibold cursor-pointer"
+                            >
+                              {historialAbierto
+                                ? 'Ocultar dosis'
+                                : `Ver dosis (${historialLista.length})`}
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {historialAbierto && historialLista.length > 0 && (
+                        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/50 p-2.5 space-y-1.5 text-[11px]">
+                          {historialLista.map((entry, idx) => (
+                            <div
+                              key={`${item.id}-dose-${idx}`}
+                              className="flex flex-wrap items-baseline justify-between gap-x-2 border-b last:border-b-0 border-slate-200/60 dark:border-slate-700/60 pb-1 last:pb-0"
+                            >
+                              <span className="font-semibold text-slate-800 dark:text-slate-100">
+                                {entry.dose}
+                                {entry.esquemaActualizado ? ' · (Cambio en intervalo)' : ''}
+                                {entry.note ? ` — ${entry.note}` : ''}
+                              </span>
+                              <span className="text-slate-500 dark:text-slate-400 tabular-nums">
+                                {entry.byName} ({rolLegible(entry.byRole)}) · {fmtFechaHora(entry.at)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       )}
 
                       {renderItemActions(
