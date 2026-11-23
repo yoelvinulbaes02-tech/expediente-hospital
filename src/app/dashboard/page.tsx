@@ -1,11 +1,12 @@
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { signOut } from '@/auth'
+import { obtenerSesionSegura, signOut } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { ListaPacientes } from '@/components/ListaPacientes'
 import { ConsultasDashboard } from '@/components/ConsultasDashboard'
 import { ROLES_CLINICOS } from '@/lib/permisos'
 import { obtenerContextoResidencia } from '@/lib/tenant'
+import { registrarCierreSesionNonce } from '@/lib/session-control'
 import {
   CATEGORIAS_DISPOSITIVOS_CIRUGIA,
   resolverTeamAutomatico,
@@ -551,6 +552,14 @@ export default async function DashboardPage({
 
   async function cerrarSesion() {
     'use server'
+    const sesionActual = await obtenerSesionSegura()
+    if (sesionActual?.user?.id && sesionActual.sessionNonce) {
+      await registrarCierreSesionNonce({
+        actorId: sesionActual.user.id,
+        actorRole: String(sesionActual.user.role ?? 'READONLY'),
+        sessionNonce: sesionActual.sessionNonce,
+      })
+    }
     await signOut({ redirectTo: '/login' })
   }
 

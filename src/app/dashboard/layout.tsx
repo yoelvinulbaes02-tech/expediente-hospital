@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { auth } from '@/auth'
 import { obtenerContextoResidencia } from '@/lib/tenant'
 import { SessionTimeout } from '@/components/SessionTimeout'
 
@@ -24,7 +25,16 @@ export default async function DashboardLayout({
       PREFIJOS_COOKIE_SESION.some((p) => c.name === p || c.name.startsWith(`${p}.`))
     )
     if (tieneCookieSesion) {
-      redirect('/api/auth/limpiar-sesion')
+      let motivo = ''
+      try {
+        const s = await auth()
+        if (s?.revokedReason === 'evicted') {
+          motivo = '?motivo=limite_sesiones'
+        }
+      } catch {
+        // Ignorar si la cookie está corrupta
+      }
+      redirect(`/api/auth/limpiar-sesion${motivo}`)
     }
     redirect('/login')
   }

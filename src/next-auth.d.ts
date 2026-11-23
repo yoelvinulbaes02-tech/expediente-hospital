@@ -5,9 +5,13 @@ declare module "next-auth" {
   interface User {
     role?: string
     residencyId?: string | null
+    sessionNonce?: string
+    sessionStartedAt?: number
   }
 
   interface Session {
+    revokedReason?: string | null
+    sessionNonce?: string | null
     user: {
       id: string
       role: string
@@ -21,6 +25,9 @@ declare module "next-auth/jwt" {
     id: string
     role: string
     residencyId: string | null
+    sessionNonce?: string
+    sessionStartedAt?: number
+    revokedReason?: string | null
   }
 }
 

@@ -39,6 +39,7 @@ export default async function UsuariosPage({
   const { q } = await searchParams
   const busqueda = q || ''
   const esPagoIndividual = ctx.residency.billingMode === 'INDIVIDUAL'
+  const suscripcionBloqueada = !ctx.esSuperAdmin && Boolean(ctx.suscripcion?.bloqueada)
 
   const [usuarios, activosCount] = await Promise.all([
     prisma.user.findMany({
@@ -93,10 +94,29 @@ export default async function UsuariosPage({
           </Link>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
-          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Crear Nuevo Usuario</h2>
-          <FormularioCrearUsuario />
-        </div>
+        {suscripcionBloqueada ? (
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 p-5 rounded-xl mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base font-bold text-red-900 dark:text-red-200">
+                Creación y reactivación de usuarios bloqueada por suscripción suspendida
+              </h2>
+              <p className="text-xs text-red-800 dark:text-red-300 mt-0.5">
+                Regulariza el pago de tu suscripción para habilitar nuevas altas o reactivar cuentas de tu equipo clínico.
+              </p>
+            </div>
+            <Link
+              href="/dashboard/suscripcion"
+              className="shrink-0 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold text-center"
+            >
+              Renovar suscripción →
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Crear Nuevo Usuario</h2>
+            <FormularioCrearUsuario />
+          </div>
+        )}
 
         <div className="mb-4">
           <SearchInput defaultValue={busqueda} placeholder="🔍 Buscar doctor por nombre o correo..." />
@@ -185,7 +205,19 @@ export default async function UsuariosPage({
                               <input type="hidden" name="isActive" value={String(!u.isActive)} />
                               <button
                                 type="submit"
-                                className={`text-xs font-medium px-2 py-1 rounded border transition-colors ${u.isActive ? 'text-red-600 border-red-200 hover:bg-red-50' : 'text-green-600 border-green-200 hover:bg-green-50'}`}
+                                disabled={!u.isActive && suscripcionBloqueada}
+                                title={
+                                  !u.isActive && suscripcionBloqueada
+                                    ? 'Renueva tu suscripción para reactivar usuarios'
+                                    : undefined
+                                }
+                                className={`text-xs font-medium px-2 py-1 rounded border transition-colors ${
+                                  u.isActive
+                                    ? 'text-red-600 border-red-200 hover:bg-red-50'
+                                    : suscripcionBloqueada
+                                      ? 'text-slate-400 border-slate-200 bg-slate-100 cursor-not-allowed'
+                                      : 'text-green-600 border-green-200 hover:bg-green-50'
+                                }`}
                               >
                                 {u.isActive ? 'Desactivar' : 'Activar'}
                               </button>

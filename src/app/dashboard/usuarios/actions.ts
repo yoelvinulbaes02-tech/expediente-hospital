@@ -162,6 +162,7 @@ export async function toggleUsuario(formData: FormData): Promise<void> {
   if (!objetivo) return
 
   if (nuevoEstado) {
+    if (admin.suscripcionBloqueada) return
     const activosEnResidencia = await prisma.user.count({
       where: { residencyId: admin.residencyId, isActive: true },
     })

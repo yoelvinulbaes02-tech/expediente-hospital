@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { obtenerSesionSegura } from '@/auth'
+import { registrarCierreSesionNonce } from '@/lib/session-control'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,13 +39,15 @@ function esCookieDeAutenticacion(nombre: string): boolean {
 }
 
 function construirUrlLogin(req: NextRequest): URL {
+  const motivo = req.nextUrl.searchParams.get('motivo')
+  const suffix = motivo === 'limite_sesiones' ? '/login?reset=1&motivo=limite_sesiones' : '/login?reset=1'
   const forwardedHost = req.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
   const forwardedProto = req.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
   if (forwardedHost) {
     const proto = forwardedProto === 'http' ? 'http' : 'https'
-    return new URL('/login?reset=1', `${proto}://${forwardedHost}`)
+    return new URL(suffix, `${proto}://${forwardedHost}`)
   }
-  return new URL('/login?reset=1', req.nextUrl.origin)
+  return new URL(suffix, req.nextUrl.origin)
 }
 
 function limpiarYRedirigir(req: NextRequest): NextResponse {
@@ -92,10 +96,27 @@ function limpiarYRedirigir(req: NextRequest): NextResponse {
   return response
 }
 
+async function liberarSlotSiAplica() {
+  try {
+    const sesion = await obtenerSesionSegura()
+    if (sesion?.user?.id && sesion.sessionNonce) {
+      await registrarCierreSesionNonce({
+        actorId: sesion.user.id,
+        actorRole: String(sesion.user.role ?? 'READONLY'),
+        sessionNonce: sesion.sessionNonce,
+      })
+    }
+  } catch {
+    // No bloquear limpieza de cookies si la sesión ya es ilegible
+  }
+}
+
 export async function GET(req: NextRequest) {
+  await liberarSlotSiAplica()
   return limpiarYRedirigir(req)
 }
 
 export async function POST(req: NextRequest) {
+  await liberarSlotSiAplica()
   return limpiarYRedirigir(req)
 }

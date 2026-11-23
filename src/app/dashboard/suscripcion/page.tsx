@@ -3,7 +3,12 @@ import {
   obtenerContextoResidencia,
   obtenerTarifaIndividualUsuario,
 } from '@/lib/tenant'
-import { estaPayPalConfigurado, obtenerPayPalClientId } from '@/lib/paypal'
+import {
+  estaPayPalConfigurado,
+  estaPayPalWebhookConfigurado,
+  extraerSuscripcionActivaDeNota,
+  obtenerPayPalClientId,
+} from '@/lib/paypal'
 import { PagoHibridoSuscripcion } from '@/components/PagoHibridoSuscripcion'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -65,6 +70,7 @@ export default async function SuscripcionPage({
   const interfaceModeStr = String(ctx.residency.interfaceMode)
   const paypalClientId = obtenerPayPalClientId()
   const paypalConfigurado = estaPayPalConfigurado()
+  const paypalWebhookConfigurado = estaPayPalWebhookConfigurado()
   const paypalEnv = (process.env.PAYPAL_ENV ?? 'sandbox').trim().toLowerCase() === 'live' ? 'live' : 'sandbox'
 
   const precioAplicable = esIndividual
@@ -73,6 +79,9 @@ export default async function SuscripcionPage({
   const fechaVencimientoAplicable = esIndividual
     ? ctx.user.subscriptionEndsAt
     : ctx.residency.subscriptionEndsAt
+  const suscripcionAutomaticaId = extraerSuscripcionActivaDeNota(
+    esIndividual ? ctx.user.lastPaymentNote : ctx.residency.lastPaymentNote
+  )
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8">
@@ -208,6 +217,8 @@ export default async function SuscripcionPage({
             paypalClientId={paypalClientId}
             paypalConfigurado={paypalConfigurado}
             paypalEnv={paypalEnv}
+            suscripcionAutomaticaId={suscripcionAutomaticaId}
+            paypalWebhookConfigurado={paypalWebhookConfigurado}
           />
         )}
 

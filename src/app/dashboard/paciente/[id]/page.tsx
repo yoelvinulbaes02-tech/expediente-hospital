@@ -159,7 +159,7 @@ export default async function ExpedientePage({
     }
   }
 
-  const suscripcionBloqueada = ctx.suscripcion?.bloqueada ?? false
+  const suscripcionBloqueada = !ctx.esSuperAdmin && (ctx.suscripcion?.bloqueada ?? false)
   const permisosBase = calcularPermisos(role, userId, episode)
   const permisos = suscripcionBloqueada
     ? {
@@ -423,6 +423,16 @@ export default async function ExpedientePage({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {suscripcionBloqueada && (
+        <div className="hidden print:block p-8 m-8 border-2 border-red-400 rounded-xl text-center">
+          <h1 className="text-lg font-bold text-red-900">Impresión bloqueada por suscripción vencida</h1>
+          <p className="text-sm text-red-800 mt-2">
+            La consulta clínica en pantalla permanece habilitada para continuidad de urgencia, pero la impresión y exportación operativa requieren renovar el plan en Mi Suscripción.
+          </p>
+        </div>
+      )}
+
+      <div className={suscripcionBloqueada ? 'print:hidden' : undefined}>
       {/* BARRA FIJA SUPERIOR CON EL NOMBRE DEL PACIENTE AL HACER SCROLL */}
       <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs print:hidden">
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
@@ -469,7 +479,24 @@ export default async function ExpedientePage({
           </div>
         )}
 
-        {esSoloLectura && (
+        {suscripcionBloqueada && (
+          <div className="bg-red-50 border border-red-300 text-red-900 px-4 py-3 rounded-lg mb-4 flex flex-wrap items-center justify-between gap-2 print:hidden">
+            <div className="text-xs sm:text-sm">
+              <strong>Suscripción suspendida · Solo lectura clínica de urgencia:</strong>{' '}
+              <span>
+                El expediente sigue visible para continuidad asistencial, pero la edición e impresión de reportes están bloqueadas hasta regularizar el pago.
+              </span>
+            </div>
+            <Link
+              href="/dashboard/suscripcion"
+              className="shrink-0 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold"
+            >
+              Renovar suscripción →
+            </Link>
+          </div>
+        )}
+
+        {!permisos.activo && (
           <div className="bg-amber-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-6 flex flex-wrap items-center justify-between gap-2 print:hidden">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xl">🔒</span>
@@ -1296,7 +1323,7 @@ export default async function ExpedientePage({
                 <h2 className="text-lg font-bold text-slate-800">
                   {soloDiuresisInterconsulta ? 'Historial de Diuresis' : 'Últimos Signos Vitales'}
                 </h2>
-                <BotonImprimirSignos />
+                <BotonImprimirSignos bloqueado={suscripcionBloqueada} />
               </div>
 
               <table className="w-full text-xs text-left">
@@ -1474,6 +1501,7 @@ export default async function ExpedientePage({
           </div>
         </div>
         </div>
+      </div>
       </div>
     </div>
   )

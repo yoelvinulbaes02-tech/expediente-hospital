@@ -4,6 +4,11 @@ import Google from 'next-auth/providers/google'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
+import {
+  estaSesionRevocada,
+  generarNonceSesion,
+  registrarNuevaSesionYEviccionarExceso,
+} from '@/lib/session-control'
 
 const VENTANA_BLOQUEO_MS = 15 * 60 * 1000
 const MAX_INTENTOS_POR_IP = 20
@@ -112,14 +117,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        await logAudit({
+        const sessionNonce = generarNonceSesion()
+        const sessionStartedAt = Date.now()
+
+        await registrarNuevaSesionYEviccionarExceso({
           actorId: user.id,
           actorRole: user.role,
-          action: 'login',
-          entity: 'auth',
-          reason: 'Inicio de sesión exitoso',
           ipAddress,
           userAgent,
+          sessionNonce,
         })
 
         return {
@@ -128,6 +134,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.fullName,
           role: user.role,
           residencyId: user.residencyId ?? null,
+          sessionNonce,
+          sessionStartedAt,
         }
       },
     }),
@@ -146,10 +154,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!dbUser) {
           return false
         }
+        const sessionNonce = generarNonceSesion()
+        const sessionStartedAt = Date.now()
         user.id = dbUser.id
         user.name = dbUser.fullName
         user.role = dbUser.role
         user.residencyId = dbUser.residencyId ?? null
+        user.sessionNonce = sessionNonce
+        user.sessionStartedAt = sessionStartedAt
+
+        await registrarNuevaSesionYEviccionarExceso({
+          actorId: dbUser.id,
+          actorRole: String(dbUser.role),
+          sessionNonce,
+        })
       }
       return true
     },
@@ -158,6 +176,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id!
         token.role = String(user.role ?? 'READONLY')
         token.residencyId = user.residencyId ?? null
+        token.sessionNonce = user.sessionNonce
+        token.sessionStartedAt = user.sessionStartedAt ?? Date.now()
+        token.revokedReason = null
         return token
       }
 
@@ -170,6 +191,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!dbUser || !dbUser.isActive) {
             token.role = 'REVOKED'
             token.residencyId = null
+            token.revokedReason = 'inactive'
+          } else if (token.sessionNonce) {
+            const estadoNonce = await estaSesionRevocada({
+              actorId: String(token.id),
+              sessionNonce: String(token.sessionNonce),
+              sessionStartedAt: token.sessionStartedAt ?? null,
+            })
+            if (estadoNonce.revocada) {
+              token.role = 'REVOKED'
+              token.residencyId = null
+              token.revokedReason = estadoNonce.motivo ?? 'evicted'
+            } else {
+              token.role = String(dbUser.role)
+              token.residencyId = dbUser.residencyId ?? null
+              token.revokedReason = null
+            }
           } else {
             token.role = String(dbUser.role)
             token.residencyId = dbUser.residencyId ?? null
@@ -183,14 +220,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (!token?.id || token.role === 'REVOKED') {
-        // Invalidar datos de sesión si el usuario fue desactivado o el token es inválido
-        return { expires: session.expires } as typeof session
+        // Invalidar datos de sesión si el usuario fue desactivado o superó el límite de sesiones
+        return {
+          expires: session.expires,
+          revokedReason: token?.revokedReason ?? 'revoked',
+        } as typeof session
       }
       if (session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
         session.user.residencyId = (token.residencyId as string | null) ?? null
       }
+      session.sessionNonce = token.sessionNonce ?? null
+      session.revokedReason = null
       return session
     },
   },

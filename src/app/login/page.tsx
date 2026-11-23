@@ -10,7 +10,7 @@ import { LegalFooter } from '@/components/LegalFooter'
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; reset?: string }>
+  searchParams: Promise<{ error?: string; reset?: string; motivo?: string }>
 }) {
   const session = await obtenerSesionSegura()
   if (session?.user?.id) {
@@ -32,7 +32,7 @@ export default async function LoginPage({
     }
   }
 
-  const { error, reset } = await searchParams
+  const { error, reset, motivo } = await searchParams
 
   async function loginAction(formData: FormData) {
     'use server'
@@ -92,8 +92,16 @@ export default async function LoginPage({
         </div>
 
         {reset === '1' && !error && (
-          <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 px-4 py-2.5 rounded-lg text-xs font-medium text-center">
-            Tu sesión anterior caducó o fue reiniciada. Inicia sesión nuevamente.
+          <div
+            className={`px-4 py-2.5 rounded-lg text-xs font-medium text-center border ${
+              motivo === 'limite_sesiones'
+                ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200'
+                : 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200'
+            }`}
+          >
+            {motivo === 'limite_sesiones'
+              ? 'Tu sesión se cerró porque esta cuenta alcanzó el límite de 2 sesiones simultáneas en otro dispositivo.'
+              : 'Tu sesión anterior caducó o fue reiniciada. Inicia sesión nuevamente.'}
           </div>
         )}
 

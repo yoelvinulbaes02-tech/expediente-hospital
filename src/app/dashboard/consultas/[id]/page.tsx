@@ -62,8 +62,8 @@ export default async function ConsultaDetallePage({
     }
   }
 
-  const puedeEditar =
-    ROLES_CLINICOS.includes(ctx.user.role) && !(ctx.suscripcion?.bloqueada ?? false)
+  const suscripcionBloqueada = !ctx.esSuperAdmin && (ctx.suscripcion?.bloqueada ?? false)
+  const puedeEditar = ROLES_CLINICOS.includes(ctx.user.role) && !suscripcionBloqueada
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -94,32 +94,55 @@ export default async function ConsultaDetallePage({
             <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
               {consulta.status}
             </span>
-            <PrintButton />
+            <PrintButton bloqueado={suscripcionBloqueada} />
           </div>
         </div>
       </div>
 
       {/* CABECERA SOLO PARA IMPRESIÓN DE RECETA / RESUMEN */}
-      <div className="hidden print:block max-w-4xl mx-auto p-6 border-b-2 border-slate-900 mb-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-xl font-black text-slate-900">{consulta.residency.name}</h1>
-            <p className="text-xs text-slate-600">{consulta.residency.specialty}</p>
-          </div>
-          <div className="text-right text-xs text-slate-600 tabular-nums">
-            <p>Fecha: {fmtFecha(consulta.consultationDate)}</p>
-            <p>Exp: {consulta.patient.expedienteNumber}</p>
-          </div>
+      {suscripcionBloqueada ? (
+        <div className="hidden print:block max-w-4xl mx-auto p-8 m-8 border-2 border-red-400 rounded-xl text-center">
+          <h1 className="text-lg font-bold text-red-900">Impresión de consulta bloqueada</h1>
+          <p className="text-sm text-red-800 mt-2">
+            La suscripción está vencida o suspendida. Renueva el plan en Mi Suscripción para habilitar la impresión de resúmenes y recetas.
+          </p>
         </div>
-        <p className="mt-3 text-sm font-bold text-slate-900">
-          Paciente: {consulta.patient.firstName} {consulta.patient.lastName} ({consulta.patient.age ?? '—'} años · {consulta.patient.sex})
-        </p>
-        {consulta.doctorName && (
-          <p className="text-xs text-slate-700">Médico tratante: {consulta.doctorName}</p>
-        )}
-      </div>
+      ) : (
+        <div className="hidden print:block max-w-4xl mx-auto p-6 border-b-2 border-slate-900 mb-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-xl font-black text-slate-900">{consulta.residency.name}</h1>
+              <p className="text-xs text-slate-600">{consulta.residency.specialty}</p>
+            </div>
+            <div className="text-right text-xs text-slate-600 tabular-nums">
+              <p>Fecha: {fmtFecha(consulta.consultationDate)}</p>
+              <p>Exp: {consulta.patient.expedienteNumber}</p>
+            </div>
+          </div>
+          <p className="mt-3 text-sm font-bold text-slate-900">
+            Paciente: {consulta.patient.firstName} {consulta.patient.lastName} ({consulta.patient.age ?? '—'} años · {consulta.patient.sex})
+          </p>
+          {consulta.doctorName && (
+            <p className="text-xs text-slate-700">Médico tratante: {consulta.doctorName}</p>
+          )}
+        </div>
+      )}
 
-      <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
+      <div className={`max-w-6xl mx-auto p-4 md:p-8 space-y-6 ${suscripcionBloqueada ? 'print:hidden' : ''}`}>
+        {suscripcionBloqueada && (
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200 px-4 py-3 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs print:hidden">
+            <p>
+              <strong>Suscripción suspendida:</strong> Puedes consultar este expediente en pantalla por continuidad clínica, pero la edición y la impresión están bloqueadas hasta regularizar el pago.
+            </p>
+            <Link
+              href="/dashboard/suscripcion"
+              className="shrink-0 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-bold"
+            >
+              Renovar suscripción →
+            </Link>
+          </div>
+        )}
+
         <div className="print:hidden">
           <BannerAlergias alergias={consulta.patient.allergies} />
         </div>

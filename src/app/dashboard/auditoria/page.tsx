@@ -80,6 +80,8 @@ export default async function AuditoriaPage({
     serverTs: log.serverTs.toISOString(),
   }))
 
+  const bloqueadoPorSuscripcion = !ctx.esSuperAdmin && Boolean(ctx.suscripcion?.bloqueada)
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -103,11 +105,26 @@ export default async function AuditoriaPage({
           </div>
         </div>
 
+        {bloqueadoPorSuscripcion && (
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200 px-4 py-3 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <p className="font-medium">
+              La suscripción está vencida o suspendida. Puedes consultar el registro en pantalla, pero la exportación masiva (CSV/Excel) está bloqueada hasta regularizar el pago.
+            </p>
+            <Link
+              href="/dashboard/suscripcion"
+              className="shrink-0 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-center"
+            >
+              Renovar suscripción →
+            </Link>
+          </div>
+        )}
+
         <TablaAuditoria
           logs={logs}
           fechaDesde={desde || ''}
           fechaHasta={hasta || ''}
           queryInicial={q || ''}
+          bloqueadoPorSuscripcion={bloqueadoPorSuscripcion}
         />
       </div>
     </div>

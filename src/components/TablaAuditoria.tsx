@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Download, Lock } from 'lucide-react'
 
 export type AuditItem = {
   id: string
@@ -25,6 +27,10 @@ const ETIQUETA_ACCION: Record<string, { label: string; color: string }> = {
   delete: { label: 'Eliminación', color: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' },
   discharge: { label: 'Alta Médica', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' },
   consent: { label: 'Consentimiento Legal', color: 'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300' },
+  login: { label: 'Inicio de Sesión', color: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300' },
+  login_failed: { label: 'Acceso Fallido', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' },
+  session_evicted: { label: 'Límite Sesiones', color: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300' },
+  logout: { label: 'Cierre de Sesión', color: 'bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-200' },
 }
 
 const fmtFechaHora = (iso: string) => {
@@ -45,11 +51,13 @@ export function TablaAuditoria({
   fechaDesde,
   fechaHasta,
   queryInicial,
+  bloqueadoPorSuscripcion = false,
 }: {
   logs: AuditItem[]
   fechaDesde: string
   fechaHasta: string
   queryInicial: string
+  bloqueadoPorSuscripcion?: boolean
 }) {
   const router = useRouter()
   const [desde, setDesde] = useState(fechaDesde)
@@ -75,7 +83,7 @@ export function TablaAuditoria({
 
   // EXPORTAR REPORTE OFICIAL EN FORMATO EXCEL (CSV CON UTF-8 BOM)
   const exportarExcel = () => {
-    if (logs.length === 0) return
+    if (bloqueadoPorSuscripcion || logs.length === 0) return
 
     const encabezados = [
       'Secuencia',
@@ -185,14 +193,25 @@ export function TablaAuditoria({
         </div>
 
         {/* BOTÓN OFICIAL DE EXPORTAR A EXCEL */}
-        <button
-          type="button"
-          onClick={exportarExcel}
-          disabled={logs.length === 0}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
-        >
-          <span>📥</span> Exportar a Excel (CSV)
-        </button>
+        {bloqueadoPorSuscripcion ? (
+          <Link
+            href="/dashboard/suscripcion"
+            className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            Exportación bloqueada · Renovar
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={exportarExcel}
+            disabled={logs.length === 0}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Exportar a Excel (CSV)
+          </button>
+        )}
       </form>
 
       {/* TABLA DE AUDITORÍA */}

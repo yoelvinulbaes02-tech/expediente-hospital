@@ -1,10 +1,15 @@
 import { prisma } from '@/lib/prisma'
-import { signOut } from '@/auth'
+import { obtenerSesionSegura, signOut } from '@/auth'
 import { obtenerContextoResidencia } from '@/lib/tenant'
+import {
+  obtenerAlertasCuentasCompartidas,
+  registrarCierreSesionNonce,
+} from '@/lib/session-control'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { InputPassword } from '@/components/InputPassword'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { CheckCircle2, ShieldAlert } from 'lucide-react'
 import {
   actualizarResidencia,
   crearResidenciaConAdmin,
@@ -119,6 +124,7 @@ export default async function PlataformaPage({
     pagosAprobadosFechas,
     archivadosPruebaCount,
     todosUsuariosEmail,
+    resumenCuentasCompartidas,
   ] = await Promise.all([
     prisma.residency.findMany({
       orderBy: { createdAt: 'desc' },
@@ -221,6 +227,7 @@ export default async function PlataformaPage({
     prisma.user.findMany({
       select: { email: true, fullName: true },
     }),
+    obtenerAlertasCuentasCompartidas(),
   ])
 
   const mapaMeses = new Map<string, { total: number; count: number }>()
@@ -268,6 +275,14 @@ export default async function PlataformaPage({
 
   async function cerrarSesion() {
     'use server'
+    const sesionActual = await obtenerSesionSegura()
+    if (sesionActual?.user?.id && sesionActual.sessionNonce) {
+      await registrarCierreSesionNonce({
+        actorId: sesionActual.user.id,
+        actorRole: String(sesionActual.user.role ?? 'SUPERADMIN'),
+        sessionNonce: sesionActual.sessionNonce,
+      })
+    }
     await signOut({ redirectTo: '/login' })
   }
 
@@ -355,6 +370,136 @@ export default async function PlataformaPage({
               {residencias.filter((r) => r.billingMode === 'INDIVIDUAL').length}
             </p>
           </div>
+        </div>
+
+        {/* MONITOR ANTI-CUENTAS COMPARTIDAS */}
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-start gap-2.5">
+              <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                  Monitor Anti-Cuentas Compartidas (Límite: 2 sesiones por usuario)
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Detecta cuentas con expulsiones automáticas de sesión (&gt;2 sesiones simultáneas) o múltiples IPs/dispositivos en las últimas 24 horas y 7 días.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs tabular-nums">
+              <span
+                className={`px-2.5 py-1 rounded-lg font-bold border ${
+                  resumenCuentasCompartidas.totalExpulsiones24h > 0
+                    ? 'bg-rose-50 text-rose-800 border-rose-200'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700'
+                }`}
+              >
+                Expulsiones 24h: {resumenCuentasCompartidas.totalExpulsiones24h}
+              </span>
+              <span
+                className={`px-2.5 py-1 rounded-lg font-bold border ${
+                  resumenCuentasCompartidas.alertas.length > 0
+                    ? 'bg-amber-50 text-amber-800 border-amber-200'
+                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                }`}
+              >
+                Alertas activas: {resumenCuentasCompartidas.alertas.length}
+              </span>
+            </div>
+          </div>
+
+          {resumenCuentasCompartidas.alertas.length === 0 ? (
+            <div className="px-6 py-5 flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-950/20">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>
+                Sin indicios recientes de uso compartido. Ninguna cuenta ha superado el límite de 2 sesiones simultáneas ni ha presentado actividad anómala de dispositivos.
+              </span>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                  <tr>
+                    <th className="px-4 py-3">Usuario / Rol</th>
+                    <th className="px-4 py-3">Residencia / Cobro</th>
+                    <th className="px-4 py-3">Expulsiones (&gt;2 sesiones)</th>
+                    <th className="px-4 py-3">IPs y Dispositivos (24h)</th>
+                    <th className="px-4 py-3">Último evento</th>
+                    <th className="px-4 py-3 text-right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  {resumenCuentasCompartidas.alertas.map((alerta) => (
+                    <tr key={alerta.userId} className="hover:bg-amber-50/40 dark:hover:bg-slate-700/30">
+                      <td className="px-4 py-3">
+                        <p className="font-bold text-slate-900 dark:text-white">{alerta.fullName}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {alerta.email} · <span className="font-semibold">{alerta.role}</span>
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-slate-800 dark:text-slate-200">
+                          {alerta.residencyName}
+                        </p>
+                        <span
+                          className={`inline-block mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                            alerta.billingMode === 'INDIVIDUAL'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-slate-100 text-slate-700'
+                          }`}
+                        >
+                          {alerta.billingMode === 'INDIVIDUAL' ? 'Individual' : 'Grupal'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 tabular-nums">
+                        <span
+                          className={`px-2 py-0.5 rounded font-bold ${
+                            alerta.evictions24h > 0
+                              ? 'bg-rose-100 text-rose-800'
+                              : 'bg-amber-100 text-amber-800'
+                          }`}
+                        >
+                          24h: {alerta.evictions24h} · 7d: {alerta.evictions7d}
+                        </span>
+                        <span className="block text-[11px] text-slate-500 mt-0.5">
+                          Accesos 24h: {alerta.logins24h}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">
+                          {alerta.uniqueIps24h} IP(s) · {alerta.uniqueDevices24h} equipo(s)
+                        </p>
+                        {alerta.dispositivos24h.length > 0 && (
+                          <p className="text-[11px] text-slate-500 truncate max-w-xs" title={alerta.dispositivos24h.join(', ')}>
+                            {alerta.dispositivos24h.join(', ')}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 tabular-nums whitespace-nowrap">
+                        <span>{fmtFechaHora(new Date(alerta.lastEventAt))}</span>
+                        <span className="block font-mono text-[11px] text-slate-400">
+                          {alerta.lastIp ?? 'IP no disponible'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        {alerta.residencyId ? (
+                          <Link
+                            href={`/dashboard/plataforma/residencia/${alerta.residencyId}`}
+                            className="inline-block px-2.5 py-1 rounded border border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold whitespace-nowrap"
+                          >
+                            Ver usuarios →
+                          </Link>
+                        ) : (
+                          <span className="text-slate-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* COLA DE PAGOS PENDIENTES (SI EXISTIERA ALGUNO LEGACY) */}

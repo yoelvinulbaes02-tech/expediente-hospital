@@ -46,7 +46,7 @@ export default async function EntregaTurnoPage({
     }
   }
 
-  const suscripcionBloqueada = ctx.suscripcion?.bloqueada ?? false
+  const suscripcionBloqueada = !ctx.esSuperAdmin && (ctx.suscripcion?.bloqueada ?? false)
   const permisosBase = calcularPermisos(role, userId, episode)
   const permisos = suscripcionBloqueada
     ? { ...permisosBase, puedeEditar: false, puedeEntregar: false }
@@ -99,20 +99,42 @@ export default async function EntregaTurnoPage({
 
   return (
     <div className="min-h-screen bg-white p-8 max-w-4xl mx-auto print:p-0">
-      {/* Cabecera para imprimir */}
-      <div className="hidden print:block border-b-2 border-black pb-4 mb-6">
-        <h1 className="text-2xl font-bold text-center">HOSPITAL GENERAL</h1>
-        <p className="text-center text-sm">Reporte de Entrega de Turno - SBAR</p>
-        <p className="text-center text-xs mt-1">Impreso el: {fmt(new Date())}</p>
-      </div>
+      {suscripcionBloqueada ? (
+        <div className="hidden print:block p-8 border-2 border-red-400 rounded-xl text-center">
+          <h1 className="text-lg font-bold text-red-900">Impresión de Entrega de Turno bloqueada</h1>
+          <p className="text-sm text-red-800 mt-2">
+            La suscripción está vencida o suspendida. Renueva el plan en Mi Suscripción para habilitar la impresión de resúmenes SBAR.
+          </p>
+        </div>
+      ) : (
+        <div className="hidden print:block border-b-2 border-black pb-4 mb-6">
+          <h1 className="text-2xl font-bold text-center">HOSPITAL GENERAL</h1>
+          <p className="text-center text-sm">Reporte de Entrega de Turno - SBAR</p>
+          <p className="text-center text-xs mt-1">Impreso el: {fmt(new Date())}</p>
+        </div>
+      )}
 
       {/* Navegación (oculta al imprimir) */}
       <div className="flex justify-between items-center mb-6 print:hidden">
         <Link href={`/dashboard/paciente/${episode.id}`} className="text-sm text-blue-600 hover:underline">
           ← Volver al Expediente
         </Link>
-        <PrintButton />
+        <PrintButton bloqueado={suscripcionBloqueada} />
       </div>
+
+      {suscripcionBloqueada && (
+        <div className="bg-red-50 border border-red-300 text-red-900 px-4 py-3 rounded-lg mb-4 flex flex-wrap items-center justify-between gap-2 text-xs print:hidden">
+          <p>
+            <strong>Suscripción suspendida:</strong> Puedes consultar la entrega de turno en pantalla por continuidad clínica, pero la impresión y transferencia están bloqueadas hasta regularizar el pago.
+          </p>
+          <Link
+            href="/dashboard/suscripcion"
+            className="shrink-0 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-bold"
+          >
+            Renovar suscripción →
+          </Link>
+        </div>
+      )}
 
       {error && (
         <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4 print:hidden">
@@ -120,7 +142,7 @@ export default async function EntregaTurnoPage({
         </div>
       )}
 
-      <div className="border border-slate-300 rounded-xl p-6 print:border-none print:p-0">
+      <div className={`border border-slate-300 rounded-xl p-6 print:border-none print:p-0 ${suscripcionBloqueada ? 'print:hidden' : ''}`}>
         {/* Datos del Paciente */}
         <div className="flex justify-between border-b pb-4 mb-4">
           <div>
