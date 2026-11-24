@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   description:
     'Plataforma clínica para médicos, residentes y equipos hospitalarios. Gestiona pases de guardia, hospitalización, nefrología y hemodiálisis, medicina interna, cirugía, ortopedia y consulta externa desde cualquier dispositivo.',
   keywords: [
+    'Nexo',
+    'Nexo Medical',
+    'Nexo Medical Team',
     'NEXO Medical Team Workflow',
     'sistema de guardia hospitalaria',
     'pase de guardia médico',
@@ -41,6 +44,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
   openGraph: {
     type: 'website',
     locale: 'es_DO',

@@ -645,3 +645,248 @@ export async function marcarSinAlergiasConsulta(formData: FormData): Promise<voi
   revalidatePath(`/dashboard/consultas/${consultationId}`)
   revalidatePath('/dashboard')
 }
+
+export async function iniciarNuevaAtencionConsulta(consultationId: string): Promise<{
+  ok: boolean
+  error?: string
+  consultationId?: string
+}> {
+  try {
+    const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
+    if (!consulta) return { ok: false, error: 'Consulta no encontrada.' }
+
+    const ultimaPrevia = await prisma.consultation.findFirst({
+      where: { residencyId: consulta.residencyId, patientId: consulta.patientId },
+      orderBy: { consultationDate: 'desc' },
+      select: { weight: true, weightUnit: true, heightCm: true },
+    })
+
+    const esMedico = ROLES_MEDICOS.includes(ctx.user.role)
+    const nueva = await prisma.consultation.create({
+      data: {
+        residencyId: consulta.residencyId,
+        patientId: consulta.patientId,
+        doctorId: esMedico ? ctx.user.id : null,
+        doctorName: esMedico ? ctx.user.fullName : null,
+        consultationDate: new Date(),
+        status: 'EN_CONSULTA',
+        visitType: 'Seguimiento',
+        chiefComplaint: 'Control de seguimiento',
+        weight: ultimaPrevia?.weight ?? null,
+        weightUnit: ultimaPrevia?.weightUnit ?? 'kg',
+        heightCm: ultimaPrevia?.heightCm ?? null,
+        createdBy: ctx.user.email,
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole: String(ctx.user.role),
+      action: 'create',
+      entity: 'consultation',
+      entityId: nueva.id,
+      patientId: consulta.patientId,
+      newValue: {
+        originConsultationId: consultationId,
+        visitType: 'Seguimiento',
+        status: 'EN_CONSULTA',
+      },
+      reason: 'Nueva atención generada al reabrir expediente vinculado (acápites anteriores preservados)',
+    })
+
+    revalidatePath('/dashboard')
+    revalidatePath(`/dashboard/consultas/${consultationId}`)
+    return { ok: true, consultationId: nueva.id }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo iniciar una nueva atención.' }
+  }
+}
+
+export async function agregarBloqueAntecedentesConsulta(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const consultationId = String(formData.get('consultationId') ?? '')
+    const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
+    if (!consulta) return { ok: false, error: 'Consulta no encontrada.' }
+
+    const pathological = String(formData.get('pathological') ?? '').trim() || null
+    const surgical = String(formData.get('surgical') ?? '').trim() || null
+    const family = String(formData.get('family') ?? '').trim() || null
+    const habits = String(formData.get('habits') ?? '').trim() || null
+    const medications = String(formData.get('medications') ?? '').trim() || null
+
+    if (!pathological && !surgical && !family && !habits && !medications) {
+      return { ok: false, error: 'Escribe al menos un antecedente antes de guardar el nuevo bloque.' }
+    }
+
+    const previo = await prisma.medicalHistory.findUnique({
+      where: { patientId: consulta.patientId },
+    })
+
+    const fechaLabel = new Date().toLocaleDateString('es-DO', {
+      timeZone: 'America/Santo_Domingo',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
+    const prefijo = `[${fechaLabel} · ${ctx.user.fullName}]`
+
+    const combinar = (anterior?: string | null, nuevo?: string | null): string | null => {
+      if (!nuevo) return anterior ?? null
+      const lineaNueva = `${prefijo} ${nuevo}`
+      if (!anterior?.trim()) return lineaNueva
+      return `${anterior.trim()}\n${lineaNueva}`
+    }
+
+    await prisma.medicalHistory.upsert({
+      where: { patientId: consulta.patientId },
+      update: {
+        pathological: combinar(previo?.pathological, pathological),
+        surgical: combinar(previo?.surgical, surgical),
+        family: combinar(previo?.family, family),
+        habits: combinar(previo?.habits, habits),
+        medications: combinar(previo?.medications, medications),
+        updatedBy: ctx.user.email,
+      },
+      create: {
+        patientId: consulta.patientId,
+        pathological: combinar(null, pathological),
+        surgical: combinar(null, surgical),
+        family: combinar(null, family),
+        habits: combinar(null, habits),
+        medications: combinar(null, medications),
+        updatedBy: ctx.user.email,
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole: String(ctx.user.role),
+      action: 'create',
+      entity: 'consulta_antecedente',
+      entityId: consultationId,
+      patientId: consulta.patientId,
+      newValue: {
+        authorId: ctx.user.id,
+        authorName: ctx.user.fullName,
+        authorEmail: ctx.user.email,
+        pathological,
+        surgical,
+        family,
+        habits,
+        medications,
+      },
+      reason: 'Nuevo bloque de antecedentes agregado sin modificar registros previos',
+    })
+
+    revalidatePath(`/dashboard/consultas/${consultationId}`)
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudieron guardar los antecedentes.' }
+  }
+}
+
+const SECCIONES_BLOQUE_VALIDAS = [
+  'signos',
+  'motivo',
+  'enfermedad',
+  'examen',
+  'diagnostico',
+  'receta',
+  'laboratorio',
+  'notas',
+] as const
+
+export async function agregarBloqueSeccionConsulta(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const consultationId = String(formData.get('consultationId') ?? '')
+    const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
+    if (!consulta) return { ok: false, error: 'Consulta no encontrada.' }
+
+    const seccion = String(formData.get('seccion') ?? '').trim()
+    if (!SECCIONES_BLOQUE_VALIDAS.includes(seccion as (typeof SECCIONES_BLOQUE_VALIDAS)[number])) {
+      return { ok: false, error: 'Sección clínica no válida.' }
+    }
+
+    let payload: Record<string, unknown> = {
+      seccion,
+      consultationId,
+      authorId: ctx.user.id,
+      authorName: ctx.user.fullName,
+      authorEmail: ctx.user.email,
+    }
+
+    if (seccion === 'signos') {
+      const bloodPressure = String(formData.get('bloodPressure') ?? '').trim() || null
+      const heartRateRaw = String(formData.get('heartRate') ?? '').trim()
+      const tempRaw = String(formData.get('temperature') ?? '').trim()
+      const spo2Raw = String(formData.get('oxygenSat') ?? '').trim()
+      const weightRaw = String(formData.get('weight') ?? '').trim()
+      const weightUnit = String(formData.get('weightUnit') ?? 'kg').trim() || 'kg'
+      const heightRaw = String(formData.get('heightCm') ?? '').trim()
+
+      const heartRate = heartRateRaw ? parseInt(heartRateRaw, 10) : null
+      const temperature = tempRaw ? parseFloat(tempRaw) : null
+      const oxygenSat = spo2Raw ? parseInt(spo2Raw, 10) : null
+      const weight = weightRaw ? parseFloat(weightRaw) : null
+      const heightCm = heightRaw ? parseFloat(heightRaw) : null
+
+      if (
+        !bloodPressure &&
+        (heartRate === null || isNaN(heartRate)) &&
+        (temperature === null || isNaN(temperature)) &&
+        (oxygenSat === null || isNaN(oxygenSat)) &&
+        (weight === null || isNaN(weight)) &&
+        (heightCm === null || isNaN(heightCm))
+      ) {
+        return { ok: false, error: 'Ingresa al menos un signo vital o medida para guardar este bloque.' }
+      }
+
+      payload = {
+        ...payload,
+        bloodPressure,
+        heartRate: heartRate !== null && !isNaN(heartRate) ? heartRate : null,
+        temperature: temperature !== null && !isNaN(temperature) ? temperature : null,
+        oxygenSat: oxygenSat !== null && !isNaN(oxygenSat) ? oxygenSat : null,
+        weight: weight !== null && !isNaN(weight) ? weight : null,
+        weightUnit,
+        heightCm: heightCm !== null && !isNaN(heightCm) ? heightCm : null,
+      }
+    } else if (seccion === 'motivo') {
+      const visitType = String(formData.get('visitType') ?? 'Seguimiento').trim() || 'Seguimiento'
+      const chiefComplaint = String(formData.get('chiefComplaint') ?? '').trim()
+      if (chiefComplaint.length < 2) {
+        return { ok: false, error: 'Escribe el nuevo motivo de consulta.' }
+      }
+      payload = { ...payload, visitType, chiefComplaint }
+    } else {
+      const contenido = String(formData.get('contenido') ?? '').trim()
+      if (contenido.length < 2) {
+        return { ok: false, error: 'Escribe la información clínica del nuevo bloque antes de guardar.' }
+      }
+      payload = { ...payload, contenido }
+    }
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole: String(ctx.user.role),
+      action: 'create',
+      entity: 'consulta_bloque',
+      entityId: consultationId,
+      patientId: consulta.patientId,
+      newValue: payload,
+      reason: `Nuevo bloque agregado en acápite "${seccion}" sin sobrescribir registros anteriores`,
+    })
+
+    revalidatePath(`/dashboard/consultas/${consultationId}`)
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo guardar el nuevo bloque.' }
+  }
+}

@@ -123,28 +123,41 @@ export default async function HomePage() {
     estaLogueado = false
   }
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'NEXO - Medical Team Workflow',
-    applicationCategory: 'MedicalApplication',
-    operatingSystem: 'Web',
-    url: APP_URL,
-    description:
-      'Sistema de gestión de guardia hospitalaria, seguimiento clínico por especialidades y consulta externa para médicos, residentes y equipos de salud.',
-    offers: {
-      '@type': 'Offer',
-      price: '4.99',
-      priceCurrency: 'USD',
-      description: 'Plan Individual mensual con 15 días de prueba gratis. Ciclos de 1, 3, 6 y 12 meses.',
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'NEXO - Medical Team Workflow',
+      alternateName: ['Nexo', 'Nexo Medical Team', 'Nexo Medical Team Workflow'],
+      applicationCategory: 'MedicalApplication',
+      operatingSystem: 'Web',
+      url: APP_URL,
+      description:
+        'Sistema de gestión de guardia hospitalaria, seguimiento clínico por especialidades y consulta externa para médicos, residentes y equipos de salud.',
+      offers: {
+        '@type': 'Offer',
+        price: '4.99',
+        priceCurrency: 'USD',
+        description: 'Plan Individual mensual con 15 días de prueba gratis. Ciclos de 1, 3, 6 y 12 meses.',
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'NEXO Medical Team Workflow',
+        alternateName: 'Nexo',
+        email: 'nexo072208@gmail.com',
+        url: APP_URL,
+      },
     },
-    publisher: {
+    {
+      '@context': 'https://schema.org',
       '@type': 'Organization',
       name: 'NEXO Medical Team Workflow',
-      email: 'nexo072208@gmail.com',
+      alternateName: ['Nexo', 'Nexo Medical Team'],
       url: APP_URL,
+      logo: `${APP_URL}/Logo.png`,
+      email: 'nexo072208@gmail.com',
     },
-  }
+  ]
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">

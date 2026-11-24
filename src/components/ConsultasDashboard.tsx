@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Users } from 'lucide-react'
 import { cambiarEstadoConsulta, crearConsulta } from '@/app/dashboard/consultas/actions'
 
 type ConsultaItem = {
@@ -40,6 +41,13 @@ type DoctorResumen = {
   fullName: string
 }
 
+type PacienteAgrupado = {
+  patient: ConsultaItem['patient']
+  ultima: ConsultaItem
+  totalAtenciones: number
+  textoBusqueda: string
+}
+
 const ESTADO_META: Record<string, { label: string; clase: string }> = {
   PROGRAMADA: {
     label: 'Programada',
@@ -72,14 +80,6 @@ function normalizar(texto?: string | null) {
     .trim()
 }
 
-function esHoy(isoDate: string): boolean {
-  const f = new Date(isoDate)
-  const ahora = new Date()
-  const fmt = (d: Date) =>
-    d.toLocaleDateString('en-CA', { timeZone: 'America/Santo_Domingo' })
-  return fmt(f) === fmt(ahora)
-}
-
 function fmtFechaHora(iso: string): string {
   return new Date(iso).toLocaleString('es-DO', {
     timeZone: 'America/Santo_Domingo',
@@ -108,7 +108,6 @@ export function ConsultasDashboard({
   suscripcionBloqueada: boolean
 }) {
   const router = useRouter()
-  const [filtroEstado, setFiltroEstado] = useState<'hoy' | 'espera' | 'completadas' | 'todas'>('hoy')
   const [busqueda, setBusqueda] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [patientMode, setPatientMode] = useState<'new' | 'existing'>('new')
@@ -118,15 +117,6 @@ export function ConsultasDashboard({
   const [enviando, setEnviando] = useState(false)
   const [actualizandoId, setActualizandoId] = useState<string | null>(null)
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
-
-  const consultasHoy = useMemo(
-    () => consultas.filter((c) => esHoy(c.consultationDate) && c.status !== 'CANCELADA'),
-    [consultas]
-  )
-  const enEsperaCount = useMemo(
-    () => consultas.filter((c) => c.status === 'EN_SALA' || c.status === 'EN_CONSULTA' || c.status === 'PROGRAMADA').length,
-    [consultas]
-  )
 
   const catalogoPacientes = useMemo(() => {
     const mapa = new Map<string, PacienteResumen>()
@@ -185,37 +175,60 @@ export function ConsultasDashboard({
     return { exacto: null, sugerencias }
   }, [nombreNuevo, apellidoNuevo, catalogoPacientes, consultas])
 
-  const filtradas = useMemo(() => {
-    const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean)
+  const pacientesAgrupados = useMemo<PacienteAgrupado[]>(() => {
+    const mapa = new Map<string, PacienteAgrupado>()
+    const ordenadas = [...consultas].sort(
+      (a, b) => new Date(b.consultationDate).getTime() - new Date(a.consultationDate).getTime()
+    )
 
-    return consultas.filter((c) => {
-      if (filtroEstado === 'hoy' && !esHoy(c.consultationDate)) return false
-      if (
-        filtroEstado === 'espera' &&
-        !['PROGRAMADA', 'EN_SALA', 'EN_CONSULTA'].includes(c.status)
-      ) {
-        return false
-      }
-      if (filtroEstado === 'completadas' && c.status !== 'COMPLETADA') return false
-
-      if (terminos.length === 0) return true
-
-      const textoBuscable = [
-        c.patient.firstName,
-        c.patient.lastName,
-        c.patient.expedienteNumber,
-        c.patient.cedula,
-        c.patient.phone,
+    for (const c of ordenadas) {
+      const extra = [
         c.chiefComplaint,
         c.diagnosis,
         c.doctorName,
       ]
         .map(normalizar)
+        .filter(Boolean)
         .join(' ')
 
-      return terminos.every((t) => textoBuscable.includes(t))
-    })
-  }, [consultas, filtroEstado, busqueda])
+      const existente = mapa.get(c.patient.id)
+      if (!existente) {
+        const base = [
+          c.patient.firstName,
+          c.patient.lastName,
+          c.patient.expedienteNumber,
+          c.patient.cedula,
+          c.patient.phone,
+          extra,
+        ]
+          .map(normalizar)
+          .filter(Boolean)
+          .join(' ')
+
+        mapa.set(c.patient.id, {
+          patient: c.patient,
+          ultima: c,
+          totalAtenciones: 1,
+          textoBusqueda: base,
+        })
+      } else {
+        existente.totalAtenciones += 1
+        if (extra) {
+          existente.textoBusqueda = `${existente.textoBusqueda} ${extra}`
+        }
+      }
+    }
+
+    return Array.from(mapa.values())
+  }, [consultas])
+
+  const pacientesFiltrados = useMemo(() => {
+    const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean)
+    if (terminos.length === 0) return pacientesAgrupados
+    return pacientesAgrupados.filter((item) =>
+      terminos.every((t) => item.textoBusqueda.includes(t))
+    )
+  }, [pacientesAgrupados, busqueda])
 
   const defaultFechaHora = new Date().toISOString().slice(0, 16)
 
@@ -610,31 +623,16 @@ export function ConsultasDashboard({
         </form>
       )}
 
-      {/* BARRA DE FILTROS Y BÚSQUEDA */}
+      {/* BARRA ÚNICA: PACIENTES + BÚSQUEDA */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-200/70 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-          {[
-            { id: 'hoy', label: `Hoy (${consultasHoy.length})` },
-            { id: 'espera', label: `En espera (${enEsperaCount})` },
-            { id: 'completadas', label: 'Completadas' },
-            { id: 'todas', label: `Todas (${consultas.length})` },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setFiltroEstado(tab.id as typeof filtroEstado)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
-                filtroEstado === tab.id
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 self-start">
+          <Users className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+          <span className="text-xs font-bold text-slate-900 dark:text-white">
+            Pacientes ({pacientesFiltrados.length})
+          </span>
         </div>
 
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full md:w-80">
           <input
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
@@ -653,63 +651,68 @@ export function ConsultasDashboard({
         </div>
       </div>
 
-      {/* LISTA DE CONSULTAS */}
+      {/* LISTA UNIFICADA DE PACIENTES */}
       <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl divide-y divide-slate-200 dark:divide-slate-700">
-        {filtradas.map((c) => {
-          const meta = ESTADO_META[c.status] ?? ESTADO_META.PROGRAMADA
-          const procesando = actualizandoId === c.id
+        {pacientesFiltrados.map(({ patient, ultima, totalAtenciones }) => {
+          const meta = ESTADO_META[ultima.status] ?? ESTADO_META.PROGRAMADA
+          const procesando = actualizandoId === ultima.id
           return (
             <div
-              key={c.id}
+              key={patient.id}
               className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors"
             >
               <div className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                   <span className="font-mono font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
-                    {fmtFechaHora(c.consultationDate)}
+                    {fmtFechaHora(ultima.consultationDate)}
                   </span>
                   <span aria-hidden="true">·</span>
-                  <span className="font-medium">{c.visitType}</span>
+                  <span className="font-medium">{ultima.visitType}</span>
                   <span aria-hidden="true">·</span>
                   <span className={`px-2 py-0.5 rounded border text-[11px] font-bold ${meta.clase}`}>
                     {meta.label}
                   </span>
+                  {totalAtenciones > 1 && (
+                    <span className="px-2 py-0.5 rounded border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300 text-[11px] font-bold tabular-nums">
+                      {totalAtenciones} atenciones
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap items-baseline gap-2">
                   <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    {c.patient.firstName} {c.patient.lastName}
+                    {patient.firstName} {patient.lastName}
                   </h3>
                   <span className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
-                    Exp: {c.patient.expedienteNumber}
-                    {c.patient.age !== null ? ` · ${c.patient.age} años` : ''}
-                    {c.patient.phone ? ` · Tel: ${c.patient.phone}` : ''}
+                    Exp: {patient.expedienteNumber}
+                    {patient.age !== null ? ` · ${patient.age} años` : ''}
+                    {patient.phone ? ` · Tel: ${patient.phone}` : ''}
                   </span>
                 </div>
 
                 <p className="text-sm text-slate-700 dark:text-slate-200">
-                  <span className="font-semibold">Motivo:</span> {c.chiefComplaint}
+                  <span className="font-semibold">Motivo:</span> {ultima.chiefComplaint}
                 </p>
 
-                {c.diagnosis && (
+                {ultima.diagnosis && (
                   <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
-                    Diagnóstico: {c.diagnosis}
+                    Diagnóstico: {ultima.diagnosis}
                   </p>
                 )}
 
-                {c.doctorName && (
+                {ultima.doctorName && (
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Médico: {c.doctorName}
+                    Médico: {ultima.doctorName}
                   </p>
                 )}
               </div>
 
               <div className="flex flex-wrap items-center gap-2 shrink-0">
-                {puedeRegistrar && !suscripcionBloqueada && c.status === 'PROGRAMADA' && (
+                {puedeRegistrar && !suscripcionBloqueada && ultima.status === 'PROGRAMADA' && (
                   <button
                     type="button"
                     disabled={procesando}
-                    onClick={() => handleCambiarEstado(c.id, 'EN_SALA')}
+                    onClick={() => handleCambiarEstado(ultima.id, 'EN_SALA')}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 cursor-pointer whitespace-nowrap"
                   >
                     Pasar a sala
@@ -717,23 +720,23 @@ export function ConsultasDashboard({
                 )}
 
                 <Link
-                  href={`/dashboard/consultas/${c.id}`}
+                  href={`/dashboard/consultas/${ultima.id}`}
                   className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
-                    c.status === 'COMPLETADA'
+                    ultima.status === 'COMPLETADA'
                       ? 'bg-slate-800 hover:bg-slate-900 text-white dark:bg-slate-700 dark:hover:bg-slate-600'
                       : 'bg-teal-600 hover:bg-teal-700 text-white'
                   }`}
                 >
-                  {c.status === 'COMPLETADA' ? 'Abrir expediente →' : 'Atender consulta →'}
+                  {ultima.status === 'COMPLETADA' ? 'Abrir expediente →' : 'Atender consulta →'}
                 </Link>
 
                 {puedeRegistrar &&
                   !suscripcionBloqueada &&
-                  ['PROGRAMADA', 'EN_SALA'].includes(c.status) && (
+                  ['PROGRAMADA', 'EN_SALA'].includes(ultima.status) && (
                     <button
                       type="button"
                       disabled={procesando}
-                      onClick={() => handleCambiarEstado(c.id, 'CANCELADA')}
+                      onClick={() => handleCambiarEstado(ultima.id, 'CANCELADA')}
                       className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer"
                     >
                       Cancelar
@@ -744,13 +747,13 @@ export function ConsultasDashboard({
           )
         })}
 
-        {filtradas.length === 0 && (
+        {pacientesFiltrados.length === 0 && (
           <div className="py-12 px-4 text-center space-y-2">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              No hay consultas en esta vista.
+              No hay pacientes registrados que coincidan con tu búsqueda.
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Cambia el filtro o registra una nueva cita con el botón superior.
+              Limpia el buscador o registra una nueva cita con el botón superior.
             </p>
           </div>
         )}

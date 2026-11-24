@@ -6,10 +6,17 @@ import Link from 'next/link'
 import { BannerAlergias } from '@/components/BannerAlergias'
 import { PrintButton } from '@/components/PrintButton'
 import { FormularioConsultaClinica } from '@/components/FormularioConsultaClinica'
-import { puedeEditarNotasConsulta, tieneNotasClinicasEscritas } from '@/lib/consultas-auth'
+import { AntecedentesConsultasRetraibles } from '@/components/AntecedentesConsultasRetraibles'
+import {
+  type BloqueAntecedenteConsulta,
+  type BloqueSeccionConsulta,
+  type HistorialVisitaResumen,
+  type SeccionConsultaKey,
+  puedeEditarNotasConsulta,
+  tieneNotasClinicasEscritas,
+} from '@/lib/consultas-auth'
 import {
   agregarAlergiaConsulta,
-  guardarAntecedentesConsulta,
   guardarDatosPacienteConsulta,
   marcarSinAlergiasConsulta,
 } from '../actions'
@@ -23,6 +30,24 @@ const fmtFecha = (d: Date) =>
     hour: '2-digit',
     minute: '2-digit',
   })
+
+function parseAuditJson(raw: unknown): Record<string, unknown> | null {
+  if (!raw) return null
+  if (typeof raw === 'object' && !Array.isArray(raw)) {
+    return raw as Record<string, unknown>
+  }
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw)
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+        ? (parsed as Record<string, unknown>)
+        : null
+    } catch {
+      return null
+    }
+  }
+  return null
+}
 
 export default async function ConsultaDetallePage({
   params,
@@ -43,6 +68,9 @@ export default async function ConsultaDetallePage({
         include: {
           medicalHistory: true,
           allergies: { orderBy: { createdAt: 'desc' } },
+          consultations: {
+            orderBy: { consultationDate: 'asc' },
+          },
         },
       },
     },
@@ -57,6 +85,120 @@ export default async function ConsultaDetallePage({
       redirect('/dashboard')
     }
   }
+
+  const auditLogs = await prisma.auditLog.findMany({
+    where: {
+      patientId: consulta.patientId,
+      entity: { in: ['consulta_antecedente', 'consulta_bloque'] },
+    },
+    orderBy: { serverTs: 'asc' },
+    take: 400,
+    select: {
+      id: true,
+      entity: true,
+      entityId: true,
+      actorId: true,
+      newValue: true,
+      serverTs: true,
+    },
+  })
+
+  const antecedentesEntries: BloqueAntecedenteConsulta[] = []
+  const bloquesExtra: BloqueSeccionConsulta[] = []
+
+  for (const log of auditLogs) {
+    const data = parseAuditJson(log.newValue)
+    if (!data) continue
+
+    if (log.entity === 'consulta_antecedente') {
+      antecedentesEntries.push({
+        id: `ant-${String(log.id)}`,
+        fechaIso: log.serverTs.toISOString(),
+        authorId: typeof data.authorId === 'string' ? data.authorId : log.actorId,
+        authorName:
+          typeof data.authorName === 'string'
+            ? data.authorName
+            : typeof data.authorEmail === 'string'
+              ? data.authorEmail
+              : 'Médico tratante',
+        pathological: typeof data.pathological === 'string' ? data.pathological : null,
+        surgical: typeof data.surgical === 'string' ? data.surgical : null,
+        medications: typeof data.medications === 'string' ? data.medications : null,
+        family: typeof data.family === 'string' ? data.family : null,
+        habits: typeof data.habits === 'string' ? data.habits : null,
+      })
+    } else if (log.entity === 'consulta_bloque') {
+      const seccion = data.seccion as SeccionConsultaKey | undefined
+      if (!seccion) continue
+      bloquesExtra.push({
+        id: `blq-${String(log.id)}`,
+        seccion,
+        fechaIso: log.serverTs.toISOString(),
+        authorId: typeof data.authorId === 'string' ? data.authorId : log.actorId,
+        authorName:
+          typeof data.authorName === 'string'
+            ? data.authorName
+            : typeof data.authorEmail === 'string'
+              ? data.authorEmail
+              : 'Médico tratante',
+        consultationId: typeof data.consultationId === 'string' ? data.consultationId : log.entityId,
+        bloodPressure: typeof data.bloodPressure === 'string' ? data.bloodPressure : null,
+        heartRate: typeof data.heartRate === 'number' ? data.heartRate : null,
+        temperature: typeof data.temperature === 'number' ? data.temperature : null,
+        oxygenSat: typeof data.oxygenSat === 'number' ? data.oxygenSat : null,
+        weight: typeof data.weight === 'number' ? data.weight : null,
+        weightUnit: typeof data.weightUnit === 'string' ? data.weightUnit : null,
+        heightCm: typeof data.heightCm === 'number' ? data.heightCm : null,
+        visitType: typeof data.visitType === 'string' ? data.visitType : null,
+        chiefComplaint: typeof data.chiefComplaint === 'string' ? data.chiefComplaint : null,
+        contenido: typeof data.contenido === 'string' ? data.contenido : null,
+      })
+    }
+  }
+
+  const mh = consulta.patient.medicalHistory
+  if (
+    antecedentesEntries.length === 0 &&
+    mh &&
+    (mh.pathological || mh.surgical || mh.medications || mh.family || mh.habits)
+  ) {
+    antecedentesEntries.push({
+      id: 'legacy-mh',
+      fechaIso: mh.updatedAt.toISOString(),
+      authorId: null,
+      authorName: mh.updatedBy || 'Registro previo',
+      pathological: mh.pathological,
+      surgical: mh.surgical,
+      medications: mh.medications,
+      family: mh.family,
+      habits: mh.habits,
+    })
+  }
+
+  const historialVisitas: HistorialVisitaResumen[] = consulta.patient.consultations
+    .filter((v) => v.residencyId === consulta.residencyId)
+    .map((v) => ({
+      id: v.id,
+      consultationDate: v.consultationDate.toISOString(),
+      status: v.status,
+      visitType: v.visitType,
+      doctorId: v.doctorId,
+      doctorName: v.doctorName,
+      chiefComplaint: v.chiefComplaint,
+      bloodPressure: v.bloodPressure,
+      heartRate: v.heartRate,
+      temperature: v.temperature,
+      oxygenSat: v.oxygenSat,
+      weight: v.weight,
+      weightUnit: v.weightUnit,
+      heightCm: v.heightCm,
+      historyIllness: v.historyIllness,
+      physicalExam: v.physicalExam,
+      diagnosis: v.diagnosis,
+      treatmentPlan: v.treatmentPlan,
+      labOrders: v.labOrders,
+      notes: v.notes,
+    }))
 
   const suscripcionBloqueada = !ctx.esSuperAdmin && (ctx.suscripcion?.bloqueada ?? false)
   const puedeEditar = ROLES_CLINICOS.includes(ctx.user.role) && !suscripcionBloqueada
@@ -74,7 +216,7 @@ export default async function ConsultaDetallePage({
               href="/dashboard"
               className="text-xs font-bold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-2.5 py-1.5 rounded-lg transition-colors shrink-0 whitespace-nowrap"
             >
-              ← Consultas
+              ← Pacientes
             </Link>
             <div className="min-w-0">
               <p className="text-sm md:text-base font-extrabold text-slate-900 dark:text-white truncate">
@@ -147,7 +289,7 @@ export default async function ConsultaDetallePage({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* COLUMNA IZQUIERDA: DATOS, ALERGIAS, ANTECEDENTES E HISTORIAL */}
+          {/* COLUMNA IZQUIERDA: DATOS, ALERGIAS Y ANTECEDENTES RETRAÍBLES */}
           <div className="lg:col-span-1 space-y-5 print:hidden">
             <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
@@ -214,40 +356,22 @@ export default async function ConsultaDetallePage({
               </div>
             )}
 
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 space-y-3">
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">
-                Antecedentes Médicos
-              </h2>
-              <form action={guardarAntecedentesConsulta} className="space-y-2">
-                <input type="hidden" name="consultationId" value={consulta.id} />
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-500">Patológicos</label>
-                  <textarea name="pathological" rows={2} defaultValue={consulta.patient.medicalHistory?.pathological ?? ''} disabled={!puedeEditar} className="w-full px-2.5 py-1.5 border rounded text-xs" />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-500">Quirúrgicos</label>
-                  <textarea name="surgical" rows={2} defaultValue={consulta.patient.medicalHistory?.surgical ?? ''} disabled={!puedeEditar} className="w-full px-2.5 py-1.5 border rounded text-xs" />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-500">Medicación Habitual</label>
-                  <textarea name="medications" rows={2} defaultValue={consulta.patient.medicalHistory?.medications ?? ''} disabled={!puedeEditar} className="w-full px-2.5 py-1.5 border rounded text-xs" />
-                </div>
-                {puedeEditar && (
-                  <button type="submit" className="w-full bg-slate-800 text-white py-2 rounded-lg text-xs font-bold hover:bg-slate-900 cursor-pointer">
-                    Guardar Antecedentes
-                  </button>
-                )}
-              </form>
-            </div>
-
+            <AntecedentesConsultasRetraibles
+              consultationId={consulta.id}
+              registros={antecedentesEntries}
+              puedeAgregar={puedeEditar}
+            />
           </div>
 
           {/* COLUMNA DERECHA: FORMULARIO CLÍNICO PRINCIPAL */}
           <div className="lg:col-span-2">
             <FormularioConsultaClinica
               puedeEditar={puedeEditarNotas}
+              puedeCrearNuevaAtencion={puedeEditar}
               autorNotas={autorNotas}
               bloqueadoPorAutoria={puedeEditar && !puedeEditarNotas && tieneNotas}
+              historialVisitas={historialVisitas}
+              bloquesExtra={bloquesExtra}
               consulta={{
                 id: consulta.id,
                 status: consulta.status,
