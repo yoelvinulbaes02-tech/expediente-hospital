@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { BannerAlergias } from '@/components/BannerAlergias'
 import { PrintButton } from '@/components/PrintButton'
 import { FormularioConsultaClinica } from '@/components/FormularioConsultaClinica'
+import { puedeEditarNotasConsulta, tieneNotasClinicasEscritas } from '@/lib/consultas-auth'
 import {
   agregarAlergiaConsulta,
   guardarAntecedentesConsulta,
@@ -42,11 +43,6 @@ export default async function ConsultaDetallePage({
         include: {
           medicalHistory: true,
           allergies: { orderBy: { createdAt: 'desc' } },
-          consultations: {
-            where: { id: { not: id } },
-            orderBy: { consultationDate: 'desc' },
-            take: 10,
-          },
         },
       },
     },
@@ -64,6 +60,9 @@ export default async function ConsultaDetallePage({
 
   const suscripcionBloqueada = !ctx.esSuperAdmin && (ctx.suscripcion?.bloqueada ?? false)
   const puedeEditar = ROLES_CLINICOS.includes(ctx.user.role) && !suscripcionBloqueada
+  const tieneNotas = tieneNotasClinicasEscritas(consulta)
+  const puedeEditarNotas = puedeEditar && puedeEditarNotasConsulta(consulta, ctx.user)
+  const autorNotas = consulta.doctorName || consulta.updatedBy || null
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -241,36 +240,14 @@ export default async function ConsultaDetallePage({
               </form>
             </div>
 
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 space-y-3">
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">
-                Consultas Anteriores ({consulta.patient.consultations.length})
-              </h2>
-              <div className="space-y-2">
-                {consulta.patient.consultations.map((prev) => (
-                  <Link
-                    key={prev.id}
-                    href={`/dashboard/consultas/${prev.id}`}
-                    className="block p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40 text-xs space-y-0.5"
-                  >
-                    <p className="font-bold text-slate-800 dark:text-slate-100 tabular-nums">
-                      {fmtFecha(prev.consultationDate)} · {prev.visitType}
-                    </p>
-                    <p className="text-slate-600 dark:text-slate-300 truncate">
-                      {prev.diagnosis || prev.chiefComplaint}
-                    </p>
-                  </Link>
-                ))}
-                {consulta.patient.consultations.length === 0 && (
-                  <p className="text-xs text-slate-400">Primera consulta registrada para este paciente.</p>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* COLUMNA DERECHA: FORMULARIO CLÍNICO PRINCIPAL */}
           <div className="lg:col-span-2">
             <FormularioConsultaClinica
-              puedeEditar={puedeEditar}
+              puedeEditar={puedeEditarNotas}
+              autorNotas={autorNotas}
+              bloqueadoPorAutoria={puedeEditar && !puedeEditarNotas && tieneNotas}
               consulta={{
                 id: consulta.id,
                 status: consulta.status,

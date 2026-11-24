@@ -92,15 +92,6 @@ export const OPCIONES_MOTILIDAD_DISTAL = [
   'Déficit motor / Paresia',
 ] as const
 
-export const PRESETS_DRENAJES_ORTOPEDIA = [
-  'Hemovac',
-  'Drenaje aspirativo',
-  'Drenaje subfascial',
-  'Jackson-Pratt',
-  'Penrose',
-  'VAC / Terapia negativa',
-] as const
-
 export function calcularDiasPostQx(
   surgeryDate: Date | string | null | undefined,
   surgeryStatus?: string | null

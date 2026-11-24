@@ -151,12 +151,12 @@ export function CurasPanel({
         <div>
           <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
             {esOrtopedia
-              ? `Curas Ortopédicas, Heridas y Pines (${curas.length})`
+              ? `Curas Ortopédicas (${curas.length})`
               : `Curas Quirúrgicas (${curas.length})`}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {esOrtopedia
-              ? 'Seguimiento de curas de heridas quirúrgicas, fracturas expuestas y sitios de pines de fijadores externos (fecha, hora y responsable).'
+              ? 'Seguimiento de curas de heridas quirúrgicas y traumatológicas (fecha, hora y responsable).'
               : 'Listado de pacientes en seguimiento de curas con checklist de curas realizadas (fecha, hora y responsable).'}
           </p>
         </div>
@@ -276,7 +276,7 @@ export function CurasPanel({
               required
               placeholder={
                 esOrtopedia
-                  ? 'Ej. Fractura expuesta tibia Gustilo II / Sitio de pines fijador externo'
+                  ? 'Ej. Fractura expuesta tibia Gustilo II / Herida quirúrgica'
                   : 'Ej. Pie diabético infectado / Dehiscencia de herida abdominal'
               }
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
@@ -433,7 +433,7 @@ export function CurasPanel({
                     }
                     placeholder={
                       esOrtopedia
-                        ? 'Observación (ej. pines limpios sin eritema ni secreción)'
+                        ? 'Observación de la cura (ej. herida limpia sin eritema ni secreción)'
                         : 'Observación de la cura (opcional, ej. herida limpia)'
                     }
                     className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"

@@ -40,6 +40,7 @@ export function PagoHibridoSuscripcion({
   paypalEnv,
   suscripcionAutomaticaId = null,
   paypalWebhookConfigurado = false,
+  detalleTarifaGrupal,
 }: {
   monthlyPriceUsd: number
   residencyName: string
@@ -50,6 +51,7 @@ export function PagoHibridoSuscripcion({
   paypalEnv: 'sandbox' | 'live'
   suscripcionAutomaticaId?: string | null
   paypalWebhookConfigurado?: boolean
+  detalleTarifaGrupal?: string
 }) {
   const router = useRouter()
   const [subOverride, setSubOverride] = useState<string | null | undefined>(undefined)
@@ -443,9 +445,14 @@ export function PagoHibridoSuscripcion({
               <div className="text-xs text-emerald-900 dark:text-emerald-200">
                 <p className="font-bold text-sm">Suscripción Mensual Automática Activa</p>
                 <p className="mt-0.5">
-                  ID PayPal: <span className="font-mono font-bold">{subActivaId}</span> · Cargo
-                  automático mensual de <strong>${monthlyPriceUsd.toFixed(2)} USD</strong>.
+                  ID PayPal: <span className="font-mono font-bold">{subActivaId}</span> · Tarifa
+                  actual calculada: <strong>${monthlyPriceUsd.toFixed(2)} USD/mes</strong>.
                 </p>
+                {detalleTarifaGrupal && (
+                  <p className="text-[11px] text-emerald-900 dark:text-emerald-200 mt-0.5">
+                    Tarifa grupal dinámica ({detalleTarifaGrupal}). Si agregaste o desactivaste usuarios desde que iniciaste la suscripción automática, cancela la anterior y activa una nueva con el monto actualizado o realiza pago único.
+                  </p>
+                )}
                 {!paypalWebhookConfigurado && (
                   <p className="text-[11px] text-emerald-800/80 dark:text-emerald-300/80 mt-0.5">
                     Nota técnica: configura <code className="font-mono">PAYPAL_WEBHOOK_ID</code> para acreditar renovaciones de los meses siguientes automáticamente en segundo plano.

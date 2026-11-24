@@ -3,7 +3,12 @@
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
 import { ROLES_CLINICOS } from '@/lib/permisos'
-import { obtenerContextoResidencia, verificarEscrituraResidencia } from '@/lib/tenant'
+import {
+  obtenerContextoResidencia,
+  verificarEscrituraResidencia,
+  fusionarSurgicalStatsExtra,
+} from '@/lib/tenant'
+import type { Prisma } from '@/generated/prisma'
 import {
   CATEGORIAS_DISPOSITIVOS_CIRUGIA,
   resolverTeamAutomatico,
@@ -151,7 +156,11 @@ export async function guardarResumenCirugiaConfig(formData: FormData): Promise<{
   if (accion === 'auto') {
     await prisma.residency.update({
       where: { id: residency.id },
-      data: { surgicalStatsExtra: { mode: 'auto' } },
+      data: {
+        surgicalStatsExtra: fusionarSurgicalStatsExtra(residency.surgicalStatsExtra, {
+          mode: 'auto',
+        }) as Prisma.InputJsonValue,
+      },
     })
     revalidatePath('/dashboard')
     return { ok: true }
@@ -171,7 +180,12 @@ export async function guardarResumenCirugiaConfig(formData: FormData): Promise<{
 
   await prisma.residency.update({
     where: { id: residency.id },
-    data: { surgicalStatsExtra: payload },
+    data: {
+      surgicalStatsExtra: fusionarSurgicalStatsExtra(
+        residency.surgicalStatsExtra,
+        payload
+      ) as Prisma.InputJsonValue,
+    },
   })
 
   const esOrtopedia = ctx.interfaceMode === 'ORTOPEDIA'

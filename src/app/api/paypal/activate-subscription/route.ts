@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
-import { obtenerContextoResidencia, obtenerTarifaIndividualUsuario } from '@/lib/tenant'
+import {
+  calcularTarifaGrupalResidencia,
+  contarUsuariosActivosResidencia,
+  obtenerContextoResidencia,
+  obtenerTarifaIndividualUsuario,
+} from '@/lib/tenant'
 import {
   estaPayPalConfigurado,
   obtenerPrecioPlanPayPal,
@@ -79,7 +84,10 @@ export async function POST(req: NextRequest) {
     const tarifaEsperada =
       customScope === 'INDIVIDUAL'
         ? obtenerTarifaIndividualUsuario(ctx.residency, ctx.user)
-        : ctx.residency.monthlyPriceUsd
+        : calcularTarifaGrupalResidencia(
+            ctx.residency,
+            await contarUsuariosActivosResidencia(ctx.residency.id)
+          ).totalUsd
 
     if (sub.plan_id) {
       const precioPlan = await obtenerPrecioPlanPayPal(sub.plan_id)

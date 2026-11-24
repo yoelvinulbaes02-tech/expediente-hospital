@@ -13,11 +13,71 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://expediente-hospital.vercel.app').replace(/\/+$/, '')
+
 export const metadata: Metadata = {
-  title: 'NEXO - Medical Team Workflow',
-  description: 'NEXO: Medical Team Workflow - Sistema de Guardia Hospitalaria y Seguimiento Clínico',
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: 'NEXO - Medical Team Workflow | Sistema de Guardia Hospitalaria y Expediente Clínico',
+    template: '%s | NEXO Medical Team Workflow',
+  },
+  description:
+    'Plataforma clínica para médicos, residentes y equipos hospitalarios. Gestiona pases de guardia, hospitalización, nefrología y hemodiálisis, medicina interna, cirugía, ortopedia y consulta externa desde cualquier dispositivo.',
+  keywords: [
+    'NEXO Medical Team Workflow',
+    'sistema de guardia hospitalaria',
+    'pase de guardia médico',
+    'expediente clínico electrónico',
+    'seguimiento hospitalario',
+    'residencia médica',
+    'nefrología hemodiálisis software',
+    'consulta externa médica',
+    'medicina interna',
+    'cirugía y ortopedia',
+  ],
+  authors: [{ name: 'NEXO Medical Team Workflow' }],
+  creator: 'NEXO Medical Team Workflow',
+  publisher: 'NEXO Medical Team Workflow',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'es_DO',
+    url: APP_URL,
+    siteName: 'NEXO Medical Team Workflow',
+    title: 'NEXO - Medical Team Workflow | Guardia Hospitalaria y Seguimiento Clínico',
+    description:
+      'Centraliza pases de guardia, pendientes clínicos, gráficas vitales, curas, antibióticos en hemodiálisis y consulta externa. 15 días de prueba gratis desde $4.99/mes.',
+    images: [
+      {
+        url: '/Logo.png',
+        width: 512,
+        height: 512,
+        alt: 'NEXO Medical Team Workflow',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NEXO - Medical Team Workflow',
+    description:
+      'Plataforma para residencias médicas y médicos independientes: guardias, entregas de turno, auditoría y consulta externa.',
+    images: ['/Logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+    },
+  },
   icons: {
     icon: '/Logo.png',
+    apple: '/Logo.png',
   },
 }
 

@@ -2,7 +2,12 @@
 
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
-import { ROLES_CLINICOS } from '@/lib/permisos'
+import { ROLES_CLINICOS, ROLES_MEDICOS } from '@/lib/permisos'
+import {
+  normalizarNombreCompleto,
+  puedeEditarNotasConsulta,
+  tieneNotasClinicasEscritas,
+} from '@/lib/consultas-auth'
 import { obtenerContextoResidencia, verificarEscrituraResidencia } from '@/lib/tenant'
 import { revalidatePath } from 'next/cache'
 
@@ -21,7 +26,22 @@ async function exigirAccesoConsulta(consultationId?: string) {
   if (consultationId) {
     const consulta = await prisma.consultation.findUnique({
       where: { id: consultationId },
-      select: { id: true, residencyId: true, patientId: true, status: true },
+      select: {
+        id: true,
+        residencyId: true,
+        patientId: true,
+        status: true,
+        doctorId: true,
+        doctorName: true,
+        createdBy: true,
+        updatedBy: true,
+        historyIllness: true,
+        physicalExam: true,
+        diagnosis: true,
+        treatmentPlan: true,
+        labOrders: true,
+        notes: true,
+      },
     })
     if (!consulta) throw new Error('Consulta no encontrada')
     if (!ctx.esSuperAdmin && (!ctx.residency || consulta.residencyId !== ctx.residency.id)) {
@@ -42,6 +62,7 @@ export async function crearConsulta(formData: FormData): Promise<{
   ok: boolean
   error?: string
   consultationId?: string
+  matchedExistingPatient?: boolean
 }> {
   try {
     const { ctx } = await exigirAccesoConsulta()
@@ -79,12 +100,13 @@ export async function crearConsulta(formData: FormData): Promise<{
         doctorId = doc.id
         doctorName = doc.fullName
       }
-    } else if (ctx.user.role === 'DOCTOR' || ctx.user.role === 'RESIDENT') {
+    } else if (initialStatus === 'EN_CONSULTA' && ROLES_MEDICOS.includes(ctx.user.role)) {
       doctorId = ctx.user.id
       doctorName = ctx.user.fullName
     }
 
     let patientId = ''
+    let matchedExistingPatient = false
 
     if (patientMode === 'existing') {
       const existingId = String(formData.get('patientId') ?? '').trim()
@@ -99,6 +121,7 @@ export async function crearConsulta(formData: FormData): Promise<{
         return { ok: false, error: 'Paciente no encontrado en esta residencia.' }
       }
       patientId = existing.id
+      matchedExistingPatient = true
     } else {
       const firstName = String(formData.get('firstName') ?? '').trim()
       const lastName = String(formData.get('lastName') ?? '').trim()
@@ -114,46 +137,107 @@ export async function crearConsulta(formData: FormData): Promise<{
         return { ok: false, error: 'Escribe el nombre y apellido del paciente.' }
       }
 
-      const expedienteNumber =
-        expInput ||
-        `CON-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
-
-      const duplicado = await prisma.patient.findFirst({
-        where: { residencyId, expedienteNumber },
-        select: { id: true },
+      const nombreNormalizado = normalizarNombreCompleto(firstName, lastName)
+      const candidatos = await prisma.patient.findMany({
+        where: { residencyId },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          age: true,
+          phone: true,
+          cedula: true,
+          _count: { select: { allergies: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 5000,
       })
-      if (duplicado) {
-        return { ok: false, error: `Ya existe un paciente con el expediente ${expedienteNumber}.` }
+
+      const coincidente = candidatos.find(
+        (p) => normalizarNombreCompleto(p.firstName, p.lastName) === nombreNormalizado
+      )
+
+      if (coincidente) {
+        patientId = coincidente.id
+        matchedExistingPatient = true
+
+        // Enriquecer solo campos faltantes sin sobreescribir historial ni alergias previas
+        const updates: Record<string, unknown> = {}
+        if (coincidente.age === null && age !== null && !isNaN(age)) updates.age = age
+        if (!coincidente.phone && phone) updates.phone = phone
+        if (!coincidente.cedula && cedula) updates.cedula = cedula
+        if (Object.keys(updates).length > 0) {
+          await prisma.patient.update({
+            where: { id: coincidente.id },
+            data: updates,
+          })
+        }
+
+        if (coincidente._count.allergies === 0) {
+          await prisma.allergy.create({
+            data: {
+              patientId: coincidente.id,
+              episodeId: null,
+              allergen: alergiasEstado === 'sin_alergias' ? 'Ninguna' : 'No evaluadas',
+              type: 'otro',
+              severity: 'no_especificada',
+              reaction: alergiasEstado === 'sin_alergias' ? 'Niega alergias' : null,
+              status: alergiasEstado,
+              createdBy: ctx.user.email,
+            },
+          })
+        }
+      } else {
+        const expedienteNumber =
+          expInput ||
+          `CON-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
+
+        const duplicado = await prisma.patient.findFirst({
+          where: { residencyId, expedienteNumber },
+          select: { id: true },
+        })
+        if (duplicado) {
+          return { ok: false, error: `Ya existe un paciente con el expediente ${expedienteNumber}.` }
+        }
+
+        const nuevoPaciente = await prisma.patient.create({
+          data: {
+            residencyId,
+            expedienteNumber,
+            firstName,
+            lastName,
+            age: age !== null && !isNaN(age) ? age : null,
+            sex,
+            phone,
+            cedula,
+          },
+        })
+
+        await prisma.allergy.create({
+          data: {
+            patientId: nuevoPaciente.id,
+            episodeId: null,
+            allergen: alergiasEstado === 'sin_alergias' ? 'Ninguna' : 'No evaluadas',
+            type: 'otro',
+            severity: 'no_especificada',
+            reaction: alergiasEstado === 'sin_alergias' ? 'Niega alergias' : null,
+            status: alergiasEstado,
+            createdBy: ctx.user.email,
+          },
+        })
+
+        patientId = nuevoPaciente.id
       }
-
-      const nuevoPaciente = await prisma.patient.create({
-        data: {
-          residencyId,
-          expedienteNumber,
-          firstName,
-          lastName,
-          age: age !== null && !isNaN(age) ? age : null,
-          sex,
-          phone,
-          cedula,
-        },
-      })
-
-      await prisma.allergy.create({
-        data: {
-          patientId: nuevoPaciente.id,
-          episodeId: null,
-          allergen: alergiasEstado === 'sin_alergias' ? 'Ninguna' : 'No evaluadas',
-          type: 'otro',
-          severity: 'no_especificada',
-          reaction: alergiasEstado === 'sin_alergias' ? 'Niega alergias' : null,
-          status: alergiasEstado,
-          createdBy: ctx.user.email,
-        },
-      })
-
-      patientId = nuevoPaciente.id
     }
+
+    // Copiar antropometría basal previa del mismo expediente si el paciente ya tuvo consultas
+    const consultaPrevia = matchedExistingPatient
+      ? await prisma.consultation.findFirst({
+          where: { residencyId, patientId },
+          orderBy: { consultationDate: 'desc' },
+          select: { weight: true, weightUnit: true, heightCm: true },
+        })
+      : null
 
     const consulta = await prisma.consultation.create({
       data: {
@@ -163,8 +247,12 @@ export async function crearConsulta(formData: FormData): Promise<{
         doctorName,
         consultationDate,
         status: initialStatus,
-        visitType,
+        visitType:
+          matchedExistingPatient && visitType === 'Primera vez' ? 'Seguimiento' : visitType,
         chiefComplaint,
+        weight: consultaPrevia?.weight ?? null,
+        weightUnit: consultaPrevia?.weightUnit ?? 'kg',
+        heightCm: consultaPrevia?.heightCm ?? null,
         createdBy: ctx.user.email,
       },
     })
@@ -177,16 +265,19 @@ export async function crearConsulta(formData: FormData): Promise<{
       entityId: consulta.id,
       patientId,
       newValue: {
-        visitType,
+        visitType: consulta.visitType,
         chiefComplaint,
         status: initialStatus,
         doctorName,
+        matchedExistingPatient,
       },
-      reason: 'Nueva consulta registrada',
+      reason: matchedExistingPatient
+        ? 'Nueva consulta vinculada a expediente existente (antecedentes preservados)'
+        : 'Nueva consulta registrada',
     })
 
     revalidatePath('/dashboard')
-    return { ok: true, consultationId: consulta.id }
+    return { ok: true, consultationId: consulta.id, matchedExistingPatient }
   } catch (e: unknown) {
     return { ok: false, error: (e as Error)?.message || 'No se pudo crear la consulta.' }
   }
@@ -203,12 +294,24 @@ export async function cambiarEstadoConsulta(
     const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
     if (!consulta) return { ok: false, error: 'Consulta no encontrada.' }
 
+    if (
+      tieneNotasClinicasEscritas(consulta) &&
+      !puedeEditarNotasConsulta(consulta, ctx.user)
+    ) {
+      return {
+        ok: false,
+        error: `Solo el médico que llenó estas notas (${consulta.doctorName || consulta.updatedBy || 'autor'}) puede cambiar su estado.`,
+      }
+    }
+
     await prisma.consultation.update({
       where: { id: consultationId },
       data: {
         status: nuevoEstado,
         updatedBy: ctx.user.email,
-        ...(nuevoEstado === 'EN_CONSULTA' && (ctx.user.role === 'DOCTOR' || ctx.user.role === 'RESIDENT')
+        ...(nuevoEstado === 'EN_CONSULTA' &&
+        !consulta.doctorId &&
+        ROLES_MEDICOS.includes(ctx.user.role)
           ? { doctorId: ctx.user.id, doctorName: ctx.user.fullName }
           : {}),
       },
@@ -238,11 +341,21 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
   ok: boolean
   error?: string
   finalizada?: boolean
+  reabierta?: boolean
 }> {
   try {
     const consultationId = String(formData.get('consultationId') ?? '')
     const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
     if (!consulta) return { ok: false, error: 'Consulta no encontrada.' }
+
+    const yaTieneNotas = tieneNotasClinicasEscritas(consulta)
+    if (!puedeEditarNotasConsulta(consulta, ctx.user)) {
+      const autor = consulta.doctorName || consulta.updatedBy || 'el médico autor'
+      return {
+        ok: false,
+        error: `Solo el médico que registró estas notas (${autor}) puede modificarlas.`,
+      }
+    }
 
     const accion = String(formData.get('accion') ?? 'guardar')
     const chiefComplaint = String(formData.get('chiefComplaint') ?? '').trim()
@@ -280,15 +393,33 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
     }
 
     if (accion === 'finalizar' && !diagnosis) {
-      return { ok: false, error: 'Indica el diagnóstico o impresión clínica antes de finalizar la consulta.' }
+      return { ok: false, error: 'Indica el diagnóstico o impresión clínica antes de cerrar la consulta.' }
     }
 
     const nuevoEstado =
       accion === 'finalizar'
         ? 'COMPLETADA'
-        : consulta.status === 'PROGRAMADA' || consulta.status === 'EN_SALA'
+        : accion === 'reabrir'
           ? 'EN_CONSULTA'
-          : consulta.status
+          : consulta.status === 'PROGRAMADA' || consulta.status === 'EN_SALA'
+            ? 'EN_CONSULTA'
+            : consulta.status
+
+    const escribeNotasClinicas = Boolean(
+      historyIllness ||
+        physicalExam ||
+        diagnosis ||
+        treatmentPlan ||
+        labOrders ||
+        notes ||
+        accion === 'finalizar'
+    )
+
+    // Si aún no había notas escritas y el usuario registra evaluación clínica (o es médico sin autor previo),
+    // queda registrado como autor exclusivo de esas notas.
+    const asignarAutor =
+      (!yaTieneNotas && escribeNotasClinicas) ||
+      (!consulta.doctorId && ROLES_MEDICOS.includes(ctx.user.role))
 
     await prisma.consultation.update({
       where: { id: consultationId },
@@ -311,9 +442,7 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
         notes,
         status: nuevoEstado,
         updatedBy: ctx.user.email,
-        ...(ctx.user.role === 'DOCTOR' || ctx.user.role === 'RESIDENT'
-          ? { doctorId: ctx.user.id, doctorName: ctx.user.fullName }
-          : {}),
+        ...(asignarAutor ? { doctorId: ctx.user.id, doctorName: ctx.user.fullName } : {}),
       },
     })
 
@@ -331,12 +460,21 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
         bloodPressure,
         weight,
       },
-      reason: accion === 'finalizar' ? 'Consulta médica finalizada y firmada' : 'Nota clínica de consulta guardada',
+      reason:
+        accion === 'finalizar'
+          ? 'Consulta médica finalizada y cerrada'
+          : accion === 'reabrir'
+            ? 'Consulta reabierta por su médico autor'
+            : 'Nota clínica de consulta guardada',
     })
 
     revalidatePath('/dashboard')
     revalidatePath(`/dashboard/consultas/${consultationId}`)
-    return { ok: true, finalizada: accion === 'finalizar' }
+    return {
+      ok: true,
+      finalizada: accion === 'finalizar',
+      reabierta: accion === 'reabrir',
+    }
   } catch (e: unknown) {
     return { ok: false, error: (e as Error)?.message || 'No se pudo guardar la consulta.' }
   }

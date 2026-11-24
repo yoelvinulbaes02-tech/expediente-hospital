@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
+import { calcularTarifaGrupalResidencia } from '@/lib/tenant'
 import {
   estaPayPalConfigurado,
   estaPayPalWebhookConfigurado,
@@ -87,7 +88,13 @@ export async function POST(req: NextRequest) {
 
         const residency = await tx.residency.findUnique({
           where: { id: residencyId },
-          select: { id: true, monthlyPriceUsd: true, individualPriceUsd: true, subscriptionEndsAt: true },
+          select: {
+            id: true,
+            monthlyPriceUsd: true,
+            individualPriceUsd: true,
+            subscriptionEndsAt: true,
+            surgicalStatsExtra: true,
+          },
         })
         if (!residency) return { processed: false as const, reason: 'Residencia no encontrada' }
 
@@ -137,10 +144,16 @@ export async function POST(req: NextRequest) {
           return { processed: false as const, reason: 'Ciclo inicial ya acreditado' }
         }
 
+        const activosResidencia =
+          scope === 'RESIDENCY'
+            ? await tx.user.count({
+                where: { residencyId: residency.id, isActive: true, role: { not: 'SUPERADMIN' } },
+              })
+            : 0
         const tarifaEsperada =
           scope === 'INDIVIDUAL'
             ? (targetUser?.individualPriceUsd ?? residency.individualPriceUsd)
-            : residency.monthlyPriceUsd
+            : calcularTarifaGrupalResidencia(residency, activosResidencia).totalUsd
         const montoUsd = !Number.isNaN(montoParsed) && montoParsed > 0 ? montoParsed : tarifaEsperada
 
         const baseActual =

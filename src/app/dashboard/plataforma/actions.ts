@@ -3,10 +3,15 @@
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
-import { obtenerContextoResidencia } from '@/lib/tenant'
+import {
+  calcularTarifaGrupalResidencia,
+  contarUsuariosActivosResidencia,
+  fusionarSurgicalStatsExtra,
+  obtenerContextoResidencia,
+} from '@/lib/tenant'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import type { BillingMode, InterfaceMode, PlanStatus } from '@/generated/prisma'
+import type { BillingMode, InterfaceMode, PlanStatus, Prisma } from '@/generated/prisma'
 
 async function exigirSuperAdmin() {
   const ctx = await obtenerContextoResidencia()
@@ -92,6 +97,17 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
     )
   }
 
+  const groupPricingEnabled =
+    String(formData.get('groupPricingEnabled') ?? '') === 'true' ||
+    String(formData.get('groupPricingEnabled') ?? '') === 'on'
+  const groupIncludedParsed = parseInt(String(formData.get('groupIncludedUsers') ?? '10'), 10)
+  const groupIncludedUsers = Number.isFinite(groupIncludedParsed) ? Math.max(0, groupIncludedParsed) : 10
+  const groupPerUserParsed = parseFloat(String(formData.get('groupPricePerUserUsd') ?? '5'))
+  const groupPricePerUserUsd =
+    Number.isFinite(groupPerUserParsed) && groupPerUserParsed >= 0
+      ? Math.round(groupPerUserParsed * 100) / 100
+      : 5
+
   const slugBase = crearSlug(name) || `residencia-${Date.now()}`
   const slugExiste = await prisma.residency.findUnique({ where: { slug: slugBase }, select: { id: true } })
   const slug = slugExiste ? `${slugBase}-${Math.floor(100 + Math.random() * 900)}` : slugBase
@@ -115,6 +131,18 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
         subscriptionEndsAt,
         billingContactEmail: adminEmail,
         isActive: true,
+        ...(groupPricingEnabled
+          ? {
+              surgicalStatsExtra: {
+                groupPricing: {
+                  enabled: true,
+                  basePriceUsd: monthlyPriceUsd,
+                  includedUsers: groupIncludedUsers,
+                  pricePerUserUsd: groupPricePerUserUsd,
+                },
+              } as Prisma.InputJsonValue,
+            }
+          : {}),
       },
     })
 
@@ -237,6 +265,86 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
       `${redirectTo}?ok=${encodeURIComponent('Configuración de cobro, interfaz y plan de la residencia actualizada.')}`
     )
   }
+}
+
+export async function actualizarTarifaGrupalDinamica(formData: FormData): Promise<void> {
+  const superAdmin = await exigirSuperAdmin()
+  const residencyId = String(formData.get('residencyId') ?? '').trim()
+  if (!residencyId) return
+
+  const actual = await prisma.residency.findUnique({
+    where: { id: residencyId },
+    select: { id: true, name: true, monthlyPriceUsd: true, surgicalStatsExtra: true },
+  })
+  if (!actual) return
+
+  const enabled = String(formData.get('groupPricingEnabled') ?? '') === 'true'
+  const baseParsed = parseFloat(String(formData.get('basePriceUsd') ?? actual.monthlyPriceUsd))
+  const basePriceUsd =
+    Number.isFinite(baseParsed) && baseParsed >= 0
+      ? Math.round(baseParsed * 100) / 100
+      : actual.monthlyPriceUsd
+  const includedParsed = parseInt(String(formData.get('includedUsers') ?? '10'), 10)
+  const includedUsers = Number.isFinite(includedParsed) ? Math.max(0, includedParsed) : 0
+  const perUserParsed = parseFloat(String(formData.get('pricePerUserUsd') ?? '5'))
+  const pricePerUserUsd =
+    Number.isFinite(perUserParsed) && perUserParsed >= 0
+      ? Math.round(perUserParsed * 100) / 100
+      : 0
+
+  const nuevoExtra = fusionarSurgicalStatsExtra(actual.surgicalStatsExtra, {
+    groupPricing: {
+      enabled,
+      basePriceUsd,
+      includedUsers,
+      pricePerUserUsd,
+    },
+  })
+
+  const actualizada = await prisma.residency.update({
+    where: { id: residencyId },
+    data: {
+      monthlyPriceUsd: Math.round(basePriceUsd),
+      surgicalStatsExtra: nuevoExtra as Prisma.InputJsonValue,
+    },
+    select: { monthlyPriceUsd: true, surgicalStatsExtra: true },
+  })
+
+  const activos = await contarUsuariosActivosResidencia(residencyId)
+  const calculo = calcularTarifaGrupalResidencia(actualizada, activos)
+
+  await logAudit({
+    actorId: superAdmin.id,
+    actorRole: 'SUPERADMIN',
+    action: 'update',
+    entity: 'residency_group_pricing',
+    entityId: residencyId,
+    newValue: {
+      enabled,
+      basePriceUsd,
+      includedUsers,
+      pricePerUserUsd,
+      activeUsersCount: activos,
+      calculatedTotalUsd: calculo.totalUsd,
+    },
+    reason: enabled
+      ? `Tarifa grupal dinámica activada para ${actual.name}: $${calculo.totalUsd.toFixed(2)} USD/mes (${activos} usuarios activos)`
+      : `Tarifa grupal fija restaurada para ${actual.name}: $${calculo.totalUsd.toFixed(2)} USD/mes`,
+  })
+
+  revalidatePath('/dashboard/plataforma')
+  revalidatePath(`/dashboard/plataforma/residencia/${residencyId}`)
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard')
+
+  redirect(
+    `/dashboard/plataforma/residencia/${residencyId}?ok=${encodeURIComponent(
+      enabled
+        ? `Tarifa grupal dinámica guardada: actualmente son $${calculo.totalUsd.toFixed(2)} USD/mes (${activos} usuario(s) activo(s)).`
+        : `Tarifa grupal fija guardada: $${calculo.totalUsd.toFixed(2)} USD/mes.`
+    )}`
+  )
 }
 
 export async function extenderSuscripcion(formData: FormData): Promise<void> {

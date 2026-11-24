@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import {
+  calcularTarifaGrupalResidencia,
   evaluarPlanEstado,
+  extraerConfigPrecioGrupal,
   obtenerContextoResidencia,
   obtenerTarifaIndividualUsuario,
 } from '@/lib/tenant'
@@ -12,6 +14,7 @@ import {
   actualizarPrecioUsuario,
   actualizarResidencia,
   actualizarSuscripcionUsuario,
+  actualizarTarifaGrupalDinamica,
   aplicarVigenciaATodosUsuarios,
   cambiarModalidadCobroResidencia,
 } from '../../actions'
@@ -129,6 +132,11 @@ export default async function ControlResidenciaSuperAdminPage({
   })
 
   const esIndividual = residency.billingMode === 'INDIVIDUAL'
+  const activosTotalResidencia = await prisma.user.count({
+    where: { residencyId: residency.id, isActive: true, role: { not: 'SUPERADMIN' } },
+  })
+  const configGrupal = extraerConfigPrecioGrupal(residency.surgicalStatsExtra)
+  const tarifaGrupal = calcularTarifaGrupalResidencia(residency, activosTotalResidencia)
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -359,6 +367,94 @@ export default async function ControlResidenciaSuperAdminPage({
               </button>
             </div>
           </form>
+
+          {/* TARIFA GRUPAL DINÁMICA POR USUARIOS ACTIVOS */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300">
+                  Tarifa Grupal Dinámica por Cantidad de Usuarios Activos
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Ejemplo: $50 base hasta 10 usuarios y +$5 por cada usuario adicional (11 usuarios = $55/mes). Si pones 0 en incluidos y $0 en base, cobra exclusivamente por cada usuario activo.
+                </p>
+              </div>
+              <div className="px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 text-xs font-bold text-teal-900 dark:text-teal-200 tabular-nums">
+                Total actual ({activosTotalResidencia} activos): ${tarifaGrupal.totalUsd.toFixed(2)} USD/mes
+              </div>
+            </div>
+
+            <form
+              action={actualizarTarifaGrupalDinamica}
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-end"
+            >
+              <input type="hidden" name="residencyId" value={residency.id} />
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Modo de tarifa grupal
+                </label>
+                <select
+                  name="groupPricingEnabled"
+                  defaultValue={configGrupal.enabled ? 'true' : 'false'}
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
+                >
+                  <option value="true">Dinámica (escala por usuarios)</option>
+                  <option value="false">Fija (USD Grupal / mes)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Precio base ($ USD)
+                </label>
+                <input
+                  name="basePriceUsd"
+                  type="number"
+                  step="0.01"
+                  min={0}
+                  defaultValue={configGrupal.basePriceUsd ?? residency.monthlyPriceUsd}
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Usuarios incluidos en base
+                </label>
+                <input
+                  name="includedUsers"
+                  type="number"
+                  min={0}
+                  defaultValue={configGrupal.enabled ? configGrupal.includedUsers : 10}
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  $ USD por usuario adicional
+                </label>
+                <input
+                  name="pricePerUserUsd"
+                  type="number"
+                  step="0.01"
+                  min={0}
+                  defaultValue={configGrupal.enabled ? configGrupal.pricePerUserUsd : 5}
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  className="w-full px-3.5 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold cursor-pointer"
+                >
+                  Guardar Tarifa Dinámica
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
         {/* MÉTRICAS DE USUARIOS DE ESTA RESIDENCIA */}

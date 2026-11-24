@@ -68,6 +68,7 @@ function normalizar(texto?: string | null) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
+    .replace(/\s+/g, ' ')
     .trim()
 }
 
@@ -111,6 +112,8 @@ export function ConsultasDashboard({
   const [busqueda, setBusqueda] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [patientMode, setPatientMode] = useState<'new' | 'existing'>('new')
+  const [nombreNuevo, setNombreNuevo] = useState('')
+  const [apellidoNuevo, setApellidoNuevo] = useState('')
   const [abrirAlCrear, setAbrirAlCrear] = useState(true)
   const [enviando, setEnviando] = useState(false)
   const [actualizandoId, setActualizandoId] = useState<string | null>(null)
@@ -124,10 +127,63 @@ export function ConsultasDashboard({
     () => consultas.filter((c) => c.status === 'EN_SALA' || c.status === 'EN_CONSULTA' || c.status === 'PROGRAMADA').length,
     [consultas]
   )
-  const completadasHoyCount = useMemo(
-    () => consultasHoy.filter((c) => c.status === 'COMPLETADA').length,
-    [consultasHoy]
-  )
+
+  const catalogoPacientes = useMemo(() => {
+    const mapa = new Map<string, PacienteResumen>()
+    for (const p of pacientes) {
+      mapa.set(p.id, p)
+    }
+    for (const c of consultas) {
+      if (!mapa.has(c.patient.id)) {
+        mapa.set(c.patient.id, {
+          id: c.patient.id,
+          firstName: c.patient.firstName,
+          lastName: c.patient.lastName,
+          expedienteNumber: c.patient.expedienteNumber,
+          age: c.patient.age,
+          sex: c.patient.sex,
+          phone: c.patient.phone,
+        })
+      }
+    }
+    return Array.from(mapa.values())
+  }, [pacientes, consultas])
+
+  const coincidenciasNombre = useMemo(() => {
+    const clave = normalizar(`${nombreNuevo} ${apellidoNuevo}`)
+    if (!clave || clave.length < 3) {
+      return { exacto: null, sugerencias: [] as { paciente: PacienteResumen; ultimaConsulta: ConsultaItem | null }[] }
+    }
+
+    const tokens = clave.split(' ').filter(Boolean)
+    const exactoPac =
+      nombreNuevo.trim().length > 0 && apellidoNuevo.trim().length > 0
+        ? catalogoPacientes.find(
+            (p) => normalizar(`${p.firstName} ${p.lastName}`) === clave
+          ) ?? null
+        : null
+
+    if (exactoPac) {
+      const ultimaConsulta = consultas.find((c) => c.patient.id === exactoPac.id) ?? null
+      return {
+        exacto: { paciente: exactoPac, ultimaConsulta },
+        sugerencias: [],
+      }
+    }
+
+    const sugerencias = catalogoPacientes
+      .filter((p) => {
+        const completo = normalizar(`${p.firstName} ${p.lastName}`)
+        return tokens.every((t) => completo.includes(t))
+      })
+      .slice(0, 4)
+      .map((pac) => ({
+        paciente: pac,
+        ultimaConsulta: consultas.find((c) => c.patient.id === pac.id) ?? null,
+      }))
+
+    return { exacto: null, sugerencias }
+  }, [nombreNuevo, apellidoNuevo, catalogoPacientes, consultas])
 
   const filtradas = useMemo(() => {
     const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean)
@@ -187,6 +243,8 @@ export function ConsultasDashboard({
         return
       }
       setMostrarFormulario(false)
+      setNombreNuevo('')
+      setApellidoNuevo('')
       if (abrirAlCrear && res.consultationId) {
         router.push(`/dashboard/consultas/${res.consultationId}`)
       } else {
@@ -220,34 +278,6 @@ export function ConsultasDashboard({
             {mostrarFormulario ? 'Cerrar formulario' : '+ Nueva Consulta / Cita'}
           </button>
         )}
-      </div>
-
-      {/* KPI STRIP CON NUMERALES TABULARES */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Consultas de hoy</p>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tabular-nums">
-            {consultasHoy.length}
-          </p>
-        </div>
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">En espera / curso</p>
-          <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1 tabular-nums">
-            {enEsperaCount}
-          </p>
-        </div>
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Completadas hoy</p>
-          <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
-            {completadasHoyCount}
-          </p>
-        </div>
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Pacientes registrados</p>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tabular-nums">
-            {pacientes.length}
-          </p>
-        </div>
       </div>
 
       {mensaje && (
@@ -331,6 +361,8 @@ export function ConsultasDashboard({
                 <input
                   name="firstName"
                   required
+                  value={nombreNuevo}
+                  onChange={(e) => setNombreNuevo(e.target.value)}
                   placeholder="Ej. María"
                   className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
                 />
@@ -342,10 +374,69 @@ export function ConsultasDashboard({
                 <input
                   name="lastName"
                   required
+                  value={apellidoNuevo}
+                  onChange={(e) => setApellidoNuevo(e.target.value)}
                   placeholder="Ej. González"
                   className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
                 />
               </div>
+              {coincidenciasNombre.exacto && (
+                <div className="sm:col-span-2 md:col-span-3 px-3.5 py-2.5 rounded-lg border border-teal-300 dark:border-teal-700 bg-teal-50 dark:bg-teal-950/40 text-xs text-teal-950 dark:text-teal-100 flex flex-wrap items-center justify-between gap-2">
+                  <span>
+                    <strong>Coincidencia exacta encontrada:</strong>{' '}
+                    {coincidenciasNombre.exacto.paciente.firstName} {coincidenciasNombre.exacto.paciente.lastName} (Exp: {coincidenciasNombre.exacto.paciente.expedienteNumber}). Al registrar, se vinculará su expediente y se conservarán sus antecedentes y alergias previas.
+                  </span>
+                  {coincidenciasNombre.exacto.ultimaConsulta && (
+                    <Link
+                      href={`/dashboard/consultas/${coincidenciasNombre.exacto.ultimaConsulta.id}`}
+                      className="font-bold underline shrink-0"
+                    >
+                      Abrir expediente anterior →
+                    </Link>
+                  )}
+                </div>
+              )}
+
+              {!coincidenciasNombre.exacto && coincidenciasNombre.sugerencias.length > 0 && (
+                <div className="sm:col-span-2 md:col-span-3 px-3.5 py-2.5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30 text-xs text-amber-950 dark:text-amber-100 space-y-2">
+                  <p className="font-bold">
+                    Posibles pacientes registrados con nombre similar (sin distinguir mayúsculas ni acentos):
+                  </p>
+                  <div className="space-y-1.5">
+                    {coincidenciasNombre.sugerencias.map(({ paciente, ultimaConsulta }) => (
+                      <div
+                        key={paciente.id}
+                        className="flex flex-wrap items-center justify-between gap-2 bg-white/80 dark:bg-slate-900/60 border border-amber-200 dark:border-amber-800 rounded-md px-2.5 py-1.5"
+                      >
+                        <span className="font-medium">
+                          <strong>{paciente.firstName} {paciente.lastName}</strong> · Exp: {paciente.expedienteNumber}
+                          {paciente.age !== null ? ` · ${paciente.age} años` : ''}
+                        </span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNombreNuevo(paciente.firstName)
+                              setApellidoNuevo(paciente.lastName)
+                            }}
+                            className="px-2.5 py-1 rounded bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] cursor-pointer"
+                          >
+                            Vincular este expediente
+                          </button>
+                          {ultimaConsulta && (
+                            <Link
+                              href={`/dashboard/consultas/${ultimaConsulta.id}`}
+                              className="font-bold underline text-[11px]"
+                            >
+                              Abrir anterior →
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Edad
@@ -633,7 +724,7 @@ export function ConsultasDashboard({
                       : 'bg-teal-600 hover:bg-teal-700 text-white'
                   }`}
                 >
-                  {c.status === 'COMPLETADA' ? 'Ver resumen / Receta →' : 'Atender consulta →'}
+                  {c.status === 'COMPLETADA' ? 'Abrir expediente →' : 'Atender consulta →'}
                 </Link>
 
                 {puedeRegistrar &&

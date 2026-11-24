@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { AuthError } from 'next-auth'
 import Image from 'next/image'
+import Link from 'next/link'
+import { ArrowLeft, Home } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { InputPassword } from '@/components/InputPassword'
 import { LegalFooter } from '@/components/LegalFooter'
@@ -51,40 +53,54 @@ export default async function LoginPage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4 transition-colors duration-300 relative">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4 pt-16 transition-colors duration-300 relative">
+      <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-3">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-[#0D2344] dark:text-white hover:border-[#00A8B5] shadow-xs transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 text-[#00A8B5]" />
+          <Home className="w-3.5 h-3.5 text-[#00A8B5]" />
+          <span>Inicio</span>
+        </Link>
         <ThemeToggle />
       </div>
 
       <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 space-y-6">
         <div className="text-center space-y-1">
-          <Image
-            src="/Logo.png"
-            alt="NEXO Isotipo"
-            width={160}
-            height={80}
-            priority
-            referrerPolicy="no-referrer"
-            className="h-16 md:h-20 w-auto object-contain mx-auto mb-2"
-          />
-          <div>
-            {/* 1. NEXO CON LA X EXACTA EN CIAN/TURQUESA */}
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-none text-[#0D2344] dark:text-white">
-              NE<span className="text-[#00A8B5] dark:text-[#00C4D6]">X</span>O
-            </h1>
+          <Link
+            href="/"
+            title="Ir a la página principal de NEXO"
+            className="inline-block hover:opacity-90 transition-opacity"
+          >
+            <Image
+              src="/Logo.png"
+              alt="NEXO Isotipo"
+              width={160}
+              height={80}
+              priority
+              referrerPolicy="no-referrer"
+              className="h-16 md:h-20 w-auto object-contain mx-auto mb-2"
+            />
+            <div>
+              {/* 1. NEXO CON LA X EXACTA EN CIAN/TURQUESA */}
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-none text-[#0D2344] dark:text-white">
+                NE<span className="text-[#00A8B5] dark:text-[#00C4D6]">X</span>O
+              </h1>
 
-            {/* 2. MEDICAL TEAM WORKFLOW */}
-            <p className="text-xs md:text-sm font-extrabold text-[#0D2344] dark:text-slate-300 tracking-wider uppercase mt-1">
-              MEDICAL TEAM WORKFLOW
-            </p>
+              {/* 2. MEDICAL TEAM WORKFLOW */}
+              <p className="text-xs md:text-sm font-extrabold text-[#0D2344] dark:text-slate-300 tracking-wider uppercase mt-1">
+                MEDICAL TEAM WORKFLOW
+              </p>
 
-            {/* 3. LÍNEA LARGA CON EL PULSO ECG */}
-            <div className="w-full max-w-60 mx-auto my-1.5">
-              <svg viewBox="0 0 160 12" className="w-full h-2.5 text-[#00A8B5]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M0 6 H65 L69 1 L73 11 L77 2 L81 9 L84 6 H160" />
-              </svg>
+              {/* 3. LÍNEA LARGA CON EL PULSO ECG */}
+              <div className="w-full max-w-60 mx-auto my-1.5">
+                <svg viewBox="0 0 160 12" className="w-full h-2.5 text-[#00A8B5]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M0 6 H65 L69 1 L73 11 L77 2 L81 9 L84 6 H160" />
+                </svg>
+              </div>
             </div>
-          </div>
+          </Link>
 
           <p className="text-xs text-slate-500 dark:text-slate-400 pt-1">
             Sistema de Guardia Hospitalaria y Seguimiento de Pacientes

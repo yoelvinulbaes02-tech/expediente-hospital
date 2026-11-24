@@ -375,7 +375,7 @@ export function ListaPacientes({
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
-              <span>{esOrtopedia ? '🦴' : '🩹'}</span> {esOrtopedia ? 'Curas / Pines' : 'Curas'}
+              <span>{esOrtopedia ? '🦴' : '🩹'}</span> Curas
               <span className={`px-2 py-0.2 rounded-full text-xs font-bold ${areaGuardia === 'curas' ? 'bg-teal-800 text-white' : 'bg-slate-200 text-slate-700'}`}>
                 {curas.length}
               </span>

@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import {
+  calcularTarifaGrupalResidencia,
+  contarUsuariosActivosResidencia,
   obtenerContextoResidencia,
   obtenerTarifaIndividualUsuario,
 } from '@/lib/tenant'
@@ -52,9 +54,7 @@ export default async function SuscripcionPage({
   const { error } = await searchParams
 
   const [usuariosActivos, pagos] = await Promise.all([
-    prisma.user.count({
-      where: { residencyId: ctx.residency.id, isActive: true },
-    }),
+    contarUsuariosActivosResidencia(ctx.residency.id),
     puedePagar
       ? prisma.subscriptionPayment.findMany({
           where: esIndividual
@@ -73,9 +73,12 @@ export default async function SuscripcionPage({
   const paypalWebhookConfigurado = estaPayPalWebhookConfigurado()
   const paypalEnv = (process.env.PAYPAL_ENV ?? 'sandbox').trim().toLowerCase() === 'live' ? 'live' : 'sandbox'
 
+  const tarifaGrupal = !esIndividual
+    ? calcularTarifaGrupalResidencia(ctx.residency, usuariosActivos)
+    : null
   const precioAplicable = esIndividual
     ? obtenerTarifaIndividualUsuario(ctx.residency, ctx.user)
-    : ctx.residency.monthlyPriceUsd
+    : tarifaGrupal!.totalUsd
   const fechaVencimientoAplicable = esIndividual
     ? ctx.user.subscriptionEndsAt
     : ctx.residency.subscriptionEndsAt
@@ -141,7 +144,8 @@ export default async function SuscripcionPage({
                 'Exonerado'
               ) : (
                 <>
-                  ${precioAplicable} <span className="text-xs font-normal text-slate-500">USD / mes</span>
+                  ${precioAplicable.toFixed(2)}{' '}
+                  <span className="text-xs font-normal text-slate-500">USD / mes</span>
                 </>
               )}
             </p>
@@ -150,7 +154,9 @@ export default async function SuscripcionPage({
                 ? ctx.user.individualPriceUsd !== null
                   ? 'Tarifa asignada a tu cuenta'
                   : 'Tarifa base de la residencia'
-                : ctx.residency.planName}
+                : tarifaGrupal?.esDinamico
+                  ? tarifaGrupal.detalle
+                  : ctx.residency.planName}
             </p>
           </div>
 
@@ -219,6 +225,7 @@ export default async function SuscripcionPage({
             paypalEnv={paypalEnv}
             suscripcionAutomaticaId={suscripcionAutomaticaId}
             paypalWebhookConfigurado={paypalWebhookConfigurado}
+            detalleTarifaGrupal={tarifaGrupal?.esDinamico ? tarifaGrupal.detalle : undefined}
           />
         )}
 

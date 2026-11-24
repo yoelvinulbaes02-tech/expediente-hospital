@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
-import { obtenerContextoResidencia, obtenerTarifaIndividualUsuario } from '@/lib/tenant'
+import {
+  calcularTarifaGrupalResidencia,
+  contarUsuariosActivosResidencia,
+  obtenerContextoResidencia,
+  obtenerTarifaIndividualUsuario,
+} from '@/lib/tenant'
 import { capturarOrdenPayPal, estaPayPalConfigurado } from '@/lib/paypal'
 
 const PERIODOS_VALIDOS = [1, 3, 6, 12]
@@ -110,7 +115,10 @@ export async function POST(req: NextRequest) {
     const tarifaEsperada =
       customScope === 'INDIVIDUAL'
         ? obtenerTarifaIndividualUsuario(ctx.residency, ctx.user)
-        : ctx.residency.monthlyPriceUsd
+        : calcularTarifaGrupalResidencia(
+            ctx.residency,
+            await contarUsuariosActivosResidencia(ctx.residency.id)
+          ).totalUsd
     const montoEsperado = Number((tarifaEsperada * periodMonths).toFixed(2))
     const montoCobrado = parseFloat(pagoCapture.amount?.value ?? '0')
     if (isNaN(montoCobrado) || montoCobrado + 0.01 < montoEsperado) {

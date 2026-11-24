@@ -224,7 +224,7 @@ export default async function ExpedientePage({
           })
           .catch(() => [])
       : Promise.resolve([]),
-    esModoQuirurgicoBase
+    esModoCirugia
       ? prisma.episodeDrain
           .findMany({
             where: { episodeId: episode.id },
@@ -1053,8 +1053,8 @@ export default async function ExpedientePage({
           </div>
         )}
 
-        {/* CONTROL INDEPENDIENTE DE DRENAJES (CIRUGÍA / ORTOPEDIA) — PRIMERO QUE SIGNOS VITALES */}
-        {esModoQuirurgicoBase && (
+        {/* CONTROL INDEPENDIENTE DE DRENAJES (SOLO CIRUGÍA) — PRIMERO QUE SIGNOS VITALES */}
+        {esModoCirugia && (
           <div className="mt-6">
             <ControlDrenajes
               episodeId={episode.id}
@@ -1063,7 +1063,6 @@ export default async function ExpedientePage({
               roles={roles}
               puedeRegistrar={permisos.puedeRegistrar}
               ahoraIso={ahoraIso}
-              modoOrtopedia={esModoOrtopedia}
             />
           </div>
         )}

@@ -144,6 +144,9 @@ export async function crearUsuario(
   })
 
   revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/plataforma')
+  revalidatePath(`/dashboard/plataforma/residencia/${admin.residencyId}`)
   return { ok: true, creado: `${fullName} (${email})`, valores: {} }
 }
 
@@ -187,6 +190,9 @@ export async function toggleUsuario(formData: FormData): Promise<void> {
   })
 
   revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/plataforma')
+  revalidatePath(`/dashboard/plataforma/residencia/${admin.residencyId}`)
 }
 
 export async function resetearPassword(userId: string): Promise<ResultadoReset> {
@@ -324,6 +330,9 @@ export async function eliminarUsuario(
   })
 
   revalidatePath('/dashboard/usuarios')
+  revalidatePath('/dashboard/suscripcion')
+  revalidatePath('/dashboard/plataforma')
+  revalidatePath(`/dashboard/plataforma/residencia/${admin.residencyId}`)
   revalidatePath('/dashboard')
   return { ok: true }
 }

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, Home, ShieldCheck } from 'lucide-react'
 import { LegalFooter } from '@/components/LegalFooter'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
@@ -28,18 +28,30 @@ export function LegalPageShell({
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-8 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <Link
-            href="/login"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline whitespace-nowrap shrink-0"
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D2344] dark:text-white hover:text-[#00A8B5] whitespace-nowrap shrink-0"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Volver al acceso</span>
+            <ArrowLeft className="w-3.5 h-3.5 text-[#00A8B5]" />
+            <Home className="w-3.5 h-3.5 text-[#00A8B5]" />
+            <span>Inicio</span>
           </Link>
 
-          <span className="text-sm font-black tracking-tight text-[#0D2344] dark:text-white whitespace-nowrap">
+          <Link
+            href="/"
+            className="text-sm font-black tracking-tight text-[#0D2344] dark:text-white hover:opacity-85 whitespace-nowrap"
+          >
             NE<span className="text-[#00A8B5] dark:text-[#00C4D6]">X</span>O · Marco Legal
-          </span>
+          </Link>
 
-          <ThemeToggle />
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/login"
+              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline whitespace-nowrap"
+            >
+              Iniciar Sesión
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

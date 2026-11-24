@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import {
+  calcularTarifaGrupalResidencia,
   evaluarPlanEstado,
   obtenerContextoResidencia,
   obtenerTarifaIndividualUsuario,
@@ -58,9 +59,13 @@ export default async function UsuariosPage({
       orderBy: { createdAt: 'desc' },
     }),
     prisma.user.count({
-      where: { residencyId: ctx.residency.id, isActive: true },
+      where: { residencyId: ctx.residency.id, isActive: true, role: { not: 'SUPERADMIN' } },
     }),
   ])
+
+  const tarifaGrupal = !esPagoIndividual
+    ? calcularTarifaGrupalResidencia(ctx.residency, activosCount)
+    : null
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8">
@@ -83,7 +88,17 @@ export default async function UsuariosPage({
                   Cobro Individual (Base ${ctx.residency.individualPriceUsd} USD/usuario)
                 </span>
               )}
+              {!esPagoIndividual && tarifaGrupal?.esDinamico && (
+                <span className="ml-2 px-2 py-0.5 rounded bg-teal-100 text-teal-800 font-semibold tabular-nums">
+                  Tarifa grupal dinámica: ${tarifaGrupal.totalUsd.toFixed(2)} USD/mes
+                </span>
+              )}
             </p>
+            {!esPagoIndividual && tarifaGrupal?.esDinamico && (
+              <p className="text-[11px] text-teal-800 dark:text-teal-300 mt-1 tabular-nums">
+                {tarifaGrupal.detalle} · Cada nuevo usuario activo sobre {tarifaGrupal.includedUsers} ajusta el monto mensual en +${tarifaGrupal.pricePerUserUsd.toFixed(2)} USD.
+              </p>
+            )}
           </div>
 
           <Link

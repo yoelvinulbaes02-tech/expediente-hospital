@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { obtenerContextoResidencia, obtenerTarifaIndividualUsuario } from '@/lib/tenant'
+import {
+  calcularTarifaGrupalResidencia,
+  contarUsuariosActivosResidencia,
+  obtenerContextoResidencia,
+  obtenerTarifaIndividualUsuario,
+} from '@/lib/tenant'
 import { crearOrdenPayPal, estaPayPalConfigurado } from '@/lib/paypal'
 import { registrarAceptacionLegal } from '@/lib/legal'
 
@@ -55,7 +60,10 @@ export async function POST(req: NextRequest) {
 
     const tarifaMensual = esIndividual
       ? obtenerTarifaIndividualUsuario(ctx.residency, ctx.user)
-      : ctx.residency.monthlyPriceUsd
+      : calcularTarifaGrupalResidencia(
+          ctx.residency,
+          await contarUsuariosActivosResidencia(ctx.residency.id)
+        ).totalUsd
     const amountUsd = Number((tarifaMensual * periodMonths).toFixed(2))
 
     if (amountUsd <= 0) {

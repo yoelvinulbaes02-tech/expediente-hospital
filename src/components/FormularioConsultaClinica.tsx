@@ -28,15 +28,19 @@ type ConsultaEditable = {
 export function FormularioConsultaClinica({
   consulta,
   puedeEditar,
+  autorNotas,
+  bloqueadoPorAutoria = false,
 }: {
   consulta: ConsultaEditable
   puedeEditar: boolean
+  autorNotas?: string | null
+  bloqueadoPorAutoria?: boolean
 }) {
   const router = useRouter()
   const [peso, setPeso] = useState(consulta.weight ? String(consulta.weight) : '')
   const [unidadPeso, setUnidadPeso] = useState(consulta.weightUnit ?? 'kg')
   const [tallaCm, setTallaCm] = useState(consulta.heightCm ? String(consulta.heightCm) : '')
-  const [guardando, setGuardando] = useState<'guardar' | 'finalizar' | null>(null)
+  const [guardando, setGuardando] = useState<'guardar' | 'finalizar' | 'reabrir' | null>(null)
   const [feedback, setFeedback] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
 
   const calcularIMC = () => {
@@ -52,7 +56,7 @@ export function FormularioConsultaClinica({
 
   const imc = calcularIMC()
 
-  const enviar = async (formData: FormData, accion: 'guardar' | 'finalizar') => {
+  const enviar = async (formData: FormData, accion: 'guardar' | 'finalizar' | 'reabrir') => {
     if (!puedeEditar) return
     formData.set('accion', accion)
     setGuardando(accion)
@@ -63,11 +67,16 @@ export function FormularioConsultaClinica({
         setFeedback({ tipo: 'error', texto: res.error ?? 'No se pudo guardar.' })
         return
       }
+      if (res.finalizada) {
+        router.push('/dashboard')
+        router.refresh()
+        return
+      }
       setFeedback({
         tipo: 'ok',
-        texto: res.finalizada
-          ? 'Consulta finalizada y firmada correctamente.'
-          : 'Progreso de la consulta guardado.',
+        texto: res.reabierta
+          ? 'Consulta reabierta en curso.'
+          : 'Cambios de la consulta guardados correctamente.',
       })
       router.refresh()
     } finally {
@@ -97,6 +106,18 @@ export function FormularioConsultaClinica({
           </div>
         )}
       </div>
+
+      {bloqueadoPorAutoria && (
+        <div className="px-4 py-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 text-xs font-medium print:hidden">
+          Solo el médico autor de estas notas ({autorNotas || 'médico tratante'}) puede modificarlas. El expediente completo sigue visible para consulta del equipo médico.
+        </div>
+      )}
+
+      {consulta.status === 'COMPLETADA' && puedeEditar && (
+        <div className="px-4 py-2.5 rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/30 text-teal-900 dark:text-teal-200 text-xs font-medium print:hidden">
+          Consulta cerrada · Como médico autor ({autorNotas || 'tratante'}), puedes editar estas notas o reabrirla cuando el paciente regrese.
+        </div>
+      )}
 
       {feedback && (
         <div
@@ -350,17 +371,32 @@ export function FormularioConsultaClinica({
             disabled={guardando !== null}
             className="px-4 py-2.5 rounded-lg text-xs font-bold border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white hover:bg-slate-50 cursor-pointer"
           >
-            {guardando === 'guardar' ? 'Guardando...' : 'Guardar progreso'}
+            {guardando === 'guardar'
+              ? 'Guardando...'
+              : consulta.status === 'COMPLETADA'
+                ? 'Guardar modificaciones'
+                : 'Guardar progreso'}
           </button>
 
-          <button
-            type="submit"
-            formAction={(fd) => enviar(fd, 'finalizar')}
-            disabled={guardando !== null}
-            className="px-5 py-2.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
-          >
-            {guardando === 'finalizar' ? 'Finalizando...' : '✓ Finalizar y Firmar Consulta'}
-          </button>
+          {consulta.status === 'COMPLETADA' ? (
+            <button
+              type="submit"
+              formAction={(fd) => enviar(fd, 'reabrir')}
+              disabled={guardando !== null}
+              className="px-5 py-2.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white cursor-pointer"
+            >
+              {guardando === 'reabrir' ? 'Reabriendo...' : 'Reabrir consulta'}
+            </button>
+          ) : (
+            <button
+              type="submit"
+              formAction={(fd) => enviar(fd, 'finalizar')}
+              disabled={guardando !== null}
+              className="px-5 py-2.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
+            >
+              {guardando === 'finalizar' ? 'Cerrando...' : '✓ Finalizar y Cerrar Consulta'}
+            </button>
+          )}
         </div>
       )}
     </form>

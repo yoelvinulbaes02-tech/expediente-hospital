@@ -156,7 +156,7 @@ export default async function DashboardPage({
             phone: true,
           },
           orderBy: [{ firstName: 'asc' }, { lastName: 'asc' }],
-          take: 300,
+          take: 2500,
         })
       : Promise.resolve([]),
   ])

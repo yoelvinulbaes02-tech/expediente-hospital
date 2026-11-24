@@ -161,6 +161,126 @@ export function obtenerTarifaIndividualUsuario(
   return user.individualPriceUsd ?? residency.individualPriceUsd
 }
 
+export type GroupPricingConfig = {
+  enabled: boolean
+  basePriceUsd: number | null
+  includedUsers: number
+  pricePerUserUsd: number
+}
+
+export type TarifaGrupalCalculada = {
+  totalUsd: number
+  esDinamico: boolean
+  activeUsersCount: number
+  basePriceUsd: number
+  includedUsers: number
+  pricePerUserUsd: number
+  usuariosAdicionales: number
+  detalle: string
+}
+
+export function extraerConfigPrecioGrupal(surgicalStatsExtra: unknown): GroupPricingConfig {
+  if (!surgicalStatsExtra || typeof surgicalStatsExtra !== 'object' || Array.isArray(surgicalStatsExtra)) {
+    return { enabled: false, basePriceUsd: null, includedUsers: 0, pricePerUserUsd: 0 }
+  }
+  const raw = (surgicalStatsExtra as Record<string, unknown>).groupPricing
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { enabled: false, basePriceUsd: null, includedUsers: 0, pricePerUserUsd: 0 }
+  }
+  const gp = raw as Record<string, unknown>
+  const enabled = gp.enabled === true
+  const baseParsed =
+    gp.basePriceUsd !== null && gp.basePriceUsd !== undefined && gp.basePriceUsd !== ''
+      ? Number(gp.basePriceUsd)
+      : null
+  const basePriceUsd =
+    baseParsed !== null && Number.isFinite(baseParsed) && baseParsed >= 0
+      ? Math.round(baseParsed * 100) / 100
+      : null
+  const includedParsed = Number(gp.includedUsers ?? 0)
+  const includedUsers =
+    Number.isFinite(includedParsed) && includedParsed >= 0 ? Math.floor(includedParsed) : 0
+  const perUserParsed = Number(gp.pricePerUserUsd ?? 0)
+  const pricePerUserUsd =
+    Number.isFinite(perUserParsed) && perUserParsed >= 0
+      ? Math.round(perUserParsed * 100) / 100
+      : 0
+
+  return { enabled, basePriceUsd, includedUsers, pricePerUserUsd }
+}
+
+export function fusionarSurgicalStatsExtra(
+  actual: unknown,
+  patch: Record<string, unknown>
+): Record<string, unknown> {
+  const base =
+    actual && typeof actual === 'object' && !Array.isArray(actual)
+      ? { ...(actual as Record<string, unknown>) }
+      : {}
+  return { ...base, ...patch }
+}
+
+export function calcularTarifaGrupalResidencia(
+  residency: Pick<Residency, 'monthlyPriceUsd' | 'surgicalStatsExtra'>,
+  activeUsersCount: number
+): TarifaGrupalCalculada {
+  const cfg = extraerConfigPrecioGrupal(residency.surgicalStatsExtra)
+  const baseFallback = Math.max(0, Number(residency.monthlyPriceUsd ?? 0))
+  const usuariosActivos = Math.max(0, Math.floor(activeUsersCount))
+
+  if (!cfg.enabled) {
+    return {
+      totalUsd: Math.round(baseFallback * 100) / 100,
+      esDinamico: false,
+      activeUsersCount: usuariosActivos,
+      basePriceUsd: baseFallback,
+      includedUsers: 0,
+      pricePerUserUsd: 0,
+      usuariosAdicionales: 0,
+      detalle: 'Tarifa grupal fija mensual',
+    }
+  }
+
+  const basePriceUsd = cfg.basePriceUsd !== null ? cfg.basePriceUsd : baseFallback
+  const usuariosAdicionales = Math.max(0, usuariosActivos - cfg.includedUsers)
+  const totalUsd =
+    Math.round((basePriceUsd + usuariosAdicionales * cfg.pricePerUserUsd) * 100) / 100
+
+  let detalle = ''
+  if (cfg.includedUsers > 0) {
+    detalle =
+      usuariosAdicionales > 0
+        ? `Base $${basePriceUsd.toFixed(2)} (hasta ${cfg.includedUsers} u.) + ${usuariosAdicionales} adicional(es) × $${cfg.pricePerUserUsd.toFixed(2)}`
+        : `Base $${basePriceUsd.toFixed(2)} (incluye hasta ${cfg.includedUsers} usuarios · +$${cfg.pricePerUserUsd.toFixed(2)}/extra)`
+  } else {
+    detalle =
+      basePriceUsd > 0
+        ? `Base $${basePriceUsd.toFixed(2)} + ${usuariosActivos} usuario(s) × $${cfg.pricePerUserUsd.toFixed(2)}`
+        : `${usuariosActivos} usuario(s) activo(s) × $${cfg.pricePerUserUsd.toFixed(2)}/u`
+  }
+
+  return {
+    totalUsd,
+    esDinamico: true,
+    activeUsersCount: usuariosActivos,
+    basePriceUsd,
+    includedUsers: cfg.includedUsers,
+    pricePerUserUsd: cfg.pricePerUserUsd,
+    usuariosAdicionales,
+    detalle,
+  }
+}
+
+export async function contarUsuariosActivosResidencia(residencyId: string): Promise<number> {
+  return prisma.user.count({
+    where: {
+      residencyId,
+      isActive: true,
+      role: { not: 'SUPERADMIN' },
+    },
+  })
+}
+
 export async function asegurarResidenciaPrincipal(): Promise<Residency> {
   let principal = await prisma.residency.findFirst({
     where: {

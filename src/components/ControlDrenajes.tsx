@@ -23,7 +23,6 @@ import {
   registrarDebitoDrenaje,
   retirarDrenaje,
 } from '@/app/dashboard/paciente/[id]/actions-clinicas'
-import { PRESETS_DRENAJES_ORTOPEDIA } from '@/lib/ortopedia-constants'
 
 export type DrainEntryItem = {
   id: string
@@ -473,7 +472,6 @@ export function ControlDrenajes({
   roles,
   puedeRegistrar,
   ahoraIso,
-  modoOrtopedia = false,
 }: {
   episodeId: string
   drenajes: EpisodeDrainItem[]
@@ -481,9 +479,8 @@ export function ControlDrenajes({
   roles: Record<string, string>
   puedeRegistrar: boolean
   ahoraIso: string
-  modoOrtopedia?: boolean
 }) {
-  const presetsDrenajes = modoOrtopedia ? PRESETS_DRENAJES_ORTOPEDIA : PRESETS_DRENAJES
+  const presetsDrenajes = PRESETS_DRENAJES
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [mostrarNuevo, setMostrarNuevo] = useState(false)
@@ -733,11 +730,7 @@ export function ControlDrenajes({
                 value={nombreNuevo}
                 onChange={(e) => setNombreNuevo(e.target.value)}
                 required
-                placeholder={
-                  modoOrtopedia
-                    ? 'Ej. Hemovac, Drenaje subfascial'
-                    : 'Ej. Sonda pleural, Drenaje abdominal'
-                }
+                placeholder="Ej. Sonda pleural, Drenaje abdominal"
                 className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white text-slate-900"
               />
             </div>
@@ -749,9 +742,7 @@ export function ControlDrenajes({
               <input
                 value={ubicacionNueva}
                 onChange={(e) => setUbicacionNueva(e.target.value)}
-                placeholder={
-                  modoOrtopedia ? 'Ej. Cadera der., Herida tibial' : 'Ej. Hemitórax derecho, FID'
-                }
+                placeholder="Ej. Hemitórax derecho, FID"
                 className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white text-slate-900"
               />
             </div>

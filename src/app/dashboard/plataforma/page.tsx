@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { obtenerSesionSegura, signOut } from '@/auth'
-import { obtenerContextoResidencia } from '@/lib/tenant'
+import { calcularTarifaGrupalResidencia, obtenerContextoResidencia } from '@/lib/tenant'
 import {
   obtenerAlertasCuentasCompartidas,
   registrarCierreSesionNonce,
@@ -266,7 +266,7 @@ export default async function PlataformaPage({
       return acc + sumaIndividual
     }
     if (r.planStatus === 'ACTIVE') {
-      return acc + r.monthlyPriceUsd
+      return acc + calcularTarifaGrupalResidencia(r, r._count.users).totalUsd
     }
     return acc
   }, 0)
@@ -340,7 +340,7 @@ export default async function PlataformaPage({
           <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
             <p className="text-xs text-slate-500 dark:text-slate-400">MRR mensual estimado</p>
             <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
-              ${mrrEstimado} USD
+              ${mrrEstimado.toFixed(2)} USD
             </p>
           </div>
           <div className="bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
@@ -964,6 +964,45 @@ export default async function PlataformaPage({
               </select>
             </div>
 
+            <div className="md:col-span-3 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20 p-3.5 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+              <label className="inline-flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-100 cursor-pointer md:col-span-2">
+                <input
+                  type="checkbox"
+                  name="groupPricingEnabled"
+                  value="true"
+                  className="w-4 h-4 rounded"
+                />
+                <span>
+                  Cobro grupal dinámico (sube automáticamente si se agregan más usuarios activos)
+                </span>
+              </label>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Usuarios incluidos en tarifa base
+                </label>
+                <input
+                  name="groupIncludedUsers"
+                  type="number"
+                  min={0}
+                  defaultValue={10}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  USD extra por usuario adicional
+                </label>
+                <input
+                  name="groupPricePerUserUsd"
+                  type="number"
+                  step="0.01"
+                  min={0}
+                  defaultValue={5}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Nombre del Admin Inicial *
@@ -1040,6 +1079,7 @@ export default async function PlataformaPage({
               {residencias.map((r) => {
                 const esIndividual = r.billingMode === 'INDIVIDUAL'
                 const usuariosVigentes = r.users.filter((u) => u.planStatus === 'ACTIVE').length
+                const tarifaGrupal = calcularTarifaGrupalResidencia(r, r._count.users)
                 return (
                   <tr key={r.id}>
                     <td className="px-4 py-3">
@@ -1049,12 +1089,16 @@ export default async function PlataformaPage({
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                             esIndividual
                               ? 'bg-blue-50 text-blue-800 border-blue-200'
-                              : 'bg-slate-100 text-slate-700 border-slate-200'
+                              : tarifaGrupal.esDinamico
+                                ? 'bg-teal-50 text-teal-800 border-teal-200'
+                                : 'bg-slate-100 text-slate-700 border-slate-200'
                           }`}
                         >
                           {esIndividual
                             ? `👤 Individual ($${r.individualPriceUsd}/u)`
-                            : `🏢 Grupal ($${r.monthlyPriceUsd})`}
+                            : tarifaGrupal.esDinamico
+                              ? `🏢 Grupal dinámico ($${tarifaGrupal.totalUsd.toFixed(2)} · ${r._count.users}u)`
+                              : `🏢 Grupal ($${r.monthlyPriceUsd})`}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
