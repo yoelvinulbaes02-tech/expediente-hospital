@@ -33,6 +33,8 @@ const ENTIDADES: Record<string, string> = {
   episode_drain_entry: 'un registro de débito de drenaje',
   wound_care: 'una cura quirúrgica',
   hemodialysis_item: 'un registro de Hemodiálisis',
+  consultation: 'una consulta externa',
+  medical_history: 'antecedentes clínicos',
 }
 
 export function describirRegistro(log: {
@@ -228,6 +230,38 @@ export function describirRegistro(log: {
         detalle: log.reason
           ? log.reason
           : unir(lleno(n.patientName) && String(n.patientName), lleno(n.title) && cortar(String(n.title))),
+      }
+
+    case 'consultation:create':
+      return {
+        que: n.copiedFromConsultationId
+          ? 'Creó nueva consulta copiando datos de una visita anterior'
+          : 'Registró una consulta externa',
+        detalle: unir(
+          lleno(n.visitType) && String(n.visitType),
+          lleno(n.chiefComplaint) && `Motivo: ${cortar(String(n.chiefComplaint), 100)}`,
+          lleno(n.diagnosis) && `Dx: ${cortar(String(n.diagnosis), 90)}`
+        ),
+      }
+
+    case 'consultation:update':
+      return {
+        que:
+          n.status === 'COMPLETADA' && o.status !== 'COMPLETADA'
+            ? 'Finalizó y firmó la consulta externa'
+            : log.reason
+              ? log.reason
+              : 'Actualizó la ficha clínica de consulta externa',
+        detalle: unir(
+          lleno(n.diagnosis) && `Dx: ${cortar(String(n.diagnosis), 90)}`,
+          lleno(n.chiefComplaint) && `Motivo: ${cortar(String(n.chiefComplaint), 90)}`
+        ),
+      }
+
+    case 'medical_history:update':
+      return {
+        que: 'Actualizó antecedentes del paciente',
+        detalle: log.reason ? log.reason : 'Modificó antecedentes clínicos del expediente',
       }
 
     default: {

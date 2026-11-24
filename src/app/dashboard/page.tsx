@@ -27,7 +27,7 @@ import Link from 'next/link'
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ doc?: string; vista?: string }>
+  searchParams: Promise<{ doc?: string; vista?: string; cerrada?: string }>
 }) {
   const ctx = await obtenerContextoResidencia()
   if (!ctx?.user) redirect('/login')
@@ -48,7 +48,7 @@ export default async function DashboardPage({
   const suscripcion = ctx.suscripcion
   const suscripcionBloqueada = suscripcion?.bloqueada ?? false
 
-  const { doc, vista } = await searchParams
+  const { doc, vista, cerrada } = await searchParams
   const filtroDoc = doc || ''
   const esModoConsultas = ctx.interfaceMode === 'CONSULTAS'
   const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
@@ -125,6 +125,9 @@ export default async function DashboardPage({
       ? prisma.consultation.findMany({
           where: { residencyId: residency.id },
           include: {
+            doctor: {
+              select: { id: true, fullName: true, role: true },
+            },
             patient: {
               select: {
                 id: true,
@@ -139,7 +142,7 @@ export default async function DashboardPage({
             },
           },
           orderBy: { consultationDate: 'desc' },
-          take: 250,
+          take: 1000,
         })
       : Promise.resolve([]),
 
@@ -542,11 +545,14 @@ export default async function DashboardPage({
   const consultasSerializadas = consultas.map((c) => ({
     id: c.id,
     consultationDate: c.consultationDate.toISOString(),
+    updatedAt: c.updatedAt.toISOString(),
     status: c.status,
     visitType: c.visitType,
     chiefComplaint: c.chiefComplaint,
     diagnosis: c.diagnosis,
+    doctorId: c.doctorId,
     doctorName: c.doctorName,
+    doctorRole: c.doctor?.role ? String(c.doctor.role) : null,
     patient: c.patient,
   }))
 
@@ -751,6 +757,7 @@ export default async function DashboardPage({
             specialty={residency.specialty}
             puedeRegistrar={puedeRegistrar}
             suscripcionBloqueada={suscripcionBloqueada}
+            consultaRecienCerrada={cerrada === '1'}
           />
         ) : (
           <ListaPacientes

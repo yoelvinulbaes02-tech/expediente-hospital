@@ -1,15 +1,17 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, CopyPlus, Lock, PlusCircle } from 'lucide-react'
-import type {
-  BloqueSeccionConsulta,
-  HistorialVisitaResumen,
-  SeccionConsultaKey,
+import { Check, ChevronDown, ClipboardCopy, Lock, Pencil, PlusCircle } from 'lucide-react'
+import {
+  type HistorialVisitaResumen,
+  type MapaMetaSecciones,
+  type SeccionAutorMeta,
+  type SeccionConsultaKey,
+  etiquetaRolClinico,
 } from '@/lib/consultas-auth'
 import {
-  agregarBloqueSeccionConsulta,
   guardarConsultaClinica,
   iniciarNuevaAtencionConsulta,
 } from '@/app/dashboard/consultas/actions'
@@ -35,12 +37,23 @@ type ConsultaEditable = {
   notes: string | null
 }
 
-type RegistroHistorico = {
-  id: string
-  fechaIso: string
-  autor: string
-  etiqueta?: string
-  contenido: string
+type FormState = {
+  visitType: string
+  nextAppointment: string
+  chiefComplaint: string
+  bloodPressure: string
+  heartRate: string
+  temperature: string
+  oxygenSat: string
+  weight: string
+  weightUnit: string
+  heightCm: string
+  historyIllness: string
+  physicalExam: string
+  diagnosis: string
+  treatmentPlan: string
+  labOrders: string
+  notes: string
 }
 
 function fmtFechaHora(iso: string) {
@@ -54,72 +67,38 @@ function fmtFechaHora(iso: string) {
   })
 }
 
-function AcapiteRetraible({
+function fmtHora(iso: string) {
+  return new Date(iso).toLocaleTimeString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
+}
+
+function AcapiteClinico({
   titulo,
-  seccion,
-  historicos,
-  puedeDuplicar,
+  meta,
   abiertoPorDefecto = true,
-  duplicadorAbierto,
-  onToggleDuplicador,
-  consultationId,
-  onBloqueGuardado,
+  puedeEditar,
+  editando,
+  onToggleEditar,
+  bloqueadoPorAutoria,
+  autorNotas,
+  badgeExtra,
   children,
 }: {
   titulo: string
-  seccion: SeccionConsultaKey
-  historicos: RegistroHistorico[]
-  puedeDuplicar: boolean
+  meta?: SeccionAutorMeta | null
   abiertoPorDefecto?: boolean
-  duplicadorAbierto: boolean
-  onToggleDuplicador: () => void
-  consultationId: string
-  onBloqueGuardado: (msg: string) => void
+  puedeEditar: boolean
+  editando: boolean
+  onToggleEditar: () => void
+  bloqueadoPorAutoria: boolean
+  autorNotas?: string | null
+  badgeExtra?: React.ReactNode
   children: React.ReactNode
 }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [guardandoBloque, setGuardandoBloque] = useState(false)
-  const [errorBloque, setErrorBloque] = useState<string | null>(null)
-
-  const handleGuardarBloque = async () => {
-    if (!containerRef.current) return
-    const fd = new FormData()
-    fd.set('consultationId', consultationId)
-    fd.set('seccion', seccion)
-
-    const campos = containerRef.current.querySelectorAll<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >('[data-field]')
-    campos.forEach((el) => {
-      const key = el.dataset.field
-      if (key) {
-        fd.set(key, el.value)
-      }
-    })
-
-    setGuardandoBloque(true)
-    setErrorBloque(null)
-    try {
-      const res = await agregarBloqueSeccionConsulta(fd)
-      if (!res.ok) {
-        setErrorBloque(res.error ?? 'No se pudo guardar el nuevo bloque.')
-        return
-      }
-      campos.forEach((el) => {
-        if (el.tagName === 'SELECT') {
-          if (el.dataset.field === 'weightUnit') el.value = 'kg'
-          if (el.dataset.field === 'visitType') el.value = 'Seguimiento'
-        } else {
-          el.value = ''
-        }
-      })
-      onToggleDuplicador()
-      onBloqueGuardado(`Nuevo registro agregado en "${titulo}" sin alterar los anteriores.`)
-    } finally {
-      setGuardandoBloque(false)
-    }
-  }
-
   return (
     <details
       open={abiertoPorDefecto}
@@ -131,183 +110,65 @@ function AcapiteRetraible({
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
             {titulo}
           </h3>
-          {historicos.length > 0 && (
-            <span className="px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold tabular-nums">
-              {historicos.length} previo{historicos.length === 1 ? '' : 's'}
-            </span>
-          )}
+          {badgeExtra}
         </div>
 
-        {puedeDuplicar && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault()
-              setErrorBloque(null)
-              onToggleDuplicador()
-            }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-900/30 hover:bg-teal-100 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 text-[11px] font-bold cursor-pointer whitespace-nowrap print:hidden"
-          >
-            <CopyPlus className="w-3.5 h-3.5" />
-            <span>{duplicadorAbierto ? 'Cerrar nuevo bloque' : 'Duplicar / Nuevo'}</span>
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2 ml-auto">
+          {meta && (
+            <span className="inline-flex flex-wrap items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
+              <span>✍️ Modificado por:</span>
+              <strong className="text-slate-700 dark:text-slate-200">{meta.byName}</strong>
+              {meta.byRole && (
+                <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                  {etiquetaRolClinico(meta.byRole)}
+                </span>
+              )}
+              <span className="text-[10px] text-slate-400 tabular-nums">
+                · {fmtFechaHora(meta.atIso)}
+              </span>
+            </span>
+          )}
+
+          {bloqueadoPorAutoria ? (
+            <span
+              title={`Solo lectura: pertenece a ${autorNotas || 'otro médico'}`}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[10px] font-bold text-amber-800 dark:text-amber-300 print:hidden"
+            >
+              <Lock className="w-3 h-3" />
+              <span>Solo lectura</span>
+            </span>
+          ) : (
+            puedeEditar && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  onToggleEditar()
+                }}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer whitespace-nowrap print:hidden ${
+                  editando
+                    ? 'bg-teal-600 hover:bg-teal-700 text-white border-teal-600'
+                    : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-700 dark:text-blue-300 border-slate-300 dark:border-slate-600'
+                }`}
+              >
+                {editando ? (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Listo</span>
+                  </>
+                ) : (
+                  <>
+                    <Pencil className="w-3 h-3" />
+                    <span>Editar</span>
+                  </>
+                )}
+              </button>
+            )
+          )}
+        </div>
       </summary>
 
-      <div className="mt-3 space-y-3">
-        {/* HISTORIAL PREVIO RETRAÍBLE Y SOLO LECTURA */}
-        {historicos.length > 0 && (
-          <details className="group/hist rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 px-3 py-2">
-            <summary className="list-none cursor-pointer flex items-center justify-between gap-2 text-[11px] font-bold text-slate-600 dark:text-slate-300 [&::-webkit-details-marker]:hidden">
-              <span className="inline-flex items-center gap-1.5">
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 transition-transform group-open/hist:rotate-0 -rotate-90" />
-                <span>Ver registros anteriores ({historicos.length}) · Solo lectura</span>
-              </span>
-              <Lock className="w-3 h-3 text-slate-400" />
-            </summary>
-
-            <div className="mt-2.5 space-y-2 border-t border-slate-100 dark:border-slate-700 pt-2">
-              {historicos.map((h) => (
-                <details
-                  key={h.id}
-                  open
-                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 px-3 py-2"
-                >
-                  <summary className="list-none cursor-pointer flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-slate-300 [&::-webkit-details-marker]:hidden">
-                    <span className="font-bold text-slate-800 dark:text-slate-100 tabular-nums">
-                      {fmtFechaHora(h.fechaIso)}
-                      {h.etiqueta ? ` · ${h.etiqueta}` : ''}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-                      <Lock className="w-3 h-3" />
-                      {h.autor}
-                    </span>
-                  </summary>
-                  <p className="mt-1.5 pt-1.5 border-t border-slate-200/70 dark:border-slate-700/70 text-xs text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
-                    {h.contenido}
-                  </p>
-                </details>
-              ))}
-            </div>
-          </details>
-        )}
-
-        {/* BLOQUE INDEPENDIENTE PARA DUPLICAR / AGREGAR SIN ALTERAR ANTERIORES */}
-        {puedeDuplicar && duplicadorAbierto && (
-          <div
-            ref={containerRef}
-            className="rounded-lg border border-teal-300 dark:border-teal-700 bg-teal-50/50 dark:bg-teal-950/20 p-3.5 space-y-3 print:hidden"
-          >
-            <p className="text-[11px] font-bold text-teal-900 dark:text-teal-200">
-              Nuevo registro independiente en &ldquo;{titulo}&rdquo; (no modifica los anteriores)
-            </p>
-            {errorBloque && (
-              <div className="px-3 py-2 rounded border border-red-200 bg-red-50 text-red-800 text-xs font-medium">
-                {errorBloque}
-              </div>
-            )}
-
-            <div className="space-y-3">
-              {seccion === 'signos' ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
-                  <input
-                    data-field="bloodPressure"
-                    placeholder="TA (120/80)"
-                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                  />
-                  <input
-                    data-field="heartRate"
-                    type="number"
-                    placeholder="FC (lpm)"
-                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                  />
-                  <input
-                    data-field="temperature"
-                    type="number"
-                    step="0.1"
-                    placeholder="Temp (°C)"
-                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                  />
-                  <input
-                    data-field="oxygenSat"
-                    type="number"
-                    placeholder="SpO2 (%)"
-                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                  />
-                  <div className="flex gap-1">
-                    <input
-                      data-field="weight"
-                      type="number"
-                      step="0.1"
-                      placeholder="Peso"
-                      className="w-full px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    />
-                    <select
-                      data-field="weightUnit"
-                      defaultValue="kg"
-                      className="px-1.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-700"
-                    >
-                      <option value="kg">kg</option>
-                      <option value="lb">lb</option>
-                    </select>
-                  </div>
-                  <input
-                    data-field="heightCm"
-                    type="number"
-                    step="0.5"
-                    placeholder="Talla (cm)"
-                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                  />
-                </div>
-              ) : seccion === 'motivo' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <select
-                    data-field="visitType"
-                    defaultValue="Seguimiento"
-                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                  >
-                    <option value="Seguimiento">Seguimiento</option>
-                    <option value="Control de resultados">Control de resultados</option>
-                    <option value="Urgencia ambulatoria">Urgencia ambulatoria</option>
-                    <option value="Primera vez">Primera vez</option>
-                  </select>
-                  <input
-                    data-field="chiefComplaint"
-                    placeholder="Nuevo motivo de consulta..."
-                    className="sm:col-span-2 w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                  />
-                </div>
-              ) : (
-                <textarea
-                  data-field="contenido"
-                  rows={3}
-                  placeholder={`Escribe el nuevo registro para ${titulo.toLowerCase()}...`}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                />
-              )}
-
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={onToggleDuplicador}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  disabled={guardandoBloque}
-                  onClick={handleGuardarBloque}
-                  className="px-4 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white disabled:opacity-50 cursor-pointer"
-                >
-                  {guardandoBloque ? 'Guardando...' : 'Guardar nuevo bloque'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* CAMPOS ACTUALES DE ESTA VISITA */}
+      <div className="mt-3 pt-2.5 border-t border-slate-200/70 dark:border-slate-700/70">
         {children}
       </div>
     </details>
@@ -321,7 +182,8 @@ export function FormularioConsultaClinica({
   autorNotas,
   bloqueadoPorAutoria = false,
   historialVisitas = [],
-  bloquesExtra = [],
+  metaSeccionesInicial = {},
+  usuarioActual,
 }: {
   consulta: ConsultaEditable
   puedeEditar: boolean
@@ -329,15 +191,32 @@ export function FormularioConsultaClinica({
   autorNotas?: string | null
   bloqueadoPorAutoria?: boolean
   historialVisitas?: HistorialVisitaResumen[]
-  bloquesExtra?: BloqueSeccionConsulta[]
+  metaSeccionesInicial?: MapaMetaSecciones
+  usuarioActual: { fullName: string; role: string }
 }) {
   const router = useRouter()
-  const [peso, setPeso] = useState(consulta.weight ? String(consulta.weight) : '')
-  const [unidadPeso, setUnidadPeso] = useState(consulta.weightUnit ?? 'kg')
-  const [tallaCm, setTallaCm] = useState(consulta.heightCm ? String(consulta.heightCm) : '')
-  const [guardando, setGuardando] = useState<'guardar' | 'finalizar' | 'nueva' | null>(null)
-  const [feedback, setFeedback] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
-  const [duplicadoresAbiertos, setDuplicadoresAbiertos] = useState<Record<SeccionConsultaKey, boolean>>({
+
+  const [form, setForm] = useState<FormState>({
+    visitType: consulta.visitType,
+    nextAppointment: consulta.nextAppointment ?? '',
+    chiefComplaint: consulta.chiefComplaint,
+    bloodPressure: consulta.bloodPressure ?? '',
+    heartRate: consulta.heartRate !== null ? String(consulta.heartRate) : '',
+    temperature: consulta.temperature !== null ? String(consulta.temperature) : '',
+    oxygenSat: consulta.oxygenSat !== null ? String(consulta.oxygenSat) : '',
+    weight: consulta.weight !== null ? String(consulta.weight) : '',
+    weightUnit: consulta.weightUnit ?? 'kg',
+    heightCm: consulta.heightCm !== null ? String(consulta.heightCm) : '',
+    historyIllness: consulta.historyIllness ?? '',
+    physicalExam: consulta.physicalExam ?? '',
+    diagnosis: consulta.diagnosis ?? '',
+    treatmentPlan: consulta.treatmentPlan ?? '',
+    labOrders: consulta.labOrders ?? '',
+    notes: consulta.notes ?? '',
+  })
+
+  const [metaSecciones, setMetaSecciones] = useState<MapaMetaSecciones>(metaSeccionesInicial)
+  const [editandoSeccion, setEditandoSeccion] = useState<Record<SeccionConsultaKey, boolean>>({
     signos: false,
     motivo: false,
     enfermedad: false,
@@ -348,20 +227,33 @@ export function FormularioConsultaClinica({
     notas: false,
   })
 
-  // Si la consulta ya está cerrada (COMPLETADA) o bloqueada por autoría, sus campos originales son de solo lectura.
-  // Para escribir nuevos datos se duplican acápites o se inicia una nueva atención limpia.
-  const esConsultaCerrada = consulta.status === 'COMPLETADA'
-  const camposActualesEditables = puedeEditar && !esConsultaCerrada
+  const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'saving' | 'saved'>('idle')
+  const [ultimaHoraGuardado, setUltimaHoraGuardado] = useState<string | null>(null)
+  const [finalizando, setFinalizando] = useState(false)
+  const [creandoNueva, setCreandoNueva] = useState(false)
+  const [feedback, setFeedback] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
 
-  const toggleDuplicador = (sec: SeccionConsultaKey) => {
-    setDuplicadoresAbiertos((prev) => ({ ...prev, [sec]: !prev[sec] }))
-  }
+  const visitasPrevias = [...historialVisitas]
+    .filter((v) => v.id !== consulta.id)
+    .sort((a, b) => new Date(b.consultationDate).getTime() - new Date(a.consultationDate).getTime())
+
+  const [visitaSeleccionadaId, setVisitaSeleccionadaId] = useState<string>(
+    visitasPrevias[0]?.id ?? ''
+  )
+
+  const esConsultaCerrada = consulta.status === 'COMPLETADA' || consulta.status === 'CANCELADA'
+  const camposActualesEditables = puedeEditar && !esConsultaCerrada && !bloqueadoPorAutoria
+
+  const formRef = useRef(form)
+  const dirtyRef = useRef(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const mountedRef = useRef(true)
 
   const calcularIMC = () => {
-    const pNum = parseFloat(peso)
-    const tNum = parseFloat(tallaCm)
+    const pNum = parseFloat(form.weight)
+    const tNum = parseFloat(form.heightCm)
     if (!pNum || !tNum || tNum <= 0) return null
-    const pesoKg = unidadPeso === 'lb' ? pNum * 0.453592 : pNum
+    const pesoKg = form.weightUnit === 'lb' ? pNum * 0.453592 : pNum
     const alturaM = tNum / 100
     const imc = pesoKg / (alturaM * alturaM)
     if (!isFinite(imc)) return null
@@ -370,37 +262,212 @@ export function FormularioConsultaClinica({
 
   const imc = calcularIMC()
 
-  const enviar = async (formData: FormData, accion: 'guardar' | 'finalizar') => {
+  const ejecutarAutosave = useCallback(
+    async (keepalive = false) => {
+      if (!camposActualesEditables || !dirtyRef.current) return
+      const payload = formRef.current
+      if (payload.chiefComplaint.trim().length < 2) return
+
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+
+      dirtyRef.current = false
+      if (mountedRef.current) setEstadoGuardado('saving')
+
+      try {
+        const res = await fetch('/api/consultas/autosave', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          keepalive,
+          body: JSON.stringify({
+            consultationId: consulta.id,
+            ...payload,
+          }),
+        })
+        const json = (await res.json()) as {
+          ok?: boolean
+          error?: string
+          savedAtIso?: string
+          changedSections?: SeccionConsultaKey[]
+          authorName?: string
+          authorRole?: string
+        }
+
+        if (!res.ok || !json.ok) {
+          dirtyRef.current = true
+          if (mountedRef.current) {
+            setEstadoGuardado('idle')
+            setFeedback({
+              tipo: 'error',
+              texto: json.error ?? 'No se pudo guardar automáticamente.',
+            })
+          }
+          return
+        }
+
+        if (!mountedRef.current) return
+
+        const ahoraIso = json.savedAtIso ?? new Date().toISOString()
+        setEstadoGuardado('saved')
+        setUltimaHoraGuardado(ahoraIso)
+        if (json.changedSections && json.changedSections.length > 0) {
+          const nuevaMeta: SeccionAutorMeta = {
+            byName: json.authorName ?? usuarioActual.fullName,
+            byRole: json.authorRole ?? usuarioActual.role,
+            atIso: ahoraIso,
+          }
+          setMetaSecciones((prev) => {
+            const next = { ...prev }
+            for (const sec of json.changedSections!) {
+              next[sec] = nuevaMeta
+            }
+            return next
+          })
+        }
+      } catch {
+        dirtyRef.current = true
+        if (mountedRef.current) setEstadoGuardado('idle')
+      }
+    },
+    [camposActualesEditables, consulta.id, usuarioActual.fullName, usuarioActual.role]
+  )
+
+  useEffect(() => {
+    mountedRef.current = true
+    const flush = () => {
+      if (dirtyRef.current && camposActualesEditables) {
+        void ejecutarAutosave(true)
+      }
+    }
+    const onVisChange = () => {
+      if (document.visibilityState === 'hidden') flush()
+    }
+    window.addEventListener('pagehide', flush)
+    window.addEventListener('beforeunload', flush)
+    document.addEventListener('visibilitychange', onVisChange)
+    return () => {
+      mountedRef.current = false
+      window.removeEventListener('pagehide', flush)
+      window.removeEventListener('beforeunload', flush)
+      document.removeEventListener('visibilitychange', onVisChange)
+      if (timerRef.current) clearTimeout(timerRef.current)
+      flush()
+    }
+  }, [camposActualesEditables, ejecutarAutosave])
+
+  const actualizarCampo = <K extends keyof FormState>(campo: K, valor: FormState[K]) => {
     if (!camposActualesEditables) return
-    formData.set('accion', accion)
-    setGuardando(accion)
+    dirtyRef.current = true
     setFeedback(null)
+    setForm((prev) => {
+      const next = { ...prev, [campo]: valor }
+      formRef.current = next
+      return next
+    })
+
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      void ejecutarAutosave(false)
+    }, 700)
+  }
+
+  const toggleSeccion = async (sec: SeccionConsultaKey) => {
+    if (!camposActualesEditables) return
+    const estabaEditando = editandoSeccion[sec]
+    if (estabaEditando && dirtyRef.current) {
+      await ejecutarAutosave(false)
+    }
+    setEditandoSeccion((prev) => ({ ...prev, [sec]: !estabaEditando }))
+  }
+
+  const handlePegarVisitaAnterior = () => {
+    if (!camposActualesEditables || !visitaSeleccionadaId) return
+    const origen = visitasPrevias.find((v) => v.id === visitaSeleccionadaId)
+    if (!origen) return
+
+    dirtyRef.current = true
+    setForm((prev) => {
+      const next: FormState = {
+        ...prev,
+        visitType: prev.visitType === 'Primera vez' ? 'Seguimiento' : prev.visitType,
+        chiefComplaint: origen.chiefComplaint || prev.chiefComplaint,
+        bloodPressure: origen.bloodPressure ?? '',
+        heartRate: origen.heartRate !== null ? String(origen.heartRate) : '',
+        temperature: origen.temperature !== null ? String(origen.temperature) : '',
+        oxygenSat: origen.oxygenSat !== null ? String(origen.oxygenSat) : '',
+        weight: origen.weight !== null ? String(origen.weight) : '',
+        weightUnit: origen.weightUnit ?? 'kg',
+        heightCm: origen.heightCm !== null ? String(origen.heightCm) : '',
+        historyIllness: origen.historyIllness ?? '',
+        physicalExam: origen.physicalExam ?? '',
+        diagnosis: origen.diagnosis ?? '',
+        treatmentPlan: origen.treatmentPlan ?? '',
+        labOrders: origen.labOrders ?? '',
+        notes: origen.notes ?? '',
+      }
+      formRef.current = next
+      return next
+    })
+    setFeedback({
+      tipo: 'ok',
+      texto: `Datos copiados de la consulta del ${fmtFechaHora(origen.consultationDate)}. Edita solo lo que cambió.`,
+    })
+    setTimeout(() => {
+      void ejecutarAutosave(false)
+    }, 80)
+  }
+
+  const handleFinalizarConsulta = async () => {
+    if (!camposActualesEditables) return
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+    setFinalizando(true)
+    setFeedback(null)
+
     try {
-      const res = await guardarConsultaClinica(formData)
+      const actual = formRef.current
+      const fd = new FormData()
+      fd.set('consultationId', consulta.id)
+      fd.set('accion', 'finalizar')
+      fd.set('visitType', actual.visitType)
+      fd.set('nextAppointment', actual.nextAppointment)
+      fd.set('chiefComplaint', actual.chiefComplaint)
+      fd.set('bloodPressure', actual.bloodPressure)
+      fd.set('heartRate', actual.heartRate)
+      fd.set('temperature', actual.temperature)
+      fd.set('oxygenSat', actual.oxygenSat)
+      fd.set('weight', actual.weight)
+      fd.set('weightUnit', actual.weightUnit)
+      fd.set('heightCm', actual.heightCm)
+      fd.set('historyIllness', actual.historyIllness)
+      fd.set('physicalExam', actual.physicalExam)
+      fd.set('diagnosis', actual.diagnosis)
+      fd.set('treatmentPlan', actual.treatmentPlan)
+      fd.set('labOrders', actual.labOrders)
+      fd.set('notes', actual.notes)
+
+      const res = await guardarConsultaClinica(fd)
       if (!res.ok) {
-        setFeedback({ tipo: 'error', texto: res.error ?? 'No se pudo guardar.' })
+        setFeedback({ tipo: 'error', texto: res.error ?? 'No se pudo finalizar la consulta.' })
         return
       }
-      if (res.finalizada) {
-        router.push('/dashboard')
-        router.refresh()
-        return
-      }
-      setFeedback({
-        tipo: 'ok',
-        texto: 'Cambios de la consulta guardados correctamente.',
-      })
+      dirtyRef.current = false
+      router.push('/dashboard?cerrada=1')
       router.refresh()
     } finally {
-      setGuardando(null)
+      setFinalizando(false)
     }
   }
 
   const handleIniciarNuevaAtencion = async () => {
-    setGuardando('nueva')
+    setCreandoNueva(true)
     setFeedback(null)
     try {
-      const res = await iniciarNuevaAtencionConsulta(consulta.id)
+      const res = await iniciarNuevaAtencionConsulta(consulta.id, true)
       if (!res.ok || !res.consultationId) {
         setFeedback({ tipo: 'error', texto: res.error ?? 'No se pudo crear la nueva atención.' })
         return
@@ -408,161 +475,133 @@ export function FormularioConsultaClinica({
       router.push(`/dashboard/consultas/${res.consultationId}`)
       router.refresh()
     } finally {
-      setGuardando(null)
+      setCreandoNueva(false)
     }
   }
 
-  const visitasPrevias = historialVisitas.filter((v) => v.id !== consulta.id)
-
-  const obtenerHistoricosSeccion = (sec: SeccionConsultaKey): RegistroHistorico[] => {
-    const items: RegistroHistorico[] = []
-
-    for (const v of visitasPrevias) {
-      const autor = v.doctorName || 'Médico tratante'
-      if (sec === 'signos') {
-        const partes = [
-          v.bloodPressure ? `TA: ${v.bloodPressure}` : null,
-          v.heartRate !== null ? `FC: ${v.heartRate} lpm` : null,
-          v.temperature !== null ? `Temp: ${v.temperature} °C` : null,
-          v.oxygenSat !== null ? `SpO2: ${v.oxygenSat}%` : null,
-          v.weight !== null ? `Peso: ${v.weight} ${v.weightUnit ?? 'kg'}` : null,
-          v.heightCm !== null ? `Talla: ${v.heightCm} cm` : null,
-        ].filter(Boolean)
-        if (partes.length > 0) {
-          items.push({ id: `v-${v.id}-signos`, fechaIso: v.consultationDate, autor, contenido: partes.join(' · ') })
-        }
-      } else if (sec === 'motivo') {
-        if (v.chiefComplaint?.trim()) {
-          items.push({
-            id: `v-${v.id}-motivo`,
-            fechaIso: v.consultationDate,
-            autor,
-            etiqueta: v.visitType,
-            contenido: v.chiefComplaint,
-          })
-        }
-      } else if (sec === 'enfermedad' && v.historyIllness?.trim()) {
-        items.push({ id: `v-${v.id}-enf`, fechaIso: v.consultationDate, autor, contenido: v.historyIllness })
-      } else if (sec === 'examen' && v.physicalExam?.trim()) {
-        items.push({ id: `v-${v.id}-ex`, fechaIso: v.consultationDate, autor, contenido: v.physicalExam })
-      } else if (sec === 'diagnostico' && v.diagnosis?.trim()) {
-        items.push({ id: `v-${v.id}-dx`, fechaIso: v.consultationDate, autor, contenido: v.diagnosis })
-      } else if (sec === 'receta' && v.treatmentPlan?.trim()) {
-        items.push({ id: `v-${v.id}-rx`, fechaIso: v.consultationDate, autor, contenido: v.treatmentPlan })
-      } else if (sec === 'laboratorio' && v.labOrders?.trim()) {
-        items.push({ id: `v-${v.id}-lab`, fechaIso: v.consultationDate, autor, contenido: v.labOrders })
-      } else if (sec === 'notas' && v.notes?.trim()) {
-        items.push({ id: `v-${v.id}-not`, fechaIso: v.consultationDate, autor, contenido: v.notes })
-      }
-    }
-
-    for (const b of bloquesExtra) {
-      if (b.seccion !== sec) continue
-      if (sec === 'signos') {
-        const partes = [
-          b.bloodPressure ? `TA: ${b.bloodPressure}` : null,
-          b.heartRate !== null && b.heartRate !== undefined ? `FC: ${b.heartRate} lpm` : null,
-          b.temperature !== null && b.temperature !== undefined ? `Temp: ${b.temperature} °C` : null,
-          b.oxygenSat !== null && b.oxygenSat !== undefined ? `SpO2: ${b.oxygenSat}%` : null,
-          b.weight !== null && b.weight !== undefined ? `Peso: ${b.weight} ${b.weightUnit ?? 'kg'}` : null,
-          b.heightCm !== null && b.heightCm !== undefined ? `Talla: ${b.heightCm} cm` : null,
-        ].filter(Boolean)
-        if (partes.length > 0) {
-          items.push({
-            id: b.id,
-            fechaIso: b.fechaIso,
-            autor: b.authorName,
-            etiqueta: 'Registro adicional',
-            contenido: partes.join(' · '),
-          })
-        }
-      } else if (sec === 'motivo' && b.chiefComplaint) {
-        items.push({
-          id: b.id,
-          fechaIso: b.fechaIso,
-          autor: b.authorName,
-          etiqueta: b.visitType ?? 'Seguimiento',
-          contenido: b.chiefComplaint,
-        })
-      } else if (b.contenido) {
-        items.push({
-          id: b.id,
-          fechaIso: b.fechaIso,
-          autor: b.authorName,
-          etiqueta: 'Registro adicional',
-          contenido: b.contenido,
-        })
-      }
-    }
-
-    return items
-  }
+  const renderTextoLectura = (texto: string, vacio: string, bold = false) =>
+    texto.trim() ? (
+      <p
+        className={`text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap leading-relaxed ${
+          bold ? 'font-semibold' : ''
+        }`}
+      >
+        {texto}
+      </p>
+    ) : (
+      <p className="text-xs text-slate-400 italic">{vacio}</p>
+    )
 
   return (
     <div className="space-y-4">
-      {/* BANNER SUPERIOR PARA NUEVA ATENCIÓN AL REGRESAR EL PACIENTE */}
+      {/* BANNER SUPERIOR PARA COPIAR A UN EXPEDIENTE NUEVO SI ESTE YA CERRÓ O PERTENECE A OTRO MÉDICO */}
       {puedeCrearNuevaAtencion && (esConsultaCerrada || bloqueadoPorAutoria) && (
         <div className="bg-white dark:bg-slate-800 border border-teal-200 dark:border-teal-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <div className="space-y-0.5">
             <p className="text-xs font-bold text-teal-800 dark:text-teal-300">
-              Expediente previo · Los registros viejos quedan protegidos y en solo lectura
+              {bloqueadoPorAutoria
+                ? `Consulta de ${autorNotas || 'otro médico'} · Protegida (solo lectura)`
+                : 'Expediente cerrado y archivado · Registro histórico intacto'}
             </p>
             <p className="text-[11px] text-slate-600 dark:text-slate-300">
-              Abre una nueva atención con acápites limpios para escribir esta visita, o usa &ldquo;Duplicar / Nuevo&rdquo; directamente en cada acápite abajo.
+              Si el paciente regresó contigo, abre una nueva visita copiando estos datos para editar solo lo que cambió.
             </p>
           </div>
           <button
             type="button"
-            disabled={guardando !== null}
+            disabled={creandoNueva}
             onClick={handleIniciarNuevaAtencion}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold cursor-pointer shrink-0 disabled:opacity-50"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>{guardando === 'nueva' ? 'Creando...' : 'Nueva atención (Nuevos acápites)'}</span>
+            <span>
+              {creandoNueva ? 'Creando...' : '+ Nueva visita copiando estos datos'}
+            </span>
           </button>
         </div>
       )}
 
-      <form
-        action={(fd) => enviar(fd, 'guardar')}
-        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 md:p-6 space-y-5"
-      >
-        <input type="hidden" name="consultationId" value={consulta.id} />
+      {/* BARRA SIMPLE DE COPIADO DE VISITA ANTERIOR DENTRO DE UNA CONSULTA ABIERTA */}
+      {camposActualesEditables && visitasPrevias.length > 0 && (
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 flex flex-wrap items-center gap-2.5 print:hidden">
+          <span className="text-xs font-bold text-slate-700 dark:text-slate-200 shrink-0">
+            Copiar visita anterior:
+          </span>
+          <select
+            value={visitaSeleccionadaId}
+            onChange={(e) => setVisitaSeleccionadaId(e.target.value)}
+            className="flex-1 min-w-52 px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+          >
+            {visitasPrevias.map((v, idx) => (
+              <option key={v.id} value={v.id}>
+                #{idx + 1} · {fmtFechaHora(v.consultationDate)} ·{' '}
+                {v.doctorName || 'Sin médico'} · {v.diagnosis || v.chiefComplaint}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={handlePegarVisitaAnterior}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold cursor-pointer shrink-0"
+          >
+            <ClipboardCopy className="w-3.5 h-3.5" />
+            <span>Pegar en esta consulta</span>
+          </button>
+          {visitaSeleccionadaId && (
+            <Link
+              href={`/dashboard/consultas/${visitaSeleccionadaId}`}
+              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline shrink-0"
+            >
+              Ver anterior
+            </Link>
+          )}
+        </div>
+      )}
 
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 md:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">
               Ficha Clínica de Consulta
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Cada acápite es retraíble y puede duplicarse en bloques nuevos cuantas veces regrese el paciente sin alterar registros previos.
+              {camposActualesEditables
+                ? 'Pulsa ✏️ Editar en cualquier acápite; todo se guarda automáticamente.'
+                : 'Vista clínica en modo lectura.'}
             </p>
           </div>
-          {imc && (
-            <div className="px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-800 text-xs font-bold text-teal-800 dark:text-teal-300 tabular-nums">
-              IMC calculado: {imc} kg/m²
-            </div>
-          )}
+
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
+            {camposActualesEditables && (
+              <span
+                className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border tabular-nums ${
+                  estadoGuardado === 'saving'
+                    ? 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-300'
+                    : 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-300'
+                }`}
+              >
+                {estadoGuardado === 'saving'
+                  ? 'Guardando...'
+                  : ultimaHoraGuardado
+                    ? `✓ Guardado automático · ${fmtHora(ultimaHoraGuardado)}`
+                    : '✓ Guardado automático activo'}
+              </span>
+            )}
+          </div>
         </div>
 
         {bloqueadoPorAutoria && (
           <div className="px-4 py-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 text-xs font-medium print:hidden">
-            Las notas de esta visita pertenecen a <strong>{autorNotas || 'su médico autor'}</strong> (solo lectura). Puedes consultar todo el expediente y agregar bloques nuevos con <strong>&ldquo;Duplicar / Nuevo&rdquo;</strong> o pulsar <strong>&ldquo;Nueva atención&rdquo;</strong>.
-          </div>
-        )}
-
-        {esConsultaCerrada && !bloqueadoPorAutoria && (
-          <div className="px-4 py-2.5 rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/30 text-teal-900 dark:text-teal-200 text-xs font-medium print:hidden">
-            Consulta cerrada ({autorNotas || 'médico tratante'}). Sus notas originales quedan intactas en solo lectura; usa <strong>&ldquo;Duplicar / Nuevo&rdquo;</strong> en cualquier acápite o pulsa <strong>&ldquo;Reabrir con nuevos acápites&rdquo;</strong>.
+            Las notas de esta consulta pertenecen a <strong>{autorNotas || 'su médico autor'}</strong>. No es posible modificar lo que otro doctor registró en consulta.
           </div>
         )}
 
         {feedback && (
           <div
-            className={`px-4 py-3 rounded-lg border text-sm font-medium print:hidden ${
+            className={`px-4 py-3 rounded-lg border text-xs font-medium print:hidden ${
               feedback.tipo === 'ok'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                : 'bg-red-50 border-red-200 text-red-800'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-200'
+                : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950/30 dark:border-red-800 dark:text-red-200'
             }`}
           >
             {feedback.texto}
@@ -570,359 +609,396 @@ export function FormularioConsultaClinica({
         )}
 
         {/* 1. SIGNOS VITALES Y ANTROPOMETRÍA */}
-        <AcapiteRetraible
+        <AcapiteClinico
           titulo="Signos Vitales y Antropometría"
-          seccion="signos"
-          historicos={obtenerHistoricosSeccion('signos')}
-          puedeDuplicar={puedeCrearNuevaAtencion}
-          duplicadorAbierto={duplicadoresAbiertos.signos}
-          onToggleDuplicador={() => toggleDuplicador('signos')}
-          consultationId={consulta.id}
-          onBloqueGuardado={(msg) => {
-            setFeedback({ tipo: 'ok', texto: msg })
-            router.refresh()
-          }}
+          meta={metaSecciones.signos}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.signos}
+          onToggleEditar={() => void toggleSeccion('signos')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
+          badgeExtra={
+            imc ? (
+              <span className="px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-800 text-[10px] font-bold text-teal-800 dark:text-teal-300 tabular-nums">
+                IMC: {imc} kg/m²
+              </span>
+            ) : null
+          }
         >
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                Presión Arterial
-              </label>
-              <input
-                name="bloodPressure"
-                defaultValue={consulta.bloodPressure ?? ''}
-                disabled={!camposActualesEditables}
-                placeholder="120/80"
-                className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums disabled:opacity-70"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                FC (lpm)
-              </label>
-              <input
-                name="heartRate"
-                type="number"
-                defaultValue={consulta.heartRate ?? ''}
-                disabled={!camposActualesEditables}
-                placeholder="76"
-                className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums disabled:opacity-70"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                Temp (°C)
-              </label>
-              <input
-                name="temperature"
-                type="number"
-                step="0.1"
-                defaultValue={consulta.temperature ?? ''}
-                disabled={!camposActualesEditables}
-                placeholder="36.5"
-                className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums disabled:opacity-70"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                SpO2 (%)
-              </label>
-              <input
-                name="oxygenSat"
-                type="number"
-                defaultValue={consulta.oxygenSat ?? ''}
-                disabled={!camposActualesEditables}
-                placeholder="98"
-                className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums disabled:opacity-70"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                Peso
-              </label>
-              <div className="flex gap-1">
+          {editandoSeccion.signos && camposActualesEditables ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Presión Arterial
+                </label>
                 <input
-                  name="weight"
+                  value={form.bloodPressure}
+                  onChange={(e) => actualizarCampo('bloodPressure', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  placeholder="120/80"
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  FC (lpm)
+                </label>
+                <input
+                  type="number"
+                  value={form.heartRate}
+                  onChange={(e) => actualizarCampo('heartRate', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  placeholder="76"
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Temp (°C)
+                </label>
+                <input
                   type="number"
                   step="0.1"
-                  value={peso}
-                  onChange={(e) => setPeso(e.target.value)}
-                  disabled={!camposActualesEditables}
-                  placeholder="70"
-                  className="w-full px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums disabled:opacity-70"
+                  value={form.temperature}
+                  onChange={(e) => actualizarCampo('temperature', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  placeholder="36.5"
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
                 />
-                <select
-                  name="weightUnit"
-                  value={unidadPeso}
-                  onChange={(e) => setUnidadPeso(e.target.value)}
-                  disabled={!camposActualesEditables}
-                  className="px-1.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white disabled:opacity-70"
-                >
-                  <option value="kg">kg</option>
-                  <option value="lb">lb</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                Talla (cm)
-              </label>
-              <input
-                name="heightCm"
-                type="number"
-                step="0.5"
-                value={tallaCm}
-                onChange={(e) => setTallaCm(e.target.value)}
-                disabled={!camposActualesEditables}
-                placeholder="170"
-                className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums disabled:opacity-70"
-              />
-            </div>
-          </div>
-        </AcapiteRetraible>
-
-        {/* 2. MOTIVO DE CONSULTA Y TIPO DE VISITA */}
-        <AcapiteRetraible
-          titulo="Motivo de Consulta y Tipo de Visita"
-          seccion="motivo"
-          historicos={obtenerHistoricosSeccion('motivo')}
-          puedeDuplicar={puedeCrearNuevaAtencion}
-          duplicadorAbierto={duplicadoresAbiertos.motivo}
-          onToggleDuplicador={() => toggleDuplicador('motivo')}
-          consultationId={consulta.id}
-          onBloqueGuardado={(msg) => {
-            setFeedback({ tipo: 'ok', texto: msg })
-            router.refresh()
-          }}
-        >
-          <div className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
-                  Tipo de Consulta
-                </label>
-                <select
-                  name="visitType"
-                  defaultValue={consulta.visitType}
-                  disabled={!camposActualesEditables}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
-                >
-                  <option value="Primera vez">Primera vez</option>
-                  <option value="Seguimiento">Seguimiento</option>
-                  <option value="Control de resultados">Control de resultados</option>
-                  <option value="Urgencia ambulatoria">Urgencia ambulatoria</option>
-                </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
-                  Próxima Cita (Opcional)
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  SpO2 (%)
                 </label>
                 <input
-                  name="nextAppointment"
-                  type="date"
-                  defaultValue={consulta.nextAppointment ?? ''}
-                  disabled={!camposActualesEditables}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
+                  type="number"
+                  value={form.oxygenSat}
+                  onChange={(e) => actualizarCampo('oxygenSat', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  placeholder="98"
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Peso
+                </label>
+                <div className="flex gap-1">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={form.weight}
+                    onChange={(e) => actualizarCampo('weight', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="70"
+                    className="w-full px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                  <select
+                    value={form.weightUnit}
+                    onChange={(e) => actualizarCampo('weightUnit', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    className="px-1.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white"
+                  >
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Talla (cm)
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  value={form.heightCm}
+                  onChange={(e) => actualizarCampo('heightCm', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  placeholder="170"
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
                 />
               </div>
             </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
-                Motivo de Consulta *
-              </label>
-              <input
-                name="chiefComplaint"
-                defaultValue={consulta.chiefComplaint}
-                required
-                disabled={!camposActualesEditables}
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
-              />
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 text-xs">
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">TA</span>
+                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
+                  {form.bloodPressure || '—'}
+                </strong>
+              </div>
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">FC</span>
+                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
+                  {form.heartRate ? `${form.heartRate} lpm` : '—'}
+                </strong>
+              </div>
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">Temp</span>
+                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
+                  {form.temperature ? `${form.temperature} °C` : '—'}
+                </strong>
+              </div>
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">SpO2</span>
+                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
+                  {form.oxygenSat ? `${form.oxygenSat}%` : '—'}
+                </strong>
+              </div>
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">Peso</span>
+                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
+                  {form.weight ? `${form.weight} ${form.weightUnit}` : '—'}
+                </strong>
+              </div>
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">Talla</span>
+                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
+                  {form.heightCm ? `${form.heightCm} cm` : '—'}
+                </strong>
+              </div>
             </div>
-          </div>
-        </AcapiteRetraible>
+          )}
+        </AcapiteClinico>
+
+        {/* 2. MOTIVO DE CONSULTA Y TIPO DE VISITA */}
+        <AcapiteClinico
+          titulo="Motivo de Consulta y Tipo de Visita"
+          meta={metaSecciones.motivo}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.motivo}
+          onToggleEditar={() => void toggleSeccion('motivo')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
+        >
+          {editandoSeccion.motivo && camposActualesEditables ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+                    Tipo de Consulta
+                  </label>
+                  <select
+                    value={form.visitType}
+                    onChange={(e) => actualizarCampo('visitType', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  >
+                    <option value="Primera vez">Primera vez</option>
+                    <option value="Seguimiento">Seguimiento</option>
+                    <option value="Control de resultados">Control de resultados</option>
+                    <option value="Urgencia ambulatoria">Urgencia ambulatoria</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+                    Próxima Cita (Opcional)
+                  </label>
+                  <input
+                    type="date"
+                    value={form.nextAppointment}
+                    onChange={(e) => actualizarCampo('nextAppointment', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+                  Motivo de Consulta *
+                </label>
+                <input
+                  value={form.chiefComplaint}
+                  onChange={(e) => actualizarCampo('chiefComplaint', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  required
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-1.5 text-sm text-slate-800 dark:text-slate-100">
+              <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
+                <span>
+                  Tipo: <strong className="text-slate-800 dark:text-slate-200">{form.visitType}</strong>
+                </span>
+                {form.nextAppointment && (
+                  <span>
+                    Próxima cita:{' '}
+                    <strong className="text-slate-800 dark:text-slate-200 tabular-nums">
+                      {form.nextAppointment}
+                    </strong>
+                  </span>
+                )}
+              </div>
+              <p className="font-medium">{form.chiefComplaint || 'Sin motivo registrado'}</p>
+            </div>
+          )}
+        </AcapiteClinico>
 
         {/* 3. ENFERMEDAD ACTUAL / ANAMNESIS */}
-        <AcapiteRetraible
+        <AcapiteClinico
           titulo="Enfermedad Actual / Anamnesis"
-          seccion="enfermedad"
-          historicos={obtenerHistoricosSeccion('enfermedad')}
-          puedeDuplicar={puedeCrearNuevaAtencion}
-          duplicadorAbierto={duplicadoresAbiertos.enfermedad}
-          onToggleDuplicador={() => toggleDuplicador('enfermedad')}
-          consultationId={consulta.id}
-          onBloqueGuardado={(msg) => {
-            setFeedback({ tipo: 'ok', texto: msg })
-            router.refresh()
-          }}
+          meta={metaSecciones.enfermedad}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.enfermedad}
+          onToggleEditar={() => void toggleSeccion('enfermedad')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
         >
-          <textarea
-            name="historyIllness"
-            rows={4}
-            defaultValue={consulta.historyIllness ?? ''}
-            disabled={!camposActualesEditables}
-            placeholder="Inicio, duración, síntomas asociados..."
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
-          />
-        </AcapiteRetraible>
+          {editandoSeccion.enfermedad && camposActualesEditables ? (
+            <textarea
+              rows={4}
+              autoFocus
+              value={form.historyIllness}
+              onChange={(e) => actualizarCampo('historyIllness', e.target.value)}
+              onBlur={() => void ejecutarAutosave(false)}
+              placeholder="Inicio, duración, síntomas asociados..."
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            />
+          ) : (
+            renderTextoLectura(form.historyIllness, 'Sin anamnesis registrada.')
+          )}
+        </AcapiteClinico>
 
         {/* 4. EXAMEN FÍSICO */}
-        <AcapiteRetraible
+        <AcapiteClinico
           titulo="Examen Físico"
-          seccion="examen"
-          historicos={obtenerHistoricosSeccion('examen')}
-          puedeDuplicar={puedeCrearNuevaAtencion}
-          duplicadorAbierto={duplicadoresAbiertos.examen}
-          onToggleDuplicador={() => toggleDuplicador('examen')}
-          consultationId={consulta.id}
-          onBloqueGuardado={(msg) => {
-            setFeedback({ tipo: 'ok', texto: msg })
-            router.refresh()
-          }}
+          meta={metaSecciones.examen}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.examen}
+          onToggleEditar={() => void toggleSeccion('examen')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
         >
-          <textarea
-            name="physicalExam"
-            rows={4}
-            defaultValue={consulta.physicalExam ?? ''}
-            disabled={!camposActualesEditables}
-            placeholder="Hallazgos cardiovasculares, respiratorios, abdomen, extremidades..."
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
-          />
-        </AcapiteRetraible>
+          {editandoSeccion.examen && camposActualesEditables ? (
+            <textarea
+              rows={4}
+              autoFocus
+              value={form.physicalExam}
+              onChange={(e) => actualizarCampo('physicalExam', e.target.value)}
+              onBlur={() => void ejecutarAutosave(false)}
+              placeholder="Hallazgos cardiovasculares, respiratorios, abdomen, extremidades..."
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            />
+          ) : (
+            renderTextoLectura(form.physicalExam, 'Sin examen físico registrado.')
+          )}
+        </AcapiteClinico>
 
         {/* 5. DIAGNÓSTICO / IMPRESIÓN CLÍNICA */}
-        <AcapiteRetraible
+        <AcapiteClinico
           titulo="Diagnóstico / Impresión Clínica"
-          seccion="diagnostico"
-          historicos={obtenerHistoricosSeccion('diagnostico')}
-          puedeDuplicar={puedeCrearNuevaAtencion}
-          duplicadorAbierto={duplicadoresAbiertos.diagnostico}
-          onToggleDuplicador={() => toggleDuplicador('diagnostico')}
-          consultationId={consulta.id}
-          onBloqueGuardado={(msg) => {
-            setFeedback({ tipo: 'ok', texto: msg })
-            router.refresh()
-          }}
+          meta={metaSecciones.diagnostico}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.diagnostico}
+          onToggleEditar={() => void toggleSeccion('diagnostico')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
         >
-          <input
-            name="diagnosis"
-            defaultValue={consulta.diagnosis ?? ''}
-            disabled={!camposActualesEditables}
-            placeholder="Ej. Hipertensión arterial esencial compensada / Diabetes Mellitus tipo 2"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
-          />
-        </AcapiteRetraible>
+          {editandoSeccion.diagnostico && camposActualesEditables ? (
+            <input
+              autoFocus
+              value={form.diagnosis}
+              onChange={(e) => actualizarCampo('diagnosis', e.target.value)}
+              onBlur={() => void ejecutarAutosave(false)}
+              placeholder="Ej. Hipertensión arterial esencial compensada / Diabetes Mellitus tipo 2"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            />
+          ) : (
+            renderTextoLectura(form.diagnosis, 'Sin diagnóstico registrado.', true)
+          )}
+        </AcapiteClinico>
 
         {/* 6. RECETA MÉDICA / PLAN TERAPÉUTICO */}
-        <AcapiteRetraible
+        <AcapiteClinico
           titulo="Receta Médica / Plan Terapéutico e Indicaciones"
-          seccion="receta"
-          historicos={obtenerHistoricosSeccion('receta')}
-          puedeDuplicar={puedeCrearNuevaAtencion}
-          duplicadorAbierto={duplicadoresAbiertos.receta}
-          onToggleDuplicador={() => toggleDuplicador('receta')}
-          consultationId={consulta.id}
-          onBloqueGuardado={(msg) => {
-            setFeedback({ tipo: 'ok', texto: msg })
-            router.refresh()
-          }}
+          meta={metaSecciones.receta}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.receta}
+          onToggleEditar={() => void toggleSeccion('receta')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
         >
-          <textarea
-            name="treatmentPlan"
-            rows={5}
-            defaultValue={consulta.treatmentPlan ?? ''}
-            disabled={!camposActualesEditables}
-            placeholder={'1. Losartán 50 mg VO cada 24 horas\n2. Medidas higiénico-dietéticas y control de presión arterial'}
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
-          />
-        </AcapiteRetraible>
+          {editandoSeccion.receta && camposActualesEditables ? (
+            <textarea
+              rows={5}
+              autoFocus
+              value={form.treatmentPlan}
+              onChange={(e) => actualizarCampo('treatmentPlan', e.target.value)}
+              onBlur={() => void ejecutarAutosave(false)}
+              placeholder={'1. Losartán 50 mg VO cada 24 horas\n2. Medidas higiénico-dietéticas y control de presión arterial'}
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            />
+          ) : (
+            renderTextoLectura(form.treatmentPlan, 'Sin receta o plan terapéutico registrado.')
+          )}
+        </AcapiteClinico>
 
         {/* 7. ÓRDENES DE LABORATORIO / ESTUDIOS */}
-        <AcapiteRetraible
+        <AcapiteClinico
           titulo="Órdenes de Laboratorio / Estudios"
-          seccion="laboratorio"
-          historicos={obtenerHistoricosSeccion('laboratorio')}
-          puedeDuplicar={puedeCrearNuevaAtencion}
-          duplicadorAbierto={duplicadoresAbiertos.laboratorio}
-          onToggleDuplicador={() => toggleDuplicador('laboratorio')}
-          consultationId={consulta.id}
-          onBloqueGuardado={(msg) => {
-            setFeedback({ tipo: 'ok', texto: msg })
-            router.refresh()
-          }}
+          meta={metaSecciones.laboratorio}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.laboratorio}
+          onToggleEditar={() => void toggleSeccion('laboratorio')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
         >
-          <textarea
-            name="labOrders"
-            rows={3}
-            defaultValue={consulta.labOrders ?? ''}
-            disabled={!camposActualesEditables}
-            placeholder="Hemograma, química sanguínea, HbA1c, perfil lipídico, radiografía..."
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
-          />
-        </AcapiteRetraible>
+          {editandoSeccion.laboratorio && camposActualesEditables ? (
+            <textarea
+              rows={3}
+              autoFocus
+              value={form.labOrders}
+              onChange={(e) => actualizarCampo('labOrders', e.target.value)}
+              onBlur={() => void ejecutarAutosave(false)}
+              placeholder="Hemograma, química sanguínea, HbA1c, perfil lipídico, radiografía..."
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            />
+          ) : (
+            renderTextoLectura(form.labOrders, 'Sin órdenes de laboratorio o estudios.')
+          )}
+        </AcapiteClinico>
 
         {/* 8. NOTAS INTERNAS / SEGUIMIENTO */}
-        <AcapiteRetraible
+        <AcapiteClinico
           titulo="Notas Internas / Seguimiento"
-          seccion="notas"
-          historicos={obtenerHistoricosSeccion('notas')}
-          puedeDuplicar={puedeCrearNuevaAtencion}
-          duplicadorAbierto={duplicadoresAbiertos.notas}
-          onToggleDuplicador={() => toggleDuplicador('notas')}
-          consultationId={consulta.id}
-          onBloqueGuardado={(msg) => {
-            setFeedback({ tipo: 'ok', texto: msg })
-            router.refresh()
-          }}
+          meta={metaSecciones.notas}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.notas}
+          onToggleEditar={() => void toggleSeccion('notas')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
         >
-          <textarea
-            name="notes"
-            rows={3}
-            defaultValue={consulta.notes ?? ''}
-            disabled={!camposActualesEditables}
-            placeholder="Observaciones adicionales para la próxima visita..."
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-70"
-          />
-        </AcapiteRetraible>
+          {editandoSeccion.notas && camposActualesEditables ? (
+            <textarea
+              rows={3}
+              autoFocus
+              value={form.notes}
+              onChange={(e) => actualizarCampo('notes', e.target.value)}
+              onBlur={() => void ejecutarAutosave(false)}
+              placeholder="Observaciones adicionales para la próxima visita..."
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            />
+          ) : (
+            renderTextoLectura(form.notes, 'Sin notas internas adicionales.')
+          )}
+        </AcapiteClinico>
 
-        {(camposActualesEditables || (puedeCrearNuevaAtencion && esConsultaCerrada)) && (
+        {camposActualesEditables && (
           <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700 print:hidden">
-            {camposActualesEditables ? (
-              <>
-                <button
-                  type="submit"
-                  disabled={guardando !== null}
-                  className="px-4 py-2.5 rounded-lg text-xs font-bold border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white hover:bg-slate-50 cursor-pointer"
-                >
-                  {guardando === 'guardar' ? 'Guardando...' : 'Guardar progreso'}
-                </button>
-                <button
-                  type="submit"
-                  formAction={(fd) => enviar(fd, 'finalizar')}
-                  disabled={guardando !== null}
-                  className="px-5 py-2.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
-                >
-                  {guardando === 'finalizar' ? 'Cerrando...' : '✓ Finalizar y Cerrar Consulta'}
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                disabled={guardando !== null}
-                onClick={handleIniciarNuevaAtencion}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer disabled:opacity-50"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span>
-                  {guardando === 'nueva'
-                    ? 'Creando nuevos acápites...'
-                    : 'Reabrir expediente (Nuevos acápites)'}
-                </span>
-              </button>
-            )}
+            <button
+              type="button"
+              disabled={finalizando}
+              onClick={() => void handleFinalizarConsulta()}
+              className="px-5 py-2.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer disabled:opacity-50"
+            >
+              {finalizando ? 'Firmando y cerrando...' : '✓ Finalizar y Firmar Consulta'}
+            </button>
           </div>
         )}
-      </form>
+      </div>
     </div>
   )
 }

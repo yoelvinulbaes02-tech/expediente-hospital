@@ -1,4 +1,28 @@
-import { ROLES_CLINICOS } from '@/lib/permisos'
+export const ROLES_CLINICOS_CONSULTA: readonly string[] = [
+  'SUPERADMIN',
+  'ADMIN',
+  'DOCTOR',
+  'RESIDENT',
+  'NURSE',
+  'LAB',
+]
+
+export const ROLES_MEDICOS_CONSULTA: readonly string[] = ['DOCTOR', 'RESIDENT']
+
+export const ETIQUETA_ROL_CLINICO: Record<string, string> = {
+  SUPERADMIN: 'Superadmin',
+  ADMIN: 'Admin / Dirección',
+  DOCTOR: 'Médico',
+  RESIDENT: 'Residente',
+  NURSE: 'Enfermería',
+  LAB: 'Laboratorio',
+  READONLY: 'Solo lectura',
+}
+
+export function etiquetaRolClinico(rol?: string | null): string {
+  if (!rol) return 'Personal clínico'
+  return ETIQUETA_ROL_CLINICO[rol] ?? rol
+}
 
 export type SeccionConsultaKey =
   | 'signos'
@@ -10,38 +34,23 @@ export type SeccionConsultaKey =
   | 'laboratorio'
   | 'notas'
 
-export type BloqueAntecedenteConsulta = {
-  id: string
-  fechaIso: string
-  authorId: string | null
-  authorName: string
-  pathological: string | null
-  surgical: string | null
-  medications: string | null
-  family: string | null
-  habits: string | null
+export type SeccionAutorMeta = {
+  byName: string
+  byRole: string
+  atIso: string
 }
 
-export type BloqueSeccionConsulta = {
-  id: string
-  seccion: SeccionConsultaKey
-  fechaIso: string
-  authorId: string | null
-  authorName: string
-  consultationId: string | null
-  // Signos
-  bloodPressure?: string | null
-  heartRate?: number | null
-  temperature?: number | null
-  oxygenSat?: number | null
-  weight?: number | null
-  weightUnit?: string | null
-  heightCm?: number | null
-  // Motivo
-  visitType?: string | null
-  chiefComplaint?: string | null
-  // Textuales (enfermedad, examen, diagnostico, receta, laboratorio, notas)
-  contenido?: string | null
+export type MapaMetaSecciones = Partial<Record<SeccionConsultaKey, SeccionAutorMeta>>
+
+export type AntecedentesConsultaState = {
+  pathological: string
+  surgical: string
+  medications: string
+  family: string
+  habits: string
+  authorName: string | null
+  authorRole: string | null
+  updatedAtIso: string | null
 }
 
 export type HistorialVisitaResumen = {
@@ -51,6 +60,7 @@ export type HistorialVisitaResumen = {
   visitType: string
   doctorId: string | null
   doctorName: string | null
+  doctorRole: string | null
   chiefComplaint: string
   bloodPressure: string | null
   heartRate: number | null
@@ -122,20 +132,21 @@ export function puedeEditarNotasConsulta(
     role: string
   }
 ): boolean {
-  if (!ROLES_CLINICOS.includes(user.role)) return false
+  if (!ROLES_CLINICOS_CONSULTA.includes(user.role)) return false
 
-  if (!tieneNotasClinicasEscritas(consulta)) {
-    return true
-  }
-
+  // Si la consulta ya tiene un médico autor asignado, nadie más puede modificarla
   if (consulta.doctorId) {
     return consulta.doctorId === user.id
   }
 
-  const autorEmail = (consulta.updatedBy || consulta.createdBy || '').trim().toLowerCase()
-  if (autorEmail) {
-    return autorEmail === user.email.trim().toLowerCase()
+  // Si aún no tiene doctorId pero ya tiene notas clínicas escritas, solo quien las escribió puede editarlas
+  if (tieneNotasClinicasEscritas(consulta)) {
+    const autorEmail = (consulta.updatedBy || consulta.createdBy || '').trim().toLowerCase()
+    if (autorEmail) {
+      return autorEmail === user.email.trim().toLowerCase()
+    }
+    return false
   }
 
-  return false
+  return true
 }

@@ -11,8 +11,9 @@ function createOfflinePrismaProxy(): PrismaClient {
     {},
     {
       get(_target, prop) {
-        if (prop === 'findMany') return async () => []
+        if (prop === 'findMany' || prop === 'groupBy') return async () => []
         if (prop === 'count') return async () => 0
+        if (prop === 'aggregate') return async () => ({ _sum: {}, _count: { _all: 0 }, _avg: {}, _min: {}, _max: {} })
         if (prop === 'findUnique' || prop === 'findFirst') return async () => null
         if (prop === 'create' || prop === 'update' || prop === 'upsert' || prop === 'delete') {
           return async () => ({})

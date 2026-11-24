@@ -8,10 +8,12 @@ import { PrintButton } from '@/components/PrintButton'
 import { FormularioConsultaClinica } from '@/components/FormularioConsultaClinica'
 import { AntecedentesConsultasRetraibles } from '@/components/AntecedentesConsultasRetraibles'
 import {
-  type BloqueAntecedenteConsulta,
-  type BloqueSeccionConsulta,
+  type AntecedentesConsultaState,
   type HistorialVisitaResumen,
+  type MapaMetaSecciones,
+  type SeccionAutorMeta,
   type SeccionConsultaKey,
+  etiquetaRolClinico,
   puedeEditarNotasConsulta,
   tieneNotasClinicasEscritas,
 } from '@/lib/consultas-auth'
@@ -49,6 +51,14 @@ function parseAuditJson(raw: unknown): Record<string, unknown> | null {
   return null
 }
 
+const ETIQUETA_ESTADO_CONSULTA: Record<string, string> = {
+  PROGRAMADA: 'Programada',
+  EN_SALA: 'En sala de espera',
+  EN_CONSULTA: 'En consulta',
+  COMPLETADA: 'Firmada y cerrada',
+  CANCELADA: 'Cancelada',
+}
+
 export default async function ConsultaDetallePage({
   params,
 }: {
@@ -64,11 +74,17 @@ export default async function ConsultaDetallePage({
     where: { id },
     include: {
       residency: true,
+      doctor: {
+        select: { id: true, fullName: true, role: true },
+      },
       patient: {
         include: {
           medicalHistory: true,
           allergies: { orderBy: { createdAt: 'desc' } },
           consultations: {
+            include: {
+              doctor: { select: { id: true, fullName: true, role: true } },
+            },
             orderBy: { consultationDate: 'asc' },
           },
         },
@@ -86,93 +102,145 @@ export default async function ConsultaDetallePage({
     }
   }
 
-  const auditLogs = await prisma.auditLog.findMany({
-    where: {
-      patientId: consulta.patientId,
-      entity: { in: ['consulta_antecedente', 'consulta_bloque'] },
-    },
-    orderBy: { serverTs: 'asc' },
-    take: 400,
-    select: {
-      id: true,
-      entity: true,
-      entityId: true,
-      actorId: true,
-      newValue: true,
-      serverTs: true,
-    },
-  })
+  const [logsConsulta, logUltimoAntecedente] = await Promise.all([
+    prisma.auditLog.findMany({
+      where: {
+        entity: 'consultation',
+        entityId: consulta.id,
+      },
+      orderBy: { serverTs: 'asc' },
+      take: 250,
+      select: {
+        actorRole: true,
+        newValue: true,
+        serverTs: true,
+        actor: {
+          select: { fullName: true, email: true, role: true },
+        },
+      },
+    }),
+    prisma.auditLog.findFirst({
+      where: {
+        patientId: consulta.patientId,
+        entity: 'medical_history',
+      },
+      orderBy: { serverTs: 'desc' },
+      select: {
+        actorRole: true,
+        newValue: true,
+        serverTs: true,
+        actor: {
+          select: { fullName: true, email: true, role: true },
+        },
+      },
+    }),
+  ])
 
-  const antecedentesEntries: BloqueAntecedenteConsulta[] = []
-  const bloquesExtra: BloqueSeccionConsulta[] = []
+  // Construir el último modificador por cada acápite (nombre, rol, fecha/hora)
+  const metaSecciones: MapaMetaSecciones = {}
+  const seccionesValidas: SeccionConsultaKey[] = [
+    'signos',
+    'motivo',
+    'enfermedad',
+    'examen',
+    'diagnostico',
+    'receta',
+    'laboratorio',
+    'notas',
+  ]
 
-  for (const log of auditLogs) {
+  for (const log of logsConsulta) {
     const data = parseAuditJson(log.newValue)
     if (!data) continue
+    const byName =
+      (typeof data.authorName === 'string' && data.authorName) ||
+      log.actor?.fullName ||
+      log.actor?.email ||
+      'Personal clínico'
+    const byRole =
+      (typeof data.authorRole === 'string' && data.authorRole) ||
+      log.actorRole ||
+      String(log.actor?.role ?? '')
+    const atIso = log.serverTs.toISOString()
 
-    if (log.entity === 'consulta_antecedente') {
-      antecedentesEntries.push({
-        id: `ant-${String(log.id)}`,
-        fechaIso: log.serverTs.toISOString(),
-        authorId: typeof data.authorId === 'string' ? data.authorId : log.actorId,
-        authorName:
-          typeof data.authorName === 'string'
-            ? data.authorName
-            : typeof data.authorEmail === 'string'
-              ? data.authorEmail
-              : 'Médico tratante',
-        pathological: typeof data.pathological === 'string' ? data.pathological : null,
-        surgical: typeof data.surgical === 'string' ? data.surgical : null,
-        medications: typeof data.medications === 'string' ? data.medications : null,
-        family: typeof data.family === 'string' ? data.family : null,
-        habits: typeof data.habits === 'string' ? data.habits : null,
-      })
-    } else if (log.entity === 'consulta_bloque') {
-      const seccion = data.seccion as SeccionConsultaKey | undefined
-      if (!seccion) continue
-      bloquesExtra.push({
-        id: `blq-${String(log.id)}`,
-        seccion,
-        fechaIso: log.serverTs.toISOString(),
-        authorId: typeof data.authorId === 'string' ? data.authorId : log.actorId,
-        authorName:
-          typeof data.authorName === 'string'
-            ? data.authorName
-            : typeof data.authorEmail === 'string'
-              ? data.authorEmail
-              : 'Médico tratante',
-        consultationId: typeof data.consultationId === 'string' ? data.consultationId : log.entityId,
-        bloodPressure: typeof data.bloodPressure === 'string' ? data.bloodPressure : null,
-        heartRate: typeof data.heartRate === 'number' ? data.heartRate : null,
-        temperature: typeof data.temperature === 'number' ? data.temperature : null,
-        oxygenSat: typeof data.oxygenSat === 'number' ? data.oxygenSat : null,
-        weight: typeof data.weight === 'number' ? data.weight : null,
-        weightUnit: typeof data.weightUnit === 'string' ? data.weightUnit : null,
-        heightCm: typeof data.heightCm === 'number' ? data.heightCm : null,
-        visitType: typeof data.visitType === 'string' ? data.visitType : null,
-        chiefComplaint: typeof data.chiefComplaint === 'string' ? data.chiefComplaint : null,
-        contenido: typeof data.contenido === 'string' ? data.contenido : null,
-      })
+    const changed = Array.isArray(data.changedSections)
+      ? data.changedSections.filter((s): s is SeccionConsultaKey =>
+          typeof s === 'string' && seccionesValidas.includes(s as SeccionConsultaKey)
+        )
+      : []
+
+    if (changed.length > 0) {
+      for (const sec of changed) {
+        metaSecciones[sec] = { byName, byRole, atIso }
+      }
+    } else {
+      // Compatibilidad con registros anteriores que no guardaban changedSections
+      if (data.bloodPressure !== undefined || data.weight !== undefined) {
+        metaSecciones.signos = { byName, byRole, atIso }
+      }
+      if (data.chiefComplaint !== undefined || data.visitType !== undefined) {
+        metaSecciones.motivo = { byName, byRole, atIso }
+      }
+      if (data.diagnosis !== undefined) {
+        metaSecciones.diagnostico = { byName, byRole, atIso }
+      }
+      if (data.treatmentPlan !== undefined) {
+        metaSecciones.receta = { byName, byRole, atIso }
+      }
     }
   }
 
+  // Fallback para secciones con datos que provienen de registros previos sin log detallado
+  const fallbackMeta: SeccionAutorMeta | null =
+    consulta.doctorName || consulta.updatedBy || consulta.createdBy
+      ? {
+          byName: consulta.doctorName || consulta.updatedBy || consulta.createdBy,
+          byRole: consulta.doctor?.role ? String(consulta.doctor.role) : '',
+          atIso: (consulta.updatedAt || consulta.createdAt).toISOString(),
+        }
+      : null
+
+  if (fallbackMeta) {
+    if (
+      !metaSecciones.signos &&
+      (consulta.bloodPressure ||
+        consulta.heartRate !== null ||
+        consulta.temperature !== null ||
+        consulta.oxygenSat !== null ||
+        consulta.weight !== null ||
+        consulta.heightCm !== null)
+    ) {
+      metaSecciones.signos = fallbackMeta
+    }
+    if (!metaSecciones.motivo && consulta.chiefComplaint) metaSecciones.motivo = fallbackMeta
+    if (!metaSecciones.enfermedad && consulta.historyIllness) metaSecciones.enfermedad = fallbackMeta
+    if (!metaSecciones.examen && consulta.physicalExam) metaSecciones.examen = fallbackMeta
+    if (!metaSecciones.diagnostico && consulta.diagnosis) metaSecciones.diagnostico = fallbackMeta
+    if (!metaSecciones.receta && consulta.treatmentPlan) metaSecciones.receta = fallbackMeta
+    if (!metaSecciones.laboratorio && consulta.labOrders) metaSecciones.laboratorio = fallbackMeta
+    if (!metaSecciones.notas && consulta.notes) metaSecciones.notas = fallbackMeta
+  }
+
   const mh = consulta.patient.medicalHistory
-  if (
-    antecedentesEntries.length === 0 &&
-    mh &&
-    (mh.pathological || mh.surgical || mh.medications || mh.family || mh.habits)
-  ) {
-    antecedentesEntries.push({
-      id: 'legacy-mh',
-      fechaIso: mh.updatedAt.toISOString(),
-      authorId: null,
-      authorName: mh.updatedBy || 'Registro previo',
-      pathological: mh.pathological,
-      surgical: mh.surgical,
-      medications: mh.medications,
-      family: mh.family,
-      habits: mh.habits,
-    })
+  const mhLogData = parseAuditJson(logUltimoAntecedente?.newValue)
+  const antecedentesInicial: AntecedentesConsultaState = {
+    pathological: mh?.pathological ?? '',
+    surgical: mh?.surgical ?? '',
+    medications: mh?.medications ?? '',
+    family: mh?.family ?? '',
+    habits: mh?.habits ?? '',
+    authorName:
+      (typeof mhLogData?.authorName === 'string' && mhLogData.authorName) ||
+      logUltimoAntecedente?.actor?.fullName ||
+      mh?.updatedBy ||
+      null,
+    authorRole:
+      (typeof mhLogData?.authorRole === 'string' && mhLogData.authorRole) ||
+      logUltimoAntecedente?.actorRole ||
+      null,
+    updatedAtIso:
+      logUltimoAntecedente?.serverTs.toISOString() ??
+      (mh ? mh.updatedAt.toISOString() : null),
   }
 
   const historialVisitas: HistorialVisitaResumen[] = consulta.patient.consultations
@@ -184,6 +252,7 @@ export default async function ConsultaDetallePage({
       visitType: v.visitType,
       doctorId: v.doctorId,
       doctorName: v.doctorName,
+      doctorRole: v.doctor?.role ? String(v.doctor.role) : null,
       chiefComplaint: v.chiefComplaint,
       bloodPressure: v.bloodPressure,
       heartRate: v.heartRate,
@@ -203,8 +272,12 @@ export default async function ConsultaDetallePage({
   const suscripcionBloqueada = !ctx.esSuperAdmin && (ctx.suscripcion?.bloqueada ?? false)
   const puedeEditar = ROLES_CLINICOS.includes(ctx.user.role) && !suscripcionBloqueada
   const tieneNotas = tieneNotasClinicasEscritas(consulta)
-  const puedeEditarNotas = puedeEditar && puedeEditarNotasConsulta(consulta, ctx.user)
-  const autorNotas = consulta.doctorName || consulta.updatedBy || null
+  const autorDeEstaConsulta = puedeEditarNotasConsulta(consulta, ctx.user)
+  const esCerrada = consulta.status === 'COMPLETADA' || consulta.status === 'CANCELADA'
+  const puedeEditarNotas = puedeEditar && autorDeEstaConsulta && !esCerrada
+  const bloqueadoPorAutoria =
+    puedeEditar && !autorDeEstaConsulta && (Boolean(consulta.doctorId) || tieneNotas)
+  const autorNotas = consulta.doctorName || consulta.updatedBy || consulta.createdBy || null
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -233,7 +306,7 @@ export default async function ConsultaDetallePage({
 
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
-              {consulta.status}
+              {ETIQUETA_ESTADO_CONSULTA[consulta.status] ?? consulta.status}
             </span>
             <PrintButton bloqueado={suscripcionBloqueada} />
           </div>
@@ -264,7 +337,10 @@ export default async function ConsultaDetallePage({
             Paciente: {consulta.patient.firstName} {consulta.patient.lastName} ({consulta.patient.age ?? '—'} años · {consulta.patient.sex})
           </p>
           {consulta.doctorName && (
-            <p className="text-xs text-slate-700">Médico tratante: {consulta.doctorName}</p>
+            <p className="text-xs text-slate-700">
+              Médico tratante: {consulta.doctorName}
+              {consulta.doctor?.role ? ` (${etiquetaRolClinico(String(consulta.doctor.role))})` : ''}
+            </p>
           )}
         </div>
       )}
@@ -289,12 +365,12 @@ export default async function ConsultaDetallePage({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* COLUMNA IZQUIERDA: DATOS, ALERGIAS Y ANTECEDENTES RETRAÍBLES */}
+          {/* COLUMNA IZQUIERDA: DATOS, ALERGIAS Y ANTECEDENTES */}
           <div className="lg:col-span-1 space-y-5 print:hidden">
             <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
                 <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Datos del Paciente
+                  Datos del Paciente y Registro
                 </h2>
                 {puedeEditar && (
                   <details className="relative">
@@ -330,7 +406,16 @@ export default async function ConsultaDetallePage({
                 <p><strong>Teléfono:</strong> {consulta.patient.phone || 'No registrado'}</p>
                 <p><strong>Cédula:</strong> {consulta.patient.cedula || 'No registrada'}</p>
                 <p><strong>Grupo Sanguíneo:</strong> {consulta.patient.bloodType || 'Pendiente'}</p>
-                <p><strong>Fecha de cita:</strong> {fmtFecha(consulta.consultationDate)}</p>
+                <p className="tabular-nums"><strong>Fecha y hora:</strong> {fmtFecha(consulta.consultationDate)}</p>
+                <p>
+                  <strong>Médico / Firma:</strong>{' '}
+                  {consulta.doctorName || 'Por asignar'}
+                  {consulta.doctor?.role ? ` (${etiquetaRolClinico(String(consulta.doctor.role))})` : ''}
+                </p>
+                <p>
+                  <strong>Estado:</strong>{' '}
+                  {ETIQUETA_ESTADO_CONSULTA[consulta.status] ?? consulta.status}
+                </p>
               </div>
             </div>
 
@@ -358,8 +443,8 @@ export default async function ConsultaDetallePage({
 
             <AntecedentesConsultasRetraibles
               consultationId={consulta.id}
-              registros={antecedentesEntries}
-              puedeAgregar={puedeEditar}
+              inicial={antecedentesInicial}
+              puedeEditar={puedeEditar}
             />
           </div>
 
@@ -369,9 +454,13 @@ export default async function ConsultaDetallePage({
               puedeEditar={puedeEditarNotas}
               puedeCrearNuevaAtencion={puedeEditar}
               autorNotas={autorNotas}
-              bloqueadoPorAutoria={puedeEditar && !puedeEditarNotas && tieneNotas}
+              bloqueadoPorAutoria={bloqueadoPorAutoria}
               historialVisitas={historialVisitas}
-              bloquesExtra={bloquesExtra}
+              metaSeccionesInicial={metaSecciones}
+              usuarioActual={{
+                fullName: ctx.user.fullName,
+                role: String(ctx.user.role),
+              }}
               consulta={{
                 id: consulta.id,
                 status: consulta.status,
