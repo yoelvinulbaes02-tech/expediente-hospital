@@ -131,7 +131,11 @@ export default async function SuscripcionPage({
                     ? 'Cirugía'
                     : interfaceModeStr === 'ORTOPEDIA'
                       ? 'Ortopedia y Traumatología'
-                      : 'Hospitalización / Nefrología'}
+                      : interfaceModeStr === 'EMERGENCIA'
+                        ? 'Emergencia'
+                        : interfaceModeStr === 'HEMATOLOGIA'
+                          ? 'Hematología'
+                          : 'Hospitalización / Nefrología'}
             </p>
           </div>
 

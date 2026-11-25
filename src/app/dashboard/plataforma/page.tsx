@@ -871,6 +871,8 @@ export default async function PlataformaPage({
                 <option value="MEDICINA_INTERNA">Interfaz de Medicina Interna (Hospitalización)</option>
                 <option value="CIRUGIA">Interfaz de Cirugía (Quirúrgico y Curas)</option>
                 <option value="ORTOPEDIA">Interfaz de Ortopedia y Traumatología</option>
+                <option value="EMERGENCIA">Interfaz de Emergencia (Trauma Shock / Observación)</option>
+                <option value="HEMATOLOGIA">Interfaz de Hematología (Sala y Pase)</option>
               </select>
             </div>
 
@@ -1141,6 +1143,8 @@ export default async function PlataformaPage({
                           <option value="MEDICINA_INTERNA">Medicina Interna</option>
                           <option value="CIRUGIA">Cirugía</option>
                           <option value="ORTOPEDIA">Ortopedia y Traumatología</option>
+                          <option value="EMERGENCIA">Emergencia</option>
+                          <option value="HEMATOLOGIA">Hematología</option>
                           <option value="CONSULTAS">Consultas Externas</option>
                         </select>
                         <select

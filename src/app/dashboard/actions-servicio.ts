@@ -15,6 +15,7 @@ import {
 } from '@/lib/cirugia-constants'
 import { CATEGORIAS_DISPOSITIVOS_ORTOPEDIA } from '@/lib/ortopedia-constants'
 import { componerTituloAtb, parsearEsquemaDosis } from '@/lib/hemodialisis-atb'
+import { extraerEmergenciaGuardia } from '@/lib/emergencia-constants'
 import { revalidatePath } from 'next/cache'
 
 async function exigirEscrituraDashboard() {
@@ -860,4 +861,114 @@ export async function reactivarItemHemodialisis(formData: FormData): Promise<{
   revalidatePath('/dashboard')
   return { ok: true }
 }
+
+// ─── 6. ENTREGA DE GUARDIA Y RESUMEN DEL SERVICIO DE EMERGENCIA ───
+export async function guardarEmergenciaGuardia(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  const authRes = await exigirEscrituraDashboard()
+  if (!authRes.ok) return { ok: false, error: authRes.error }
+  const { ctx } = authRes
+  const residency = ctx.residency!
+
+  if (ctx.interfaceMode !== 'EMERGENCIA') {
+    return { ok: false, error: 'Este resumen solo corresponde a la interfaz de Emergencia.' }
+  }
+
+  const str = (k: string, def = '') => String(formData.get(k) ?? def).trim()
+  const num = (k: string) => Math.max(0, parseInt(String(formData.get(k) ?? '0'), 10) || 0)
+
+  const prev = extraerEmergenciaGuardia(residency.surgicalStatsExtra)
+  const accion = str('accion', 'manual') // 'auto' | 'equipo' | 'manual'
+  const actorNombre = ctx.user.fullName || ctx.user.email
+  const actorRole = String(ctx.user.role)
+  const nowIso = new Date().toISOString()
+
+  const payload =
+    accion === 'auto' && !formData.has('fecha')
+      ? {
+          ...prev,
+          mode: 'auto' as const,
+          updatedBy: actorNombre,
+          updatedByRole: actorRole,
+          updatedAt: nowIso,
+        }
+      : {
+          mode: (accion === 'manual' ? 'manual' : 'auto') as 'auto' | 'manual',
+          fecha: str('fecha'),
+          teamServicio: str('teamServicio'),
+          ortopedia: str('ortopedia'),
+          cirugia: str('cirugia'),
+          residentesEmergenciologia: str('residentesEmergenciologia'),
+          residentesMaxilofacial: str('residentesMaxilofacial'),
+          residentesMedicinaInterna: str('residentesMedicinaInterna'),
+          medicosAsistentes: str('medicosAsistentes'),
+          ma: str('ma'),
+          ri: str('ri'),
+          mg: str('mg'),
+          totalVistos: accion === 'equipo' ? prev.totalVistos : num('totalVistos'),
+          triage: accion === 'equipo' ? prev.triage : num('triage'),
+          emergencias: accion === 'equipo' ? prev.emergencias : num('emergencias'),
+          ingresosTotales: accion === 'equipo' ? prev.ingresosTotales : num('ingresosTotales'),
+          medicinaInterna: accion === 'equipo' ? prev.medicinaInterna : num('medicinaInterna'),
+          cirugiaCount: accion === 'equipo' ? prev.cirugiaCount : num('cirugiaCount'),
+          ortopediaCount: accion === 'equipo' ? prev.ortopediaCount : num('ortopediaCount'),
+          neurocirugia: accion === 'equipo' ? prev.neurocirugia : num('neurocirugia'),
+          enviadosSala: accion === 'equipo' ? prev.enviadosSala : num('enviadosSala'),
+          enviadoUci: accion === 'equipo' ? prev.enviadoUci : num('enviadoUci'),
+          traslado: accion === 'equipo' ? prev.traslado : num('traslado'),
+          referimientos: accion === 'equipo' ? prev.referimientos : num('referimientos'),
+          fallecido: accion === 'equipo' ? prev.fallecido : num('fallecido'),
+          traidoFallecido: num('traidoFallecido'),
+          procEkg: num('procEkg'),
+          procSondaPleurostomia: num('procSondaPleurostomia'),
+          procTrombolisis: num('procTrombolisis'),
+          procToracocentesis: num('procToracocentesis'),
+          procParacentesis: num('procParacentesis'),
+          procRcp: num('procRcp'),
+          procDesfibrilacion: num('procDesfibrilacion'),
+          procViaCentral: num('procViaCentral'),
+          procSondaVesical: num('procSondaVesical'),
+          procIntubacion: num('procIntubacion'),
+          procCardioversion: num('procCardioversion'),
+          pacientesIngresados: accion === 'equipo' ? prev.pacientesIngresados : num('pacientesIngresados'),
+          pacientesTraumaShock: accion === 'equipo' ? prev.pacientesTraumaShock : num('pacientesTraumaShock'),
+          camasDisponibles: num('camasDisponibles'),
+          situacionesAdministrativas: str('situacionesAdministrativas', '0') || '0',
+          camillasRetenidas: num('camillasRetenidas'),
+          updatedBy: actorNombre,
+          updatedByRole: actorRole,
+          updatedAt: nowIso,
+        }
+
+  await prisma.residency.update({
+    where: { id: residency.id },
+    data: {
+      surgicalStatsExtra: fusionarSurgicalStatsExtra(residency.surgicalStatsExtra, {
+        emergenciaGuardia: payload,
+      }) as Prisma.InputJsonValue,
+    },
+  })
+
+  await logAudit({
+    actorId: ctx.user.id,
+    actorRole,
+    action: 'update',
+    entity: 'emergencia_guardia',
+    entityId: residency.id,
+    oldValue: prev,
+    newValue: payload,
+    reason:
+      accion === 'auto'
+        ? `Restableció conteo automático en Entrega de Guardia de Emergencia${payload.fecha ? ` (${payload.fecha})` : ''}`
+        : accion === 'equipo'
+          ? `Actualizó equipo y procedimientos en Entrega de Guardia de Emergencia${payload.fecha ? ` (${payload.fecha})` : ''}`
+          : `Ajuste manual en Entrega de Guardia de Emergencia${payload.fecha ? ` (${payload.fecha})` : ''}`,
+  })
+
+  revalidatePath('/dashboard')
+  return { ok: true }
+}
+
 

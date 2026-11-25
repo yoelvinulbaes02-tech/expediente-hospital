@@ -151,6 +151,83 @@ export async function crearPaciente(formData: FormData) {
     },
   })
 
+  let initialSpecialtyMeta: Record<string, unknown> | undefined
+
+  if (ctx.interfaceMode === 'EMERGENCIA') {
+    const amc = String(formData.get('emergencyAmc') ?? '').trim() || null
+    const specialty = String(formData.get('emergencySpecialty') ?? '').trim() || null
+    const triageLevel = String(formData.get('emergencyTriageLevel') ?? 'Emergencia').trim() || 'Emergencia'
+    const relevantLabsStudies = String(formData.get('emergencyRelevantLabs') ?? '').trim() || null
+    const interestsPending = String(formData.get('emergencyInterestsPending') ?? '').trim() || null
+    await prisma.emergencyProfile
+      .create({
+        data: {
+          episodeId,
+          amc,
+          specialty,
+          triageLevel,
+          relevantLabsStudies,
+          interestsPending,
+          updatedBy: ctx.user.email,
+        },
+      })
+      .catch(() => null)
+    initialSpecialtyMeta = { amc, specialty, triageLevel, relevantLabsStudies, interestsPending }
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole: String(ctx.user.role),
+      action: 'create',
+      entity: 'emergency_profile',
+      entityId: episodeId,
+      patientId: nuevoPaciente.id,
+      episodeId,
+      newValue: {
+        ...initialSpecialtyMeta,
+        actualizadoPor: ctx.user.email,
+        actorRole: String(ctx.user.role),
+      },
+      reason: 'Perfil inicial de Emergencia creado al ingresar paciente',
+    })
+  } else if (ctx.interfaceMode === 'HEMATOLOGIA') {
+    const vitalSignsFrequency = String(formData.get('hemaVitalFreq') ?? 'c/8 horas').trim() || 'c/8 horas'
+    const bleedingWatch = String(formData.get('hemaBleedingWatch') ?? '').trim() || null
+    const pendingBloodProducts = String(formData.get('hemaPendingBlood') ?? '').trim() || null
+    const pendingStudies = String(formData.get('hemaPendingStudies') ?? '').trim() || null
+    await prisma.hematologyProfile
+      .create({
+        data: {
+          episodeId,
+          vitalSignsFrequency,
+          bleedingWatch,
+          pendingBloodProducts,
+          pendingStudies,
+          updatedBy: ctx.user.email,
+        },
+      })
+      .catch(() => null)
+    initialSpecialtyMeta = {
+      vitalSignsFrequency,
+      bleedingWatch,
+      pendingBloodProducts,
+      pendingStudies,
+    }
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole: String(ctx.user.role),
+      action: 'create',
+      entity: 'hematology_profile',
+      entityId: episodeId,
+      patientId: nuevoPaciente.id,
+      episodeId,
+      newValue: {
+        ...initialSpecialtyMeta,
+        actualizadoPor: ctx.user.email,
+        actorRole: String(ctx.user.role),
+      },
+      reason: 'Perfil inicial de Hematología creado al ingresar paciente',
+    })
+  }
+
   await logAudit({
     actorId: ctx.user.id,
     actorRole: String(ctx.user.role),
@@ -167,6 +244,7 @@ export async function crearPaciente(formData: FormData) {
       fechaIngreso: admissionDate.toISOString(),
       pesoInicial: initialWeight ? `${initialWeight} ${initialWeightUnit}` : null,
       nombre: `${firstName} ${lastName}`,
+      ...(initialSpecialtyMeta ? { perfilInicial: initialSpecialtyMeta } : {}),
     },
     reason: `Apertura de expediente (${serviceType === 'interconsulta' ? 'Interconsulta' : 'Paciente Propio'})`,
   })

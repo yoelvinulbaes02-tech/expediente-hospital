@@ -9,8 +9,12 @@ import { TeamServicioCard } from '@/components/TeamServicioCard'
 import { CirugiaResumenPanel, type ResumenCirugiaStats } from '@/components/CirugiaResumenPanel'
 import { CurasPanel, type CuraPacienteItem } from '@/components/CurasPanel'
 import { HemodialisisPanel, type HemodialisisItemData } from '@/components/HemodialisisPanel'
+import { EmergenciaGuardiaPanel } from '@/components/EmergenciaGuardiaPanel'
+import { EmergenciaTablaPanel } from '@/components/EmergenciaTablaPanel'
+import { HematologiaResumenPanel } from '@/components/HematologiaResumenPanel'
 import { ESTADOS_CIRUGIA, type TeamServicioData } from '@/lib/cirugia-constants'
 import { ESTADOS_ORTOPEDIA } from '@/lib/ortopedia-constants'
+import type { EmergenciaGuardiaAutoStats, EmergenciaGuardiaData } from '@/lib/emergencia-constants'
 
 type TareaPendienteResumen = {
   id: string
@@ -54,6 +58,31 @@ type Episodio = {
     neurovascularStatus?: string | null
     compartmentAlert?: boolean
     weightBearingPlan?: string | null
+  } | null
+  hematologyProfile?: {
+    vitalSignsFrequency: string
+    bleedingWatch: string | null
+    painWatch: string | null
+    temperatureWatch: string | null
+    hemodynamicWatch: string | null
+    pendingBloodProducts: string | null
+    pendingStudies: string | null
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: string | null
+  } | null
+  emergencyProfile?: {
+    amc: string | null
+    specialty: string | null
+    relevantLabsStudies: string | null
+    interestsPending: string | null
+    triageLevel: string
+    clinicalStatus: string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: string | null
   } | null
   _count: { tasks: number }
   handoffs: { recibidoPor: string }[]
@@ -133,6 +162,8 @@ export function ListaPacientes({
   resumenCirugiaAuto,
   resumenCirugiaGuardado = null,
   conteosDispositivosCirugia,
+  emergenciaGuardia,
+  emergenciaAutoStats,
   curas = [],
   hemodialisisItems = [],
   ahoraIso = '',
@@ -144,12 +175,20 @@ export function ListaPacientes({
   vistaInicial?: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis'
   puedeMarcarTareas?: boolean
   puedeEditarServicio?: boolean
-  interfaceMode?: 'HOSPITALIZACION' | 'MEDICINA_INTERNA' | 'CIRUGIA' | 'ORTOPEDIA'
+  interfaceMode?:
+    | 'HOSPITALIZACION'
+    | 'MEDICINA_INTERNA'
+    | 'CIRUGIA'
+    | 'ORTOPEDIA'
+    | 'EMERGENCIA'
+    | 'HEMATOLOGIA'
   teamData?: TeamServicioData
   sugerenciaAutoTeam?: { ma: string; r4: string; r3: string; r2: string; r1: string }
   resumenCirugiaAuto?: Omit<ResumenCirugiaStats, 'mode'>
   resumenCirugiaGuardado?: ResumenCirugiaStats | null
   conteosDispositivosCirugia?: Record<string, number>
+  emergenciaGuardia?: EmergenciaGuardiaData
+  emergenciaAutoStats?: EmergenciaGuardiaAutoStats
   curas?: CuraPacienteItem[]
   hemodialisisItems?: HemodialisisItemData[]
   ahoraIso?: string
@@ -158,6 +197,8 @@ export function ListaPacientes({
   const esCirugia = interfaceMode === 'CIRUGIA'
   const esOrtopedia = interfaceMode === 'ORTOPEDIA'
   const esCirugiaBase = esCirugia || esOrtopedia
+  const esEmergencia = interfaceMode === 'EMERGENCIA'
+  const esHematologia = interfaceMode === 'HEMATOLOGIA'
   const esNefrologia = interfaceMode === 'HOSPITALIZACION'
   const router = useRouter()
   const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta' | 'curas' | 'hemodialisis'>(
@@ -249,6 +290,8 @@ export function ListaPacientes({
         normalizar(e.primaryDiagnosis),
         normalizar(e.consultingDepartment),
         normalizar(e.consultingResident),
+        normalizar(e.emergencyProfile?.amc),
+        normalizar(e.emergencyProfile?.specialty),
       ]
       return terminos.every((t) => palabras.some((p) => p.startsWith(t)))
     })
@@ -315,6 +358,16 @@ export function ListaPacientes({
                 ? 'Cirugía'
                 : 'Medicina Interna'
           }
+        />
+      )}
+
+      {/* PANEL DE ENTREGA DE GUARDIA DE EMERGENCIA */}
+      {esEmergencia && emergenciaGuardia && (
+        <EmergenciaGuardiaPanel
+          data={emergenciaGuardia}
+          autoStats={emergenciaAutoStats}
+          puedeEditar={puedeEditarServicio}
+          ingresosActivosCount={totalPropios}
         />
       )}
 
@@ -400,15 +453,82 @@ export function ListaPacientes({
           )}
         </div>
 
-        <Link
-          href="/dashboard/nuevo-paciente"
-          className={`w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-center text-white transition-colors shadow-sm ${
-            areaGuardia === 'interconsulta' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          + {areaGuardia === 'interconsulta' ? 'Ingresar Interconsulta' : 'Ingresar Paciente de Sala'}
-        </Link>
+        {esEmergencia ? (
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Link
+              href="/dashboard/nuevo-paciente?tipo=propio"
+              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-center text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm whitespace-nowrap"
+            >
+              + Ingresar Paciente Propio
+            </Link>
+            {areaGuardia === 'interconsulta' && (
+              <Link
+                href="/dashboard/nuevo-paciente?tipo=interconsulta"
+                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-center text-white bg-purple-600 hover:bg-purple-700 transition-colors shadow-sm whitespace-nowrap"
+              >
+                + Ingresar Interconsulta
+              </Link>
+            )}
+          </div>
+        ) : (
+          <Link
+            href={
+              areaGuardia === 'interconsulta'
+                ? '/dashboard/nuevo-paciente?tipo=interconsulta'
+                : '/dashboard/nuevo-paciente'
+            }
+            className={`w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-center text-white transition-colors shadow-sm ${
+              areaGuardia === 'interconsulta'
+                ? 'bg-purple-600 hover:bg-purple-700'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            +{' '}
+            {esHematologia
+              ? areaGuardia === 'interconsulta'
+                ? 'Ingresar Interconsulta a Hematología'
+                : 'Ingresar Paciente en Hematología'
+              : areaGuardia === 'interconsulta'
+                ? 'Ingresar Interconsulta'
+                : 'Ingresar Paciente de Sala'}
+          </Link>
+        )}
       </div>
+
+      {/* PASE DE VISITA HEMATOLOGÍA */}
+      {esHematologia && (
+        <HematologiaResumenPanel
+          episodes={episodiosDelArea.map((ep) => ({
+            id: String(ep.id),
+            room: ep.room,
+            bed: ep.bed,
+            primaryDiagnosis: ep.primaryDiagnosis ?? null,
+            secondaryDiagnoses: ep.secondaryDiagnoses ?? null,
+            chiefComplaint: ep.chiefComplaint,
+            patient: ep.patient,
+            hematologyProfile: ep.hematologyProfile ?? null,
+          }))}
+          puedeEditar={puedeMarcarTareas}
+        />
+      )}
+
+      {/* TABLA GENERAL DE EMERGENCIA */}
+      {esEmergencia && (
+        <EmergenciaTablaPanel
+          episodes={episodiosDelArea.map((ep) => ({
+            id: String(ep.id),
+            room: ep.room,
+            bed: ep.bed,
+            admissionDate: ep.admissionDate,
+            primaryDiagnosis: ep.primaryDiagnosis ?? null,
+            chiefComplaint: ep.chiefComplaint,
+            patient: ep.patient,
+            emergencyProfile: ep.emergencyProfile ?? null,
+          }))}
+          guardiaData={emergenciaGuardia}
+          puedeEditar={puedeMarcarTareas}
+        />
+      )}
 
       {esCirugiaBase && areaGuardia === 'curas' ? (
         <CurasPanel
@@ -426,21 +546,29 @@ export function ListaPacientes({
         <>
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          {esOrtopedia
+          {esEmergencia
             ? areaGuardia === 'propio'
-              ? '🦴 Sala de Ortopedia y Traumatología'
-              : '📋 Interconsultas a Ortopedia'
-            : esCirugia
+              ? 'Pacientes en Área de Emergencia'
+              : 'Interconsultas en Emergencia'
+            : esHematologia
               ? areaGuardia === 'propio'
-                ? '🔪 Sala de Cirugía'
-                : '📋 Interconsultas a Cirugía'
-              : esMedicinaInterna
+                ? 'Sala de Hematología'
+                : 'Interconsultas a Hematología'
+              : esOrtopedia
                 ? areaGuardia === 'propio'
-                  ? '🩺 Sala de Medicina Interna'
-                  : '📋 Interconsultas a Medicina Interna'
-                : areaGuardia === 'propio'
-                  ? '🏥 Sala de Hospitalización'
-                  : '📋 Pacientes de Interconsulta'}
+                  ? '🦴 Sala de Ortopedia y Traumatología'
+                  : '📋 Interconsultas a Ortopedia'
+                : esCirugia
+                  ? areaGuardia === 'propio'
+                    ? '🔪 Sala de Cirugía'
+                    : '📋 Interconsultas a Cirugía'
+                  : esMedicinaInterna
+                    ? areaGuardia === 'propio'
+                      ? '🩺 Sala de Medicina Interna'
+                      : '📋 Interconsultas a Medicina Interna'
+                    : areaGuardia === 'propio'
+                      ? '🏥 Sala de Hospitalización'
+                      : '📋 Pacientes de Interconsulta'}
         </h2>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -574,8 +702,10 @@ export function ListaPacientes({
                         {episode.consultingDepartment ?? 'Interconsulta'}
                       </span>
                     ) : null}
-                    <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md text-xs font-bold border border-blue-100">
-                      Hab. {episode.room} - Cama {episode.bed}
+                    <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md text-xs font-bold border border-blue-100 tabular-nums">
+                      {esEmergencia
+                        ? `Área ${episode.room} - Cama ${episode.bed}`
+                        : `Hab. ${episode.room} - Cama ${episode.bed}`}
                     </span>
                   </div>
                 </div>
@@ -602,10 +732,11 @@ export function ListaPacientes({
                     ) : (
                       <div className="flex flex-wrap items-center justify-between gap-1">
                         <span>
-                          📅 <strong>Ingreso a Sala:</strong> {fmtFechaCorta(episode.admissionDate)}
+                          📅 <strong>{esEmergencia ? 'Ingreso a Emergencia:' : 'Ingreso a Sala:'}</strong>{' '}
+                          {fmtFechaCorta(episode.admissionDate)}
                         </span>
-                        <span className="font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded">
-                          Día {diaInterconsulta} de internamiento
+                        <span className="font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded tabular-nums">
+                          Día {diaInterconsulta} {esEmergencia ? 'en Emergencia' : 'de internamiento'}
                         </span>
                       </div>
                     )}
@@ -639,6 +770,24 @@ export function ListaPacientes({
                         </p>
                       </>
                     )
+                  )}
+
+                  {!soloPendientes && esEmergencia && episode.emergencyProfile && (
+                    <p className="text-xs text-slate-600 dark:text-slate-300 pt-1 tabular-nums">
+                      <strong>Triaje:</strong> {episode.emergencyProfile.triageLevel}
+                      {' · '}
+                      <strong>Especialidad:</strong> {episode.emergencyProfile.specialty || 'Emergenciología'}
+                      {episode.emergencyProfile.amc ? ` · AMC: ${episode.emergencyProfile.amc}` : ''}
+                    </p>
+                  )}
+
+                  {!soloPendientes && esHematologia && episode.hematologyProfile && (
+                    <p className="text-xs text-slate-600 dark:text-slate-300 pt-1">
+                      <strong>Signos vitales:</strong> {episode.hematologyProfile.vitalSignsFrequency}
+                      {episode.hematologyProfile.pendingBloodProducts
+                        ? ` · ${episode.hematologyProfile.pendingBloodProducts}`
+                        : ''}
+                    </p>
                   )}
 
                   {!soloPendientes &&

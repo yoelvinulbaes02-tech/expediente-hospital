@@ -54,11 +54,127 @@ export type AntecedentesConsultaState = {
   updatedAtIso: string | null
 }
 
+export const TIPOS_CONSULTA_EXTERNA = [
+  'Consulta general',
+  'Glomerulopatías',
+  'Biopsias',
+  'Pre-diálisis',
+  'Hemodiálisis',
+] as const
+
+export type TipoConsultaExterna = (typeof TIPOS_CONSULTA_EXTERNA)[number]
+
+export const ANALITICAS_BIOPSIA = [
+  'Pendiente',
+  'Pendiente urocultivo',
+  'Pendiente todo',
+  'Listo',
+  'Completo',
+] as const
+
+export const AGUJA_BIOPSIA = [
+  'Utilizar la del centro',
+  'Disponible en el centro',
+  'Lista',
+  'Pendiente',
+] as const
+
+export const KIT_BIOPSIA = ['Pendiente', 'Listo'] as const
+
+export const SENASA_BIOPSIA = [
+  'Pendiente',
+  'En proceso',
+  'Autorizada',
+  'El centro se hará responsable',
+] as const
+
+export type BiopsyRecordItem = {
+  id: string
+  patientId: string | null
+  status: 'agendada' | 'realizada'
+  patientName: string
+  phone: string | null
+  labsStatus: string | null
+  needleStatus: string | null
+  kitStatus: string | null
+  scheduledDate: string | null
+  senasaAuth: string | null
+  note: string | null
+  performedDate: string | null
+  complications: string | null
+  report: string | null
+  highlightTag: 'normal' | 'programada' | 'alerta' | 'completada'
+  createdByName: string
+  createdByRole: string
+  createdAt: string
+  updatedByName: string | null
+  updatedByRole: string | null
+  updatedAt: string | null
+  performedByName: string | null
+  performedByRole: string | null
+  performedAt: string | null
+}
+
+export type OutpatientHemodialysisItem = {
+  id: string
+  patientId: string | null
+  firstName: string
+  lastName: string
+  expedienteNumber: string | null
+  age: number | null
+  sex: string | null
+  phone: string | null
+  cedula: string | null
+  bloodType: string | null
+  diagnosisAndTime: string | null
+  medications: string | null
+  allergies: string | null
+  allergyReaction: string | null
+  transfusions: string | null
+  referredFromCenter: string | null
+  firstTimeInCenter: string | null
+  otherDialysisModality: string | null
+  pathologicalHistory: string | null
+  surgicalHistory: string | null
+  familyHistory: string | null
+  habitCoffee: string | null
+  habitTobacco: string | null
+  habitAlcohol: string | null
+  habitDrugs: string | null
+  habitOther: string | null
+  viralHiv: string | null
+  viralHbsag: string | null
+  viralHvc: string | null
+  labHgb: string | null
+  labHct: string | null
+  labUrea: string | null
+  labCr: string | null
+  labK: string | null
+  labBloodType: string | null
+  labOther: string | null
+  imagingSonography: string | null
+  imagingCt: string | null
+  imagingOther: string | null
+  accessAvFistula: string | null
+  accessGraft: string | null
+  accessTunneledCatheter: string | null
+  accessFavi: string | null
+  clinicalNotes: string | null
+  isActive: boolean
+  createdByName: string
+  createdByRole: string
+  createdAt: string
+  updatedByName: string | null
+  updatedByRole: string | null
+  updatedAt: string | null
+}
+
 export type HistorialVisitaResumen = {
   id: string
   consultationDate: string
   status: string
   visitType: string
+  consultationType?: string | null
   doctorId: string | null
   doctorName: string | null
   doctorRole: string | null

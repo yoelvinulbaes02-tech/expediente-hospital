@@ -13,6 +13,7 @@ export type PayloadConsultaClinica = {
   consultationId: string
   accion?: 'guardar' | 'finalizar' | 'reabrir'
   visitType?: string
+  consultationType?: string
   chiefComplaint?: string
   bloodPressure?: string | null
   heartRate?: string | number | null
@@ -83,6 +84,7 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
       patientId: true,
       status: true,
       visitType: true,
+      consultationType: true,
       chiefComplaint: true,
       bloodPressure: true,
       heartRate: true,
@@ -148,6 +150,11 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
     payload.visitType !== undefined
       ? String(payload.visitType).trim() || 'Primera vez'
       : consulta.visitType
+
+  const consultationType =
+    payload.consultationType !== undefined
+      ? String(payload.consultationType).trim() || 'Consulta general'
+      : consulta.consultationType || 'Consulta general'
 
   const bloodPressure =
     payload.bloodPressure !== undefined ? aTextoOpcional(payload.bloodPressure) : consulta.bloodPressure
@@ -223,6 +230,7 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
   track('antropometria', 'heightCm', consulta.heightCm, heightCm)
 
   track('motivo', 'visitType', consulta.visitType, visitType)
+  track('motivo', 'consultationType', consulta.consultationType || 'Consulta general', consultationType)
   track('motivo', 'chiefComplaint', consulta.chiefComplaint, chiefComplaint)
   track('motivo', 'nextAppointment', consulta.nextAppointment, nextAppointment)
 
@@ -282,6 +290,7 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
     where: { id: consultationId },
     data: {
       visitType,
+      consultationType,
       chiefComplaint,
       bloodPressure,
       heartRate,

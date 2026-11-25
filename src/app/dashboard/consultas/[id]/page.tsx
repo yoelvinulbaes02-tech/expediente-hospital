@@ -202,7 +202,11 @@ export default async function ConsultaDetallePage({
       ) {
         metaSecciones.signos = { byName, byRole, atIso }
       }
-      if (data.chiefComplaint !== undefined || data.visitType !== undefined) {
+      if (
+        data.chiefComplaint !== undefined ||
+        data.visitType !== undefined ||
+        data.consultationType !== undefined
+      ) {
         metaSecciones.motivo = { byName, byRole, atIso }
       }
       if (data.diagnosis !== undefined) {
@@ -277,6 +281,7 @@ export default async function ConsultaDetallePage({
       id: v.id,
       consultationDate: v.consultationDate.toISOString(),
       status: v.status,
+      consultationType: v.consultationType ?? 'Consulta general',
       visitType: v.visitType,
       doctorId: v.doctorId,
       doctorName: v.doctorName,
@@ -463,6 +468,7 @@ export default async function ConsultaDetallePage({
               consulta={{
                 id: consulta.id,
                 status: consulta.status,
+                consultationType: consulta.consultationType ?? 'Consulta general',
                 visitType: consulta.visitType,
                 chiefComplaint: consulta.chiefComplaint,
                 bloodPressure: consulta.bloodPressure,

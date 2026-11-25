@@ -20,9 +20,23 @@ import type {
   HemodialisisItemData,
   SeccionHd,
 } from '@/components/HemodialisisPanel'
+import {
+  extraerEmergenciaGuardia,
+  type EmergenciaGuardiaAutoStats,
+  type EmergenciaGuardiaData,
+} from '@/lib/emergencia-constants'
+import { describirRegistro } from '@/lib/auditoria-texto'
+import type {
+  BiopsyRecordItem,
+  OutpatientHemodialysisItem,
+} from '@/lib/consultas-auth'
 import { LegalFooter } from '@/components/LegalFooter'
 import Image from 'next/image'
 import Link from 'next/link'
+
+function hace24Horas(): Date {
+  return new Date(Date.now() - 24 * 60 * 60 * 1000)
+}
 
 export default async function DashboardPage({
   searchParams,
@@ -54,8 +68,15 @@ export default async function DashboardPage({
   const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
   const esModoCirugia = ctx.interfaceMode === 'CIRUGIA'
   const esModoOrtopedia = ctx.interfaceMode === 'ORTOPEDIA'
+  const esModoEmergencia = ctx.interfaceMode === 'EMERGENCIA'
+  const esModoHematologia = ctx.interfaceMode === 'HEMATOLOGIA'
   const esModoQuirurgicoBase = esModoCirugia || esModoOrtopedia
-  const esModoNefrologia = !esModoConsultas && !esModoMedicinaInterna && !esModoQuirurgicoBase
+  const esModoNefrologia =
+    !esModoConsultas &&
+    !esModoMedicinaInterna &&
+    !esModoQuirurgicoBase &&
+    !esModoEmergencia &&
+    !esModoHematologia
   const requiereTeamServicio = esModoMedicinaInterna || esModoQuirurgicoBase
 
   const vistaInicial: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis' =
@@ -66,6 +87,13 @@ export default async function DashboardPage({
         : vista === 'interconsulta'
           ? 'interconsulta'
           : 'propio'
+
+  const vistaConsultaInicial: 'consultas' | 'biopsias' | 'hemodialisis' =
+    vista === 'biopsias'
+      ? 'biopsias'
+      : vista === 'hemodialisis'
+        ? 'hemodialisis'
+        : 'consultas'
 
   const userId = ctx.user.id
   const userRole = String(ctx.user.role)
@@ -197,6 +225,419 @@ export default async function DashboardPage({
         },
       ])
     )
+  }
+
+  let perfilesHema = new Map<
+    string,
+    {
+      vitalSignsFrequency: string
+      bleedingWatch: string | null
+      painWatch: string | null
+      temperatureWatch: string | null
+      hemodynamicWatch: string | null
+      pendingBloodProducts: string | null
+      pendingStudies: string | null
+      updatedBy: string
+      updatedByName: string | null
+      updatedByRole: string | null
+      updatedAt: string
+    }
+  >()
+  if (esModoHematologia && episodesBase.length > 0) {
+    const listaHema = await prisma.hematologyProfile
+      .findMany({
+        where: { episodeId: { in: episodesBase.map((e) => e.id) } },
+        select: {
+          episodeId: true,
+          vitalSignsFrequency: true,
+          bleedingWatch: true,
+          painWatch: true,
+          temperatureWatch: true,
+          hemodynamicWatch: true,
+          pendingBloodProducts: true,
+          pendingStudies: true,
+          updatedBy: true,
+          updatedAt: true,
+        },
+      })
+      .catch(() => [])
+    const hemaEmails = Array.from(new Set(listaHema.map((p) => p.updatedBy).filter(Boolean)))
+    const hemaUsers =
+      hemaEmails.length > 0
+        ? await prisma.user.findMany({
+            where: { residencyId: residency.id, email: { in: hemaEmails } },
+            select: { email: true, fullName: true, role: true },
+          })
+        : []
+    const mapaHemaUsers = new Map(hemaUsers.map((u) => [u.email, u]))
+    perfilesHema = new Map(
+      listaHema.map((p) => {
+        const u = mapaHemaUsers.get(p.updatedBy)
+        return [
+          p.episodeId,
+          {
+            vitalSignsFrequency: p.vitalSignsFrequency,
+            bleedingWatch: p.bleedingWatch,
+            painWatch: p.painWatch,
+            temperatureWatch: p.temperatureWatch,
+            hemodynamicWatch: p.hemodynamicWatch,
+            pendingBloodProducts: p.pendingBloodProducts,
+            pendingStudies: p.pendingStudies,
+            updatedBy: p.updatedBy,
+            updatedByName: u?.fullName ?? p.updatedBy,
+            updatedByRole: u ? String(u.role) : null,
+            updatedAt: p.updatedAt.toISOString(),
+          },
+        ]
+      })
+    )
+  }
+
+  let perfilesEmergencia = new Map<
+    string,
+    {
+      amc: string | null
+      specialty: string | null
+      relevantLabsStudies: string | null
+      interestsPending: string | null
+      triageLevel: string
+      clinicalStatus: string
+      updatedBy: string
+      updatedByName: string | null
+      updatedByRole: string | null
+      updatedAt: string
+    }
+  >()
+  if (esModoEmergencia && episodesBase.length > 0) {
+    const listaEmergencia = await prisma.emergencyProfile
+      .findMany({
+        where: { episodeId: { in: episodesBase.map((e) => e.id) } },
+        select: {
+          episodeId: true,
+          amc: true,
+          specialty: true,
+          relevantLabsStudies: true,
+          interestsPending: true,
+          triageLevel: true,
+          clinicalStatus: true,
+          updatedBy: true,
+          updatedAt: true,
+        },
+      })
+      .catch(() => [])
+    const emEmails = Array.from(new Set(listaEmergencia.map((p) => p.updatedBy).filter(Boolean)))
+    const emUsers =
+      emEmails.length > 0
+        ? await prisma.user.findMany({
+            where: { residencyId: residency.id, email: { in: emEmails } },
+            select: { email: true, fullName: true, role: true },
+          })
+        : []
+    const mapaEmUsers = new Map(emUsers.map((u) => [u.email, u]))
+    perfilesEmergencia = new Map(
+      listaEmergencia.map((p) => {
+        const u = mapaEmUsers.get(p.updatedBy)
+        return [
+          p.episodeId,
+          {
+            amc: p.amc,
+            specialty: p.specialty,
+            relevantLabsStudies: p.relevantLabsStudies,
+            interestsPending: p.interestsPending,
+            triageLevel: p.triageLevel,
+            clinicalStatus: p.clinicalStatus,
+            updatedBy: p.updatedBy,
+            updatedByName: u?.fullName ?? p.updatedBy,
+            updatedByRole: u ? String(u.role) : null,
+            updatedAt: p.updatedAt.toISOString(),
+          },
+        ]
+      })
+    )
+  }
+
+  const emergenciaGuardia: EmergenciaGuardiaData | undefined = esModoEmergencia
+    ? extraerEmergenciaGuardia(residency.surgicalStatsExtra)
+    : undefined
+
+  let emergenciaAutoStats: EmergenciaGuardiaAutoStats | undefined
+  if (esModoEmergencia) {
+    const hace24h = hace24Horas()
+    const closedEmergencia24h = await prisma.episode
+      .findMany({
+        where: {
+          residencyId: residency.id,
+          status: 'closed',
+          updatedAt: { gte: hace24h },
+          ...(filtroDoc ? { attendingDoctor: { contains: filtroDoc, mode: 'insensitive' } } : {}),
+        },
+        select: {
+          id: true,
+          serviceType: true,
+          admissionType: true,
+          dischargeType: true,
+          room: true,
+          emergencyProfile: {
+            select: {
+              specialty: true,
+              triageLevel: true,
+              clinicalStatus: true,
+              dispositionPlan: true,
+            },
+          },
+        },
+      })
+      .catch(() => [])
+
+    const norm = (s?: string | null) =>
+      (s ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+
+    let triage = 0
+    let emergencias = 0
+    let medicinaInterna = 0
+    let cirugiaCount = 0
+    let ortopediaCount = 0
+    let neurocirugia = 0
+    let pacientesTraumaShock = 0
+
+    const clasificarAtencion = (triageLevel?: string | null, admissionType?: string | null, specialty?: string | null) => {
+      const tNorm = norm(triageLevel)
+      const admNorm = norm(admissionType)
+      if (
+        tNorm.includes('triage') ||
+        tNorm.includes('menor') ||
+        tNorm.includes('prioritario') ||
+        tNorm.includes('urgencia') ||
+        (!tNorm && admNorm.includes('triage'))
+      ) {
+        triage += 1
+      } else {
+        emergencias += 1
+      }
+
+      const esp = norm(specialty)
+      if (esp.includes('medicina interna')) medicinaInterna += 1
+      else if (esp.includes('neurocirug')) neurocirugia += 1
+      else if (esp.includes('cirug')) cirugiaCount += 1
+      else if (esp.includes('ortoped')) ortopediaCount += 1
+    }
+
+    for (const ep of episodesBase) {
+      const prof = perfilesEmergencia.get(ep.id)
+      clasificarAtencion(prof?.triageLevel, ep.admissionType, prof?.specialty)
+      const roomStr = (ep.room ?? '').trim()
+      if (
+        norm(prof?.triageLevel).includes('trauma') ||
+        norm(prof?.clinicalStatus).includes('trauma') ||
+        norm(roomStr).includes('trauma') ||
+        /^ts(\b|\d)/i.test(roomStr)
+      ) {
+        pacientesTraumaShock += 1
+      }
+    }
+
+    let enviadosSala = 0
+    let enviadoUci = 0
+    let traslado = 0
+    let referimientos = 0
+    let fallecido = 0
+
+    for (const ep of closedEmergencia24h) {
+      clasificarAtencion(ep.emergencyProfile?.triageLevel, ep.admissionType, ep.emergencyProfile?.specialty)
+      const dest = norm(`${ep.dischargeType ?? ''} ${ep.emergencyProfile?.dispositionPlan ?? ''}`)
+      if (dest.includes('uci')) enviadoUci += 1
+      else if (dest.includes('traslado')) traslado += 1
+      else if (dest.includes('refer')) referimientos += 1
+      else if (dest.includes('fallecido') && !dest.includes('traido')) fallecido += 1
+      else if (dest.includes('sala') || dest.includes('egreso') || dest.includes('ingreso')) enviadosSala += 1
+    }
+
+    const propiosActivosCount = episodesBase.filter((e) => (e.serviceType ?? 'propio') === 'propio').length
+    emergenciaAutoStats = {
+      totalVistos: episodesBase.length + closedEmergencia24h.length,
+      triage,
+      emergencias,
+      ingresosTotales: propiosActivosCount,
+      medicinaInterna,
+      cirugiaCount,
+      ortopediaCount,
+      neurocirugia,
+      enviadosSala,
+      enviadoUci,
+      traslado,
+      referimientos,
+      fallecido,
+      pacientesIngresados: propiosActivosCount,
+      pacientesTraumaShock,
+    }
+  }
+
+  let biopsiasSerializadas: BiopsyRecordItem[] = []
+  let hdOutpatientSerializados: OutpatientHemodialysisItem[] = []
+  if (esModoConsultas) {
+    const [biopsiasDb, hdOutpatientDb] = await Promise.all([
+      prisma.biopsyRecord
+        .findMany({
+          where: { residencyId: residency.id },
+          orderBy: [{ status: 'asc' }, { scheduledDate: 'asc' }, { createdAt: 'desc' }],
+          take: 500,
+        })
+        .catch(() => []),
+      prisma.outpatientHemodialysis
+        .findMany({
+          where: { residencyId: residency.id },
+          orderBy: [{ isActive: 'desc' }, { updatedAt: 'desc' }, { createdAt: 'desc' }],
+          take: 500,
+        })
+        .catch(() => []),
+    ])
+
+    biopsiasSerializadas = biopsiasDb.map((b) => ({
+      id: b.id,
+      patientId: b.patientId,
+      status: b.status === 'realizada' ? 'realizada' : 'agendada',
+      patientName: b.patientName,
+      phone: b.phone,
+      labsStatus: b.labsStatus,
+      needleStatus: b.needleStatus,
+      kitStatus: b.kitStatus,
+      scheduledDate: b.scheduledDate,
+      senasaAuth: b.senasaAuth,
+      note: b.note,
+      performedDate: b.performedDate,
+      complications: b.complications,
+      report: b.report,
+      highlightTag:
+        b.highlightTag === 'programada' ||
+        b.highlightTag === 'alerta' ||
+        b.highlightTag === 'completada'
+          ? b.highlightTag
+          : 'normal',
+      createdByName: b.createdByName,
+      createdByRole: b.createdByRole,
+      createdAt: b.createdAt.toISOString(),
+      updatedByName: b.updatedByName,
+      updatedByRole: b.updatedByRole,
+      updatedAt: b.updatedAt ? b.updatedAt.toISOString() : null,
+      performedByName: b.performedByName,
+      performedByRole: b.performedByRole,
+      performedAt: b.performedAt ? b.performedAt.toISOString() : null,
+    }))
+
+    hdOutpatientSerializados = hdOutpatientDb.map((h) => ({
+      id: h.id,
+      patientId: h.patientId,
+      firstName: h.firstName,
+      lastName: h.lastName,
+      expedienteNumber: h.expedienteNumber,
+      age: h.age,
+      sex: h.sex,
+      phone: h.phone,
+      cedula: h.cedula,
+      bloodType: h.bloodType,
+      diagnosisAndTime: h.diagnosisAndTime,
+      medications: h.medications,
+      allergies: h.allergies,
+      allergyReaction: h.allergyReaction,
+      transfusions: h.transfusions,
+      referredFromCenter: h.referredFromCenter,
+      firstTimeInCenter: h.firstTimeInCenter,
+      otherDialysisModality: h.otherDialysisModality,
+      pathologicalHistory: h.pathologicalHistory,
+      surgicalHistory: h.surgicalHistory,
+      familyHistory: h.familyHistory,
+      habitCoffee: h.habitCoffee,
+      habitTobacco: h.habitTobacco,
+      habitAlcohol: h.habitAlcohol,
+      habitDrugs: h.habitDrugs,
+      habitOther: h.habitOther,
+      viralHiv: h.viralHiv,
+      viralHbsag: h.viralHbsag,
+      viralHvc: h.viralHvc,
+      labHgb: h.labHgb,
+      labHct: h.labHct,
+      labUrea: h.labUrea,
+      labCr: h.labCr,
+      labK: h.labK,
+      labBloodType: h.labBloodType,
+      labOther: h.labOther,
+      imagingSonography: h.imagingSonography,
+      imagingCt: h.imagingCt,
+      imagingOther: h.imagingOther,
+      accessAvFistula: h.accessAvFistula,
+      accessGraft: h.accessGraft,
+      accessTunneledCatheter: h.accessTunneledCatheter,
+      accessFavi: h.accessFavi,
+      clinicalNotes: h.clinicalNotes,
+      isActive: h.isActive,
+      createdByName: h.createdByName,
+      createdByRole: h.createdByRole,
+      createdAt: h.createdAt.toISOString(),
+      updatedByName: h.updatedByName,
+      updatedByRole: h.updatedByRole,
+      updatedAt: h.updatedAt ? h.updatedAt.toISOString() : null,
+    }))
+  }
+
+  type ActividadAuditItem = {
+    id: string
+    actorName: string
+    actorRole: string
+    atIso: string
+    que: string
+    detalle: string
+  }
+
+  let historialActividadConsultas: ActividadAuditItem[] = []
+  let mapaEditoresConsultas = new Map<string, { fullName: string; role: string }>()
+  if (esModoConsultas) {
+    const emailsConsulta = Array.from(
+      new Set(consultas.map((c) => c.updatedBy || c.createdBy).filter((e): e is string => Boolean(e)))
+    )
+    const [auditConsultasDb, editoresConsultasDb] = await Promise.all([
+      prisma.auditLog
+        .findMany({
+          where: {
+            entity: {
+              in: ['consultation', 'biopsy_record', 'outpatient_hemodialysis', 'medical_history', 'patient'],
+            },
+            actor: { residencyId: residency.id },
+          },
+          orderBy: { seq: 'desc' },
+          take: 40,
+          include: {
+            actor: { select: { fullName: true, email: true, role: true } },
+          },
+        })
+        .catch(() => []),
+      emailsConsulta.length > 0
+        ? prisma.user
+            .findMany({
+              where: { residencyId: residency.id, email: { in: emailsConsulta } },
+              select: { email: true, fullName: true, role: true },
+            })
+            .catch(() => [])
+        : Promise.resolve([]),
+    ])
+
+    mapaEditoresConsultas = new Map(
+      editoresConsultasDb.map((u) => [u.email, { fullName: u.fullName, role: String(u.role) }])
+    )
+    historialActividadConsultas = auditConsultasDb.map((log) => {
+      const desc = describirRegistro(log)
+      return {
+        id: String(log.id),
+        actorName: log.actor.fullName || log.actor.email,
+        actorRole: String(log.actorRole || log.actor.role),
+        atIso: log.serverTs.toISOString(),
+        que: desc.que,
+        detalle: desc.detalle,
+      }
+    })
   }
 
   let perfilesCirugia = new Map<
@@ -538,29 +979,38 @@ export default async function DashboardPage({
     ...ep,
     internalMedicineProfile: perfilesMI.get(ep.id) ?? null,
     surgicalProfile: perfilesCirugia.get(ep.id) ?? null,
+    hematologyProfile: perfilesHema.get(ep.id) ?? null,
+    emergencyProfile: perfilesEmergencia.get(ep.id) ?? null,
   }))
 
   const textoBadge = turnosPendientes > 9 ? '+9' : String(turnosPendientes)
 
-  const consultasSerializadas = consultas.map((c) => ({
-    id: c.id,
-    consultationDate: c.consultationDate.toISOString(),
-    updatedAt: c.updatedAt.toISOString(),
-    status: c.status,
-    visitType: c.visitType,
-    chiefComplaint: c.chiefComplaint,
-    diagnosis: c.diagnosis,
-    treatmentPlan: c.treatmentPlan,
-    nextAppointment: c.nextAppointment ? c.nextAppointment.toISOString() : null,
-    notes: c.notes,
-    weight: c.weight,
-    weightUnit: c.weightUnit,
-    heightCm: c.heightCm,
-    doctorId: c.doctorId,
-    doctorName: c.doctorName,
-    doctorRole: c.doctor?.role ? String(c.doctor.role) : null,
-    patient: c.patient,
-  }))
+  const consultasSerializadas = consultas.map((c) => {
+    const editorEmail = c.updatedBy || c.createdBy
+    const editor = editorEmail ? mapaEditoresConsultas.get(editorEmail) : undefined
+    return {
+      id: c.id,
+      consultationDate: c.consultationDate.toISOString(),
+      updatedAt: c.updatedAt.toISOString(),
+      status: c.status,
+      consultationType: c.consultationType ?? 'Consulta general',
+      visitType: c.visitType,
+      chiefComplaint: c.chiefComplaint,
+      diagnosis: c.diagnosis,
+      treatmentPlan: c.treatmentPlan,
+      nextAppointment: c.nextAppointment ? c.nextAppointment.toISOString() : null,
+      notes: c.notes,
+      weight: c.weight,
+      weightUnit: c.weightUnit,
+      heightCm: c.heightCm,
+      doctorId: c.doctorId,
+      doctorName: c.doctorName,
+      doctorRole: c.doctor?.role ? String(c.doctor.role) : null,
+      updatedByName: editor?.fullName ?? editorEmail ?? null,
+      updatedByRole: editor?.role ?? null,
+      patient: c.patient,
+    }
+  })
 
   async function cerrarSesion() {
     'use server'
@@ -764,6 +1214,10 @@ export default async function DashboardPage({
             puedeRegistrar={puedeRegistrar}
             suscripcionBloqueada={suscripcionBloqueada}
             consultaRecienCerrada={cerrada === '1'}
+            biopsias={biopsiasSerializadas}
+            hemodialisis={hdOutpatientSerializados}
+            historialActividad={historialActividadConsultas}
+            vistaInicial={vistaConsultaInicial}
           />
         ) : (
           <ListaPacientes
@@ -776,19 +1230,25 @@ export default async function DashboardPage({
             puedeMarcarTareas={puedeRegistrar}
             puedeEditarServicio={puedeEditarServicio}
             interfaceMode={
-              esModoMedicinaInterna
-                ? 'MEDICINA_INTERNA'
-                : esModoOrtopedia
-                  ? 'ORTOPEDIA'
-                  : esModoCirugia
-                    ? 'CIRUGIA'
-                    : 'HOSPITALIZACION'
+              esModoEmergencia
+                ? 'EMERGENCIA'
+                : esModoHematologia
+                  ? 'HEMATOLOGIA'
+                  : esModoMedicinaInterna
+                    ? 'MEDICINA_INTERNA'
+                    : esModoOrtopedia
+                      ? 'ORTOPEDIA'
+                      : esModoCirugia
+                        ? 'CIRUGIA'
+                        : 'HOSPITALIZACION'
             }
             teamData={teamData}
             sugerenciaAutoTeam={sugerenciaAutoTeam}
             resumenCirugiaAuto={resumenCirugiaAuto}
             resumenCirugiaGuardado={resumenCirugiaGuardado}
             conteosDispositivosCirugia={conteosDispositivosCirugia}
+            emergenciaGuardia={emergenciaGuardia}
+            emergenciaAutoStats={emergenciaAutoStats}
             curas={curasSerializadas}
             hemodialisisItems={hemodialisisSerializados}
             ahoraIso={ahoraIso}

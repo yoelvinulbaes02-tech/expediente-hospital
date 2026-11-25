@@ -17,6 +17,7 @@ import {
 } from './actions-clinicas'
 import { GraficasSignos, type RegistroVital } from '@/components/GraficasSignos'
 import { calcularPermisos } from '@/lib/permisos'
+import { describirRegistro } from '@/lib/auditoria-texto'
 
 // Componentes clínicos
 import { NotasImportantes } from '@/components/NotasImportantes'
@@ -24,6 +25,8 @@ import { BloqueNefrologico } from '@/components/BloqueNefrologico'
 import { BloqueMedicinaInterna } from '@/components/BloqueMedicinaInterna'
 import { BloqueCirugia } from '@/components/BloqueCirugia'
 import { BloqueOrtopedia } from '@/components/BloqueOrtopedia'
+import { BloqueHematologia } from '@/components/BloqueHematologia'
+import { BloqueEmergencia } from '@/components/BloqueEmergencia'
 import { SeccionAntecedentes } from '@/components/SeccionAntecedentes'
 import { ReportesLaboratorio } from '@/components/ReportesLaboratorio'
 import { ReportesEstudios } from '@/components/ReportesEstudios'
@@ -179,12 +182,20 @@ export default async function ExpedientePage({
   const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
   const esModoCirugia = ctx.interfaceMode === 'CIRUGIA'
   const esModoOrtopedia = ctx.interfaceMode === 'ORTOPEDIA'
+  const esModoEmergencia = ctx.interfaceMode === 'EMERGENCIA'
+  const esModoHematologia = ctx.interfaceMode === 'HEMATOLOGIA'
   const esModoQuirurgicoBase = esModoCirugia || esModoOrtopedia
-  const ocultarPesoSignos = esModoMedicinaInterna || esModoQuirurgicoBase
+  const ocultarPesoSignos =
+    esModoMedicinaInterna ||
+    esModoQuirurgicoBase ||
+    esModoHematologia ||
+    esModoEmergencia
 
   const [
     internalMedicineProfile,
     surgicalProfile,
+    hematologyProfile,
+    emergencyProfile,
     antibiotics,
     surgicalDevices,
     basePlanEntriesDb,
@@ -197,6 +208,16 @@ export default async function ExpedientePage({
       : Promise.resolve(null),
     esModoQuirurgicoBase
       ? prisma.surgicalProfile
+          .findUnique({ where: { episodeId: episode.id } })
+          .catch(() => null)
+      : Promise.resolve(null),
+    esModoHematologia
+      ? prisma.hematologyProfile
+          .findUnique({ where: { episodeId: episode.id } })
+          .catch(() => null)
+      : Promise.resolve(null),
+    esModoEmergencia
+      ? prisma.emergencyProfile
           .findUnique({ where: { episodeId: episode.id } })
           .catch(() => null)
       : Promise.resolve(null),
@@ -273,7 +294,12 @@ export default async function ExpedientePage({
     ]
   }
 
-  const soloDiuresisInterconsulta = esInterconsulta && !esModoMedicinaInterna && !esModoQuirurgicoBase
+  const soloDiuresisInterconsulta =
+    esInterconsulta &&
+    !esModoMedicinaInterna &&
+    !esModoQuirurgicoBase &&
+    !esModoHematologia &&
+    !esModoEmergencia
   const volverHref =
     vista === 'interconsulta' || (!vista && esInterconsulta)
       ? '/dashboard?vista=interconsulta#lista-pacientes'
@@ -326,6 +352,12 @@ export default async function ExpedientePage({
   episode.gfrRecords.forEach((gfr) => emails.add(gfr.recordedBy))
   if (internalMedicineProfile?.updatedBy) {
     emails.add(internalMedicineProfile.updatedBy)
+  }
+  if (hematologyProfile?.updatedBy) {
+    emails.add(hematologyProfile.updatedBy)
+  }
+  if (emergencyProfile?.updatedBy) {
+    emails.add(emergencyProfile.updatedBy)
   }
   if (episode.anthropometryUpdatedBy) {
     emails.add(episode.anthropometryUpdatedBy)
@@ -383,6 +415,31 @@ export default async function ExpedientePage({
     emails.add(entregaPendiente.recibidoPor)
   }
 
+  const auditLogsEspecialidad =
+    esModoHematologia || esModoEmergencia
+      ? await prisma.auditLog
+          .findMany({
+            where: {
+              episodeId: episode.id,
+              entity: {
+                in: [
+                  'hematology_profile',
+                  'emergency_profile',
+                  'viral_serology',
+                  'patient',
+                  'episode',
+                ],
+              },
+            },
+            orderBy: { serverTs: 'asc' },
+            take: 150,
+            include: {
+              actor: { select: { fullName: true, email: true, role: true } },
+            },
+          })
+          .catch(() => [])
+      : []
+
   const usuarios = await prisma.user.findMany({
     where: {
       email: { in: Array.from(emails) },
@@ -392,6 +449,63 @@ export default async function ExpedientePage({
   })
   const nombres: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.fullName]))
   const roles: Record<string, string> = Object.fromEntries(usuarios.map((u) => [u.email, u.role]))
+
+  const CAMPOS_TRACK_AUDIT = [
+    'vitalSignsFrequency',
+    'bleedingWatch',
+    'painWatch',
+    'temperatureWatch',
+    'hemodynamicWatch',
+    'isolationType',
+    'oxygenSupport',
+    'pendingBloodProducts',
+    'pendingStudies',
+    'amc',
+    'specialty',
+    'triageLevel',
+    'clinicalStatus',
+    'relevantLabsStudies',
+    'interestsPending',
+    'dispositionPlan',
+  ] as const
+
+  const auditSecciones: Record<string, { byName: string; byRole: string; atIso: string }> = {}
+  for (const log of auditLogsEspecialidad) {
+    if (log.actor.email) {
+      if (!nombres[log.actor.email]) nombres[log.actor.email] = log.actor.fullName
+      if (!roles[log.actor.email]) roles[log.actor.email] = String(log.actor.role)
+    }
+    if (
+      (log.entity === 'hematology_profile' || log.entity === 'emergency_profile') &&
+      log.newValue &&
+      typeof log.newValue === 'object' &&
+      !Array.isArray(log.newValue)
+    ) {
+      const nv = log.newValue as Record<string, unknown>
+      const meta = {
+        byName: log.actor.fullName || log.actor.email,
+        byRole: String(log.actorRole || log.actor.role),
+        atIso: log.serverTs.toISOString(),
+      }
+      for (const campo of CAMPOS_TRACK_AUDIT) {
+        if (campo in nv) {
+          auditSecciones[campo] = meta
+        }
+      }
+    }
+  }
+
+  const historialCambios = [...auditLogsEspecialidad].reverse().map((log) => {
+    const desc = describirRegistro(log)
+    return {
+      id: String(log.id),
+      actorName: log.actor.fullName || log.actor.email,
+      actorRole: String(log.actorRole || log.actor.role),
+      atIso: log.serverTs.toISOString(),
+      que: desc.que,
+      detalle: desc.detalle,
+    }
+  })
 
   const esAnormal = (tipo: string, valor: number | null) => {
     if (!valor) return false
@@ -461,8 +575,12 @@ export default async function ExpedientePage({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-1 rounded-lg text-xs font-bold">
-              {esInterconsulta ? `${episode.room} · Cama ${episode.bed}` : `Hab. ${episode.room} · Cama ${episode.bed}`}
+            <span className="bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-1 rounded-lg text-xs font-bold tabular-nums">
+              {esInterconsulta
+                ? `${episode.room} · Cama ${episode.bed}`
+                : esModoEmergencia
+                  ? `Área ${episode.room} · Cama ${episode.bed}`
+                  : `Hab. ${episode.room} · Cama ${episode.bed}`}
             </span>
             <span className="hidden sm:inline-block bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded-lg text-[11px] font-bold">
               Día {diasEstancia}
@@ -594,12 +712,24 @@ export default async function ExpedientePage({
               • {episode.patient.age} años • {episode.patient.sex}
             </p>
 
-            <div className="mt-2 inline-flex flex-wrap items-center gap-2 bg-slate-200/70 border border-slate-300 px-3 py-1 rounded-lg text-xs text-slate-800">
+            <div className="mt-2 inline-flex flex-wrap items-center gap-2 bg-slate-200/70 border border-slate-300 px-3 py-1 rounded-lg text-xs text-slate-800 tabular-nums">
               <span>
-                📅 <strong>{esInterconsulta ? 'Interconsulta:' : 'Ingreso a Sala:'}</strong> {fechaHoraCompleta(episode.admissionDate)}
+                <strong>
+                  {esInterconsulta
+                    ? 'Interconsulta:'
+                    : esModoEmergencia
+                      ? 'Ingreso a Emergencia:'
+                      : 'Ingreso a Sala:'}
+                </strong>{' '}
+                {fechaHoraCompleta(episode.admissionDate)}
               </span>
               <span className="font-bold text-blue-700 bg-white px-2 py-0.5 rounded shadow-2xs">
-                Día {diasEstancia} de {esInterconsulta ? 'interconsulta' : 'internamiento'}
+                Día {diasEstancia}{' '}
+                {esInterconsulta
+                  ? 'de interconsulta'
+                  : esModoEmergencia
+                    ? 'en Emergencia'
+                    : 'de internamiento'}
               </span>
             </div>
           </div>
@@ -786,8 +916,14 @@ export default async function ExpedientePage({
 
             {/* UBICACIÓN */}
             <div className="relative">
-              <div className="bg-blue-100 text-blue-900 px-3.5 py-1.5 rounded-lg font-bold border border-blue-200 text-sm md:text-base flex items-center gap-2">
-                <span>{esInterconsulta ? `${episode.room} - Cama ${episode.bed}` : `Hab. ${episode.room} - Cama ${episode.bed}`}</span>
+              <div className="bg-blue-100 text-blue-900 px-3.5 py-1.5 rounded-lg font-bold border border-blue-200 text-sm md:text-base flex items-center gap-2 tabular-nums">
+                <span>
+                  {esInterconsulta
+                    ? `${episode.room} - Cama ${episode.bed}`
+                    : esModoEmergencia
+                      ? `Área ${episode.room} - Cama ${episode.bed}`
+                      : `Hab. ${episode.room} - Cama ${episode.bed}`}
+                </span>
                 {permisos.puedeRegistrar && (
                   <details className="inline-block relative">
                     <summary className="list-none cursor-pointer text-xs bg-white text-blue-700 px-2 py-0.5 rounded border border-blue-300 hover:bg-blue-50 font-normal">
@@ -1028,6 +1164,52 @@ export default async function ExpedientePage({
               roles={roles}
               puedeRegistrar={permisos.puedeRegistrar}
             />
+          ) : esModoHematologia ? (
+            <BloqueHematologia
+              episodeId={episode.id}
+              perfil={hematologyProfile}
+              virales={episode.viralSerologies[0] ?? null}
+              tipificacion={{
+                bloodType: episode.patient.bloodType,
+                recordedBy: episode.patient.bloodTypeRecordedBy,
+                updatedAt: episode.patient.bloodTypeUpdatedAt,
+              }}
+              antropometria={{
+                weight: episode.anthropometryWeight,
+                weightUnit: episode.anthropometryWeightUnit,
+                heightCm: episode.anthropometryHeightCm,
+                updatedBy: episode.anthropometryUpdatedBy,
+                updatedAt: episode.anthropometryUpdatedAt,
+              }}
+              nombres={nombres}
+              roles={roles}
+              auditSecciones={auditSecciones}
+              historialCambios={historialCambios}
+              puedeRegistrar={permisos.puedeRegistrar}
+            />
+          ) : esModoEmergencia ? (
+            <BloqueEmergencia
+              episodeId={episode.id}
+              perfil={emergencyProfile}
+              virales={episode.viralSerologies[0] ?? null}
+              tipificacion={{
+                bloodType: episode.patient.bloodType,
+                recordedBy: episode.patient.bloodTypeRecordedBy,
+                updatedAt: episode.patient.bloodTypeUpdatedAt,
+              }}
+              antropometria={{
+                weight: episode.anthropometryWeight,
+                weightUnit: episode.anthropometryWeightUnit,
+                heightCm: episode.anthropometryHeightCm,
+                updatedBy: episode.anthropometryUpdatedBy,
+                updatedAt: episode.anthropometryUpdatedAt,
+              }}
+              nombres={nombres}
+              roles={roles}
+              auditSecciones={auditSecciones}
+              historialCambios={historialCambios}
+              puedeRegistrar={permisos.puedeRegistrar}
+            />
           ) : (
             <BloqueNefrologico
               episodeId={episode.id}
@@ -1072,20 +1254,29 @@ export default async function ExpedientePage({
           <div className="lg:col-span-1 space-y-6 print:hidden">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
               <h2 className="text-lg font-bold text-slate-800 border-b pb-2 mb-4">
-                {esInterconsulta ? 'Datos de la Interconsulta' : 'Datos del Ingreso a Sala'}
+                {esInterconsulta
+                  ? 'Datos de la Interconsulta'
+                  : esModoEmergencia
+                    ? 'Datos de Ingreso a Emergencia'
+                    : 'Datos del Ingreso a Sala'}
               </h2>
               
               <div className="space-y-2 text-sm text-slate-700">
                 <p>
                   <strong>{esInterconsulta ? 'Fecha de Solicitud:' : 'Fecha y Hora de Ingreso:'}</strong>
-                  <span className="block text-xs font-semibold text-blue-800 mt-0.5">
+                  <span className="block text-xs font-semibold text-blue-800 mt-0.5 tabular-nums">
                     {fechaHoraCompleta(episode.admissionDate)}
                   </span>
                 </p>
                 <p>
                   <strong>Tiempo de Estancia:</strong>{' '}
-                  <span className="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
-                    Día {diasEstancia} de {esInterconsulta ? 'interconsulta' : 'internamiento'}
+                  <span className="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded tabular-nums">
+                    Día {diasEstancia}{' '}
+                    {esInterconsulta
+                      ? 'de interconsulta'
+                      : esModoEmergencia
+                        ? 'en Emergencia'
+                        : 'de internamiento'}
                   </span>
                 </p>
 

@@ -474,6 +474,7 @@ export async function guardarVirales(formData: FormData): Promise<void> {
 
   const status = String(formData.get('status') ?? 'negativo')
   const details = String(formData.get('details') ?? '').trim()
+  const detailsFinal = status === 'negativo' ? 'No reactivo / Negativo' : details
 
   const existente = await prisma.viralSerology.findFirst({
     where: { episodeId },
@@ -485,7 +486,7 @@ export async function guardarVirales(formData: FormData): Promise<void> {
       where: { id: existente.id },
       data: {
         status,
-        details: status === 'negativo' ? 'No reactivo / Negativo' : details,
+        details: detailsFinal,
         recordedBy: email,
       },
     })
@@ -495,7 +496,7 @@ export async function guardarVirales(formData: FormData): Promise<void> {
         patientId: episode.patientId,
         episodeId,
         status,
-        details: status === 'negativo' ? 'No reactivo / Negativo' : details,
+        details: detailsFinal,
         recordedBy: email,
       },
     })
@@ -506,9 +507,13 @@ export async function guardarVirales(formData: FormData): Promise<void> {
     actorRole: role,
     action: 'update',
     entity: 'viral_serology',
+    entityId: existente?.id,
     patientId: episode.patientId,
     episodeId,
-    newValue: { status, details },
+    oldValue: existente
+      ? { status: existente.status, details: existente.details }
+      : null,
+    newValue: { status, details: detailsFinal, recordedBy: email, actorRole: role },
     reason: 'Actualización de marcadores virales',
   })
 
@@ -572,6 +577,11 @@ export async function guardarTipificacion(formData: FormData): Promise<void> {
   const bloodType = String(formData.get('bloodType') ?? '').trim().toUpperCase()
   if (!bloodType) volverAlExpediente(episodeId, 'Selecciona o escribe el tipo de sangre')
 
+  const prevPatient = await prisma.patient.findUnique({
+    where: { id: episode.patientId },
+    select: { bloodType: true },
+  })
+
   await prisma.patient.update({
     where: { id: episode.patientId },
     data: {
@@ -589,7 +599,8 @@ export async function guardarTipificacion(formData: FormData): Promise<void> {
     entityId: episode.patientId,
     patientId: episode.patientId,
     episodeId,
-    newValue: { tipificacion: bloodType },
+    oldValue: { tipificacion: prevPatient?.bloodType ?? null },
+    newValue: { tipificacion: bloodType, recordedBy: email, actorRole: role },
     reason: 'Registro de tipificación sanguínea',
   })
 
@@ -2016,4 +2027,343 @@ export async function retirarDrenaje(formData: FormData): Promise<{
 
   revalidatePath(`/dashboard/paciente/${episodeId}`)
   return { ok: true }
+}
+
+// ─── 22. PERFIL CLÍNICO DE HEMATOLOGÍA ───
+const CAMPOS_HEMATOLOGIA = [
+  'vitalSignsFrequency',
+  'bleedingWatch',
+  'painWatch',
+  'temperatureWatch',
+  'hemodynamicWatch',
+  'pendingBloodProducts',
+  'pendingStudies',
+  'isolationType',
+  'oxygenSupport',
+  'hematologicSummary',
+] as const
+
+type CampoHematologia = (typeof CAMPOS_HEMATOLOGIA)[number]
+
+export async function actualizarCampoHematologia(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const field = String(formData.get('field') ?? '').trim() as CampoHematologia
+  const value = String(formData.get('value') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  if (!CAMPOS_HEMATOLOGIA.includes(field)) {
+    volverAlExpediente(episodeId, 'Campo de Hematología no válido')
+  }
+
+  const previo = await prisma.hematologyProfile.findUnique({ where: { episodeId } })
+  const valorFinal =
+    field === 'vitalSignsFrequency' || field === 'isolationType' || field === 'oxygenSupport'
+      ? value || (field === 'vitalSignsFrequency' ? 'c/8 horas' : field === 'isolationType' ? 'Sin aislamiento' : 'Aire ambiente')
+      : value || null
+
+  await prisma.hematologyProfile.upsert({
+    where: { episodeId },
+    update: {
+      [field]: valorFinal,
+      updatedBy: email,
+    },
+    create: {
+      episodeId,
+      [field]: valorFinal,
+      updatedBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'hematology_profile',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: { [field]: previo ? (previo as Record<string, unknown>)[field] ?? null : null },
+    newValue: { [field]: valorFinal, actualizadoPor: email, actorRole: role },
+    reason: `Actualización de Hematología (${field})`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+export async function actualizarResumenHematologiaDashboard(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const episodeId = String(formData.get('episodeId') ?? '').trim()
+    if (!episodeId) return { ok: false, error: 'Expediente inválido.' }
+    const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+    const str = (k: string) => String(formData.get(k) ?? '').trim() || null
+    const room = String(formData.get('room') ?? '').trim()
+    const bed = String(formData.get('bed') ?? '').trim()
+    const primaryDiagnosis = String(formData.get('primaryDiagnosis') ?? '').trim()
+    const vitalSignsFrequency = String(formData.get('vitalSignsFrequency') ?? 'c/8 horas').trim() || 'c/8 horas'
+    const bleedingWatch = str('bleedingWatch')
+    const painWatch = str('painWatch')
+    const temperatureWatch = str('temperatureWatch')
+    const hemodynamicWatch = str('hemodynamicWatch')
+    const pendingBloodProducts = str('pendingBloodProducts')
+    const pendingStudies = str('pendingStudies')
+
+    const [prevEpisode, prevProfile] = await Promise.all([
+      prisma.episode.findUnique({
+        where: { id: episodeId },
+        select: { room: true, bed: true, primaryDiagnosis: true },
+      }),
+      prisma.hematologyProfile.findUnique({
+        where: { episodeId },
+      }),
+    ])
+
+    await Promise.all([
+      prisma.episode.update({
+        where: { id: episodeId },
+        data: {
+          ...(room ? { room } : {}),
+          ...(bed ? { bed } : {}),
+          ...(primaryDiagnosis ? { primaryDiagnosis } : {}),
+        },
+      }),
+      prisma.hematologyProfile.upsert({
+        where: { episodeId },
+        update: {
+          vitalSignsFrequency,
+          bleedingWatch,
+          painWatch,
+          temperatureWatch,
+          hemodynamicWatch,
+          pendingBloodProducts,
+          pendingStudies,
+          updatedBy: email,
+        },
+        create: {
+          episodeId,
+          vitalSignsFrequency,
+          bleedingWatch,
+          painWatch,
+          temperatureWatch,
+          hemodynamicWatch,
+          pendingBloodProducts,
+          pendingStudies,
+          updatedBy: email,
+        },
+      }),
+    ])
+
+    await logAudit({
+      actorId: userId,
+      actorRole: role,
+      action: 'update',
+      entity: 'hematology_profile',
+      entityId: episodeId,
+      patientId: episode.patientId,
+      episodeId,
+      oldValue: {
+        room: prevEpisode?.room ?? null,
+        bed: prevEpisode?.bed ?? null,
+        primaryDiagnosis: prevEpisode?.primaryDiagnosis ?? null,
+        vitalSignsFrequency: prevProfile?.vitalSignsFrequency ?? null,
+        bleedingWatch: prevProfile?.bleedingWatch ?? null,
+        painWatch: prevProfile?.painWatch ?? null,
+        temperatureWatch: prevProfile?.temperatureWatch ?? null,
+        hemodynamicWatch: prevProfile?.hemodynamicWatch ?? null,
+        pendingBloodProducts: prevProfile?.pendingBloodProducts ?? null,
+        pendingStudies: prevProfile?.pendingStudies ?? null,
+      },
+      newValue: {
+        room: room || prevEpisode?.room || null,
+        bed: bed || prevEpisode?.bed || null,
+        primaryDiagnosis: primaryDiagnosis || prevEpisode?.primaryDiagnosis || null,
+        vitalSignsFrequency,
+        bleedingWatch,
+        painWatch,
+        temperatureWatch,
+        hemodynamicWatch,
+        pendingBloodProducts,
+        pendingStudies,
+        actualizadoPor: email,
+        actorRole: role,
+      },
+      reason: 'Actualización de Pase de Visita de Hematología',
+    })
+
+    revalidatePath('/dashboard')
+    revalidatePath(`/dashboard/paciente/${episodeId}`)
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo actualizar el registro de Hematología.' }
+  }
+}
+
+// ─── 23. PERFIL CLÍNICO DE EMERGENCIA ───
+const CAMPOS_EMERGENCIA = [
+  'amc',
+  'specialty',
+  'relevantLabsStudies',
+  'interestsPending',
+  'triageLevel',
+  'clinicalStatus',
+  'oxygenSupport',
+  'dispositionPlan',
+] as const
+
+type CampoEmergencia = (typeof CAMPOS_EMERGENCIA)[number]
+
+export async function actualizarCampoEmergencia(formData: FormData): Promise<void> {
+  const episodeId = String(formData.get('episodeId') ?? '')
+  const field = String(formData.get('field') ?? '').trim() as CampoEmergencia
+  const value = String(formData.get('value') ?? '').trim()
+  const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+  if (!CAMPOS_EMERGENCIA.includes(field)) {
+    volverAlExpediente(episodeId, 'Campo de Emergencia no válido')
+  }
+
+  const previo = await prisma.emergencyProfile.findUnique({ where: { episodeId } })
+  const valorFinal =
+    field === 'triageLevel' || field === 'clinicalStatus' || field === 'oxygenSupport'
+      ? value || (field === 'triageLevel' ? 'Emergencia' : field === 'clinicalStatus' ? 'En observación' : 'Aire ambiente')
+      : value || null
+
+  await prisma.emergencyProfile.upsert({
+    where: { episodeId },
+    update: {
+      [field]: valorFinal,
+      updatedBy: email,
+    },
+    create: {
+      episodeId,
+      [field]: valorFinal,
+      updatedBy: email,
+    },
+  })
+
+  await logAudit({
+    actorId: userId,
+    actorRole: role,
+    action: 'update',
+    entity: 'emergency_profile',
+    entityId: episodeId,
+    patientId: episode.patientId,
+    episodeId,
+    oldValue: { [field]: previo ? (previo as Record<string, unknown>)[field] ?? null : null },
+    newValue: { [field]: valorFinal, actualizadoPor: email, actorRole: role },
+    reason: `Actualización de Emergencia (${field})`,
+  })
+
+  revalidatePath(`/dashboard/paciente/${episodeId}`)
+  revalidatePath('/dashboard')
+}
+
+export async function actualizarResumenEmergenciaDashboard(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const episodeId = String(formData.get('episodeId') ?? '').trim()
+    if (!episodeId) return { ok: false, error: 'Expediente inválido.' }
+    const { userId, role, email, episode } = await exigirPermiso(episodeId, 'registrar')
+
+    const str = (k: string) => String(formData.get(k) ?? '').trim() || null
+    const room = String(formData.get('room') ?? '').trim()
+    const bed = String(formData.get('bed') ?? '').trim()
+    const primaryDiagnosis = String(formData.get('primaryDiagnosis') ?? '').trim()
+    const amc = str('amc')
+    const specialty = str('specialty')
+    const relevantLabsStudies = str('relevantLabsStudies')
+    const interestsPending = str('interestsPending')
+    const triageLevel = String(formData.get('triageLevel') ?? 'Emergencia').trim() || 'Emergencia'
+    const clinicalStatus = String(formData.get('clinicalStatus') ?? 'En observación').trim() || 'En observación'
+
+    const [prevEpisode, prevProfile] = await Promise.all([
+      prisma.episode.findUnique({
+        where: { id: episodeId },
+        select: { room: true, bed: true, primaryDiagnosis: true },
+      }),
+      prisma.emergencyProfile.findUnique({
+        where: { episodeId },
+      }),
+    ])
+
+    await Promise.all([
+      prisma.episode.update({
+        where: { id: episodeId },
+        data: {
+          ...(room ? { room } : {}),
+          ...(bed ? { bed } : {}),
+          ...(primaryDiagnosis ? { primaryDiagnosis } : {}),
+        },
+      }),
+      prisma.emergencyProfile.upsert({
+        where: { episodeId },
+        update: {
+          amc,
+          specialty,
+          relevantLabsStudies,
+          interestsPending,
+          triageLevel,
+          clinicalStatus,
+          updatedBy: email,
+        },
+        create: {
+          episodeId,
+          amc,
+          specialty,
+          relevantLabsStudies,
+          interestsPending,
+          triageLevel,
+          clinicalStatus,
+          updatedBy: email,
+        },
+      }),
+    ])
+
+    await logAudit({
+      actorId: userId,
+      actorRole: role,
+      action: 'update',
+      entity: 'emergency_profile',
+      entityId: episodeId,
+      patientId: episode.patientId,
+      episodeId,
+      oldValue: {
+        room: prevEpisode?.room ?? null,
+        bed: prevEpisode?.bed ?? null,
+        primaryDiagnosis: prevEpisode?.primaryDiagnosis ?? null,
+        amc: prevProfile?.amc ?? null,
+        specialty: prevProfile?.specialty ?? null,
+        relevantLabsStudies: prevProfile?.relevantLabsStudies ?? null,
+        interestsPending: prevProfile?.interestsPending ?? null,
+        triageLevel: prevProfile?.triageLevel ?? null,
+        clinicalStatus: prevProfile?.clinicalStatus ?? null,
+      },
+      newValue: {
+        room: room || prevEpisode?.room || null,
+        bed: bed || prevEpisode?.bed || null,
+        primaryDiagnosis: primaryDiagnosis || prevEpisode?.primaryDiagnosis || null,
+        amc,
+        specialty,
+        relevantLabsStudies,
+        interestsPending,
+        triageLevel,
+        clinicalStatus,
+        actualizadoPor: email,
+        actorRole: role,
+      },
+      reason: 'Actualización de paciente en tabla de Emergencia',
+    })
+
+    revalidatePath('/dashboard')
+    revalidatePath(`/dashboard/paciente/${episodeId}`)
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo actualizar el paciente de Emergencia.' }
+  }
 }

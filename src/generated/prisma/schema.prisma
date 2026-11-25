@@ -24,6 +24,8 @@ enum InterfaceMode {
   MEDICINA_INTERNA
   CIRUGIA
   ORTOPEDIA
+  EMERGENCIA
+  HEMATOLOGIA
 }
 
 enum PlanStatus {
@@ -66,14 +68,16 @@ model Residency {
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 
-  users             User[]
-  patients          Patient[]
-  episodes          Episode[]
-  consultations     Consultation[]
-  payments          SubscriptionPayment[]
-  surgicalDevices   SurgicalDevice[]
-  woundCares        WoundCare[]
-  hemodialysisItems HemodialysisItem[]
+  users                  User[]
+  patients               Patient[]
+  episodes               Episode[]
+  consultations          Consultation[]
+  payments               SubscriptionPayment[]
+  surgicalDevices        SurgicalDevice[]
+  woundCares             WoundCare[]
+  hemodialysisItems      HemodialysisItem[]
+  biopsyRecords          BiopsyRecord[]
+  outpatientHemodialyses OutpatientHemodialysis[]
 }
 
 model SubscriptionPayment {
@@ -169,12 +173,14 @@ model Patient {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  residency       Residency?      @relation(fields: [residencyId], references: [id])
-  episodes        Episode[]
-  consultations   Consultation[]
-  allergies       Allergy[]
-  medicalHistory  MedicalHistory?
-  viralSerologies ViralSerology[]
+  residency              Residency?               @relation(fields: [residencyId], references: [id])
+  episodes               Episode[]
+  consultations          Consultation[]
+  allergies              Allergy[]
+  medicalHistory         MedicalHistory?
+  viralSerologies        ViralSerology[]
+  biopsyRecords          BiopsyRecord[]
+  outpatientHemodialyses OutpatientHemodialysis[]
 
   @@unique([residencyId, expedienteNumber])
   @@index([residencyId])
@@ -239,6 +245,8 @@ model Episode {
   vascularAccesses          VascularAccess[]
   internalMedicineProfile   InternalMedicineProfile?
   surgicalProfile           SurgicalProfile?
+  hematologyProfile         HematologyProfile?
+  emergencyProfile          EmergencyProfile?
   antibiotics               EpisodeAntibiotic[]
   surgicalDevices           SurgicalDevice[]
   baseDepartmentPlanEntries BaseDepartmentPlanEntry[]
@@ -259,6 +267,7 @@ model Consultation {
   consultationDate DateTime  @default(now()) @db.Timestamptz
   status           String    @default("PROGRAMADA")
   visitType        String    @default("Primera vez")
+  consultationType String    @default("Consulta general")
   chiefComplaint   String
   bloodPressure    String?
   heartRate        Int?
@@ -306,6 +315,146 @@ model InternalMedicineProfile {
   updatedAt          DateTime @updatedAt
 
   episode Episode @relation(fields: [episodeId], references: [id])
+}
+
+// ─── PERFIL CLÍNICO DE HEMATOLOGÍA ───
+model HematologyProfile {
+  id                   String   @id @default(cuid())
+  episodeId            String   @unique
+  vitalSignsFrequency  String   @default("c/8 horas")
+  bleedingWatch        String?
+  painWatch            String?
+  temperatureWatch     String?
+  hemodynamicWatch     String?
+  pendingBloodProducts String?
+  pendingStudies       String?
+  isolationType        String   @default("Sin aislamiento")
+  oxygenSupport        String   @default("Aire ambiente")
+  hematologicSummary   String?
+  updatedBy            String
+  updatedAt            DateTime @updatedAt
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+}
+
+// ─── PERFIL CLÍNICO DE EMERGENCIA ───
+model EmergencyProfile {
+  id                  String   @id @default(cuid())
+  episodeId           String   @unique
+  amc                 String?
+  specialty           String?
+  relevantLabsStudies String?
+  interestsPending    String?
+  triageLevel         String   @default("Emergencia")
+  clinicalStatus      String   @default("En observación")
+  oxygenSupport       String   @default("Aire ambiente")
+  dispositionPlan     String?
+  updatedBy           String
+  updatedAt           DateTime @updatedAt
+
+  episode Episode @relation(fields: [episodeId], references: [id])
+}
+
+// ─── AGENDA Y RESULTADOS DE BIOPSIAS (CONSULTA EXTERNA) ───
+model BiopsyRecord {
+  id              String    @id @default(cuid())
+  residencyId     String
+  patientId       String?
+  status          String    @default("agendada") // agendada | realizada
+  patientName     String
+  phone           String?
+  labsStatus      String?
+  needleStatus    String?
+  kitStatus       String?
+  scheduledDate   String?
+  senasaAuth      String?
+  note            String?
+  performedDate   String?
+  complications   String?
+  report          String?
+  highlightTag    String    @default("normal") // normal | programada | alerta | completada
+  createdBy       String
+  createdByName   String
+  createdByRole   String
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+  updatedBy       String?
+  updatedByName   String?
+  updatedByRole   String?
+  updatedAt       DateTime? @db.Timestamptz
+  performedBy     String?
+  performedByName String?
+  performedByRole String?
+  performedAt     DateTime? @db.Timestamptz
+
+  residency Residency @relation(fields: [residencyId], references: [id])
+  patient   Patient?  @relation(fields: [patientId], references: [id])
+
+  @@index([residencyId, status])
+  @@index([residencyId, createdAt])
+}
+
+// ─── EXPEDIENTES AMBULATORIOS DE HEMODIÁLISIS (CONSULTA EXTERNA) ───
+model OutpatientHemodialysis {
+  id                     String    @id @default(cuid())
+  residencyId            String
+  patientId              String?
+  firstName              String
+  lastName               String
+  expedienteNumber       String?
+  age                    Int?
+  sex                    String?
+  phone                  String?
+  cedula                 String?
+  bloodType              String?
+  diagnosisAndTime       String?
+  medications            String?
+  allergies              String?
+  allergyReaction        String?
+  transfusions           String?
+  referredFromCenter     String?
+  firstTimeInCenter      String?
+  otherDialysisModality  String?
+  pathologicalHistory    String?
+  surgicalHistory        String?
+  familyHistory          String?
+  habitCoffee            String?
+  habitTobacco           String?
+  habitAlcohol           String?
+  habitDrugs             String?
+  habitOther             String?
+  viralHiv               String?
+  viralHbsag             String?
+  viralHvc               String?
+  labHgb                 String?
+  labHct                 String?
+  labUrea                String?
+  labCr                  String?
+  labK                   String?
+  labBloodType           String?
+  labOther               String?
+  imagingSonography      String?
+  imagingCt              String?
+  imagingOther           String?
+  accessAvFistula        String?
+  accessGraft            String?
+  accessTunneledCatheter String?
+  accessFavi             String?
+  clinicalNotes          String?
+  isActive               Boolean   @default(true)
+  createdBy              String
+  createdByName          String
+  createdByRole          String
+  createdAt              DateTime  @default(now()) @db.Timestamptz
+  updatedBy              String?
+  updatedByName          String?
+  updatedByRole          String?
+  updatedAt              DateTime? @db.Timestamptz
+
+  residency Residency @relation(fields: [residencyId], references: [id])
+  patient   Patient?  @relation(fields: [patientId], references: [id])
+
+  @@index([residencyId, isActive])
+  @@index([residencyId, createdAt])
 }
 
 // ─── PERFIL QUIRÚRGICO Y ORTOPÉDICO (INTERFAZ DE CIRUGÍA / ORTOPEDIA) ───

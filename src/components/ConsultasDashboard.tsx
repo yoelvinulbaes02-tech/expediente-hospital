@@ -3,15 +3,24 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ClipboardCopy, FolderArchive, PlusCircle, Users } from 'lucide-react'
-import { etiquetaRolClinico, normalizarTextoClinico } from '@/lib/consultas-auth'
+import { ChevronDown, ClipboardCopy, FolderArchive, History, PlusCircle, Users } from 'lucide-react'
+import {
+  TIPOS_CONSULTA_EXTERNA,
+  etiquetaRolClinico,
+  normalizarTextoClinico,
+  type BiopsyRecordItem,
+  type OutpatientHemodialysisItem,
+} from '@/lib/consultas-auth'
 import { cambiarEstadoConsulta, crearConsulta } from '@/app/dashboard/consultas/actions'
+import { BiopsiasConsultaPanel } from '@/components/BiopsiasConsultaPanel'
+import { HemodialisisConsultaPanel } from '@/components/HemodialisisConsultaPanel'
 
 type ConsultaItem = {
   id: string
   consultationDate: string
   updatedAt: string
   status: string
+  consultationType: string
   visitType: string
   chiefComplaint: string
   diagnosis: string | null
@@ -24,6 +33,8 @@ type ConsultaItem = {
   doctorId: string | null
   doctorName: string | null
   doctorRole: string | null
+  updatedByName?: string | null
+  updatedByRole?: string | null
   patient: {
     id: string
     firstName: string
@@ -127,6 +138,10 @@ export function ConsultasDashboard({
   puedeRegistrar,
   suscripcionBloqueada,
   consultaRecienCerrada = false,
+  biopsias = [],
+  hemodialisis = [],
+  historialActividad = [],
+  vistaInicial = 'consultas',
 }: {
   consultas: ConsultaItem[]
   pacientes: PacienteResumen[]
@@ -136,14 +151,27 @@ export function ConsultasDashboard({
   puedeRegistrar: boolean
   suscripcionBloqueada: boolean
   consultaRecienCerrada?: boolean
+  biopsias?: BiopsyRecordItem[]
+  hemodialisis?: OutpatientHemodialysisItem[]
+  historialActividad?: Array<{
+    id: string
+    actorName: string
+    actorRole: string
+    atIso: string
+    que: string
+    detalle: string
+  }>
+  vistaInicial?: 'consultas' | 'biopsias' | 'hemodialisis'
 }) {
   const router = useRouter()
+  const [areaTab, setAreaTab] = useState<'consultas' | 'biopsias' | 'hemodialisis'>(vistaInicial)
   const [busqueda, setBusqueda] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [patientMode, setPatientMode] = useState<'new' | 'existing'>('new')
   const [selectedExistingId, setSelectedExistingId] = useState('')
   const [nombreNuevo, setNombreNuevo] = useState('')
   const [apellidoNuevo, setApellidoNuevo] = useState('')
+  const [consultationTypeInput, setConsultationTypeInput] = useState<string>('Consulta general')
   const [motivoInput, setMotivoInput] = useState('')
   const [visitTypeInput, setVisitTypeInput] = useState('Primera vez')
   const [initialStatusInput, setInitialStatusInput] = useState('EN_SALA')
@@ -151,6 +179,28 @@ export function ConsultasDashboard({
   const [abrirAlCrear, setAbrirAlCrear] = useState(true)
   const [enviando, setEnviando] = useState(false)
   const [actualizandoId, setActualizandoId] = useState<string | null>(null)
+
+  const cambiarAreaTab = (tab: 'consultas' | 'biopsias' | 'hemodialisis') => {
+    setAreaTab(tab)
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      if (tab === 'consultas') {
+        url.searchParams.delete('vista')
+      } else {
+        url.searchParams.set('vista', tab)
+      }
+      window.history.replaceState(null, '', url.pathname + url.search)
+    }
+  }
+
+  const biopsiasAgendadasCount = useMemo(
+    () => biopsias.filter((b) => b.status === 'agendada').length,
+    [biopsias]
+  )
+  const hemodialisisActivosCount = useMemo(
+    () => hemodialisis.filter((h) => h.isActive).length,
+    [hemodialisis]
+  )
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(
     consultaRecienCerrada
       ? {
@@ -236,6 +286,7 @@ export function ConsultasDashboard({
             c.patient.expedienteNumber,
             c.patient.cedula,
             c.patient.phone,
+            c.consultationType,
             c.chiefComplaint,
             c.diagnosis,
             c.doctorName,
@@ -254,7 +305,7 @@ export function ConsultasDashboard({
 
     for (const c of cerradasOrdenadas) {
       const textoExtra = normalizarTextoClinico(
-        [c.chiefComplaint, c.diagnosis, c.treatmentPlan, c.notes, c.doctorName]
+        [c.consultationType, c.chiefComplaint, c.diagnosis, c.treatmentPlan, c.notes, c.doctorName]
           .filter(Boolean)
           .join(' ')
       )
@@ -299,9 +350,11 @@ export function ConsultasDashboard({
   const defaultFechaHora = new Date().toISOString().slice(0, 16)
 
   const abrirNuevaVisitaConCopia = (patientId: string, consultaOrigen: ConsultaItem) => {
+    setAreaTab('consultas')
     setPatientMode('existing')
     setSelectedExistingId(patientId)
     setSourceConsultationId(consultaOrigen.id)
+    setConsultationTypeInput(consultaOrigen.consultationType || 'Consulta general')
     setMotivoInput('Control de seguimiento')
     setVisitTypeInput('Seguimiento')
     setInitialStatusInput('EN_CONSULTA')
@@ -337,6 +390,7 @@ export function ConsultasDashboard({
       setNombreNuevo('')
       setApellidoNuevo('')
       setSelectedExistingId('')
+      setConsultationTypeInput('Consulta general')
       setMotivoInput('')
       setVisitTypeInput('Primera vez')
       setInitialStatusInput('EN_SALA')
@@ -369,22 +423,76 @@ export function ConsultasDashboard({
           </h2>
         </div>
 
-        {puedeRegistrar && !suscripcionBloqueada && (
-          <button
-            type="button"
-            onClick={() => {
-              setMostrarFormulario((v) => !v)
-              if (mostrarFormulario) {
-                setSourceConsultationId('')
-              }
-            }}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
-          >
-            {mostrarFormulario ? 'Cerrar formulario' : '+ Nueva Consulta / Cita'}
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl">
+            <button
+              type="button"
+              onClick={() => cambiarAreaTab('consultas')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                areaTab === 'consultas'
+                  ? 'bg-teal-600 text-white'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+              }`}
+            >
+              Consultas ({consultasActivas.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => cambiarAreaTab('biopsias')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                areaTab === 'biopsias'
+                  ? 'bg-teal-600 text-white'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+              }`}
+            >
+              Biopsias ({biopsiasAgendadasCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => cambiarAreaTab('hemodialisis')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                areaTab === 'hemodialisis'
+                  ? 'bg-teal-600 text-white'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+              }`}
+            >
+              Hemodiálisis ({hemodialisisActivosCount})
+            </button>
+          </div>
+
+          {areaTab === 'consultas' && puedeRegistrar && !suscripcionBloqueada && (
+            <button
+              type="button"
+              onClick={() => {
+                setMostrarFormulario((v) => !v)
+                if (mostrarFormulario) {
+                  setSourceConsultationId('')
+                }
+              }}
+              className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            >
+              {mostrarFormulario ? 'Cerrar formulario' : '+ Nueva Consulta / Cita'}
+            </button>
+          )}
+        </div>
       </div>
 
+      {areaTab === 'biopsias' ? (
+        <BiopsiasConsultaPanel
+          records={biopsias}
+          pacientes={catalogoPacientes}
+          puedeRegistrar={puedeRegistrar}
+          suscripcionBloqueada={suscripcionBloqueada}
+        />
+      ) : areaTab === 'hemodialisis' ? (
+        <HemodialisisConsultaPanel
+          records={hemodialisis}
+          pacientes={catalogoPacientes}
+          puedeRegistrar={puedeRegistrar}
+          suscripcionBloqueada={suscripcionBloqueada}
+        />
+      ) : (
+        <>
       {mensaje && (
         <div
           className={`px-4 py-3 rounded-lg border text-sm flex justify-between items-center gap-3 ${
@@ -444,6 +552,30 @@ export function ConsultasDashboard({
 
           <input type="hidden" name="patientMode" value={patientMode} />
           <input type="hidden" name="sourceConsultationId" value={sourceConsultationId} />
+          <input type="hidden" name="consultationType" value={consultationTypeInput} />
+
+          {/* RENGLÓN INICIAL: TIPO DE CONSULTA */}
+          <div className="rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20 p-3.5 space-y-2">
+            <label className="block text-xs font-bold text-teal-900 dark:text-teal-200">
+              Tipo de consulta *
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {TIPOS_CONSULTA_EXTERNA.map((tipo) => (
+                <button
+                  key={tipo}
+                  type="button"
+                  onClick={() => setConsultationTypeInput(tipo)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer whitespace-nowrap ${
+                    consultationTypeInput === tipo
+                      ? 'bg-teal-600 text-white border-teal-600'
+                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  {tipo}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {patientMode === 'existing' ? (
             <div>
@@ -849,6 +981,10 @@ export function ConsultasDashboard({
                     {fmtFechaHora(c.consultationDate)}
                   </span>
                   <span aria-hidden="true">·</span>
+                  <span className="font-semibold text-teal-700 dark:text-teal-300">
+                    {c.consultationType || 'Consulta general'}
+                  </span>
+                  <span aria-hidden="true">·</span>
                   <span className="font-medium">{c.visitType}</span>
                   <span aria-hidden="true">·</span>
                   <span className={`px-2 py-0.5 rounded border text-[11px] font-bold ${meta.clase}`}>
@@ -875,6 +1011,12 @@ export function ConsultasDashboard({
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     Médico: <strong>{c.doctorName}</strong>
                     {c.doctorRole ? ` (${etiquetaRolClinico(c.doctorRole)})` : ''}
+                  </p>
+                )}
+                {c.updatedByName && (
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">
+                    Última modif.: {c.updatedByName}
+                    {c.updatedByRole ? ` (${etiquetaRolClinico(c.updatedByRole)})` : ''} · {fmtFechaHora(c.updatedAt)}
                   </p>
                 )}
               </div>
@@ -928,10 +1070,7 @@ export function ConsultasDashboard({
       </div>
 
       {/* 2. CARPETA SEPARADA: EXPEDIENTES CERRADOS AGRUPADOS EN UN RETRAÍBLE POR PACIENTE */}
-      <details
-        open={Boolean(busqueda.trim()) && cerradosAgrupadosPorPaciente.length > 0}
-        className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
-      >
+      <details className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
         <summary className="list-none cursor-pointer px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2.5 min-w-0">
             <ChevronDown className="w-4 h-4 text-slate-500 transition-transform group-open:rotate-0 -rotate-90 shrink-0" />
@@ -966,7 +1105,6 @@ export function ConsultasDashboard({
               return (
                 <details
                   key={patient.id}
-                  open={Boolean(busqueda.trim())}
                   className="group/pac bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden"
                 >
                   <summary className="list-none cursor-pointer px-4 py-3.5 flex flex-col sm:flex-row sm:items-start justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-700/40 [&::-webkit-details-marker]:hidden">
@@ -1048,6 +1186,10 @@ export function ConsultasDashboard({
                                 #{idx + 1} · {fmtFechaHora(c.consultationDate)}
                               </span>
                               <span aria-hidden="true">·</span>
+                              <span className="font-semibold text-teal-700 dark:text-teal-300">
+                                {c.consultationType || 'Consulta general'}
+                              </span>
+                              <span aria-hidden="true">·</span>
                               <span>{c.visitType}</span>
                               <span className={`px-2 py-0.5 rounded border text-[10px] font-bold ${meta.clase}`}>
                                 {meta.label}
@@ -1075,6 +1217,12 @@ export function ConsultasDashboard({
                             <p className="text-[11px] text-slate-500 dark:text-slate-400">
                               <strong>Motivo:</strong> {c.chiefComplaint}
                             </p>
+                            {c.updatedByName && (
+                              <p className="text-[10px] text-slate-400 dark:text-slate-500 tabular-nums">
+                                Última modif.: {c.updatedByName}
+                                {c.updatedByRole ? ` (${etiquetaRolClinico(c.updatedByRole)})` : ''} · {fmtFechaHora(c.updatedAt)}
+                              </p>
+                            )}
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -1106,6 +1254,44 @@ export function ConsultasDashboard({
           )}
         </div>
       </details>
+        </>
+      )}
+
+      {historialActividad.length > 0 && (
+        <details className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2 hover:bg-slate-50/70 dark:hover:bg-slate-700/30 [&::-webkit-details-marker]:hidden">
+            <span className="inline-flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-100">
+              <ChevronDown className="w-4 h-4 text-slate-500 transition-transform group-open:rotate-0 -rotate-90 shrink-0" />
+              <History className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+              <span>
+                Historial reciente de modificaciones · Consultas, Biopsias y Hemodiálisis ({historialActividad.length})
+              </span>
+            </span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 group-open:hidden">
+              Ver registro
+            </span>
+          </summary>
+          <div className="border-t border-slate-200 dark:border-slate-700 max-h-72 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+            {historialActividad.map((item) => (
+              <div key={item.id} className="px-4 py-2.5 text-xs space-y-0.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-slate-600 dark:text-slate-300 tabular-nums">
+                  <span>
+                    <strong className="text-slate-900 dark:text-white">{item.actorName}</strong> (
+                    {etiquetaRolClinico(item.actorRole)})
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {fmtFechaHora(item.atIso)}
+                  </span>
+                </div>
+                <p className="font-semibold text-slate-800 dark:text-slate-100">{item.que}</p>
+                {item.detalle && (
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300">{item.detalle}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
     </div>
   )
 }

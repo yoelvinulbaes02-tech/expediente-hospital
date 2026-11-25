@@ -32,6 +32,7 @@ async function exigirAccesoConsulta(consultationId?: string) {
         residencyId: true,
         patientId: true,
         status: true,
+        consultationType: true,
         chiefComplaint: true,
         bloodPressure: true,
         heartRate: true,
@@ -80,6 +81,8 @@ export async function crearConsulta(formData: FormData): Promise<{
 
     const patientMode = String(formData.get('patientMode') ?? 'new')
     const visitType = String(formData.get('visitType') ?? 'Primera vez').trim() || 'Primera vez'
+    const consultationType =
+      String(formData.get('consultationType') ?? 'Consulta general').trim() || 'Consulta general'
     const chiefComplaintInput = String(formData.get('chiefComplaint') ?? '').trim()
     const consultationDateStr = String(formData.get('consultationDate') ?? '').trim()
     const doctorIdInput = String(formData.get('doctorId') ?? '').trim()
@@ -291,6 +294,7 @@ export async function crearConsulta(formData: FormData): Promise<{
         status: initialStatus,
         visitType:
           matchedExistingPatient && visitType === 'Primera vez' ? 'Seguimiento' : visitType,
+        consultationType,
         chiefComplaint,
         bloodPressure: null,
         heartRate: null,
@@ -318,6 +322,7 @@ export async function crearConsulta(formData: FormData): Promise<{
       patientId,
       newValue: {
         visitType: consulta.visitType,
+        consultationType,
         chiefComplaint,
         status: initialStatus,
         doctorName,
@@ -423,6 +428,7 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
       consultationId: String(formData.get('consultationId') ?? ''),
       accion,
       visitType: String(formData.get('visitType') ?? 'Primera vez'),
+      consultationType: String(formData.get('consultationType') ?? 'Consulta general'),
       chiefComplaint: String(formData.get('chiefComplaint') ?? ''),
       bloodPressure: String(formData.get('bloodPressure') ?? ''),
       heartRate: String(formData.get('heartRate') ?? ''),
@@ -475,7 +481,16 @@ export async function guardarDatosPacienteConsulta(formData: FormData): Promise<
 
     const pacienteActual = await prisma.patient.findUnique({
       where: { id: consulta.patientId },
-      select: { expedienteNumber: true, bloodType: true },
+      select: {
+        firstName: true,
+        lastName: true,
+        expedienteNumber: true,
+        age: true,
+        sex: true,
+        phone: true,
+        cedula: true,
+        bloodType: true,
+      },
     })
 
     if (pacienteActual && expedienteNumber !== pacienteActual.expedienteNumber) {
@@ -544,6 +559,19 @@ export async function guardarDatosPacienteConsulta(formData: FormData): Promise<
       entity: 'patient',
       entityId: consulta.patientId,
       patientId: consulta.patientId,
+      oldValue: pacienteActual
+        ? {
+            firstName: pacienteActual.firstName,
+            lastName: pacienteActual.lastName,
+            expedienteNumber: pacienteActual.expedienteNumber,
+            age: pacienteActual.age,
+            sex: pacienteActual.sex,
+            phone: pacienteActual.phone,
+            cedula: pacienteActual.cedula,
+            bloodType: pacienteActual.bloodType,
+            consultationDate: consulta.consultationDate.toISOString(),
+          }
+        : null,
       newValue: {
         firstName,
         lastName,
@@ -774,6 +802,7 @@ export async function iniciarNuevaAtencionConsulta(
         consultationDate: new Date(),
         status: 'EN_CONSULTA',
         visitType: 'Seguimiento',
+        consultationType: consulta.consultationType || 'Consulta general',
         chiefComplaint: 'Control de seguimiento',
         bloodPressure: null,
         heartRate: null,
@@ -803,6 +832,7 @@ export async function iniciarNuevaAtencionConsulta(
         originConsultationId: consultationId,
         copiedData: copiarDatos,
         visitType: 'Seguimiento',
+        consultationType: consulta.consultationType || 'Consulta general',
         status: 'EN_CONSULTA',
         changedSections: seccionesCopiadas,
         authorName: ctx.user.fullName,
@@ -817,5 +847,548 @@ export async function iniciarNuevaAtencionConsulta(
     return { ok: true, consultationId: nueva.id }
   } catch (e: unknown) {
     return { ok: false, error: (e as Error)?.message || 'No se pudo iniciar una nueva atención.' }
+  }
+}
+
+// ─── APARTADO DE BIOPSIAS (AGENDA Y RESULTADOS) EN CONSULTA EXTERNA ───
+export async function crearBiopsiaConsulta(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const { ctx } = await exigirAccesoConsulta()
+    const residencyId = ctx.residency!.id
+
+    const patientIdRaw = String(formData.get('patientId') ?? '').trim()
+    let patientId: string | null = null
+    if (patientIdRaw) {
+      const p = await prisma.patient.findFirst({
+        where: { id: patientIdRaw, residencyId },
+        select: { id: true },
+      })
+      if (p) patientId = p.id
+    }
+
+    const patientName = String(formData.get('patientName') ?? '').trim()
+    if (patientName.length < 2) {
+      return { ok: false, error: 'Escribe el nombre del paciente para agendar la biopsia.' }
+    }
+
+    const phone = String(formData.get('phone') ?? '').trim() || null
+    const labsStatus = String(formData.get('labsStatus') ?? '').trim() || 'Pendiente'
+    const needleStatus = String(formData.get('needleStatus') ?? '').trim() || 'Utilizar la del centro'
+    const kitStatus = String(formData.get('kitStatus') ?? '').trim() || 'Pendiente'
+    const scheduledDate = String(formData.get('scheduledDate') ?? '').trim() || 'Pendiente'
+    const senasaAuth = String(formData.get('senasaAuth') ?? '').trim() || 'Pendiente'
+    const note = String(formData.get('note') ?? '').trim() || null
+    const highlightTagRaw = String(formData.get('highlightTag') ?? 'normal').trim()
+    const highlightTag = ['normal', 'programada', 'alerta', 'completada'].includes(highlightTagRaw)
+      ? highlightTagRaw
+      : 'normal'
+
+    const actorName = ctx.user.fullName || ctx.user.email
+    const actorRole = String(ctx.user.role)
+
+    const creado = await prisma.biopsyRecord.create({
+      data: {
+        residencyId,
+        patientId,
+        status: 'agendada',
+        patientName,
+        phone,
+        labsStatus,
+        needleStatus,
+        kitStatus,
+        scheduledDate,
+        senasaAuth,
+        note,
+        highlightTag,
+        createdBy: ctx.user.email,
+        createdByName: actorName,
+        createdByRole: actorRole,
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole,
+      action: 'create',
+      entity: 'biopsy_record',
+      entityId: creado.id,
+      patientId: patientId ?? undefined,
+      newValue: {
+        patientName,
+        phone,
+        labsStatus,
+        needleStatus,
+        kitStatus,
+        scheduledDate,
+        senasaAuth,
+        note,
+        highlightTag,
+      },
+      reason: `Paciente agendado en Biopsias: ${patientName}`,
+    })
+
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo agendar la biopsia.' }
+  }
+}
+
+export async function actualizarBiopsiaConsulta(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const { ctx } = await exigirAccesoConsulta()
+    const residencyId = ctx.residency!.id
+    const id = String(formData.get('id') ?? '').trim()
+    if (!id) return { ok: false, error: 'Registro no especificado.' }
+
+    const previo = await prisma.biopsyRecord.findFirst({
+      where: { id, residencyId },
+    })
+    if (!previo) return { ok: false, error: 'Registro de biopsia no encontrado.' }
+
+    const patientName = String(formData.get('patientName') ?? previo.patientName).trim()
+    if (patientName.length < 2) {
+      return { ok: false, error: 'El nombre del paciente es obligatorio.' }
+    }
+
+    const phone = String(formData.get('phone') ?? '').trim() || null
+    const labsStatus = String(formData.get('labsStatus') ?? '').trim() || null
+    const needleStatus = String(formData.get('needleStatus') ?? '').trim() || null
+    const kitStatus = String(formData.get('kitStatus') ?? '').trim() || null
+    const scheduledDate = String(formData.get('scheduledDate') ?? '').trim() || null
+    const senasaAuth = String(formData.get('senasaAuth') ?? '').trim() || null
+    const note = String(formData.get('note') ?? '').trim() || null
+    const performedDate = String(formData.get('performedDate') ?? '').trim() || null
+    const complications = String(formData.get('complications') ?? '').trim() || null
+    const report = String(formData.get('report') ?? '').trim() || null
+    const highlightTagRaw = String(formData.get('highlightTag') ?? previo.highlightTag).trim()
+    const highlightTag = ['normal', 'programada', 'alerta', 'completada'].includes(highlightTagRaw)
+      ? highlightTagRaw
+      : previo.highlightTag
+
+    const actorName = ctx.user.fullName || ctx.user.email
+    const actorRole = String(ctx.user.role)
+
+    await prisma.biopsyRecord.update({
+      where: { id: previo.id },
+      data: {
+        patientName,
+        phone,
+        labsStatus,
+        needleStatus,
+        kitStatus,
+        scheduledDate,
+        senasaAuth,
+        note,
+        performedDate: previo.status === 'realizada' ? performedDate : previo.performedDate,
+        complications: previo.status === 'realizada' ? complications : previo.complications,
+        report: previo.status === 'realizada' ? report : previo.report,
+        highlightTag,
+        updatedBy: ctx.user.email,
+        updatedByName: actorName,
+        updatedByRole: actorRole,
+        updatedAt: new Date(),
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole,
+      action: 'update',
+      entity: 'biopsy_record',
+      entityId: previo.id,
+      patientId: previo.patientId ?? undefined,
+      oldValue: {
+        patientName: previo.patientName,
+        phone: previo.phone,
+        labsStatus: previo.labsStatus,
+        needleStatus: previo.needleStatus,
+        kitStatus: previo.kitStatus,
+        scheduledDate: previo.scheduledDate,
+        senasaAuth: previo.senasaAuth,
+        note: previo.note,
+        performedDate: previo.performedDate,
+        complications: previo.complications,
+        report: previo.report,
+      },
+      newValue: {
+        patientName,
+        phone,
+        labsStatus,
+        needleStatus,
+        kitStatus,
+        scheduledDate,
+        senasaAuth,
+        note,
+        performedDate,
+        complications,
+        report,
+        highlightTag,
+      },
+      reason: `Biopsia actualizada (${patientName})`,
+    })
+
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo actualizar la biopsia.' }
+  }
+}
+
+export async function marcarBiopsiaRealizada(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const { ctx } = await exigirAccesoConsulta()
+    const residencyId = ctx.residency!.id
+    const id = String(formData.get('id') ?? '').trim()
+    if (!id) return { ok: false, error: 'Registro no especificado.' }
+
+    const previo = await prisma.biopsyRecord.findFirst({
+      where: { id, residencyId },
+    })
+    if (!previo) return { ok: false, error: 'Registro de biopsia no encontrado.' }
+
+    const performedDate = String(formData.get('performedDate') ?? '').trim()
+    const complications = String(formData.get('complications') ?? '').trim() || 'Ninguna'
+    const report = String(formData.get('report') ?? '').trim() || null
+
+    if (!performedDate) {
+      return { ok: false, error: 'Indica la fecha de realización de la biopsia.' }
+    }
+
+    const actorName = ctx.user.fullName || ctx.user.email
+    const actorRole = String(ctx.user.role)
+
+    await prisma.biopsyRecord.update({
+      where: { id: previo.id },
+      data: {
+        status: 'realizada',
+        performedDate,
+        complications,
+        report,
+        highlightTag: 'completada',
+        performedBy: ctx.user.email,
+        performedByName: actorName,
+        performedByRole: actorRole,
+        performedAt: new Date(),
+        updatedBy: ctx.user.email,
+        updatedByName: actorName,
+        updatedByRole: actorRole,
+        updatedAt: new Date(),
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole,
+      action: 'update',
+      entity: 'biopsy_record',
+      entityId: previo.id,
+      patientId: previo.patientId ?? undefined,
+      oldValue: { status: previo.status },
+      newValue: {
+        status: 'realizada',
+        patientName: previo.patientName,
+        performedDate,
+        complications,
+        report,
+      },
+      reason: `Biopsia marcada como realizada (${previo.patientName} · ${performedDate})`,
+    })
+
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo registrar el resultado de biopsia.' }
+  }
+}
+
+export async function reabrirBiopsiaAgendada(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const { ctx } = await exigirAccesoConsulta()
+    const residencyId = ctx.residency!.id
+    const id = String(formData.get('id') ?? '').trim()
+    const previo = await prisma.biopsyRecord.findFirst({
+      where: { id, residencyId },
+    })
+    if (!previo) return { ok: false, error: 'Registro no encontrado.' }
+
+    const actorName = ctx.user.fullName || ctx.user.email
+    const actorRole = String(ctx.user.role)
+
+    await prisma.biopsyRecord.update({
+      where: { id: previo.id },
+      data: {
+        status: 'agendada',
+        highlightTag: 'programada',
+        updatedBy: ctx.user.email,
+        updatedByName: actorName,
+        updatedByRole: actorRole,
+        updatedAt: new Date(),
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole,
+      action: 'update',
+      entity: 'biopsy_record',
+      entityId: previo.id,
+      patientId: previo.patientId ?? undefined,
+      oldValue: { status: previo.status },
+      newValue: { status: 'agendada', patientName: previo.patientName },
+      reason: `Biopsia devuelta a Agenda (${previo.patientName})`,
+    })
+
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo reabrir el registro.' }
+  }
+}
+
+// ─── APARTADO DE HEMODIÁLISIS AMBULATORIA (CONSULTA EXTERNA) ───
+function leerCamposHemodialisisConsulta(formData: FormData) {
+  const s = (k: string) => String(formData.get(k) ?? '').trim() || null
+  const ageStr = String(formData.get('age') ?? '').trim()
+  const ageParsed = ageStr ? parseInt(ageStr, 10) : null
+  const age = ageParsed !== null && !Number.isNaN(ageParsed) ? ageParsed : null
+
+  return {
+    firstName: String(formData.get('firstName') ?? '').trim(),
+    lastName: String(formData.get('lastName') ?? '').trim(),
+    expedienteNumber: s('expedienteNumber'),
+    age,
+    sex: s('sex'),
+    phone: s('phone'),
+    cedula: s('cedula'),
+    bloodType: s('bloodType'),
+    diagnosisAndTime: s('diagnosisAndTime'),
+    medications: s('medications'),
+    allergies: s('allergies'),
+    allergyReaction: s('allergyReaction'),
+    transfusions: s('transfusions'),
+    referredFromCenter: s('referredFromCenter'),
+    firstTimeInCenter: s('firstTimeInCenter'),
+    otherDialysisModality: s('otherDialysisModality'),
+    pathologicalHistory: s('pathologicalHistory'),
+    surgicalHistory: s('surgicalHistory'),
+    familyHistory: s('familyHistory'),
+    habitCoffee: s('habitCoffee'),
+    habitTobacco: s('habitTobacco'),
+    habitAlcohol: s('habitAlcohol'),
+    habitDrugs: s('habitDrugs'),
+    habitOther: s('habitOther'),
+    viralHiv: s('viralHiv'),
+    viralHbsag: s('viralHbsag'),
+    viralHvc: s('viralHvc'),
+    labHgb: s('labHgb'),
+    labHct: s('labHct'),
+    labUrea: s('labUrea'),
+    labCr: s('labCr'),
+    labK: s('labK'),
+    labBloodType: s('labBloodType'),
+    labOther: s('labOther'),
+    imagingSonography: s('imagingSonography'),
+    imagingCt: s('imagingCt'),
+    imagingOther: s('imagingOther'),
+    accessAvFistula: s('accessAvFistula'),
+    accessGraft: s('accessGraft'),
+    accessTunneledCatheter: s('accessTunneledCatheter'),
+    accessFavi: s('accessFavi'),
+    clinicalNotes: s('clinicalNotes'),
+  }
+}
+
+export async function crearHemodialisisConsulta(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const { ctx } = await exigirAccesoConsulta()
+    const residencyId = ctx.residency!.id
+
+    const campos = leerCamposHemodialisisConsulta(formData)
+    if (campos.firstName.length < 2 || campos.lastName.length < 2) {
+      return { ok: false, error: 'Nombre y apellido del paciente son obligatorios.' }
+    }
+
+    const patientIdRaw = String(formData.get('patientId') ?? '').trim()
+    let patientId: string | null = null
+    if (patientIdRaw) {
+      const p = await prisma.patient.findFirst({
+        where: { id: patientIdRaw, residencyId },
+        select: { id: true },
+      })
+      if (p) patientId = p.id
+    }
+
+    const actorName = ctx.user.fullName || ctx.user.email
+    const actorRole = String(ctx.user.role)
+
+    const creado = await prisma.outpatientHemodialysis.create({
+      data: {
+        residencyId,
+        patientId,
+        ...campos,
+        isActive: true,
+        createdBy: ctx.user.email,
+        createdByName: actorName,
+        createdByRole: actorRole,
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole,
+      action: 'create',
+      entity: 'outpatient_hemodialysis',
+      entityId: creado.id,
+      patientId: patientId ?? undefined,
+      newValue: {
+        patientName: `${campos.firstName} ${campos.lastName}`,
+        diagnosisAndTime: campos.diagnosisAndTime,
+      },
+      reason: `Expediente de Hemodiálisis ambulatoria creado: ${campos.firstName} ${campos.lastName}`,
+    })
+
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return {
+      ok: false,
+      error: (e as Error)?.message || 'No se pudo crear el expediente de Hemodiálisis.',
+    }
+  }
+}
+
+export async function actualizarHemodialisisConsulta(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const { ctx } = await exigirAccesoConsulta()
+    const residencyId = ctx.residency!.id
+    const id = String(formData.get('id') ?? '').trim()
+    if (!id) return { ok: false, error: 'Expediente no especificado.' }
+
+    const previo = await prisma.outpatientHemodialysis.findFirst({
+      where: { id, residencyId },
+    })
+    if (!previo) return { ok: false, error: 'Expediente de Hemodiálisis no encontrado.' }
+
+    const campos = leerCamposHemodialisisConsulta(formData)
+    if (campos.firstName.length < 2 || campos.lastName.length < 2) {
+      return { ok: false, error: 'Nombre y apellido no pueden quedar vacíos.' }
+    }
+
+    const actorName = ctx.user.fullName || ctx.user.email
+    const actorRole = String(ctx.user.role)
+
+    await prisma.outpatientHemodialysis.update({
+      where: { id: previo.id },
+      data: {
+        ...campos,
+        updatedBy: ctx.user.email,
+        updatedByName: actorName,
+        updatedByRole: actorRole,
+        updatedAt: new Date(),
+      },
+    })
+
+    const previoMap = previo as unknown as Record<string, unknown>
+    const camposMap = campos as unknown as Record<string, unknown>
+    const oldChanged: Record<string, unknown> = {}
+    const newChanged: Record<string, unknown> = {
+      patientName: `${campos.firstName} ${campos.lastName}`,
+    }
+    for (const [k, newVal] of Object.entries(camposMap)) {
+      const oldVal = previoMap[k] ?? null
+      if (oldVal !== newVal) {
+        oldChanged[k] = oldVal
+        newChanged[k] = newVal
+      }
+    }
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole,
+      action: 'update',
+      entity: 'outpatient_hemodialysis',
+      entityId: previo.id,
+      patientId: previo.patientId ?? undefined,
+      oldValue: oldChanged,
+      newValue: newChanged,
+      reason: `Expediente de Hemodiálisis modificado (${campos.firstName} ${campos.lastName})`,
+    })
+
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return {
+      ok: false,
+      error: (e as Error)?.message || 'No se pudo actualizar el expediente de Hemodiálisis.',
+    }
+  }
+}
+
+export async function archivarReactivarHemodialisisConsulta(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const { ctx } = await exigirAccesoConsulta()
+    const residencyId = ctx.residency!.id
+    const id = String(formData.get('id') ?? '').trim()
+    const isActive = String(formData.get('isActive') ?? 'false') === 'true'
+
+    const previo = await prisma.outpatientHemodialysis.findFirst({
+      where: { id, residencyId },
+    })
+    if (!previo) return { ok: false, error: 'Expediente no encontrado.' }
+
+    const actorName = ctx.user.fullName || ctx.user.email
+    const actorRole = String(ctx.user.role)
+
+    await prisma.outpatientHemodialysis.update({
+      where: { id: previo.id },
+      data: {
+        isActive,
+        updatedBy: ctx.user.email,
+        updatedByName: actorName,
+        updatedByRole: actorRole,
+        updatedAt: new Date(),
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole,
+      action: 'update',
+      entity: 'outpatient_hemodialysis',
+      entityId: previo.id,
+      patientId: previo.patientId ?? undefined,
+      oldValue: { isActive: previo.isActive },
+      newValue: { isActive, patientName: `${previo.firstName} ${previo.lastName}` },
+      reason: isActive
+        ? `Expediente de Hemodiálisis reactivado (${previo.firstName} ${previo.lastName})`
+        : `Expediente de Hemodiálisis archivado (${previo.firstName} ${previo.lastName})`,
+    })
+
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo cambiar el estado del expediente.' }
   }
 }

@@ -39,6 +39,7 @@ export function AntecedentesConsultasRetraibles({
   const datosRef = useRef(datos)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const mountedRef = useRef(true)
+  const detailsRef = useRef<HTMLDetailsElement>(null)
 
   const tieneDatos = Boolean(
     datos.pathological.trim() ||
@@ -143,10 +144,10 @@ export function AntecedentesConsultasRetraibles({
 
   return (
     <details
-      open
+      ref={detailsRef}
       className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5"
     >
-      <summary className="list-none cursor-pointer flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200 dark:border-slate-700 [&::-webkit-details-marker]:hidden">
+      <summary className="list-none cursor-pointer flex flex-wrap items-center justify-between gap-2 group-open:pb-2 group-open:border-b border-slate-200 dark:border-slate-700 [&::-webkit-details-marker]:hidden">
         <div className="flex items-center gap-2 min-w-0">
           <ChevronDown className="w-4 h-4 text-slate-500 transition-transform group-open:rotate-0 -rotate-90 shrink-0" />
           <h2 className="text-sm font-bold text-slate-900 dark:text-white truncate">
@@ -179,6 +180,9 @@ export function AntecedentesConsultasRetraibles({
                   await guardarAhora(true)
                 } else {
                   setEditando(true)
+                  if (detailsRef.current) {
+                    detailsRef.current.open = true
+                  }
                 }
               }}
               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer shrink-0 ${

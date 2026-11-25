@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Check, ChevronDown, ClipboardCopy, Lock, Pencil, PlusCircle } from 'lucide-react'
 import {
+  TIPOS_CONSULTA_EXTERNA,
   type HistorialVisitaResumen,
   type MapaMetaSecciones,
   type SeccionAutorMeta,
@@ -19,6 +20,7 @@ import {
 type ConsultaEditable = {
   id: string
   status: string
+  consultationType: string
   visitType: string
   chiefComplaint: string
   bloodPressure: string | null
@@ -38,6 +40,7 @@ type ConsultaEditable = {
 }
 
 type FormState = {
+  consultationType: string
   visitType: string
   nextAppointment: string
   chiefComplaint: string
@@ -79,7 +82,7 @@ function fmtHora(iso: string) {
 function AcapiteClinico({
   titulo,
   meta,
-  abiertoPorDefecto = true,
+  abiertoPorDefecto = false,
   puedeEditar,
   editando,
   onToggleEditar,
@@ -99,9 +102,11 @@ function AcapiteClinico({
   badgeExtra?: React.ReactNode
   children: React.ReactNode
 }) {
+  const detailsRef = useRef<HTMLDetailsElement>(null)
   return (
     <details
-      open={abiertoPorDefecto}
+      ref={detailsRef}
+      {...(abiertoPorDefecto ? { open: true } : {})}
       className="group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-900/30 p-4"
     >
       <summary className="list-none cursor-pointer flex flex-wrap items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
@@ -143,6 +148,9 @@ function AcapiteClinico({
                 type="button"
                 onClick={(e) => {
                   e.preventDefault()
+                  if (!editando && detailsRef.current) {
+                    detailsRef.current.open = true
+                  }
                   onToggleEditar()
                 }}
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer whitespace-nowrap print:hidden ${
@@ -197,6 +205,7 @@ export function FormularioConsultaClinica({
   const router = useRouter()
 
   const [form, setForm] = useState<FormState>({
+    consultationType: consulta.consultationType || 'Consulta general',
     visitType: consulta.visitType,
     nextAppointment: consulta.nextAppointment ?? '',
     chiefComplaint: consulta.chiefComplaint,
@@ -431,6 +440,7 @@ export function FormularioConsultaClinica({
       const fd = new FormData()
       fd.set('consultationId', consulta.id)
       fd.set('accion', 'finalizar')
+      fd.set('consultationType', actual.consultationType)
       fd.set('visitType', actual.visitType)
       fd.set('nextAppointment', actual.nextAppointment)
       fd.set('chiefComplaint', actual.chiefComplaint)
@@ -794,9 +804,9 @@ export function FormularioConsultaClinica({
           )}
         </AcapiteClinico>
 
-        {/* 2. MOTIVO DE CONSULTA Y TIPO DE VISITA */}
+        {/* 2. MOTIVO DE CONSULTA, TIPO DE CONSULTA Y TIPO DE VISITA */}
         <AcapiteClinico
-          titulo="Motivo de Consulta y Tipo de Visita"
+          titulo="Tipo de Consulta, Visita y Motivo"
           meta={metaSecciones.motivo}
           puedeEditar={camposActualesEditables}
           editando={editandoSeccion.motivo}
@@ -806,10 +816,27 @@ export function FormularioConsultaClinica({
         >
           {editandoSeccion.motivo && camposActualesEditables ? (
             <div className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
                     Tipo de Consulta
+                  </label>
+                  <select
+                    value={form.consultationType}
+                    onChange={(e) => actualizarCampo('consultationType', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  >
+                    {TIPOS_CONSULTA_EXTERNA.map((tipo) => (
+                      <option key={tipo} value={tipo}>
+                        {tipo}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+                    Tipo de Visita
                   </label>
                   <select
                     value={form.visitType}
@@ -854,7 +881,13 @@ export function FormularioConsultaClinica({
             <div className="space-y-1.5 text-sm text-slate-800 dark:text-slate-100">
               <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
                 <span>
-                  Tipo: <strong className="text-slate-800 dark:text-slate-200">{form.visitType}</strong>
+                  Tipo de consulta:{' '}
+                  <strong className="text-teal-700 dark:text-teal-300">
+                    {form.consultationType || 'Consulta general'}
+                  </strong>
+                </span>
+                <span>
+                  Visita: <strong className="text-slate-800 dark:text-slate-200">{form.visitType}</strong>
                 </span>
                 {form.nextAppointment && (
                   <span>

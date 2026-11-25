@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Scale, Ruler, Calculator } from 'lucide-react'
 import { calcularImc } from '@/lib/cirugia-constants'
+import { etiquetaRolClinico } from '@/lib/consultas-auth'
 import { guardarAntropometria } from '@/app/dashboard/paciente/[id]/actions-clinicas'
 
 const fmtFechaHora = (d: Date | string) =>
@@ -23,6 +24,7 @@ export function AntropometriaCard({
   updatedBy,
   updatedAt,
   nombres,
+  roles,
   puedeRegistrar,
   compact = false,
 }: {
@@ -33,6 +35,7 @@ export function AntropometriaCard({
   updatedBy: string | null
   updatedAt: Date | string | null
   nombres: Record<string, string>
+  roles?: Record<string, string>
   puedeRegistrar: boolean
   compact?: boolean
 }) {
@@ -106,9 +109,14 @@ export function AntropometriaCard({
           </div>
 
           {updatedBy && updatedAt && (
-            <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500">
+            <div className="mt-2 pt-1.5 border-t border-slate-200 text-[11px] text-slate-500 tabular-nums">
               <span>Registró: </span>
               <strong className="text-slate-700">{nombres[updatedBy] ?? updatedBy}</strong>
+              {roles?.[updatedBy] && (
+                <span className="text-slate-600 font-semibold">
+                  {' '}({etiquetaRolClinico(roles[updatedBy])})
+                </span>
+              )}
               <span className="block text-[10px] text-slate-400">{fmtFechaHora(updatedAt)}</span>
             </div>
           )}
@@ -198,8 +206,12 @@ export function AntropometriaCard({
             <span>Antropometría y Cálculo Automático de IMC</span>
           </h2>
           {updatedBy && updatedAt && (
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              Actualizó: <strong className="text-slate-700 dark:text-slate-200">{nombres[updatedBy] ?? updatedBy}</strong> · {fmtFechaHora(updatedAt)}
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
+              Actualizó:{' '}
+              <strong className="text-slate-700 dark:text-slate-200">
+                {nombres[updatedBy] ?? updatedBy}
+              </strong>
+              {roles?.[updatedBy] ? ` (${etiquetaRolClinico(roles[updatedBy])})` : ''} · {fmtFechaHora(updatedAt)}
             </p>
           )}
         </div>

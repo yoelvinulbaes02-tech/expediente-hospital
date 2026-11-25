@@ -38,6 +38,8 @@ function parseInterfaceMode(raw: string): InterfaceMode {
   if (raw === 'MEDICINA_INTERNA') return 'MEDICINA_INTERNA'
   if (raw === 'CIRUGIA') return 'CIRUGIA'
   if (raw === 'ORTOPEDIA') return 'ORTOPEDIA'
+  if (raw === 'EMERGENCIA') return 'EMERGENCIA'
+  if (raw === 'HEMATOLOGIA') return 'HEMATOLOGIA'
   return 'CONSULTAS'
 }
 
@@ -249,7 +251,7 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
     console.error('Error al actualizar residencia:', err)
     redirect(
       `${targetErrorUrl}?error=${encodeURIComponent(
-        'No se pudo guardar la configuración. Si elegiste Ortopedia, Cirugía o Medicina Interna, verifica haber ejecutado el SQL de migración en Neon (ALTER TYPE "InterfaceMode" ADD VALUE \'ORTOPEDIA\').'
+        'No se pudo guardar la configuración. Verifica que hayas ejecutado npx prisma db push en la base de datos activa para habilitar todas las interfaces (EMERGENCIA, HEMATOLOGIA, etc.).'
       )}`
     )
   }

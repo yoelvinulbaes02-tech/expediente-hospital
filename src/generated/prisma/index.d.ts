@@ -54,6 +54,26 @@ export type Consultation = $Result.DefaultSelection<Prisma.$ConsultationPayload>
  */
 export type InternalMedicineProfile = $Result.DefaultSelection<Prisma.$InternalMedicineProfilePayload>
 /**
+ * Model HematologyProfile
+ * 
+ */
+export type HematologyProfile = $Result.DefaultSelection<Prisma.$HematologyProfilePayload>
+/**
+ * Model EmergencyProfile
+ * 
+ */
+export type EmergencyProfile = $Result.DefaultSelection<Prisma.$EmergencyProfilePayload>
+/**
+ * Model BiopsyRecord
+ * 
+ */
+export type BiopsyRecord = $Result.DefaultSelection<Prisma.$BiopsyRecordPayload>
+/**
+ * Model OutpatientHemodialysis
+ * 
+ */
+export type OutpatientHemodialysis = $Result.DefaultSelection<Prisma.$OutpatientHemodialysisPayload>
+/**
  * Model SurgicalProfile
  * 
  */
@@ -181,7 +201,9 @@ export const InterfaceMode: {
   CONSULTAS: 'CONSULTAS',
   MEDICINA_INTERNA: 'MEDICINA_INTERNA',
   CIRUGIA: 'CIRUGIA',
-  ORTOPEDIA: 'ORTOPEDIA'
+  ORTOPEDIA: 'ORTOPEDIA',
+  EMERGENCIA: 'EMERGENCIA',
+  HEMATOLOGIA: 'HEMATOLOGIA'
 };
 
 export type InterfaceMode = (typeof InterfaceMode)[keyof typeof InterfaceMode]
@@ -434,6 +456,46 @@ export class PrismaClient<
     * ```
     */
   get internalMedicineProfile(): Prisma.InternalMedicineProfileDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.hematologyProfile`: Exposes CRUD operations for the **HematologyProfile** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more HematologyProfiles
+    * const hematologyProfiles = await prisma.hematologyProfile.findMany()
+    * ```
+    */
+  get hematologyProfile(): Prisma.HematologyProfileDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.emergencyProfile`: Exposes CRUD operations for the **EmergencyProfile** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EmergencyProfiles
+    * const emergencyProfiles = await prisma.emergencyProfile.findMany()
+    * ```
+    */
+  get emergencyProfile(): Prisma.EmergencyProfileDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.biopsyRecord`: Exposes CRUD operations for the **BiopsyRecord** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BiopsyRecords
+    * const biopsyRecords = await prisma.biopsyRecord.findMany()
+    * ```
+    */
+  get biopsyRecord(): Prisma.BiopsyRecordDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.outpatientHemodialysis`: Exposes CRUD operations for the **OutpatientHemodialysis** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more OutpatientHemodialyses
+    * const outpatientHemodialyses = await prisma.outpatientHemodialysis.findMany()
+    * ```
+    */
+  get outpatientHemodialysis(): Prisma.OutpatientHemodialysisDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.surgicalProfile`: Exposes CRUD operations for the **SurgicalProfile** model.
@@ -1099,6 +1161,10 @@ export namespace Prisma {
     Episode: 'Episode',
     Consultation: 'Consultation',
     InternalMedicineProfile: 'InternalMedicineProfile',
+    HematologyProfile: 'HematologyProfile',
+    EmergencyProfile: 'EmergencyProfile',
+    BiopsyRecord: 'BiopsyRecord',
+    OutpatientHemodialysis: 'OutpatientHemodialysis',
     SurgicalProfile: 'SurgicalProfile',
     EpisodeAntibiotic: 'EpisodeAntibiotic',
     SurgicalDevice: 'SurgicalDevice',
@@ -1135,7 +1201,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "residency" | "subscriptionPayment" | "user" | "auditLog" | "patient" | "episode" | "consultation" | "internalMedicineProfile" | "surgicalProfile" | "episodeAntibiotic" | "surgicalDevice" | "woundCare" | "woundCareLog" | "baseDepartmentPlanEntry" | "episodeDrain" | "episodeDrainEntry" | "hemodialysisItem" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
+      modelProps: "residency" | "subscriptionPayment" | "user" | "auditLog" | "patient" | "episode" | "consultation" | "internalMedicineProfile" | "hematologyProfile" | "emergencyProfile" | "biopsyRecord" | "outpatientHemodialysis" | "surgicalProfile" | "episodeAntibiotic" | "surgicalDevice" | "woundCare" | "woundCareLog" | "baseDepartmentPlanEntry" | "episodeDrain" | "episodeDrainEntry" | "hemodialysisItem" | "medicalHistory" | "importantAlert" | "gfrRecord" | "labReport" | "studyReport" | "viralSerology" | "vascularAccess" | "allergy" | "note" | "vitalSign" | "handoff" | "task"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1728,6 +1794,302 @@ export namespace Prisma {
           count: {
             args: Prisma.InternalMedicineProfileCountArgs<ExtArgs>
             result: $Utils.Optional<InternalMedicineProfileCountAggregateOutputType> | number
+          }
+        }
+      }
+      HematologyProfile: {
+        payload: Prisma.$HematologyProfilePayload<ExtArgs>
+        fields: Prisma.HematologyProfileFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.HematologyProfileFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.HematologyProfileFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>
+          }
+          findFirst: {
+            args: Prisma.HematologyProfileFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.HematologyProfileFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>
+          }
+          findMany: {
+            args: Prisma.HematologyProfileFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>[]
+          }
+          create: {
+            args: Prisma.HematologyProfileCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>
+          }
+          createMany: {
+            args: Prisma.HematologyProfileCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.HematologyProfileCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>[]
+          }
+          delete: {
+            args: Prisma.HematologyProfileDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>
+          }
+          update: {
+            args: Prisma.HematologyProfileUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>
+          }
+          deleteMany: {
+            args: Prisma.HematologyProfileDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.HematologyProfileUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.HematologyProfileUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>[]
+          }
+          upsert: {
+            args: Prisma.HematologyProfileUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HematologyProfilePayload>
+          }
+          aggregate: {
+            args: Prisma.HematologyProfileAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateHematologyProfile>
+          }
+          groupBy: {
+            args: Prisma.HematologyProfileGroupByArgs<ExtArgs>
+            result: $Utils.Optional<HematologyProfileGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.HematologyProfileCountArgs<ExtArgs>
+            result: $Utils.Optional<HematologyProfileCountAggregateOutputType> | number
+          }
+        }
+      }
+      EmergencyProfile: {
+        payload: Prisma.$EmergencyProfilePayload<ExtArgs>
+        fields: Prisma.EmergencyProfileFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EmergencyProfileFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EmergencyProfileFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>
+          }
+          findFirst: {
+            args: Prisma.EmergencyProfileFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EmergencyProfileFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>
+          }
+          findMany: {
+            args: Prisma.EmergencyProfileFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>[]
+          }
+          create: {
+            args: Prisma.EmergencyProfileCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>
+          }
+          createMany: {
+            args: Prisma.EmergencyProfileCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EmergencyProfileCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>[]
+          }
+          delete: {
+            args: Prisma.EmergencyProfileDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>
+          }
+          update: {
+            args: Prisma.EmergencyProfileUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>
+          }
+          deleteMany: {
+            args: Prisma.EmergencyProfileDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EmergencyProfileUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EmergencyProfileUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>[]
+          }
+          upsert: {
+            args: Prisma.EmergencyProfileUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyProfilePayload>
+          }
+          aggregate: {
+            args: Prisma.EmergencyProfileAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEmergencyProfile>
+          }
+          groupBy: {
+            args: Prisma.EmergencyProfileGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EmergencyProfileGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EmergencyProfileCountArgs<ExtArgs>
+            result: $Utils.Optional<EmergencyProfileCountAggregateOutputType> | number
+          }
+        }
+      }
+      BiopsyRecord: {
+        payload: Prisma.$BiopsyRecordPayload<ExtArgs>
+        fields: Prisma.BiopsyRecordFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BiopsyRecordFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BiopsyRecordFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>
+          }
+          findFirst: {
+            args: Prisma.BiopsyRecordFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BiopsyRecordFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>
+          }
+          findMany: {
+            args: Prisma.BiopsyRecordFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>[]
+          }
+          create: {
+            args: Prisma.BiopsyRecordCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>
+          }
+          createMany: {
+            args: Prisma.BiopsyRecordCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BiopsyRecordCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>[]
+          }
+          delete: {
+            args: Prisma.BiopsyRecordDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>
+          }
+          update: {
+            args: Prisma.BiopsyRecordUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>
+          }
+          deleteMany: {
+            args: Prisma.BiopsyRecordDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BiopsyRecordUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BiopsyRecordUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>[]
+          }
+          upsert: {
+            args: Prisma.BiopsyRecordUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BiopsyRecordPayload>
+          }
+          aggregate: {
+            args: Prisma.BiopsyRecordAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBiopsyRecord>
+          }
+          groupBy: {
+            args: Prisma.BiopsyRecordGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BiopsyRecordGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BiopsyRecordCountArgs<ExtArgs>
+            result: $Utils.Optional<BiopsyRecordCountAggregateOutputType> | number
+          }
+        }
+      }
+      OutpatientHemodialysis: {
+        payload: Prisma.$OutpatientHemodialysisPayload<ExtArgs>
+        fields: Prisma.OutpatientHemodialysisFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OutpatientHemodialysisFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OutpatientHemodialysisFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>
+          }
+          findFirst: {
+            args: Prisma.OutpatientHemodialysisFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OutpatientHemodialysisFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>
+          }
+          findMany: {
+            args: Prisma.OutpatientHemodialysisFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>[]
+          }
+          create: {
+            args: Prisma.OutpatientHemodialysisCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>
+          }
+          createMany: {
+            args: Prisma.OutpatientHemodialysisCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.OutpatientHemodialysisCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>[]
+          }
+          delete: {
+            args: Prisma.OutpatientHemodialysisDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>
+          }
+          update: {
+            args: Prisma.OutpatientHemodialysisUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>
+          }
+          deleteMany: {
+            args: Prisma.OutpatientHemodialysisDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OutpatientHemodialysisUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.OutpatientHemodialysisUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>[]
+          }
+          upsert: {
+            args: Prisma.OutpatientHemodialysisUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutpatientHemodialysisPayload>
+          }
+          aggregate: {
+            args: Prisma.OutpatientHemodialysisAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOutpatientHemodialysis>
+          }
+          groupBy: {
+            args: Prisma.OutpatientHemodialysisGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OutpatientHemodialysisGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OutpatientHemodialysisCountArgs<ExtArgs>
+            result: $Utils.Optional<OutpatientHemodialysisCountAggregateOutputType> | number
           }
         }
       }
@@ -3416,6 +3778,10 @@ export namespace Prisma {
     episode?: EpisodeOmit
     consultation?: ConsultationOmit
     internalMedicineProfile?: InternalMedicineProfileOmit
+    hematologyProfile?: HematologyProfileOmit
+    emergencyProfile?: EmergencyProfileOmit
+    biopsyRecord?: BiopsyRecordOmit
+    outpatientHemodialysis?: OutpatientHemodialysisOmit
     surgicalProfile?: SurgicalProfileOmit
     episodeAntibiotic?: EpisodeAntibioticOmit
     surgicalDevice?: SurgicalDeviceOmit
@@ -3525,6 +3891,8 @@ export namespace Prisma {
     surgicalDevices: number
     woundCares: number
     hemodialysisItems: number
+    biopsyRecords: number
+    outpatientHemodialyses: number
   }
 
   export type ResidencyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3536,6 +3904,8 @@ export namespace Prisma {
     surgicalDevices?: boolean | ResidencyCountOutputTypeCountSurgicalDevicesArgs
     woundCares?: boolean | ResidencyCountOutputTypeCountWoundCaresArgs
     hemodialysisItems?: boolean | ResidencyCountOutputTypeCountHemodialysisItemsArgs
+    biopsyRecords?: boolean | ResidencyCountOutputTypeCountBiopsyRecordsArgs
+    outpatientHemodialyses?: boolean | ResidencyCountOutputTypeCountOutpatientHemodialysesArgs
   }
 
   // Custom InputTypes
@@ -3603,6 +3973,20 @@ export namespace Prisma {
    */
   export type ResidencyCountOutputTypeCountHemodialysisItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: HemodialysisItemWhereInput
+  }
+
+  /**
+   * ResidencyCountOutputType without action
+   */
+  export type ResidencyCountOutputTypeCountBiopsyRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BiopsyRecordWhereInput
+  }
+
+  /**
+   * ResidencyCountOutputType without action
+   */
+  export type ResidencyCountOutputTypeCountOutpatientHemodialysesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OutpatientHemodialysisWhereInput
   }
 
 
@@ -3673,6 +4057,8 @@ export namespace Prisma {
     consultations: number
     allergies: number
     viralSerologies: number
+    biopsyRecords: number
+    outpatientHemodialyses: number
   }
 
   export type PatientCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3680,6 +4066,8 @@ export namespace Prisma {
     consultations?: boolean | PatientCountOutputTypeCountConsultationsArgs
     allergies?: boolean | PatientCountOutputTypeCountAllergiesArgs
     viralSerologies?: boolean | PatientCountOutputTypeCountViralSerologiesArgs
+    biopsyRecords?: boolean | PatientCountOutputTypeCountBiopsyRecordsArgs
+    outpatientHemodialyses?: boolean | PatientCountOutputTypeCountOutpatientHemodialysesArgs
   }
 
   // Custom InputTypes
@@ -3719,6 +4107,20 @@ export namespace Prisma {
    */
   export type PatientCountOutputTypeCountViralSerologiesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ViralSerologyWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountBiopsyRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BiopsyRecordWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountOutpatientHemodialysesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OutpatientHemodialysisWhereInput
   }
 
 
@@ -4323,6 +4725,8 @@ export namespace Prisma {
     surgicalDevices?: boolean | Residency$surgicalDevicesArgs<ExtArgs>
     woundCares?: boolean | Residency$woundCaresArgs<ExtArgs>
     hemodialysisItems?: boolean | Residency$hemodialysisItemsArgs<ExtArgs>
+    biopsyRecords?: boolean | Residency$biopsyRecordsArgs<ExtArgs>
+    outpatientHemodialyses?: boolean | Residency$outpatientHemodialysesArgs<ExtArgs>
     _count?: boolean | ResidencyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["residency"]>
 
@@ -4423,6 +4827,8 @@ export namespace Prisma {
     surgicalDevices?: boolean | Residency$surgicalDevicesArgs<ExtArgs>
     woundCares?: boolean | Residency$woundCaresArgs<ExtArgs>
     hemodialysisItems?: boolean | Residency$hemodialysisItemsArgs<ExtArgs>
+    biopsyRecords?: boolean | Residency$biopsyRecordsArgs<ExtArgs>
+    outpatientHemodialyses?: boolean | Residency$outpatientHemodialysesArgs<ExtArgs>
     _count?: boolean | ResidencyCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ResidencyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4439,6 +4845,8 @@ export namespace Prisma {
       surgicalDevices: Prisma.$SurgicalDevicePayload<ExtArgs>[]
       woundCares: Prisma.$WoundCarePayload<ExtArgs>[]
       hemodialysisItems: Prisma.$HemodialysisItemPayload<ExtArgs>[]
+      biopsyRecords: Prisma.$BiopsyRecordPayload<ExtArgs>[]
+      outpatientHemodialyses: Prisma.$OutpatientHemodialysisPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4869,6 +5277,8 @@ export namespace Prisma {
     surgicalDevices<T extends Residency$surgicalDevicesArgs<ExtArgs> = {}>(args?: Subset<T, Residency$surgicalDevicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SurgicalDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     woundCares<T extends Residency$woundCaresArgs<ExtArgs> = {}>(args?: Subset<T, Residency$woundCaresArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WoundCarePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     hemodialysisItems<T extends Residency$hemodialysisItemsArgs<ExtArgs> = {}>(args?: Subset<T, Residency$hemodialysisItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HemodialysisItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    biopsyRecords<T extends Residency$biopsyRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Residency$biopsyRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    outpatientHemodialyses<T extends Residency$outpatientHemodialysesArgs<ExtArgs> = {}>(args?: Subset<T, Residency$outpatientHemodialysesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5506,6 +5916,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: HemodialysisItemScalarFieldEnum | HemodialysisItemScalarFieldEnum[]
+  }
+
+  /**
+   * Residency.biopsyRecords
+   */
+  export type Residency$biopsyRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    where?: BiopsyRecordWhereInput
+    orderBy?: BiopsyRecordOrderByWithRelationInput | BiopsyRecordOrderByWithRelationInput[]
+    cursor?: BiopsyRecordWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BiopsyRecordScalarFieldEnum | BiopsyRecordScalarFieldEnum[]
+  }
+
+  /**
+   * Residency.outpatientHemodialyses
+   */
+  export type Residency$outpatientHemodialysesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    where?: OutpatientHemodialysisWhereInput
+    orderBy?: OutpatientHemodialysisOrderByWithRelationInput | OutpatientHemodialysisOrderByWithRelationInput[]
+    cursor?: OutpatientHemodialysisWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OutpatientHemodialysisScalarFieldEnum | OutpatientHemodialysisScalarFieldEnum[]
   }
 
   /**
@@ -9691,6 +10149,8 @@ export namespace Prisma {
     allergies?: boolean | Patient$allergiesArgs<ExtArgs>
     medicalHistory?: boolean | Patient$medicalHistoryArgs<ExtArgs>
     viralSerologies?: boolean | Patient$viralSerologiesArgs<ExtArgs>
+    biopsyRecords?: boolean | Patient$biopsyRecordsArgs<ExtArgs>
+    outpatientHemodialyses?: boolean | Patient$outpatientHemodialysesArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["patient"]>
 
@@ -9758,6 +10218,8 @@ export namespace Prisma {
     allergies?: boolean | Patient$allergiesArgs<ExtArgs>
     medicalHistory?: boolean | Patient$medicalHistoryArgs<ExtArgs>
     viralSerologies?: boolean | Patient$viralSerologiesArgs<ExtArgs>
+    biopsyRecords?: boolean | Patient$biopsyRecordsArgs<ExtArgs>
+    outpatientHemodialyses?: boolean | Patient$outpatientHemodialysesArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PatientIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9776,6 +10238,8 @@ export namespace Prisma {
       allergies: Prisma.$AllergyPayload<ExtArgs>[]
       medicalHistory: Prisma.$MedicalHistoryPayload<ExtArgs> | null
       viralSerologies: Prisma.$ViralSerologyPayload<ExtArgs>[]
+      biopsyRecords: Prisma.$BiopsyRecordPayload<ExtArgs>[]
+      outpatientHemodialyses: Prisma.$OutpatientHemodialysisPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -10193,6 +10657,8 @@ export namespace Prisma {
     allergies<T extends Patient$allergiesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$allergiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AllergyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     medicalHistory<T extends Patient$medicalHistoryArgs<ExtArgs> = {}>(args?: Subset<T, Patient$medicalHistoryArgs<ExtArgs>>): Prisma__MedicalHistoryClient<$Result.GetResult<Prisma.$MedicalHistoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     viralSerologies<T extends Patient$viralSerologiesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$viralSerologiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ViralSerologyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    biopsyRecords<T extends Patient$biopsyRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$biopsyRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    outpatientHemodialyses<T extends Patient$outpatientHemodialysesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$outpatientHemodialysesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10772,6 +11238,54 @@ export namespace Prisma {
   }
 
   /**
+   * Patient.biopsyRecords
+   */
+  export type Patient$biopsyRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    where?: BiopsyRecordWhereInput
+    orderBy?: BiopsyRecordOrderByWithRelationInput | BiopsyRecordOrderByWithRelationInput[]
+    cursor?: BiopsyRecordWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BiopsyRecordScalarFieldEnum | BiopsyRecordScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.outpatientHemodialyses
+   */
+  export type Patient$outpatientHemodialysesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    where?: OutpatientHemodialysisWhereInput
+    orderBy?: OutpatientHemodialysisOrderByWithRelationInput | OutpatientHemodialysisOrderByWithRelationInput[]
+    cursor?: OutpatientHemodialysisWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OutpatientHemodialysisScalarFieldEnum | OutpatientHemodialysisScalarFieldEnum[]
+  }
+
+  /**
    * Patient without action
    */
   export type PatientDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11236,6 +11750,8 @@ export namespace Prisma {
     vascularAccesses?: boolean | Episode$vascularAccessesArgs<ExtArgs>
     internalMedicineProfile?: boolean | Episode$internalMedicineProfileArgs<ExtArgs>
     surgicalProfile?: boolean | Episode$surgicalProfileArgs<ExtArgs>
+    hematologyProfile?: boolean | Episode$hematologyProfileArgs<ExtArgs>
+    emergencyProfile?: boolean | Episode$emergencyProfileArgs<ExtArgs>
     antibiotics?: boolean | Episode$antibioticsArgs<ExtArgs>
     surgicalDevices?: boolean | Episode$surgicalDevicesArgs<ExtArgs>
     baseDepartmentPlanEntries?: boolean | Episode$baseDepartmentPlanEntriesArgs<ExtArgs>
@@ -11375,6 +11891,8 @@ export namespace Prisma {
     vascularAccesses?: boolean | Episode$vascularAccessesArgs<ExtArgs>
     internalMedicineProfile?: boolean | Episode$internalMedicineProfileArgs<ExtArgs>
     surgicalProfile?: boolean | Episode$surgicalProfileArgs<ExtArgs>
+    hematologyProfile?: boolean | Episode$hematologyProfileArgs<ExtArgs>
+    emergencyProfile?: boolean | Episode$emergencyProfileArgs<ExtArgs>
     antibiotics?: boolean | Episode$antibioticsArgs<ExtArgs>
     surgicalDevices?: boolean | Episode$surgicalDevicesArgs<ExtArgs>
     baseDepartmentPlanEntries?: boolean | Episode$baseDepartmentPlanEntriesArgs<ExtArgs>
@@ -11411,6 +11929,8 @@ export namespace Prisma {
       vascularAccesses: Prisma.$VascularAccessPayload<ExtArgs>[]
       internalMedicineProfile: Prisma.$InternalMedicineProfilePayload<ExtArgs> | null
       surgicalProfile: Prisma.$SurgicalProfilePayload<ExtArgs> | null
+      hematologyProfile: Prisma.$HematologyProfilePayload<ExtArgs> | null
+      emergencyProfile: Prisma.$EmergencyProfilePayload<ExtArgs> | null
       antibiotics: Prisma.$EpisodeAntibioticPayload<ExtArgs>[]
       surgicalDevices: Prisma.$SurgicalDevicePayload<ExtArgs>[]
       baseDepartmentPlanEntries: Prisma.$BaseDepartmentPlanEntryPayload<ExtArgs>[]
@@ -11860,6 +12380,8 @@ export namespace Prisma {
     vascularAccesses<T extends Episode$vascularAccessesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$vascularAccessesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VascularAccessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     internalMedicineProfile<T extends Episode$internalMedicineProfileArgs<ExtArgs> = {}>(args?: Subset<T, Episode$internalMedicineProfileArgs<ExtArgs>>): Prisma__InternalMedicineProfileClient<$Result.GetResult<Prisma.$InternalMedicineProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     surgicalProfile<T extends Episode$surgicalProfileArgs<ExtArgs> = {}>(args?: Subset<T, Episode$surgicalProfileArgs<ExtArgs>>): Prisma__SurgicalProfileClient<$Result.GetResult<Prisma.$SurgicalProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    hematologyProfile<T extends Episode$hematologyProfileArgs<ExtArgs> = {}>(args?: Subset<T, Episode$hematologyProfileArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    emergencyProfile<T extends Episode$emergencyProfileArgs<ExtArgs> = {}>(args?: Subset<T, Episode$emergencyProfileArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     antibiotics<T extends Episode$antibioticsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$antibioticsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeAntibioticPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     surgicalDevices<T extends Episode$surgicalDevicesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$surgicalDevicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SurgicalDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     baseDepartmentPlanEntries<T extends Episode$baseDepartmentPlanEntriesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$baseDepartmentPlanEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BaseDepartmentPlanEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -12667,6 +13189,44 @@ export namespace Prisma {
   }
 
   /**
+   * Episode.hematologyProfile
+   */
+  export type Episode$hematologyProfileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    where?: HematologyProfileWhereInput
+  }
+
+  /**
+   * Episode.emergencyProfile
+   */
+  export type Episode$emergencyProfileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    where?: EmergencyProfileWhereInput
+  }
+
+  /**
    * Episode.antibiotics
    */
   export type Episode$antibioticsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -12818,6 +13378,7 @@ export namespace Prisma {
     consultationDate: Date | null
     status: string | null
     visitType: string | null
+    consultationType: string | null
     chiefComplaint: string | null
     bloodPressure: string | null
     heartRate: number | null
@@ -12848,6 +13409,7 @@ export namespace Prisma {
     consultationDate: Date | null
     status: string | null
     visitType: string | null
+    consultationType: string | null
     chiefComplaint: string | null
     bloodPressure: string | null
     heartRate: number | null
@@ -12878,6 +13440,7 @@ export namespace Prisma {
     consultationDate: number
     status: number
     visitType: number
+    consultationType: number
     chiefComplaint: number
     bloodPressure: number
     heartRate: number
@@ -12926,6 +13489,7 @@ export namespace Prisma {
     consultationDate?: true
     status?: true
     visitType?: true
+    consultationType?: true
     chiefComplaint?: true
     bloodPressure?: true
     heartRate?: true
@@ -12956,6 +13520,7 @@ export namespace Prisma {
     consultationDate?: true
     status?: true
     visitType?: true
+    consultationType?: true
     chiefComplaint?: true
     bloodPressure?: true
     heartRate?: true
@@ -12986,6 +13551,7 @@ export namespace Prisma {
     consultationDate?: true
     status?: true
     visitType?: true
+    consultationType?: true
     chiefComplaint?: true
     bloodPressure?: true
     heartRate?: true
@@ -13103,6 +13669,7 @@ export namespace Prisma {
     consultationDate: Date
     status: string
     visitType: string
+    consultationType: string
     chiefComplaint: string
     bloodPressure: string | null
     heartRate: number | null
@@ -13152,6 +13719,7 @@ export namespace Prisma {
     consultationDate?: boolean
     status?: boolean
     visitType?: boolean
+    consultationType?: boolean
     chiefComplaint?: boolean
     bloodPressure?: boolean
     heartRate?: boolean
@@ -13185,6 +13753,7 @@ export namespace Prisma {
     consultationDate?: boolean
     status?: boolean
     visitType?: boolean
+    consultationType?: boolean
     chiefComplaint?: boolean
     bloodPressure?: boolean
     heartRate?: boolean
@@ -13218,6 +13787,7 @@ export namespace Prisma {
     consultationDate?: boolean
     status?: boolean
     visitType?: boolean
+    consultationType?: boolean
     chiefComplaint?: boolean
     bloodPressure?: boolean
     heartRate?: boolean
@@ -13251,6 +13821,7 @@ export namespace Prisma {
     consultationDate?: boolean
     status?: boolean
     visitType?: boolean
+    consultationType?: boolean
     chiefComplaint?: boolean
     bloodPressure?: boolean
     heartRate?: boolean
@@ -13272,7 +13843,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ConsultationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "patientId" | "doctorId" | "doctorName" | "consultationDate" | "status" | "visitType" | "chiefComplaint" | "bloodPressure" | "heartRate" | "temperature" | "oxygenSat" | "weight" | "weightUnit" | "heightCm" | "historyIllness" | "physicalExam" | "diagnosis" | "treatmentPlan" | "labOrders" | "nextAppointment" | "notes" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["consultation"]>
+  export type ConsultationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "patientId" | "doctorId" | "doctorName" | "consultationDate" | "status" | "visitType" | "consultationType" | "chiefComplaint" | "bloodPressure" | "heartRate" | "temperature" | "oxygenSat" | "weight" | "weightUnit" | "heightCm" | "historyIllness" | "physicalExam" | "diagnosis" | "treatmentPlan" | "labOrders" | "nextAppointment" | "notes" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["consultation"]>
   export type ConsultationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     residency?: boolean | ResidencyDefaultArgs<ExtArgs>
     patient?: boolean | PatientDefaultArgs<ExtArgs>
@@ -13305,6 +13876,7 @@ export namespace Prisma {
       consultationDate: Date
       status: string
       visitType: string
+      consultationType: string
       chiefComplaint: string
       bloodPressure: string | null
       heartRate: number | null
@@ -13758,6 +14330,7 @@ export namespace Prisma {
     readonly consultationDate: FieldRef<"Consultation", 'DateTime'>
     readonly status: FieldRef<"Consultation", 'String'>
     readonly visitType: FieldRef<"Consultation", 'String'>
+    readonly consultationType: FieldRef<"Consultation", 'String'>
     readonly chiefComplaint: FieldRef<"Consultation", 'String'>
     readonly bloodPressure: FieldRef<"Consultation", 'String'>
     readonly heartRate: FieldRef<"Consultation", 'Int'>
@@ -15392,6 +15965,5490 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: InternalMedicineProfileInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model HematologyProfile
+   */
+
+  export type AggregateHematologyProfile = {
+    _count: HematologyProfileCountAggregateOutputType | null
+    _min: HematologyProfileMinAggregateOutputType | null
+    _max: HematologyProfileMaxAggregateOutputType | null
+  }
+
+  export type HematologyProfileMinAggregateOutputType = {
+    id: string | null
+    episodeId: string | null
+    vitalSignsFrequency: string | null
+    bleedingWatch: string | null
+    painWatch: string | null
+    temperatureWatch: string | null
+    hemodynamicWatch: string | null
+    pendingBloodProducts: string | null
+    pendingStudies: string | null
+    isolationType: string | null
+    oxygenSupport: string | null
+    hematologicSummary: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type HematologyProfileMaxAggregateOutputType = {
+    id: string | null
+    episodeId: string | null
+    vitalSignsFrequency: string | null
+    bleedingWatch: string | null
+    painWatch: string | null
+    temperatureWatch: string | null
+    hemodynamicWatch: string | null
+    pendingBloodProducts: string | null
+    pendingStudies: string | null
+    isolationType: string | null
+    oxygenSupport: string | null
+    hematologicSummary: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type HematologyProfileCountAggregateOutputType = {
+    id: number
+    episodeId: number
+    vitalSignsFrequency: number
+    bleedingWatch: number
+    painWatch: number
+    temperatureWatch: number
+    hemodynamicWatch: number
+    pendingBloodProducts: number
+    pendingStudies: number
+    isolationType: number
+    oxygenSupport: number
+    hematologicSummary: number
+    updatedBy: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type HematologyProfileMinAggregateInputType = {
+    id?: true
+    episodeId?: true
+    vitalSignsFrequency?: true
+    bleedingWatch?: true
+    painWatch?: true
+    temperatureWatch?: true
+    hemodynamicWatch?: true
+    pendingBloodProducts?: true
+    pendingStudies?: true
+    isolationType?: true
+    oxygenSupport?: true
+    hematologicSummary?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type HematologyProfileMaxAggregateInputType = {
+    id?: true
+    episodeId?: true
+    vitalSignsFrequency?: true
+    bleedingWatch?: true
+    painWatch?: true
+    temperatureWatch?: true
+    hemodynamicWatch?: true
+    pendingBloodProducts?: true
+    pendingStudies?: true
+    isolationType?: true
+    oxygenSupport?: true
+    hematologicSummary?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type HematologyProfileCountAggregateInputType = {
+    id?: true
+    episodeId?: true
+    vitalSignsFrequency?: true
+    bleedingWatch?: true
+    painWatch?: true
+    temperatureWatch?: true
+    hemodynamicWatch?: true
+    pendingBloodProducts?: true
+    pendingStudies?: true
+    isolationType?: true
+    oxygenSupport?: true
+    hematologicSummary?: true
+    updatedBy?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type HematologyProfileAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HematologyProfile to aggregate.
+     */
+    where?: HematologyProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HematologyProfiles to fetch.
+     */
+    orderBy?: HematologyProfileOrderByWithRelationInput | HematologyProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: HematologyProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HematologyProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HematologyProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned HematologyProfiles
+    **/
+    _count?: true | HematologyProfileCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: HematologyProfileMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: HematologyProfileMaxAggregateInputType
+  }
+
+  export type GetHematologyProfileAggregateType<T extends HematologyProfileAggregateArgs> = {
+        [P in keyof T & keyof AggregateHematologyProfile]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateHematologyProfile[P]>
+      : GetScalarType<T[P], AggregateHematologyProfile[P]>
+  }
+
+
+
+
+  export type HematologyProfileGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HematologyProfileWhereInput
+    orderBy?: HematologyProfileOrderByWithAggregationInput | HematologyProfileOrderByWithAggregationInput[]
+    by: HematologyProfileScalarFieldEnum[] | HematologyProfileScalarFieldEnum
+    having?: HematologyProfileScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: HematologyProfileCountAggregateInputType | true
+    _min?: HematologyProfileMinAggregateInputType
+    _max?: HematologyProfileMaxAggregateInputType
+  }
+
+  export type HematologyProfileGroupByOutputType = {
+    id: string
+    episodeId: string
+    vitalSignsFrequency: string
+    bleedingWatch: string | null
+    painWatch: string | null
+    temperatureWatch: string | null
+    hemodynamicWatch: string | null
+    pendingBloodProducts: string | null
+    pendingStudies: string | null
+    isolationType: string
+    oxygenSupport: string
+    hematologicSummary: string | null
+    updatedBy: string
+    updatedAt: Date
+    _count: HematologyProfileCountAggregateOutputType | null
+    _min: HematologyProfileMinAggregateOutputType | null
+    _max: HematologyProfileMaxAggregateOutputType | null
+  }
+
+  type GetHematologyProfileGroupByPayload<T extends HematologyProfileGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<HematologyProfileGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof HematologyProfileGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], HematologyProfileGroupByOutputType[P]>
+            : GetScalarType<T[P], HematologyProfileGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type HematologyProfileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    vitalSignsFrequency?: boolean
+    bleedingWatch?: boolean
+    painWatch?: boolean
+    temperatureWatch?: boolean
+    hemodynamicWatch?: boolean
+    pendingBloodProducts?: boolean
+    pendingStudies?: boolean
+    isolationType?: boolean
+    oxygenSupport?: boolean
+    hematologicSummary?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hematologyProfile"]>
+
+  export type HematologyProfileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    vitalSignsFrequency?: boolean
+    bleedingWatch?: boolean
+    painWatch?: boolean
+    temperatureWatch?: boolean
+    hemodynamicWatch?: boolean
+    pendingBloodProducts?: boolean
+    pendingStudies?: boolean
+    isolationType?: boolean
+    oxygenSupport?: boolean
+    hematologicSummary?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hematologyProfile"]>
+
+  export type HematologyProfileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    vitalSignsFrequency?: boolean
+    bleedingWatch?: boolean
+    painWatch?: boolean
+    temperatureWatch?: boolean
+    hemodynamicWatch?: boolean
+    pendingBloodProducts?: boolean
+    pendingStudies?: boolean
+    isolationType?: boolean
+    oxygenSupport?: boolean
+    hematologicSummary?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hematologyProfile"]>
+
+  export type HematologyProfileSelectScalar = {
+    id?: boolean
+    episodeId?: boolean
+    vitalSignsFrequency?: boolean
+    bleedingWatch?: boolean
+    painWatch?: boolean
+    temperatureWatch?: boolean
+    hemodynamicWatch?: boolean
+    pendingBloodProducts?: boolean
+    pendingStudies?: boolean
+    isolationType?: boolean
+    oxygenSupport?: boolean
+    hematologicSummary?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }
+
+  export type HematologyProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "vitalSignsFrequency" | "bleedingWatch" | "painWatch" | "temperatureWatch" | "hemodynamicWatch" | "pendingBloodProducts" | "pendingStudies" | "isolationType" | "oxygenSupport" | "hematologicSummary" | "updatedBy" | "updatedAt", ExtArgs["result"]["hematologyProfile"]>
+  export type HematologyProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+  export type HematologyProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+  export type HematologyProfileIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+
+  export type $HematologyProfilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "HematologyProfile"
+    objects: {
+      episode: Prisma.$EpisodePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      episodeId: string
+      vitalSignsFrequency: string
+      bleedingWatch: string | null
+      painWatch: string | null
+      temperatureWatch: string | null
+      hemodynamicWatch: string | null
+      pendingBloodProducts: string | null
+      pendingStudies: string | null
+      isolationType: string
+      oxygenSupport: string
+      hematologicSummary: string | null
+      updatedBy: string
+      updatedAt: Date
+    }, ExtArgs["result"]["hematologyProfile"]>
+    composites: {}
+  }
+
+  type HematologyProfileGetPayload<S extends boolean | null | undefined | HematologyProfileDefaultArgs> = $Result.GetResult<Prisma.$HematologyProfilePayload, S>
+
+  type HematologyProfileCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<HematologyProfileFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: HematologyProfileCountAggregateInputType | true
+    }
+
+  export interface HematologyProfileDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['HematologyProfile'], meta: { name: 'HematologyProfile' } }
+    /**
+     * Find zero or one HematologyProfile that matches the filter.
+     * @param {HematologyProfileFindUniqueArgs} args - Arguments to find a HematologyProfile
+     * @example
+     * // Get one HematologyProfile
+     * const hematologyProfile = await prisma.hematologyProfile.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends HematologyProfileFindUniqueArgs>(args: SelectSubset<T, HematologyProfileFindUniqueArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one HematologyProfile that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {HematologyProfileFindUniqueOrThrowArgs} args - Arguments to find a HematologyProfile
+     * @example
+     * // Get one HematologyProfile
+     * const hematologyProfile = await prisma.hematologyProfile.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends HematologyProfileFindUniqueOrThrowArgs>(args: SelectSubset<T, HematologyProfileFindUniqueOrThrowArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HematologyProfile that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HematologyProfileFindFirstArgs} args - Arguments to find a HematologyProfile
+     * @example
+     * // Get one HematologyProfile
+     * const hematologyProfile = await prisma.hematologyProfile.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends HematologyProfileFindFirstArgs>(args?: SelectSubset<T, HematologyProfileFindFirstArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HematologyProfile that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HematologyProfileFindFirstOrThrowArgs} args - Arguments to find a HematologyProfile
+     * @example
+     * // Get one HematologyProfile
+     * const hematologyProfile = await prisma.hematologyProfile.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends HematologyProfileFindFirstOrThrowArgs>(args?: SelectSubset<T, HematologyProfileFindFirstOrThrowArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more HematologyProfiles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HematologyProfileFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all HematologyProfiles
+     * const hematologyProfiles = await prisma.hematologyProfile.findMany()
+     * 
+     * // Get first 10 HematologyProfiles
+     * const hematologyProfiles = await prisma.hematologyProfile.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const hematologyProfileWithIdOnly = await prisma.hematologyProfile.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends HematologyProfileFindManyArgs>(args?: SelectSubset<T, HematologyProfileFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a HematologyProfile.
+     * @param {HematologyProfileCreateArgs} args - Arguments to create a HematologyProfile.
+     * @example
+     * // Create one HematologyProfile
+     * const HematologyProfile = await prisma.hematologyProfile.create({
+     *   data: {
+     *     // ... data to create a HematologyProfile
+     *   }
+     * })
+     * 
+     */
+    create<T extends HematologyProfileCreateArgs>(args: SelectSubset<T, HematologyProfileCreateArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many HematologyProfiles.
+     * @param {HematologyProfileCreateManyArgs} args - Arguments to create many HematologyProfiles.
+     * @example
+     * // Create many HematologyProfiles
+     * const hematologyProfile = await prisma.hematologyProfile.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends HematologyProfileCreateManyArgs>(args?: SelectSubset<T, HematologyProfileCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many HematologyProfiles and returns the data saved in the database.
+     * @param {HematologyProfileCreateManyAndReturnArgs} args - Arguments to create many HematologyProfiles.
+     * @example
+     * // Create many HematologyProfiles
+     * const hematologyProfile = await prisma.hematologyProfile.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many HematologyProfiles and only return the `id`
+     * const hematologyProfileWithIdOnly = await prisma.hematologyProfile.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends HematologyProfileCreateManyAndReturnArgs>(args?: SelectSubset<T, HematologyProfileCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a HematologyProfile.
+     * @param {HematologyProfileDeleteArgs} args - Arguments to delete one HematologyProfile.
+     * @example
+     * // Delete one HematologyProfile
+     * const HematologyProfile = await prisma.hematologyProfile.delete({
+     *   where: {
+     *     // ... filter to delete one HematologyProfile
+     *   }
+     * })
+     * 
+     */
+    delete<T extends HematologyProfileDeleteArgs>(args: SelectSubset<T, HematologyProfileDeleteArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one HematologyProfile.
+     * @param {HematologyProfileUpdateArgs} args - Arguments to update one HematologyProfile.
+     * @example
+     * // Update one HematologyProfile
+     * const hematologyProfile = await prisma.hematologyProfile.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends HematologyProfileUpdateArgs>(args: SelectSubset<T, HematologyProfileUpdateArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more HematologyProfiles.
+     * @param {HematologyProfileDeleteManyArgs} args - Arguments to filter HematologyProfiles to delete.
+     * @example
+     * // Delete a few HematologyProfiles
+     * const { count } = await prisma.hematologyProfile.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends HematologyProfileDeleteManyArgs>(args?: SelectSubset<T, HematologyProfileDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HematologyProfiles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HematologyProfileUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many HematologyProfiles
+     * const hematologyProfile = await prisma.hematologyProfile.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends HematologyProfileUpdateManyArgs>(args: SelectSubset<T, HematologyProfileUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HematologyProfiles and returns the data updated in the database.
+     * @param {HematologyProfileUpdateManyAndReturnArgs} args - Arguments to update many HematologyProfiles.
+     * @example
+     * // Update many HematologyProfiles
+     * const hematologyProfile = await prisma.hematologyProfile.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more HematologyProfiles and only return the `id`
+     * const hematologyProfileWithIdOnly = await prisma.hematologyProfile.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends HematologyProfileUpdateManyAndReturnArgs>(args: SelectSubset<T, HematologyProfileUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one HematologyProfile.
+     * @param {HematologyProfileUpsertArgs} args - Arguments to update or create a HematologyProfile.
+     * @example
+     * // Update or create a HematologyProfile
+     * const hematologyProfile = await prisma.hematologyProfile.upsert({
+     *   create: {
+     *     // ... data to create a HematologyProfile
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the HematologyProfile we want to update
+     *   }
+     * })
+     */
+    upsert<T extends HematologyProfileUpsertArgs>(args: SelectSubset<T, HematologyProfileUpsertArgs<ExtArgs>>): Prisma__HematologyProfileClient<$Result.GetResult<Prisma.$HematologyProfilePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of HematologyProfiles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HematologyProfileCountArgs} args - Arguments to filter HematologyProfiles to count.
+     * @example
+     * // Count the number of HematologyProfiles
+     * const count = await prisma.hematologyProfile.count({
+     *   where: {
+     *     // ... the filter for the HematologyProfiles we want to count
+     *   }
+     * })
+    **/
+    count<T extends HematologyProfileCountArgs>(
+      args?: Subset<T, HematologyProfileCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], HematologyProfileCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a HematologyProfile.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HematologyProfileAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends HematologyProfileAggregateArgs>(args: Subset<T, HematologyProfileAggregateArgs>): Prisma.PrismaPromise<GetHematologyProfileAggregateType<T>>
+
+    /**
+     * Group by HematologyProfile.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HematologyProfileGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends HematologyProfileGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: HematologyProfileGroupByArgs['orderBy'] }
+        : { orderBy?: HematologyProfileGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, HematologyProfileGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetHematologyProfileGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the HematologyProfile model
+   */
+  readonly fields: HematologyProfileFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for HematologyProfile.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__HematologyProfileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    episode<T extends EpisodeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDefaultArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the HematologyProfile model
+   */
+  interface HematologyProfileFieldRefs {
+    readonly id: FieldRef<"HematologyProfile", 'String'>
+    readonly episodeId: FieldRef<"HematologyProfile", 'String'>
+    readonly vitalSignsFrequency: FieldRef<"HematologyProfile", 'String'>
+    readonly bleedingWatch: FieldRef<"HematologyProfile", 'String'>
+    readonly painWatch: FieldRef<"HematologyProfile", 'String'>
+    readonly temperatureWatch: FieldRef<"HematologyProfile", 'String'>
+    readonly hemodynamicWatch: FieldRef<"HematologyProfile", 'String'>
+    readonly pendingBloodProducts: FieldRef<"HematologyProfile", 'String'>
+    readonly pendingStudies: FieldRef<"HematologyProfile", 'String'>
+    readonly isolationType: FieldRef<"HematologyProfile", 'String'>
+    readonly oxygenSupport: FieldRef<"HematologyProfile", 'String'>
+    readonly hematologicSummary: FieldRef<"HematologyProfile", 'String'>
+    readonly updatedBy: FieldRef<"HematologyProfile", 'String'>
+    readonly updatedAt: FieldRef<"HematologyProfile", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * HematologyProfile findUnique
+   */
+  export type HematologyProfileFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which HematologyProfile to fetch.
+     */
+    where: HematologyProfileWhereUniqueInput
+  }
+
+  /**
+   * HematologyProfile findUniqueOrThrow
+   */
+  export type HematologyProfileFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which HematologyProfile to fetch.
+     */
+    where: HematologyProfileWhereUniqueInput
+  }
+
+  /**
+   * HematologyProfile findFirst
+   */
+  export type HematologyProfileFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which HematologyProfile to fetch.
+     */
+    where?: HematologyProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HematologyProfiles to fetch.
+     */
+    orderBy?: HematologyProfileOrderByWithRelationInput | HematologyProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HematologyProfiles.
+     */
+    cursor?: HematologyProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HematologyProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HematologyProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HematologyProfiles.
+     */
+    distinct?: HematologyProfileScalarFieldEnum | HematologyProfileScalarFieldEnum[]
+  }
+
+  /**
+   * HematologyProfile findFirstOrThrow
+   */
+  export type HematologyProfileFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which HematologyProfile to fetch.
+     */
+    where?: HematologyProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HematologyProfiles to fetch.
+     */
+    orderBy?: HematologyProfileOrderByWithRelationInput | HematologyProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HematologyProfiles.
+     */
+    cursor?: HematologyProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HematologyProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HematologyProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HematologyProfiles.
+     */
+    distinct?: HematologyProfileScalarFieldEnum | HematologyProfileScalarFieldEnum[]
+  }
+
+  /**
+   * HematologyProfile findMany
+   */
+  export type HematologyProfileFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which HematologyProfiles to fetch.
+     */
+    where?: HematologyProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HematologyProfiles to fetch.
+     */
+    orderBy?: HematologyProfileOrderByWithRelationInput | HematologyProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing HematologyProfiles.
+     */
+    cursor?: HematologyProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HematologyProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HematologyProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HematologyProfiles.
+     */
+    distinct?: HematologyProfileScalarFieldEnum | HematologyProfileScalarFieldEnum[]
+  }
+
+  /**
+   * HematologyProfile create
+   */
+  export type HematologyProfileCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * The data needed to create a HematologyProfile.
+     */
+    data: XOR<HematologyProfileCreateInput, HematologyProfileUncheckedCreateInput>
+  }
+
+  /**
+   * HematologyProfile createMany
+   */
+  export type HematologyProfileCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many HematologyProfiles.
+     */
+    data: HematologyProfileCreateManyInput | HematologyProfileCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * HematologyProfile createManyAndReturn
+   */
+  export type HematologyProfileCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * The data used to create many HematologyProfiles.
+     */
+    data: HematologyProfileCreateManyInput | HematologyProfileCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * HematologyProfile update
+   */
+  export type HematologyProfileUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * The data needed to update a HematologyProfile.
+     */
+    data: XOR<HematologyProfileUpdateInput, HematologyProfileUncheckedUpdateInput>
+    /**
+     * Choose, which HematologyProfile to update.
+     */
+    where: HematologyProfileWhereUniqueInput
+  }
+
+  /**
+   * HematologyProfile updateMany
+   */
+  export type HematologyProfileUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update HematologyProfiles.
+     */
+    data: XOR<HematologyProfileUpdateManyMutationInput, HematologyProfileUncheckedUpdateManyInput>
+    /**
+     * Filter which HematologyProfiles to update
+     */
+    where?: HematologyProfileWhereInput
+    /**
+     * Limit how many HematologyProfiles to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * HematologyProfile updateManyAndReturn
+   */
+  export type HematologyProfileUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * The data used to update HematologyProfiles.
+     */
+    data: XOR<HematologyProfileUpdateManyMutationInput, HematologyProfileUncheckedUpdateManyInput>
+    /**
+     * Filter which HematologyProfiles to update
+     */
+    where?: HematologyProfileWhereInput
+    /**
+     * Limit how many HematologyProfiles to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * HematologyProfile upsert
+   */
+  export type HematologyProfileUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * The filter to search for the HematologyProfile to update in case it exists.
+     */
+    where: HematologyProfileWhereUniqueInput
+    /**
+     * In case the HematologyProfile found by the `where` argument doesn't exist, create a new HematologyProfile with this data.
+     */
+    create: XOR<HematologyProfileCreateInput, HematologyProfileUncheckedCreateInput>
+    /**
+     * In case the HematologyProfile was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<HematologyProfileUpdateInput, HematologyProfileUncheckedUpdateInput>
+  }
+
+  /**
+   * HematologyProfile delete
+   */
+  export type HematologyProfileDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+    /**
+     * Filter which HematologyProfile to delete.
+     */
+    where: HematologyProfileWhereUniqueInput
+  }
+
+  /**
+   * HematologyProfile deleteMany
+   */
+  export type HematologyProfileDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HematologyProfiles to delete
+     */
+    where?: HematologyProfileWhereInput
+    /**
+     * Limit how many HematologyProfiles to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * HematologyProfile without action
+   */
+  export type HematologyProfileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HematologyProfile
+     */
+    select?: HematologyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HematologyProfile
+     */
+    omit?: HematologyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HematologyProfileInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EmergencyProfile
+   */
+
+  export type AggregateEmergencyProfile = {
+    _count: EmergencyProfileCountAggregateOutputType | null
+    _min: EmergencyProfileMinAggregateOutputType | null
+    _max: EmergencyProfileMaxAggregateOutputType | null
+  }
+
+  export type EmergencyProfileMinAggregateOutputType = {
+    id: string | null
+    episodeId: string | null
+    amc: string | null
+    specialty: string | null
+    relevantLabsStudies: string | null
+    interestsPending: string | null
+    triageLevel: string | null
+    clinicalStatus: string | null
+    oxygenSupport: string | null
+    dispositionPlan: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type EmergencyProfileMaxAggregateOutputType = {
+    id: string | null
+    episodeId: string | null
+    amc: string | null
+    specialty: string | null
+    relevantLabsStudies: string | null
+    interestsPending: string | null
+    triageLevel: string | null
+    clinicalStatus: string | null
+    oxygenSupport: string | null
+    dispositionPlan: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type EmergencyProfileCountAggregateOutputType = {
+    id: number
+    episodeId: number
+    amc: number
+    specialty: number
+    relevantLabsStudies: number
+    interestsPending: number
+    triageLevel: number
+    clinicalStatus: number
+    oxygenSupport: number
+    dispositionPlan: number
+    updatedBy: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type EmergencyProfileMinAggregateInputType = {
+    id?: true
+    episodeId?: true
+    amc?: true
+    specialty?: true
+    relevantLabsStudies?: true
+    interestsPending?: true
+    triageLevel?: true
+    clinicalStatus?: true
+    oxygenSupport?: true
+    dispositionPlan?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type EmergencyProfileMaxAggregateInputType = {
+    id?: true
+    episodeId?: true
+    amc?: true
+    specialty?: true
+    relevantLabsStudies?: true
+    interestsPending?: true
+    triageLevel?: true
+    clinicalStatus?: true
+    oxygenSupport?: true
+    dispositionPlan?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type EmergencyProfileCountAggregateInputType = {
+    id?: true
+    episodeId?: true
+    amc?: true
+    specialty?: true
+    relevantLabsStudies?: true
+    interestsPending?: true
+    triageLevel?: true
+    clinicalStatus?: true
+    oxygenSupport?: true
+    dispositionPlan?: true
+    updatedBy?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type EmergencyProfileAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EmergencyProfile to aggregate.
+     */
+    where?: EmergencyProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmergencyProfiles to fetch.
+     */
+    orderBy?: EmergencyProfileOrderByWithRelationInput | EmergencyProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EmergencyProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmergencyProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmergencyProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EmergencyProfiles
+    **/
+    _count?: true | EmergencyProfileCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EmergencyProfileMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EmergencyProfileMaxAggregateInputType
+  }
+
+  export type GetEmergencyProfileAggregateType<T extends EmergencyProfileAggregateArgs> = {
+        [P in keyof T & keyof AggregateEmergencyProfile]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEmergencyProfile[P]>
+      : GetScalarType<T[P], AggregateEmergencyProfile[P]>
+  }
+
+
+
+
+  export type EmergencyProfileGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmergencyProfileWhereInput
+    orderBy?: EmergencyProfileOrderByWithAggregationInput | EmergencyProfileOrderByWithAggregationInput[]
+    by: EmergencyProfileScalarFieldEnum[] | EmergencyProfileScalarFieldEnum
+    having?: EmergencyProfileScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EmergencyProfileCountAggregateInputType | true
+    _min?: EmergencyProfileMinAggregateInputType
+    _max?: EmergencyProfileMaxAggregateInputType
+  }
+
+  export type EmergencyProfileGroupByOutputType = {
+    id: string
+    episodeId: string
+    amc: string | null
+    specialty: string | null
+    relevantLabsStudies: string | null
+    interestsPending: string | null
+    triageLevel: string
+    clinicalStatus: string
+    oxygenSupport: string
+    dispositionPlan: string | null
+    updatedBy: string
+    updatedAt: Date
+    _count: EmergencyProfileCountAggregateOutputType | null
+    _min: EmergencyProfileMinAggregateOutputType | null
+    _max: EmergencyProfileMaxAggregateOutputType | null
+  }
+
+  type GetEmergencyProfileGroupByPayload<T extends EmergencyProfileGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EmergencyProfileGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EmergencyProfileGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EmergencyProfileGroupByOutputType[P]>
+            : GetScalarType<T[P], EmergencyProfileGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EmergencyProfileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    amc?: boolean
+    specialty?: boolean
+    relevantLabsStudies?: boolean
+    interestsPending?: boolean
+    triageLevel?: boolean
+    clinicalStatus?: boolean
+    oxygenSupport?: boolean
+    dispositionPlan?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["emergencyProfile"]>
+
+  export type EmergencyProfileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    amc?: boolean
+    specialty?: boolean
+    relevantLabsStudies?: boolean
+    interestsPending?: boolean
+    triageLevel?: boolean
+    clinicalStatus?: boolean
+    oxygenSupport?: boolean
+    dispositionPlan?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["emergencyProfile"]>
+
+  export type EmergencyProfileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    episodeId?: boolean
+    amc?: boolean
+    specialty?: boolean
+    relevantLabsStudies?: boolean
+    interestsPending?: boolean
+    triageLevel?: boolean
+    clinicalStatus?: boolean
+    oxygenSupport?: boolean
+    dispositionPlan?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["emergencyProfile"]>
+
+  export type EmergencyProfileSelectScalar = {
+    id?: boolean
+    episodeId?: boolean
+    amc?: boolean
+    specialty?: boolean
+    relevantLabsStudies?: boolean
+    interestsPending?: boolean
+    triageLevel?: boolean
+    clinicalStatus?: boolean
+    oxygenSupport?: boolean
+    dispositionPlan?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }
+
+  export type EmergencyProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "amc" | "specialty" | "relevantLabsStudies" | "interestsPending" | "triageLevel" | "clinicalStatus" | "oxygenSupport" | "dispositionPlan" | "updatedBy" | "updatedAt", ExtArgs["result"]["emergencyProfile"]>
+  export type EmergencyProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+  export type EmergencyProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+  export type EmergencyProfileIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+  }
+
+  export type $EmergencyProfilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EmergencyProfile"
+    objects: {
+      episode: Prisma.$EpisodePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      episodeId: string
+      amc: string | null
+      specialty: string | null
+      relevantLabsStudies: string | null
+      interestsPending: string | null
+      triageLevel: string
+      clinicalStatus: string
+      oxygenSupport: string
+      dispositionPlan: string | null
+      updatedBy: string
+      updatedAt: Date
+    }, ExtArgs["result"]["emergencyProfile"]>
+    composites: {}
+  }
+
+  type EmergencyProfileGetPayload<S extends boolean | null | undefined | EmergencyProfileDefaultArgs> = $Result.GetResult<Prisma.$EmergencyProfilePayload, S>
+
+  type EmergencyProfileCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EmergencyProfileFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EmergencyProfileCountAggregateInputType | true
+    }
+
+  export interface EmergencyProfileDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EmergencyProfile'], meta: { name: 'EmergencyProfile' } }
+    /**
+     * Find zero or one EmergencyProfile that matches the filter.
+     * @param {EmergencyProfileFindUniqueArgs} args - Arguments to find a EmergencyProfile
+     * @example
+     * // Get one EmergencyProfile
+     * const emergencyProfile = await prisma.emergencyProfile.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EmergencyProfileFindUniqueArgs>(args: SelectSubset<T, EmergencyProfileFindUniqueArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EmergencyProfile that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EmergencyProfileFindUniqueOrThrowArgs} args - Arguments to find a EmergencyProfile
+     * @example
+     * // Get one EmergencyProfile
+     * const emergencyProfile = await prisma.emergencyProfile.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EmergencyProfileFindUniqueOrThrowArgs>(args: SelectSubset<T, EmergencyProfileFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EmergencyProfile that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyProfileFindFirstArgs} args - Arguments to find a EmergencyProfile
+     * @example
+     * // Get one EmergencyProfile
+     * const emergencyProfile = await prisma.emergencyProfile.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EmergencyProfileFindFirstArgs>(args?: SelectSubset<T, EmergencyProfileFindFirstArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EmergencyProfile that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyProfileFindFirstOrThrowArgs} args - Arguments to find a EmergencyProfile
+     * @example
+     * // Get one EmergencyProfile
+     * const emergencyProfile = await prisma.emergencyProfile.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EmergencyProfileFindFirstOrThrowArgs>(args?: SelectSubset<T, EmergencyProfileFindFirstOrThrowArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EmergencyProfiles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyProfileFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EmergencyProfiles
+     * const emergencyProfiles = await prisma.emergencyProfile.findMany()
+     * 
+     * // Get first 10 EmergencyProfiles
+     * const emergencyProfiles = await prisma.emergencyProfile.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const emergencyProfileWithIdOnly = await prisma.emergencyProfile.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EmergencyProfileFindManyArgs>(args?: SelectSubset<T, EmergencyProfileFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EmergencyProfile.
+     * @param {EmergencyProfileCreateArgs} args - Arguments to create a EmergencyProfile.
+     * @example
+     * // Create one EmergencyProfile
+     * const EmergencyProfile = await prisma.emergencyProfile.create({
+     *   data: {
+     *     // ... data to create a EmergencyProfile
+     *   }
+     * })
+     * 
+     */
+    create<T extends EmergencyProfileCreateArgs>(args: SelectSubset<T, EmergencyProfileCreateArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EmergencyProfiles.
+     * @param {EmergencyProfileCreateManyArgs} args - Arguments to create many EmergencyProfiles.
+     * @example
+     * // Create many EmergencyProfiles
+     * const emergencyProfile = await prisma.emergencyProfile.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EmergencyProfileCreateManyArgs>(args?: SelectSubset<T, EmergencyProfileCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EmergencyProfiles and returns the data saved in the database.
+     * @param {EmergencyProfileCreateManyAndReturnArgs} args - Arguments to create many EmergencyProfiles.
+     * @example
+     * // Create many EmergencyProfiles
+     * const emergencyProfile = await prisma.emergencyProfile.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EmergencyProfiles and only return the `id`
+     * const emergencyProfileWithIdOnly = await prisma.emergencyProfile.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EmergencyProfileCreateManyAndReturnArgs>(args?: SelectSubset<T, EmergencyProfileCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EmergencyProfile.
+     * @param {EmergencyProfileDeleteArgs} args - Arguments to delete one EmergencyProfile.
+     * @example
+     * // Delete one EmergencyProfile
+     * const EmergencyProfile = await prisma.emergencyProfile.delete({
+     *   where: {
+     *     // ... filter to delete one EmergencyProfile
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EmergencyProfileDeleteArgs>(args: SelectSubset<T, EmergencyProfileDeleteArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EmergencyProfile.
+     * @param {EmergencyProfileUpdateArgs} args - Arguments to update one EmergencyProfile.
+     * @example
+     * // Update one EmergencyProfile
+     * const emergencyProfile = await prisma.emergencyProfile.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EmergencyProfileUpdateArgs>(args: SelectSubset<T, EmergencyProfileUpdateArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EmergencyProfiles.
+     * @param {EmergencyProfileDeleteManyArgs} args - Arguments to filter EmergencyProfiles to delete.
+     * @example
+     * // Delete a few EmergencyProfiles
+     * const { count } = await prisma.emergencyProfile.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EmergencyProfileDeleteManyArgs>(args?: SelectSubset<T, EmergencyProfileDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EmergencyProfiles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyProfileUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EmergencyProfiles
+     * const emergencyProfile = await prisma.emergencyProfile.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EmergencyProfileUpdateManyArgs>(args: SelectSubset<T, EmergencyProfileUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EmergencyProfiles and returns the data updated in the database.
+     * @param {EmergencyProfileUpdateManyAndReturnArgs} args - Arguments to update many EmergencyProfiles.
+     * @example
+     * // Update many EmergencyProfiles
+     * const emergencyProfile = await prisma.emergencyProfile.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EmergencyProfiles and only return the `id`
+     * const emergencyProfileWithIdOnly = await prisma.emergencyProfile.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EmergencyProfileUpdateManyAndReturnArgs>(args: SelectSubset<T, EmergencyProfileUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EmergencyProfile.
+     * @param {EmergencyProfileUpsertArgs} args - Arguments to update or create a EmergencyProfile.
+     * @example
+     * // Update or create a EmergencyProfile
+     * const emergencyProfile = await prisma.emergencyProfile.upsert({
+     *   create: {
+     *     // ... data to create a EmergencyProfile
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EmergencyProfile we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EmergencyProfileUpsertArgs>(args: SelectSubset<T, EmergencyProfileUpsertArgs<ExtArgs>>): Prisma__EmergencyProfileClient<$Result.GetResult<Prisma.$EmergencyProfilePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EmergencyProfiles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyProfileCountArgs} args - Arguments to filter EmergencyProfiles to count.
+     * @example
+     * // Count the number of EmergencyProfiles
+     * const count = await prisma.emergencyProfile.count({
+     *   where: {
+     *     // ... the filter for the EmergencyProfiles we want to count
+     *   }
+     * })
+    **/
+    count<T extends EmergencyProfileCountArgs>(
+      args?: Subset<T, EmergencyProfileCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EmergencyProfileCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EmergencyProfile.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyProfileAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EmergencyProfileAggregateArgs>(args: Subset<T, EmergencyProfileAggregateArgs>): Prisma.PrismaPromise<GetEmergencyProfileAggregateType<T>>
+
+    /**
+     * Group by EmergencyProfile.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyProfileGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EmergencyProfileGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EmergencyProfileGroupByArgs['orderBy'] }
+        : { orderBy?: EmergencyProfileGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EmergencyProfileGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEmergencyProfileGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EmergencyProfile model
+   */
+  readonly fields: EmergencyProfileFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EmergencyProfile.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EmergencyProfileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    episode<T extends EpisodeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDefaultArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EmergencyProfile model
+   */
+  interface EmergencyProfileFieldRefs {
+    readonly id: FieldRef<"EmergencyProfile", 'String'>
+    readonly episodeId: FieldRef<"EmergencyProfile", 'String'>
+    readonly amc: FieldRef<"EmergencyProfile", 'String'>
+    readonly specialty: FieldRef<"EmergencyProfile", 'String'>
+    readonly relevantLabsStudies: FieldRef<"EmergencyProfile", 'String'>
+    readonly interestsPending: FieldRef<"EmergencyProfile", 'String'>
+    readonly triageLevel: FieldRef<"EmergencyProfile", 'String'>
+    readonly clinicalStatus: FieldRef<"EmergencyProfile", 'String'>
+    readonly oxygenSupport: FieldRef<"EmergencyProfile", 'String'>
+    readonly dispositionPlan: FieldRef<"EmergencyProfile", 'String'>
+    readonly updatedBy: FieldRef<"EmergencyProfile", 'String'>
+    readonly updatedAt: FieldRef<"EmergencyProfile", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EmergencyProfile findUnique
+   */
+  export type EmergencyProfileFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyProfile to fetch.
+     */
+    where: EmergencyProfileWhereUniqueInput
+  }
+
+  /**
+   * EmergencyProfile findUniqueOrThrow
+   */
+  export type EmergencyProfileFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyProfile to fetch.
+     */
+    where: EmergencyProfileWhereUniqueInput
+  }
+
+  /**
+   * EmergencyProfile findFirst
+   */
+  export type EmergencyProfileFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyProfile to fetch.
+     */
+    where?: EmergencyProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmergencyProfiles to fetch.
+     */
+    orderBy?: EmergencyProfileOrderByWithRelationInput | EmergencyProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EmergencyProfiles.
+     */
+    cursor?: EmergencyProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmergencyProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmergencyProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmergencyProfiles.
+     */
+    distinct?: EmergencyProfileScalarFieldEnum | EmergencyProfileScalarFieldEnum[]
+  }
+
+  /**
+   * EmergencyProfile findFirstOrThrow
+   */
+  export type EmergencyProfileFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyProfile to fetch.
+     */
+    where?: EmergencyProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmergencyProfiles to fetch.
+     */
+    orderBy?: EmergencyProfileOrderByWithRelationInput | EmergencyProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EmergencyProfiles.
+     */
+    cursor?: EmergencyProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmergencyProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmergencyProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmergencyProfiles.
+     */
+    distinct?: EmergencyProfileScalarFieldEnum | EmergencyProfileScalarFieldEnum[]
+  }
+
+  /**
+   * EmergencyProfile findMany
+   */
+  export type EmergencyProfileFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyProfiles to fetch.
+     */
+    where?: EmergencyProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmergencyProfiles to fetch.
+     */
+    orderBy?: EmergencyProfileOrderByWithRelationInput | EmergencyProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EmergencyProfiles.
+     */
+    cursor?: EmergencyProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmergencyProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmergencyProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmergencyProfiles.
+     */
+    distinct?: EmergencyProfileScalarFieldEnum | EmergencyProfileScalarFieldEnum[]
+  }
+
+  /**
+   * EmergencyProfile create
+   */
+  export type EmergencyProfileCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EmergencyProfile.
+     */
+    data: XOR<EmergencyProfileCreateInput, EmergencyProfileUncheckedCreateInput>
+  }
+
+  /**
+   * EmergencyProfile createMany
+   */
+  export type EmergencyProfileCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EmergencyProfiles.
+     */
+    data: EmergencyProfileCreateManyInput | EmergencyProfileCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EmergencyProfile createManyAndReturn
+   */
+  export type EmergencyProfileCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * The data used to create many EmergencyProfiles.
+     */
+    data: EmergencyProfileCreateManyInput | EmergencyProfileCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EmergencyProfile update
+   */
+  export type EmergencyProfileUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EmergencyProfile.
+     */
+    data: XOR<EmergencyProfileUpdateInput, EmergencyProfileUncheckedUpdateInput>
+    /**
+     * Choose, which EmergencyProfile to update.
+     */
+    where: EmergencyProfileWhereUniqueInput
+  }
+
+  /**
+   * EmergencyProfile updateMany
+   */
+  export type EmergencyProfileUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EmergencyProfiles.
+     */
+    data: XOR<EmergencyProfileUpdateManyMutationInput, EmergencyProfileUncheckedUpdateManyInput>
+    /**
+     * Filter which EmergencyProfiles to update
+     */
+    where?: EmergencyProfileWhereInput
+    /**
+     * Limit how many EmergencyProfiles to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EmergencyProfile updateManyAndReturn
+   */
+  export type EmergencyProfileUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * The data used to update EmergencyProfiles.
+     */
+    data: XOR<EmergencyProfileUpdateManyMutationInput, EmergencyProfileUncheckedUpdateManyInput>
+    /**
+     * Filter which EmergencyProfiles to update
+     */
+    where?: EmergencyProfileWhereInput
+    /**
+     * Limit how many EmergencyProfiles to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EmergencyProfile upsert
+   */
+  export type EmergencyProfileUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EmergencyProfile to update in case it exists.
+     */
+    where: EmergencyProfileWhereUniqueInput
+    /**
+     * In case the EmergencyProfile found by the `where` argument doesn't exist, create a new EmergencyProfile with this data.
+     */
+    create: XOR<EmergencyProfileCreateInput, EmergencyProfileUncheckedCreateInput>
+    /**
+     * In case the EmergencyProfile was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EmergencyProfileUpdateInput, EmergencyProfileUncheckedUpdateInput>
+  }
+
+  /**
+   * EmergencyProfile delete
+   */
+  export type EmergencyProfileDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+    /**
+     * Filter which EmergencyProfile to delete.
+     */
+    where: EmergencyProfileWhereUniqueInput
+  }
+
+  /**
+   * EmergencyProfile deleteMany
+   */
+  export type EmergencyProfileDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EmergencyProfiles to delete
+     */
+    where?: EmergencyProfileWhereInput
+    /**
+     * Limit how many EmergencyProfiles to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EmergencyProfile without action
+   */
+  export type EmergencyProfileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyProfile
+     */
+    select?: EmergencyProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyProfile
+     */
+    omit?: EmergencyProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyProfileInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BiopsyRecord
+   */
+
+  export type AggregateBiopsyRecord = {
+    _count: BiopsyRecordCountAggregateOutputType | null
+    _min: BiopsyRecordMinAggregateOutputType | null
+    _max: BiopsyRecordMaxAggregateOutputType | null
+  }
+
+  export type BiopsyRecordMinAggregateOutputType = {
+    id: string | null
+    residencyId: string | null
+    patientId: string | null
+    status: string | null
+    patientName: string | null
+    phone: string | null
+    labsStatus: string | null
+    needleStatus: string | null
+    kitStatus: string | null
+    scheduledDate: string | null
+    senasaAuth: string | null
+    note: string | null
+    performedDate: string | null
+    complications: string | null
+    report: string | null
+    highlightTag: string | null
+    createdBy: string | null
+    createdByName: string | null
+    createdByRole: string | null
+    createdAt: Date | null
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+    performedBy: string | null
+    performedByName: string | null
+    performedByRole: string | null
+    performedAt: Date | null
+  }
+
+  export type BiopsyRecordMaxAggregateOutputType = {
+    id: string | null
+    residencyId: string | null
+    patientId: string | null
+    status: string | null
+    patientName: string | null
+    phone: string | null
+    labsStatus: string | null
+    needleStatus: string | null
+    kitStatus: string | null
+    scheduledDate: string | null
+    senasaAuth: string | null
+    note: string | null
+    performedDate: string | null
+    complications: string | null
+    report: string | null
+    highlightTag: string | null
+    createdBy: string | null
+    createdByName: string | null
+    createdByRole: string | null
+    createdAt: Date | null
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+    performedBy: string | null
+    performedByName: string | null
+    performedByRole: string | null
+    performedAt: Date | null
+  }
+
+  export type BiopsyRecordCountAggregateOutputType = {
+    id: number
+    residencyId: number
+    patientId: number
+    status: number
+    patientName: number
+    phone: number
+    labsStatus: number
+    needleStatus: number
+    kitStatus: number
+    scheduledDate: number
+    senasaAuth: number
+    note: number
+    performedDate: number
+    complications: number
+    report: number
+    highlightTag: number
+    createdBy: number
+    createdByName: number
+    createdByRole: number
+    createdAt: number
+    updatedBy: number
+    updatedByName: number
+    updatedByRole: number
+    updatedAt: number
+    performedBy: number
+    performedByName: number
+    performedByRole: number
+    performedAt: number
+    _all: number
+  }
+
+
+  export type BiopsyRecordMinAggregateInputType = {
+    id?: true
+    residencyId?: true
+    patientId?: true
+    status?: true
+    patientName?: true
+    phone?: true
+    labsStatus?: true
+    needleStatus?: true
+    kitStatus?: true
+    scheduledDate?: true
+    senasaAuth?: true
+    note?: true
+    performedDate?: true
+    complications?: true
+    report?: true
+    highlightTag?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+    performedBy?: true
+    performedByName?: true
+    performedByRole?: true
+    performedAt?: true
+  }
+
+  export type BiopsyRecordMaxAggregateInputType = {
+    id?: true
+    residencyId?: true
+    patientId?: true
+    status?: true
+    patientName?: true
+    phone?: true
+    labsStatus?: true
+    needleStatus?: true
+    kitStatus?: true
+    scheduledDate?: true
+    senasaAuth?: true
+    note?: true
+    performedDate?: true
+    complications?: true
+    report?: true
+    highlightTag?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+    performedBy?: true
+    performedByName?: true
+    performedByRole?: true
+    performedAt?: true
+  }
+
+  export type BiopsyRecordCountAggregateInputType = {
+    id?: true
+    residencyId?: true
+    patientId?: true
+    status?: true
+    patientName?: true
+    phone?: true
+    labsStatus?: true
+    needleStatus?: true
+    kitStatus?: true
+    scheduledDate?: true
+    senasaAuth?: true
+    note?: true
+    performedDate?: true
+    complications?: true
+    report?: true
+    highlightTag?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+    performedBy?: true
+    performedByName?: true
+    performedByRole?: true
+    performedAt?: true
+    _all?: true
+  }
+
+  export type BiopsyRecordAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BiopsyRecord to aggregate.
+     */
+    where?: BiopsyRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BiopsyRecords to fetch.
+     */
+    orderBy?: BiopsyRecordOrderByWithRelationInput | BiopsyRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BiopsyRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BiopsyRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BiopsyRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BiopsyRecords
+    **/
+    _count?: true | BiopsyRecordCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BiopsyRecordMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BiopsyRecordMaxAggregateInputType
+  }
+
+  export type GetBiopsyRecordAggregateType<T extends BiopsyRecordAggregateArgs> = {
+        [P in keyof T & keyof AggregateBiopsyRecord]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBiopsyRecord[P]>
+      : GetScalarType<T[P], AggregateBiopsyRecord[P]>
+  }
+
+
+
+
+  export type BiopsyRecordGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BiopsyRecordWhereInput
+    orderBy?: BiopsyRecordOrderByWithAggregationInput | BiopsyRecordOrderByWithAggregationInput[]
+    by: BiopsyRecordScalarFieldEnum[] | BiopsyRecordScalarFieldEnum
+    having?: BiopsyRecordScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BiopsyRecordCountAggregateInputType | true
+    _min?: BiopsyRecordMinAggregateInputType
+    _max?: BiopsyRecordMaxAggregateInputType
+  }
+
+  export type BiopsyRecordGroupByOutputType = {
+    id: string
+    residencyId: string
+    patientId: string | null
+    status: string
+    patientName: string
+    phone: string | null
+    labsStatus: string | null
+    needleStatus: string | null
+    kitStatus: string | null
+    scheduledDate: string | null
+    senasaAuth: string | null
+    note: string | null
+    performedDate: string | null
+    complications: string | null
+    report: string | null
+    highlightTag: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt: Date
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+    performedBy: string | null
+    performedByName: string | null
+    performedByRole: string | null
+    performedAt: Date | null
+    _count: BiopsyRecordCountAggregateOutputType | null
+    _min: BiopsyRecordMinAggregateOutputType | null
+    _max: BiopsyRecordMaxAggregateOutputType | null
+  }
+
+  type GetBiopsyRecordGroupByPayload<T extends BiopsyRecordGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BiopsyRecordGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BiopsyRecordGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BiopsyRecordGroupByOutputType[P]>
+            : GetScalarType<T[P], BiopsyRecordGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BiopsyRecordSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    patientId?: boolean
+    status?: boolean
+    patientName?: boolean
+    phone?: boolean
+    labsStatus?: boolean
+    needleStatus?: boolean
+    kitStatus?: boolean
+    scheduledDate?: boolean
+    senasaAuth?: boolean
+    note?: boolean
+    performedDate?: boolean
+    complications?: boolean
+    report?: boolean
+    highlightTag?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    performedBy?: boolean
+    performedByName?: boolean
+    performedByRole?: boolean
+    performedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | BiopsyRecord$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["biopsyRecord"]>
+
+  export type BiopsyRecordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    patientId?: boolean
+    status?: boolean
+    patientName?: boolean
+    phone?: boolean
+    labsStatus?: boolean
+    needleStatus?: boolean
+    kitStatus?: boolean
+    scheduledDate?: boolean
+    senasaAuth?: boolean
+    note?: boolean
+    performedDate?: boolean
+    complications?: boolean
+    report?: boolean
+    highlightTag?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    performedBy?: boolean
+    performedByName?: boolean
+    performedByRole?: boolean
+    performedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | BiopsyRecord$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["biopsyRecord"]>
+
+  export type BiopsyRecordSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    patientId?: boolean
+    status?: boolean
+    patientName?: boolean
+    phone?: boolean
+    labsStatus?: boolean
+    needleStatus?: boolean
+    kitStatus?: boolean
+    scheduledDate?: boolean
+    senasaAuth?: boolean
+    note?: boolean
+    performedDate?: boolean
+    complications?: boolean
+    report?: boolean
+    highlightTag?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    performedBy?: boolean
+    performedByName?: boolean
+    performedByRole?: boolean
+    performedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | BiopsyRecord$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["biopsyRecord"]>
+
+  export type BiopsyRecordSelectScalar = {
+    id?: boolean
+    residencyId?: boolean
+    patientId?: boolean
+    status?: boolean
+    patientName?: boolean
+    phone?: boolean
+    labsStatus?: boolean
+    needleStatus?: boolean
+    kitStatus?: boolean
+    scheduledDate?: boolean
+    senasaAuth?: boolean
+    note?: boolean
+    performedDate?: boolean
+    complications?: boolean
+    report?: boolean
+    highlightTag?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    performedBy?: boolean
+    performedByName?: boolean
+    performedByRole?: boolean
+    performedAt?: boolean
+  }
+
+  export type BiopsyRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "patientId" | "status" | "patientName" | "phone" | "labsStatus" | "needleStatus" | "kitStatus" | "scheduledDate" | "senasaAuth" | "note" | "performedDate" | "complications" | "report" | "highlightTag" | "createdBy" | "createdByName" | "createdByRole" | "createdAt" | "updatedBy" | "updatedByName" | "updatedByRole" | "updatedAt" | "performedBy" | "performedByName" | "performedByRole" | "performedAt", ExtArgs["result"]["biopsyRecord"]>
+  export type BiopsyRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | BiopsyRecord$patientArgs<ExtArgs>
+  }
+  export type BiopsyRecordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | BiopsyRecord$patientArgs<ExtArgs>
+  }
+  export type BiopsyRecordIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | BiopsyRecord$patientArgs<ExtArgs>
+  }
+
+  export type $BiopsyRecordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BiopsyRecord"
+    objects: {
+      residency: Prisma.$ResidencyPayload<ExtArgs>
+      patient: Prisma.$PatientPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      residencyId: string
+      patientId: string | null
+      status: string
+      patientName: string
+      phone: string | null
+      labsStatus: string | null
+      needleStatus: string | null
+      kitStatus: string | null
+      scheduledDate: string | null
+      senasaAuth: string | null
+      note: string | null
+      performedDate: string | null
+      complications: string | null
+      report: string | null
+      highlightTag: string
+      createdBy: string
+      createdByName: string
+      createdByRole: string
+      createdAt: Date
+      updatedBy: string | null
+      updatedByName: string | null
+      updatedByRole: string | null
+      updatedAt: Date | null
+      performedBy: string | null
+      performedByName: string | null
+      performedByRole: string | null
+      performedAt: Date | null
+    }, ExtArgs["result"]["biopsyRecord"]>
+    composites: {}
+  }
+
+  type BiopsyRecordGetPayload<S extends boolean | null | undefined | BiopsyRecordDefaultArgs> = $Result.GetResult<Prisma.$BiopsyRecordPayload, S>
+
+  type BiopsyRecordCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BiopsyRecordFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BiopsyRecordCountAggregateInputType | true
+    }
+
+  export interface BiopsyRecordDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BiopsyRecord'], meta: { name: 'BiopsyRecord' } }
+    /**
+     * Find zero or one BiopsyRecord that matches the filter.
+     * @param {BiopsyRecordFindUniqueArgs} args - Arguments to find a BiopsyRecord
+     * @example
+     * // Get one BiopsyRecord
+     * const biopsyRecord = await prisma.biopsyRecord.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BiopsyRecordFindUniqueArgs>(args: SelectSubset<T, BiopsyRecordFindUniqueArgs<ExtArgs>>): Prisma__BiopsyRecordClient<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BiopsyRecord that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BiopsyRecordFindUniqueOrThrowArgs} args - Arguments to find a BiopsyRecord
+     * @example
+     * // Get one BiopsyRecord
+     * const biopsyRecord = await prisma.biopsyRecord.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BiopsyRecordFindUniqueOrThrowArgs>(args: SelectSubset<T, BiopsyRecordFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BiopsyRecordClient<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BiopsyRecord that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BiopsyRecordFindFirstArgs} args - Arguments to find a BiopsyRecord
+     * @example
+     * // Get one BiopsyRecord
+     * const biopsyRecord = await prisma.biopsyRecord.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BiopsyRecordFindFirstArgs>(args?: SelectSubset<T, BiopsyRecordFindFirstArgs<ExtArgs>>): Prisma__BiopsyRecordClient<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BiopsyRecord that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BiopsyRecordFindFirstOrThrowArgs} args - Arguments to find a BiopsyRecord
+     * @example
+     * // Get one BiopsyRecord
+     * const biopsyRecord = await prisma.biopsyRecord.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BiopsyRecordFindFirstOrThrowArgs>(args?: SelectSubset<T, BiopsyRecordFindFirstOrThrowArgs<ExtArgs>>): Prisma__BiopsyRecordClient<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BiopsyRecords that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BiopsyRecordFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BiopsyRecords
+     * const biopsyRecords = await prisma.biopsyRecord.findMany()
+     * 
+     * // Get first 10 BiopsyRecords
+     * const biopsyRecords = await prisma.biopsyRecord.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const biopsyRecordWithIdOnly = await prisma.biopsyRecord.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BiopsyRecordFindManyArgs>(args?: SelectSubset<T, BiopsyRecordFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BiopsyRecord.
+     * @param {BiopsyRecordCreateArgs} args - Arguments to create a BiopsyRecord.
+     * @example
+     * // Create one BiopsyRecord
+     * const BiopsyRecord = await prisma.biopsyRecord.create({
+     *   data: {
+     *     // ... data to create a BiopsyRecord
+     *   }
+     * })
+     * 
+     */
+    create<T extends BiopsyRecordCreateArgs>(args: SelectSubset<T, BiopsyRecordCreateArgs<ExtArgs>>): Prisma__BiopsyRecordClient<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BiopsyRecords.
+     * @param {BiopsyRecordCreateManyArgs} args - Arguments to create many BiopsyRecords.
+     * @example
+     * // Create many BiopsyRecords
+     * const biopsyRecord = await prisma.biopsyRecord.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BiopsyRecordCreateManyArgs>(args?: SelectSubset<T, BiopsyRecordCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BiopsyRecords and returns the data saved in the database.
+     * @param {BiopsyRecordCreateManyAndReturnArgs} args - Arguments to create many BiopsyRecords.
+     * @example
+     * // Create many BiopsyRecords
+     * const biopsyRecord = await prisma.biopsyRecord.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BiopsyRecords and only return the `id`
+     * const biopsyRecordWithIdOnly = await prisma.biopsyRecord.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BiopsyRecordCreateManyAndReturnArgs>(args?: SelectSubset<T, BiopsyRecordCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BiopsyRecord.
+     * @param {BiopsyRecordDeleteArgs} args - Arguments to delete one BiopsyRecord.
+     * @example
+     * // Delete one BiopsyRecord
+     * const BiopsyRecord = await prisma.biopsyRecord.delete({
+     *   where: {
+     *     // ... filter to delete one BiopsyRecord
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BiopsyRecordDeleteArgs>(args: SelectSubset<T, BiopsyRecordDeleteArgs<ExtArgs>>): Prisma__BiopsyRecordClient<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BiopsyRecord.
+     * @param {BiopsyRecordUpdateArgs} args - Arguments to update one BiopsyRecord.
+     * @example
+     * // Update one BiopsyRecord
+     * const biopsyRecord = await prisma.biopsyRecord.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BiopsyRecordUpdateArgs>(args: SelectSubset<T, BiopsyRecordUpdateArgs<ExtArgs>>): Prisma__BiopsyRecordClient<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BiopsyRecords.
+     * @param {BiopsyRecordDeleteManyArgs} args - Arguments to filter BiopsyRecords to delete.
+     * @example
+     * // Delete a few BiopsyRecords
+     * const { count } = await prisma.biopsyRecord.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BiopsyRecordDeleteManyArgs>(args?: SelectSubset<T, BiopsyRecordDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BiopsyRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BiopsyRecordUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BiopsyRecords
+     * const biopsyRecord = await prisma.biopsyRecord.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BiopsyRecordUpdateManyArgs>(args: SelectSubset<T, BiopsyRecordUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BiopsyRecords and returns the data updated in the database.
+     * @param {BiopsyRecordUpdateManyAndReturnArgs} args - Arguments to update many BiopsyRecords.
+     * @example
+     * // Update many BiopsyRecords
+     * const biopsyRecord = await prisma.biopsyRecord.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BiopsyRecords and only return the `id`
+     * const biopsyRecordWithIdOnly = await prisma.biopsyRecord.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BiopsyRecordUpdateManyAndReturnArgs>(args: SelectSubset<T, BiopsyRecordUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BiopsyRecord.
+     * @param {BiopsyRecordUpsertArgs} args - Arguments to update or create a BiopsyRecord.
+     * @example
+     * // Update or create a BiopsyRecord
+     * const biopsyRecord = await prisma.biopsyRecord.upsert({
+     *   create: {
+     *     // ... data to create a BiopsyRecord
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BiopsyRecord we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BiopsyRecordUpsertArgs>(args: SelectSubset<T, BiopsyRecordUpsertArgs<ExtArgs>>): Prisma__BiopsyRecordClient<$Result.GetResult<Prisma.$BiopsyRecordPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BiopsyRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BiopsyRecordCountArgs} args - Arguments to filter BiopsyRecords to count.
+     * @example
+     * // Count the number of BiopsyRecords
+     * const count = await prisma.biopsyRecord.count({
+     *   where: {
+     *     // ... the filter for the BiopsyRecords we want to count
+     *   }
+     * })
+    **/
+    count<T extends BiopsyRecordCountArgs>(
+      args?: Subset<T, BiopsyRecordCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BiopsyRecordCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BiopsyRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BiopsyRecordAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BiopsyRecordAggregateArgs>(args: Subset<T, BiopsyRecordAggregateArgs>): Prisma.PrismaPromise<GetBiopsyRecordAggregateType<T>>
+
+    /**
+     * Group by BiopsyRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BiopsyRecordGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BiopsyRecordGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BiopsyRecordGroupByArgs['orderBy'] }
+        : { orderBy?: BiopsyRecordGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BiopsyRecordGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBiopsyRecordGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BiopsyRecord model
+   */
+  readonly fields: BiopsyRecordFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BiopsyRecord.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BiopsyRecordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    residency<T extends ResidencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ResidencyDefaultArgs<ExtArgs>>): Prisma__ResidencyClient<$Result.GetResult<Prisma.$ResidencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    patient<T extends BiopsyRecord$patientArgs<ExtArgs> = {}>(args?: Subset<T, BiopsyRecord$patientArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BiopsyRecord model
+   */
+  interface BiopsyRecordFieldRefs {
+    readonly id: FieldRef<"BiopsyRecord", 'String'>
+    readonly residencyId: FieldRef<"BiopsyRecord", 'String'>
+    readonly patientId: FieldRef<"BiopsyRecord", 'String'>
+    readonly status: FieldRef<"BiopsyRecord", 'String'>
+    readonly patientName: FieldRef<"BiopsyRecord", 'String'>
+    readonly phone: FieldRef<"BiopsyRecord", 'String'>
+    readonly labsStatus: FieldRef<"BiopsyRecord", 'String'>
+    readonly needleStatus: FieldRef<"BiopsyRecord", 'String'>
+    readonly kitStatus: FieldRef<"BiopsyRecord", 'String'>
+    readonly scheduledDate: FieldRef<"BiopsyRecord", 'String'>
+    readonly senasaAuth: FieldRef<"BiopsyRecord", 'String'>
+    readonly note: FieldRef<"BiopsyRecord", 'String'>
+    readonly performedDate: FieldRef<"BiopsyRecord", 'String'>
+    readonly complications: FieldRef<"BiopsyRecord", 'String'>
+    readonly report: FieldRef<"BiopsyRecord", 'String'>
+    readonly highlightTag: FieldRef<"BiopsyRecord", 'String'>
+    readonly createdBy: FieldRef<"BiopsyRecord", 'String'>
+    readonly createdByName: FieldRef<"BiopsyRecord", 'String'>
+    readonly createdByRole: FieldRef<"BiopsyRecord", 'String'>
+    readonly createdAt: FieldRef<"BiopsyRecord", 'DateTime'>
+    readonly updatedBy: FieldRef<"BiopsyRecord", 'String'>
+    readonly updatedByName: FieldRef<"BiopsyRecord", 'String'>
+    readonly updatedByRole: FieldRef<"BiopsyRecord", 'String'>
+    readonly updatedAt: FieldRef<"BiopsyRecord", 'DateTime'>
+    readonly performedBy: FieldRef<"BiopsyRecord", 'String'>
+    readonly performedByName: FieldRef<"BiopsyRecord", 'String'>
+    readonly performedByRole: FieldRef<"BiopsyRecord", 'String'>
+    readonly performedAt: FieldRef<"BiopsyRecord", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BiopsyRecord findUnique
+   */
+  export type BiopsyRecordFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which BiopsyRecord to fetch.
+     */
+    where: BiopsyRecordWhereUniqueInput
+  }
+
+  /**
+   * BiopsyRecord findUniqueOrThrow
+   */
+  export type BiopsyRecordFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which BiopsyRecord to fetch.
+     */
+    where: BiopsyRecordWhereUniqueInput
+  }
+
+  /**
+   * BiopsyRecord findFirst
+   */
+  export type BiopsyRecordFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which BiopsyRecord to fetch.
+     */
+    where?: BiopsyRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BiopsyRecords to fetch.
+     */
+    orderBy?: BiopsyRecordOrderByWithRelationInput | BiopsyRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BiopsyRecords.
+     */
+    cursor?: BiopsyRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BiopsyRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BiopsyRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BiopsyRecords.
+     */
+    distinct?: BiopsyRecordScalarFieldEnum | BiopsyRecordScalarFieldEnum[]
+  }
+
+  /**
+   * BiopsyRecord findFirstOrThrow
+   */
+  export type BiopsyRecordFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which BiopsyRecord to fetch.
+     */
+    where?: BiopsyRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BiopsyRecords to fetch.
+     */
+    orderBy?: BiopsyRecordOrderByWithRelationInput | BiopsyRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BiopsyRecords.
+     */
+    cursor?: BiopsyRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BiopsyRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BiopsyRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BiopsyRecords.
+     */
+    distinct?: BiopsyRecordScalarFieldEnum | BiopsyRecordScalarFieldEnum[]
+  }
+
+  /**
+   * BiopsyRecord findMany
+   */
+  export type BiopsyRecordFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which BiopsyRecords to fetch.
+     */
+    where?: BiopsyRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BiopsyRecords to fetch.
+     */
+    orderBy?: BiopsyRecordOrderByWithRelationInput | BiopsyRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BiopsyRecords.
+     */
+    cursor?: BiopsyRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BiopsyRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BiopsyRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BiopsyRecords.
+     */
+    distinct?: BiopsyRecordScalarFieldEnum | BiopsyRecordScalarFieldEnum[]
+  }
+
+  /**
+   * BiopsyRecord create
+   */
+  export type BiopsyRecordCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BiopsyRecord.
+     */
+    data: XOR<BiopsyRecordCreateInput, BiopsyRecordUncheckedCreateInput>
+  }
+
+  /**
+   * BiopsyRecord createMany
+   */
+  export type BiopsyRecordCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BiopsyRecords.
+     */
+    data: BiopsyRecordCreateManyInput | BiopsyRecordCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BiopsyRecord createManyAndReturn
+   */
+  export type BiopsyRecordCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * The data used to create many BiopsyRecords.
+     */
+    data: BiopsyRecordCreateManyInput | BiopsyRecordCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BiopsyRecord update
+   */
+  export type BiopsyRecordUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BiopsyRecord.
+     */
+    data: XOR<BiopsyRecordUpdateInput, BiopsyRecordUncheckedUpdateInput>
+    /**
+     * Choose, which BiopsyRecord to update.
+     */
+    where: BiopsyRecordWhereUniqueInput
+  }
+
+  /**
+   * BiopsyRecord updateMany
+   */
+  export type BiopsyRecordUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BiopsyRecords.
+     */
+    data: XOR<BiopsyRecordUpdateManyMutationInput, BiopsyRecordUncheckedUpdateManyInput>
+    /**
+     * Filter which BiopsyRecords to update
+     */
+    where?: BiopsyRecordWhereInput
+    /**
+     * Limit how many BiopsyRecords to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BiopsyRecord updateManyAndReturn
+   */
+  export type BiopsyRecordUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * The data used to update BiopsyRecords.
+     */
+    data: XOR<BiopsyRecordUpdateManyMutationInput, BiopsyRecordUncheckedUpdateManyInput>
+    /**
+     * Filter which BiopsyRecords to update
+     */
+    where?: BiopsyRecordWhereInput
+    /**
+     * Limit how many BiopsyRecords to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BiopsyRecord upsert
+   */
+  export type BiopsyRecordUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BiopsyRecord to update in case it exists.
+     */
+    where: BiopsyRecordWhereUniqueInput
+    /**
+     * In case the BiopsyRecord found by the `where` argument doesn't exist, create a new BiopsyRecord with this data.
+     */
+    create: XOR<BiopsyRecordCreateInput, BiopsyRecordUncheckedCreateInput>
+    /**
+     * In case the BiopsyRecord was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BiopsyRecordUpdateInput, BiopsyRecordUncheckedUpdateInput>
+  }
+
+  /**
+   * BiopsyRecord delete
+   */
+  export type BiopsyRecordDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+    /**
+     * Filter which BiopsyRecord to delete.
+     */
+    where: BiopsyRecordWhereUniqueInput
+  }
+
+  /**
+   * BiopsyRecord deleteMany
+   */
+  export type BiopsyRecordDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BiopsyRecords to delete
+     */
+    where?: BiopsyRecordWhereInput
+    /**
+     * Limit how many BiopsyRecords to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BiopsyRecord.patient
+   */
+  export type BiopsyRecord$patientArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Patient
+     */
+    select?: PatientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Patient
+     */
+    omit?: PatientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PatientInclude<ExtArgs> | null
+    where?: PatientWhereInput
+  }
+
+  /**
+   * BiopsyRecord without action
+   */
+  export type BiopsyRecordDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BiopsyRecord
+     */
+    select?: BiopsyRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BiopsyRecord
+     */
+    omit?: BiopsyRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BiopsyRecordInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model OutpatientHemodialysis
+   */
+
+  export type AggregateOutpatientHemodialysis = {
+    _count: OutpatientHemodialysisCountAggregateOutputType | null
+    _avg: OutpatientHemodialysisAvgAggregateOutputType | null
+    _sum: OutpatientHemodialysisSumAggregateOutputType | null
+    _min: OutpatientHemodialysisMinAggregateOutputType | null
+    _max: OutpatientHemodialysisMaxAggregateOutputType | null
+  }
+
+  export type OutpatientHemodialysisAvgAggregateOutputType = {
+    age: number | null
+  }
+
+  export type OutpatientHemodialysisSumAggregateOutputType = {
+    age: number | null
+  }
+
+  export type OutpatientHemodialysisMinAggregateOutputType = {
+    id: string | null
+    residencyId: string | null
+    patientId: string | null
+    firstName: string | null
+    lastName: string | null
+    expedienteNumber: string | null
+    age: number | null
+    sex: string | null
+    phone: string | null
+    cedula: string | null
+    bloodType: string | null
+    diagnosisAndTime: string | null
+    medications: string | null
+    allergies: string | null
+    allergyReaction: string | null
+    transfusions: string | null
+    referredFromCenter: string | null
+    firstTimeInCenter: string | null
+    otherDialysisModality: string | null
+    pathologicalHistory: string | null
+    surgicalHistory: string | null
+    familyHistory: string | null
+    habitCoffee: string | null
+    habitTobacco: string | null
+    habitAlcohol: string | null
+    habitDrugs: string | null
+    habitOther: string | null
+    viralHiv: string | null
+    viralHbsag: string | null
+    viralHvc: string | null
+    labHgb: string | null
+    labHct: string | null
+    labUrea: string | null
+    labCr: string | null
+    labK: string | null
+    labBloodType: string | null
+    labOther: string | null
+    imagingSonography: string | null
+    imagingCt: string | null
+    imagingOther: string | null
+    accessAvFistula: string | null
+    accessGraft: string | null
+    accessTunneledCatheter: string | null
+    accessFavi: string | null
+    clinicalNotes: string | null
+    isActive: boolean | null
+    createdBy: string | null
+    createdByName: string | null
+    createdByRole: string | null
+    createdAt: Date | null
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+  }
+
+  export type OutpatientHemodialysisMaxAggregateOutputType = {
+    id: string | null
+    residencyId: string | null
+    patientId: string | null
+    firstName: string | null
+    lastName: string | null
+    expedienteNumber: string | null
+    age: number | null
+    sex: string | null
+    phone: string | null
+    cedula: string | null
+    bloodType: string | null
+    diagnosisAndTime: string | null
+    medications: string | null
+    allergies: string | null
+    allergyReaction: string | null
+    transfusions: string | null
+    referredFromCenter: string | null
+    firstTimeInCenter: string | null
+    otherDialysisModality: string | null
+    pathologicalHistory: string | null
+    surgicalHistory: string | null
+    familyHistory: string | null
+    habitCoffee: string | null
+    habitTobacco: string | null
+    habitAlcohol: string | null
+    habitDrugs: string | null
+    habitOther: string | null
+    viralHiv: string | null
+    viralHbsag: string | null
+    viralHvc: string | null
+    labHgb: string | null
+    labHct: string | null
+    labUrea: string | null
+    labCr: string | null
+    labK: string | null
+    labBloodType: string | null
+    labOther: string | null
+    imagingSonography: string | null
+    imagingCt: string | null
+    imagingOther: string | null
+    accessAvFistula: string | null
+    accessGraft: string | null
+    accessTunneledCatheter: string | null
+    accessFavi: string | null
+    clinicalNotes: string | null
+    isActive: boolean | null
+    createdBy: string | null
+    createdByName: string | null
+    createdByRole: string | null
+    createdAt: Date | null
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+  }
+
+  export type OutpatientHemodialysisCountAggregateOutputType = {
+    id: number
+    residencyId: number
+    patientId: number
+    firstName: number
+    lastName: number
+    expedienteNumber: number
+    age: number
+    sex: number
+    phone: number
+    cedula: number
+    bloodType: number
+    diagnosisAndTime: number
+    medications: number
+    allergies: number
+    allergyReaction: number
+    transfusions: number
+    referredFromCenter: number
+    firstTimeInCenter: number
+    otherDialysisModality: number
+    pathologicalHistory: number
+    surgicalHistory: number
+    familyHistory: number
+    habitCoffee: number
+    habitTobacco: number
+    habitAlcohol: number
+    habitDrugs: number
+    habitOther: number
+    viralHiv: number
+    viralHbsag: number
+    viralHvc: number
+    labHgb: number
+    labHct: number
+    labUrea: number
+    labCr: number
+    labK: number
+    labBloodType: number
+    labOther: number
+    imagingSonography: number
+    imagingCt: number
+    imagingOther: number
+    accessAvFistula: number
+    accessGraft: number
+    accessTunneledCatheter: number
+    accessFavi: number
+    clinicalNotes: number
+    isActive: number
+    createdBy: number
+    createdByName: number
+    createdByRole: number
+    createdAt: number
+    updatedBy: number
+    updatedByName: number
+    updatedByRole: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type OutpatientHemodialysisAvgAggregateInputType = {
+    age?: true
+  }
+
+  export type OutpatientHemodialysisSumAggregateInputType = {
+    age?: true
+  }
+
+  export type OutpatientHemodialysisMinAggregateInputType = {
+    id?: true
+    residencyId?: true
+    patientId?: true
+    firstName?: true
+    lastName?: true
+    expedienteNumber?: true
+    age?: true
+    sex?: true
+    phone?: true
+    cedula?: true
+    bloodType?: true
+    diagnosisAndTime?: true
+    medications?: true
+    allergies?: true
+    allergyReaction?: true
+    transfusions?: true
+    referredFromCenter?: true
+    firstTimeInCenter?: true
+    otherDialysisModality?: true
+    pathologicalHistory?: true
+    surgicalHistory?: true
+    familyHistory?: true
+    habitCoffee?: true
+    habitTobacco?: true
+    habitAlcohol?: true
+    habitDrugs?: true
+    habitOther?: true
+    viralHiv?: true
+    viralHbsag?: true
+    viralHvc?: true
+    labHgb?: true
+    labHct?: true
+    labUrea?: true
+    labCr?: true
+    labK?: true
+    labBloodType?: true
+    labOther?: true
+    imagingSonography?: true
+    imagingCt?: true
+    imagingOther?: true
+    accessAvFistula?: true
+    accessGraft?: true
+    accessTunneledCatheter?: true
+    accessFavi?: true
+    clinicalNotes?: true
+    isActive?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+  }
+
+  export type OutpatientHemodialysisMaxAggregateInputType = {
+    id?: true
+    residencyId?: true
+    patientId?: true
+    firstName?: true
+    lastName?: true
+    expedienteNumber?: true
+    age?: true
+    sex?: true
+    phone?: true
+    cedula?: true
+    bloodType?: true
+    diagnosisAndTime?: true
+    medications?: true
+    allergies?: true
+    allergyReaction?: true
+    transfusions?: true
+    referredFromCenter?: true
+    firstTimeInCenter?: true
+    otherDialysisModality?: true
+    pathologicalHistory?: true
+    surgicalHistory?: true
+    familyHistory?: true
+    habitCoffee?: true
+    habitTobacco?: true
+    habitAlcohol?: true
+    habitDrugs?: true
+    habitOther?: true
+    viralHiv?: true
+    viralHbsag?: true
+    viralHvc?: true
+    labHgb?: true
+    labHct?: true
+    labUrea?: true
+    labCr?: true
+    labK?: true
+    labBloodType?: true
+    labOther?: true
+    imagingSonography?: true
+    imagingCt?: true
+    imagingOther?: true
+    accessAvFistula?: true
+    accessGraft?: true
+    accessTunneledCatheter?: true
+    accessFavi?: true
+    clinicalNotes?: true
+    isActive?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+  }
+
+  export type OutpatientHemodialysisCountAggregateInputType = {
+    id?: true
+    residencyId?: true
+    patientId?: true
+    firstName?: true
+    lastName?: true
+    expedienteNumber?: true
+    age?: true
+    sex?: true
+    phone?: true
+    cedula?: true
+    bloodType?: true
+    diagnosisAndTime?: true
+    medications?: true
+    allergies?: true
+    allergyReaction?: true
+    transfusions?: true
+    referredFromCenter?: true
+    firstTimeInCenter?: true
+    otherDialysisModality?: true
+    pathologicalHistory?: true
+    surgicalHistory?: true
+    familyHistory?: true
+    habitCoffee?: true
+    habitTobacco?: true
+    habitAlcohol?: true
+    habitDrugs?: true
+    habitOther?: true
+    viralHiv?: true
+    viralHbsag?: true
+    viralHvc?: true
+    labHgb?: true
+    labHct?: true
+    labUrea?: true
+    labCr?: true
+    labK?: true
+    labBloodType?: true
+    labOther?: true
+    imagingSonography?: true
+    imagingCt?: true
+    imagingOther?: true
+    accessAvFistula?: true
+    accessGraft?: true
+    accessTunneledCatheter?: true
+    accessFavi?: true
+    clinicalNotes?: true
+    isActive?: true
+    createdBy?: true
+    createdByName?: true
+    createdByRole?: true
+    createdAt?: true
+    updatedBy?: true
+    updatedByName?: true
+    updatedByRole?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type OutpatientHemodialysisAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OutpatientHemodialysis to aggregate.
+     */
+    where?: OutpatientHemodialysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OutpatientHemodialyses to fetch.
+     */
+    orderBy?: OutpatientHemodialysisOrderByWithRelationInput | OutpatientHemodialysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OutpatientHemodialysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OutpatientHemodialyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OutpatientHemodialyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned OutpatientHemodialyses
+    **/
+    _count?: true | OutpatientHemodialysisCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: OutpatientHemodialysisAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: OutpatientHemodialysisSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OutpatientHemodialysisMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OutpatientHemodialysisMaxAggregateInputType
+  }
+
+  export type GetOutpatientHemodialysisAggregateType<T extends OutpatientHemodialysisAggregateArgs> = {
+        [P in keyof T & keyof AggregateOutpatientHemodialysis]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOutpatientHemodialysis[P]>
+      : GetScalarType<T[P], AggregateOutpatientHemodialysis[P]>
+  }
+
+
+
+
+  export type OutpatientHemodialysisGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OutpatientHemodialysisWhereInput
+    orderBy?: OutpatientHemodialysisOrderByWithAggregationInput | OutpatientHemodialysisOrderByWithAggregationInput[]
+    by: OutpatientHemodialysisScalarFieldEnum[] | OutpatientHemodialysisScalarFieldEnum
+    having?: OutpatientHemodialysisScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OutpatientHemodialysisCountAggregateInputType | true
+    _avg?: OutpatientHemodialysisAvgAggregateInputType
+    _sum?: OutpatientHemodialysisSumAggregateInputType
+    _min?: OutpatientHemodialysisMinAggregateInputType
+    _max?: OutpatientHemodialysisMaxAggregateInputType
+  }
+
+  export type OutpatientHemodialysisGroupByOutputType = {
+    id: string
+    residencyId: string
+    patientId: string | null
+    firstName: string
+    lastName: string
+    expedienteNumber: string | null
+    age: number | null
+    sex: string | null
+    phone: string | null
+    cedula: string | null
+    bloodType: string | null
+    diagnosisAndTime: string | null
+    medications: string | null
+    allergies: string | null
+    allergyReaction: string | null
+    transfusions: string | null
+    referredFromCenter: string | null
+    firstTimeInCenter: string | null
+    otherDialysisModality: string | null
+    pathologicalHistory: string | null
+    surgicalHistory: string | null
+    familyHistory: string | null
+    habitCoffee: string | null
+    habitTobacco: string | null
+    habitAlcohol: string | null
+    habitDrugs: string | null
+    habitOther: string | null
+    viralHiv: string | null
+    viralHbsag: string | null
+    viralHvc: string | null
+    labHgb: string | null
+    labHct: string | null
+    labUrea: string | null
+    labCr: string | null
+    labK: string | null
+    labBloodType: string | null
+    labOther: string | null
+    imagingSonography: string | null
+    imagingCt: string | null
+    imagingOther: string | null
+    accessAvFistula: string | null
+    accessGraft: string | null
+    accessTunneledCatheter: string | null
+    accessFavi: string | null
+    clinicalNotes: string | null
+    isActive: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt: Date
+    updatedBy: string | null
+    updatedByName: string | null
+    updatedByRole: string | null
+    updatedAt: Date | null
+    _count: OutpatientHemodialysisCountAggregateOutputType | null
+    _avg: OutpatientHemodialysisAvgAggregateOutputType | null
+    _sum: OutpatientHemodialysisSumAggregateOutputType | null
+    _min: OutpatientHemodialysisMinAggregateOutputType | null
+    _max: OutpatientHemodialysisMaxAggregateOutputType | null
+  }
+
+  type GetOutpatientHemodialysisGroupByPayload<T extends OutpatientHemodialysisGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OutpatientHemodialysisGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OutpatientHemodialysisGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OutpatientHemodialysisGroupByOutputType[P]>
+            : GetScalarType<T[P], OutpatientHemodialysisGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OutpatientHemodialysisSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    patientId?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    expedienteNumber?: boolean
+    age?: boolean
+    sex?: boolean
+    phone?: boolean
+    cedula?: boolean
+    bloodType?: boolean
+    diagnosisAndTime?: boolean
+    medications?: boolean
+    allergies?: boolean
+    allergyReaction?: boolean
+    transfusions?: boolean
+    referredFromCenter?: boolean
+    firstTimeInCenter?: boolean
+    otherDialysisModality?: boolean
+    pathologicalHistory?: boolean
+    surgicalHistory?: boolean
+    familyHistory?: boolean
+    habitCoffee?: boolean
+    habitTobacco?: boolean
+    habitAlcohol?: boolean
+    habitDrugs?: boolean
+    habitOther?: boolean
+    viralHiv?: boolean
+    viralHbsag?: boolean
+    viralHvc?: boolean
+    labHgb?: boolean
+    labHct?: boolean
+    labUrea?: boolean
+    labCr?: boolean
+    labK?: boolean
+    labBloodType?: boolean
+    labOther?: boolean
+    imagingSonography?: boolean
+    imagingCt?: boolean
+    imagingOther?: boolean
+    accessAvFistula?: boolean
+    accessGraft?: boolean
+    accessTunneledCatheter?: boolean
+    accessFavi?: boolean
+    clinicalNotes?: boolean
+    isActive?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | OutpatientHemodialysis$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["outpatientHemodialysis"]>
+
+  export type OutpatientHemodialysisSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    patientId?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    expedienteNumber?: boolean
+    age?: boolean
+    sex?: boolean
+    phone?: boolean
+    cedula?: boolean
+    bloodType?: boolean
+    diagnosisAndTime?: boolean
+    medications?: boolean
+    allergies?: boolean
+    allergyReaction?: boolean
+    transfusions?: boolean
+    referredFromCenter?: boolean
+    firstTimeInCenter?: boolean
+    otherDialysisModality?: boolean
+    pathologicalHistory?: boolean
+    surgicalHistory?: boolean
+    familyHistory?: boolean
+    habitCoffee?: boolean
+    habitTobacco?: boolean
+    habitAlcohol?: boolean
+    habitDrugs?: boolean
+    habitOther?: boolean
+    viralHiv?: boolean
+    viralHbsag?: boolean
+    viralHvc?: boolean
+    labHgb?: boolean
+    labHct?: boolean
+    labUrea?: boolean
+    labCr?: boolean
+    labK?: boolean
+    labBloodType?: boolean
+    labOther?: boolean
+    imagingSonography?: boolean
+    imagingCt?: boolean
+    imagingOther?: boolean
+    accessAvFistula?: boolean
+    accessGraft?: boolean
+    accessTunneledCatheter?: boolean
+    accessFavi?: boolean
+    clinicalNotes?: boolean
+    isActive?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | OutpatientHemodialysis$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["outpatientHemodialysis"]>
+
+  export type OutpatientHemodialysisSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    residencyId?: boolean
+    patientId?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    expedienteNumber?: boolean
+    age?: boolean
+    sex?: boolean
+    phone?: boolean
+    cedula?: boolean
+    bloodType?: boolean
+    diagnosisAndTime?: boolean
+    medications?: boolean
+    allergies?: boolean
+    allergyReaction?: boolean
+    transfusions?: boolean
+    referredFromCenter?: boolean
+    firstTimeInCenter?: boolean
+    otherDialysisModality?: boolean
+    pathologicalHistory?: boolean
+    surgicalHistory?: boolean
+    familyHistory?: boolean
+    habitCoffee?: boolean
+    habitTobacco?: boolean
+    habitAlcohol?: boolean
+    habitDrugs?: boolean
+    habitOther?: boolean
+    viralHiv?: boolean
+    viralHbsag?: boolean
+    viralHvc?: boolean
+    labHgb?: boolean
+    labHct?: boolean
+    labUrea?: boolean
+    labCr?: boolean
+    labK?: boolean
+    labBloodType?: boolean
+    labOther?: boolean
+    imagingSonography?: boolean
+    imagingCt?: boolean
+    imagingOther?: boolean
+    accessAvFistula?: boolean
+    accessGraft?: boolean
+    accessTunneledCatheter?: boolean
+    accessFavi?: boolean
+    clinicalNotes?: boolean
+    isActive?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | OutpatientHemodialysis$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["outpatientHemodialysis"]>
+
+  export type OutpatientHemodialysisSelectScalar = {
+    id?: boolean
+    residencyId?: boolean
+    patientId?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    expedienteNumber?: boolean
+    age?: boolean
+    sex?: boolean
+    phone?: boolean
+    cedula?: boolean
+    bloodType?: boolean
+    diagnosisAndTime?: boolean
+    medications?: boolean
+    allergies?: boolean
+    allergyReaction?: boolean
+    transfusions?: boolean
+    referredFromCenter?: boolean
+    firstTimeInCenter?: boolean
+    otherDialysisModality?: boolean
+    pathologicalHistory?: boolean
+    surgicalHistory?: boolean
+    familyHistory?: boolean
+    habitCoffee?: boolean
+    habitTobacco?: boolean
+    habitAlcohol?: boolean
+    habitDrugs?: boolean
+    habitOther?: boolean
+    viralHiv?: boolean
+    viralHbsag?: boolean
+    viralHvc?: boolean
+    labHgb?: boolean
+    labHct?: boolean
+    labUrea?: boolean
+    labCr?: boolean
+    labK?: boolean
+    labBloodType?: boolean
+    labOther?: boolean
+    imagingSonography?: boolean
+    imagingCt?: boolean
+    imagingOther?: boolean
+    accessAvFistula?: boolean
+    accessGraft?: boolean
+    accessTunneledCatheter?: boolean
+    accessFavi?: boolean
+    clinicalNotes?: boolean
+    isActive?: boolean
+    createdBy?: boolean
+    createdByName?: boolean
+    createdByRole?: boolean
+    createdAt?: boolean
+    updatedBy?: boolean
+    updatedByName?: boolean
+    updatedByRole?: boolean
+    updatedAt?: boolean
+  }
+
+  export type OutpatientHemodialysisOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "residencyId" | "patientId" | "firstName" | "lastName" | "expedienteNumber" | "age" | "sex" | "phone" | "cedula" | "bloodType" | "diagnosisAndTime" | "medications" | "allergies" | "allergyReaction" | "transfusions" | "referredFromCenter" | "firstTimeInCenter" | "otherDialysisModality" | "pathologicalHistory" | "surgicalHistory" | "familyHistory" | "habitCoffee" | "habitTobacco" | "habitAlcohol" | "habitDrugs" | "habitOther" | "viralHiv" | "viralHbsag" | "viralHvc" | "labHgb" | "labHct" | "labUrea" | "labCr" | "labK" | "labBloodType" | "labOther" | "imagingSonography" | "imagingCt" | "imagingOther" | "accessAvFistula" | "accessGraft" | "accessTunneledCatheter" | "accessFavi" | "clinicalNotes" | "isActive" | "createdBy" | "createdByName" | "createdByRole" | "createdAt" | "updatedBy" | "updatedByName" | "updatedByRole" | "updatedAt", ExtArgs["result"]["outpatientHemodialysis"]>
+  export type OutpatientHemodialysisInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | OutpatientHemodialysis$patientArgs<ExtArgs>
+  }
+  export type OutpatientHemodialysisIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | OutpatientHemodialysis$patientArgs<ExtArgs>
+  }
+  export type OutpatientHemodialysisIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    residency?: boolean | ResidencyDefaultArgs<ExtArgs>
+    patient?: boolean | OutpatientHemodialysis$patientArgs<ExtArgs>
+  }
+
+  export type $OutpatientHemodialysisPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "OutpatientHemodialysis"
+    objects: {
+      residency: Prisma.$ResidencyPayload<ExtArgs>
+      patient: Prisma.$PatientPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      residencyId: string
+      patientId: string | null
+      firstName: string
+      lastName: string
+      expedienteNumber: string | null
+      age: number | null
+      sex: string | null
+      phone: string | null
+      cedula: string | null
+      bloodType: string | null
+      diagnosisAndTime: string | null
+      medications: string | null
+      allergies: string | null
+      allergyReaction: string | null
+      transfusions: string | null
+      referredFromCenter: string | null
+      firstTimeInCenter: string | null
+      otherDialysisModality: string | null
+      pathologicalHistory: string | null
+      surgicalHistory: string | null
+      familyHistory: string | null
+      habitCoffee: string | null
+      habitTobacco: string | null
+      habitAlcohol: string | null
+      habitDrugs: string | null
+      habitOther: string | null
+      viralHiv: string | null
+      viralHbsag: string | null
+      viralHvc: string | null
+      labHgb: string | null
+      labHct: string | null
+      labUrea: string | null
+      labCr: string | null
+      labK: string | null
+      labBloodType: string | null
+      labOther: string | null
+      imagingSonography: string | null
+      imagingCt: string | null
+      imagingOther: string | null
+      accessAvFistula: string | null
+      accessGraft: string | null
+      accessTunneledCatheter: string | null
+      accessFavi: string | null
+      clinicalNotes: string | null
+      isActive: boolean
+      createdBy: string
+      createdByName: string
+      createdByRole: string
+      createdAt: Date
+      updatedBy: string | null
+      updatedByName: string | null
+      updatedByRole: string | null
+      updatedAt: Date | null
+    }, ExtArgs["result"]["outpatientHemodialysis"]>
+    composites: {}
+  }
+
+  type OutpatientHemodialysisGetPayload<S extends boolean | null | undefined | OutpatientHemodialysisDefaultArgs> = $Result.GetResult<Prisma.$OutpatientHemodialysisPayload, S>
+
+  type OutpatientHemodialysisCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OutpatientHemodialysisFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OutpatientHemodialysisCountAggregateInputType | true
+    }
+
+  export interface OutpatientHemodialysisDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OutpatientHemodialysis'], meta: { name: 'OutpatientHemodialysis' } }
+    /**
+     * Find zero or one OutpatientHemodialysis that matches the filter.
+     * @param {OutpatientHemodialysisFindUniqueArgs} args - Arguments to find a OutpatientHemodialysis
+     * @example
+     * // Get one OutpatientHemodialysis
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OutpatientHemodialysisFindUniqueArgs>(args: SelectSubset<T, OutpatientHemodialysisFindUniqueArgs<ExtArgs>>): Prisma__OutpatientHemodialysisClient<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one OutpatientHemodialysis that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {OutpatientHemodialysisFindUniqueOrThrowArgs} args - Arguments to find a OutpatientHemodialysis
+     * @example
+     * // Get one OutpatientHemodialysis
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OutpatientHemodialysisFindUniqueOrThrowArgs>(args: SelectSubset<T, OutpatientHemodialysisFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OutpatientHemodialysisClient<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OutpatientHemodialysis that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutpatientHemodialysisFindFirstArgs} args - Arguments to find a OutpatientHemodialysis
+     * @example
+     * // Get one OutpatientHemodialysis
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OutpatientHemodialysisFindFirstArgs>(args?: SelectSubset<T, OutpatientHemodialysisFindFirstArgs<ExtArgs>>): Prisma__OutpatientHemodialysisClient<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OutpatientHemodialysis that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutpatientHemodialysisFindFirstOrThrowArgs} args - Arguments to find a OutpatientHemodialysis
+     * @example
+     * // Get one OutpatientHemodialysis
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OutpatientHemodialysisFindFirstOrThrowArgs>(args?: SelectSubset<T, OutpatientHemodialysisFindFirstOrThrowArgs<ExtArgs>>): Prisma__OutpatientHemodialysisClient<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more OutpatientHemodialyses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutpatientHemodialysisFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all OutpatientHemodialyses
+     * const outpatientHemodialyses = await prisma.outpatientHemodialysis.findMany()
+     * 
+     * // Get first 10 OutpatientHemodialyses
+     * const outpatientHemodialyses = await prisma.outpatientHemodialysis.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const outpatientHemodialysisWithIdOnly = await prisma.outpatientHemodialysis.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OutpatientHemodialysisFindManyArgs>(args?: SelectSubset<T, OutpatientHemodialysisFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a OutpatientHemodialysis.
+     * @param {OutpatientHemodialysisCreateArgs} args - Arguments to create a OutpatientHemodialysis.
+     * @example
+     * // Create one OutpatientHemodialysis
+     * const OutpatientHemodialysis = await prisma.outpatientHemodialysis.create({
+     *   data: {
+     *     // ... data to create a OutpatientHemodialysis
+     *   }
+     * })
+     * 
+     */
+    create<T extends OutpatientHemodialysisCreateArgs>(args: SelectSubset<T, OutpatientHemodialysisCreateArgs<ExtArgs>>): Prisma__OutpatientHemodialysisClient<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many OutpatientHemodialyses.
+     * @param {OutpatientHemodialysisCreateManyArgs} args - Arguments to create many OutpatientHemodialyses.
+     * @example
+     * // Create many OutpatientHemodialyses
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OutpatientHemodialysisCreateManyArgs>(args?: SelectSubset<T, OutpatientHemodialysisCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many OutpatientHemodialyses and returns the data saved in the database.
+     * @param {OutpatientHemodialysisCreateManyAndReturnArgs} args - Arguments to create many OutpatientHemodialyses.
+     * @example
+     * // Create many OutpatientHemodialyses
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many OutpatientHemodialyses and only return the `id`
+     * const outpatientHemodialysisWithIdOnly = await prisma.outpatientHemodialysis.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends OutpatientHemodialysisCreateManyAndReturnArgs>(args?: SelectSubset<T, OutpatientHemodialysisCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a OutpatientHemodialysis.
+     * @param {OutpatientHemodialysisDeleteArgs} args - Arguments to delete one OutpatientHemodialysis.
+     * @example
+     * // Delete one OutpatientHemodialysis
+     * const OutpatientHemodialysis = await prisma.outpatientHemodialysis.delete({
+     *   where: {
+     *     // ... filter to delete one OutpatientHemodialysis
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OutpatientHemodialysisDeleteArgs>(args: SelectSubset<T, OutpatientHemodialysisDeleteArgs<ExtArgs>>): Prisma__OutpatientHemodialysisClient<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one OutpatientHemodialysis.
+     * @param {OutpatientHemodialysisUpdateArgs} args - Arguments to update one OutpatientHemodialysis.
+     * @example
+     * // Update one OutpatientHemodialysis
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OutpatientHemodialysisUpdateArgs>(args: SelectSubset<T, OutpatientHemodialysisUpdateArgs<ExtArgs>>): Prisma__OutpatientHemodialysisClient<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more OutpatientHemodialyses.
+     * @param {OutpatientHemodialysisDeleteManyArgs} args - Arguments to filter OutpatientHemodialyses to delete.
+     * @example
+     * // Delete a few OutpatientHemodialyses
+     * const { count } = await prisma.outpatientHemodialysis.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OutpatientHemodialysisDeleteManyArgs>(args?: SelectSubset<T, OutpatientHemodialysisDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OutpatientHemodialyses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutpatientHemodialysisUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many OutpatientHemodialyses
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OutpatientHemodialysisUpdateManyArgs>(args: SelectSubset<T, OutpatientHemodialysisUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OutpatientHemodialyses and returns the data updated in the database.
+     * @param {OutpatientHemodialysisUpdateManyAndReturnArgs} args - Arguments to update many OutpatientHemodialyses.
+     * @example
+     * // Update many OutpatientHemodialyses
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more OutpatientHemodialyses and only return the `id`
+     * const outpatientHemodialysisWithIdOnly = await prisma.outpatientHemodialysis.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends OutpatientHemodialysisUpdateManyAndReturnArgs>(args: SelectSubset<T, OutpatientHemodialysisUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one OutpatientHemodialysis.
+     * @param {OutpatientHemodialysisUpsertArgs} args - Arguments to update or create a OutpatientHemodialysis.
+     * @example
+     * // Update or create a OutpatientHemodialysis
+     * const outpatientHemodialysis = await prisma.outpatientHemodialysis.upsert({
+     *   create: {
+     *     // ... data to create a OutpatientHemodialysis
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the OutpatientHemodialysis we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OutpatientHemodialysisUpsertArgs>(args: SelectSubset<T, OutpatientHemodialysisUpsertArgs<ExtArgs>>): Prisma__OutpatientHemodialysisClient<$Result.GetResult<Prisma.$OutpatientHemodialysisPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of OutpatientHemodialyses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutpatientHemodialysisCountArgs} args - Arguments to filter OutpatientHemodialyses to count.
+     * @example
+     * // Count the number of OutpatientHemodialyses
+     * const count = await prisma.outpatientHemodialysis.count({
+     *   where: {
+     *     // ... the filter for the OutpatientHemodialyses we want to count
+     *   }
+     * })
+    **/
+    count<T extends OutpatientHemodialysisCountArgs>(
+      args?: Subset<T, OutpatientHemodialysisCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OutpatientHemodialysisCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a OutpatientHemodialysis.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutpatientHemodialysisAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OutpatientHemodialysisAggregateArgs>(args: Subset<T, OutpatientHemodialysisAggregateArgs>): Prisma.PrismaPromise<GetOutpatientHemodialysisAggregateType<T>>
+
+    /**
+     * Group by OutpatientHemodialysis.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutpatientHemodialysisGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OutpatientHemodialysisGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OutpatientHemodialysisGroupByArgs['orderBy'] }
+        : { orderBy?: OutpatientHemodialysisGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OutpatientHemodialysisGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOutpatientHemodialysisGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the OutpatientHemodialysis model
+   */
+  readonly fields: OutpatientHemodialysisFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for OutpatientHemodialysis.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OutpatientHemodialysisClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    residency<T extends ResidencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ResidencyDefaultArgs<ExtArgs>>): Prisma__ResidencyClient<$Result.GetResult<Prisma.$ResidencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    patient<T extends OutpatientHemodialysis$patientArgs<ExtArgs> = {}>(args?: Subset<T, OutpatientHemodialysis$patientArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the OutpatientHemodialysis model
+   */
+  interface OutpatientHemodialysisFieldRefs {
+    readonly id: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly residencyId: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly patientId: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly firstName: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly lastName: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly expedienteNumber: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly age: FieldRef<"OutpatientHemodialysis", 'Int'>
+    readonly sex: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly phone: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly cedula: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly bloodType: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly diagnosisAndTime: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly medications: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly allergies: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly allergyReaction: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly transfusions: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly referredFromCenter: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly firstTimeInCenter: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly otherDialysisModality: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly pathologicalHistory: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly surgicalHistory: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly familyHistory: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly habitCoffee: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly habitTobacco: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly habitAlcohol: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly habitDrugs: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly habitOther: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly viralHiv: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly viralHbsag: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly viralHvc: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly labHgb: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly labHct: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly labUrea: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly labCr: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly labK: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly labBloodType: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly labOther: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly imagingSonography: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly imagingCt: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly imagingOther: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly accessAvFistula: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly accessGraft: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly accessTunneledCatheter: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly accessFavi: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly clinicalNotes: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly isActive: FieldRef<"OutpatientHemodialysis", 'Boolean'>
+    readonly createdBy: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly createdByName: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly createdByRole: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly createdAt: FieldRef<"OutpatientHemodialysis", 'DateTime'>
+    readonly updatedBy: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly updatedByName: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly updatedByRole: FieldRef<"OutpatientHemodialysis", 'String'>
+    readonly updatedAt: FieldRef<"OutpatientHemodialysis", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * OutpatientHemodialysis findUnique
+   */
+  export type OutpatientHemodialysisFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * Filter, which OutpatientHemodialysis to fetch.
+     */
+    where: OutpatientHemodialysisWhereUniqueInput
+  }
+
+  /**
+   * OutpatientHemodialysis findUniqueOrThrow
+   */
+  export type OutpatientHemodialysisFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * Filter, which OutpatientHemodialysis to fetch.
+     */
+    where: OutpatientHemodialysisWhereUniqueInput
+  }
+
+  /**
+   * OutpatientHemodialysis findFirst
+   */
+  export type OutpatientHemodialysisFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * Filter, which OutpatientHemodialysis to fetch.
+     */
+    where?: OutpatientHemodialysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OutpatientHemodialyses to fetch.
+     */
+    orderBy?: OutpatientHemodialysisOrderByWithRelationInput | OutpatientHemodialysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OutpatientHemodialyses.
+     */
+    cursor?: OutpatientHemodialysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OutpatientHemodialyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OutpatientHemodialyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OutpatientHemodialyses.
+     */
+    distinct?: OutpatientHemodialysisScalarFieldEnum | OutpatientHemodialysisScalarFieldEnum[]
+  }
+
+  /**
+   * OutpatientHemodialysis findFirstOrThrow
+   */
+  export type OutpatientHemodialysisFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * Filter, which OutpatientHemodialysis to fetch.
+     */
+    where?: OutpatientHemodialysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OutpatientHemodialyses to fetch.
+     */
+    orderBy?: OutpatientHemodialysisOrderByWithRelationInput | OutpatientHemodialysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OutpatientHemodialyses.
+     */
+    cursor?: OutpatientHemodialysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OutpatientHemodialyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OutpatientHemodialyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OutpatientHemodialyses.
+     */
+    distinct?: OutpatientHemodialysisScalarFieldEnum | OutpatientHemodialysisScalarFieldEnum[]
+  }
+
+  /**
+   * OutpatientHemodialysis findMany
+   */
+  export type OutpatientHemodialysisFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * Filter, which OutpatientHemodialyses to fetch.
+     */
+    where?: OutpatientHemodialysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OutpatientHemodialyses to fetch.
+     */
+    orderBy?: OutpatientHemodialysisOrderByWithRelationInput | OutpatientHemodialysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing OutpatientHemodialyses.
+     */
+    cursor?: OutpatientHemodialysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OutpatientHemodialyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OutpatientHemodialyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OutpatientHemodialyses.
+     */
+    distinct?: OutpatientHemodialysisScalarFieldEnum | OutpatientHemodialysisScalarFieldEnum[]
+  }
+
+  /**
+   * OutpatientHemodialysis create
+   */
+  export type OutpatientHemodialysisCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * The data needed to create a OutpatientHemodialysis.
+     */
+    data: XOR<OutpatientHemodialysisCreateInput, OutpatientHemodialysisUncheckedCreateInput>
+  }
+
+  /**
+   * OutpatientHemodialysis createMany
+   */
+  export type OutpatientHemodialysisCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many OutpatientHemodialyses.
+     */
+    data: OutpatientHemodialysisCreateManyInput | OutpatientHemodialysisCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * OutpatientHemodialysis createManyAndReturn
+   */
+  export type OutpatientHemodialysisCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * The data used to create many OutpatientHemodialyses.
+     */
+    data: OutpatientHemodialysisCreateManyInput | OutpatientHemodialysisCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * OutpatientHemodialysis update
+   */
+  export type OutpatientHemodialysisUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * The data needed to update a OutpatientHemodialysis.
+     */
+    data: XOR<OutpatientHemodialysisUpdateInput, OutpatientHemodialysisUncheckedUpdateInput>
+    /**
+     * Choose, which OutpatientHemodialysis to update.
+     */
+    where: OutpatientHemodialysisWhereUniqueInput
+  }
+
+  /**
+   * OutpatientHemodialysis updateMany
+   */
+  export type OutpatientHemodialysisUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update OutpatientHemodialyses.
+     */
+    data: XOR<OutpatientHemodialysisUpdateManyMutationInput, OutpatientHemodialysisUncheckedUpdateManyInput>
+    /**
+     * Filter which OutpatientHemodialyses to update
+     */
+    where?: OutpatientHemodialysisWhereInput
+    /**
+     * Limit how many OutpatientHemodialyses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * OutpatientHemodialysis updateManyAndReturn
+   */
+  export type OutpatientHemodialysisUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * The data used to update OutpatientHemodialyses.
+     */
+    data: XOR<OutpatientHemodialysisUpdateManyMutationInput, OutpatientHemodialysisUncheckedUpdateManyInput>
+    /**
+     * Filter which OutpatientHemodialyses to update
+     */
+    where?: OutpatientHemodialysisWhereInput
+    /**
+     * Limit how many OutpatientHemodialyses to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * OutpatientHemodialysis upsert
+   */
+  export type OutpatientHemodialysisUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * The filter to search for the OutpatientHemodialysis to update in case it exists.
+     */
+    where: OutpatientHemodialysisWhereUniqueInput
+    /**
+     * In case the OutpatientHemodialysis found by the `where` argument doesn't exist, create a new OutpatientHemodialysis with this data.
+     */
+    create: XOR<OutpatientHemodialysisCreateInput, OutpatientHemodialysisUncheckedCreateInput>
+    /**
+     * In case the OutpatientHemodialysis was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OutpatientHemodialysisUpdateInput, OutpatientHemodialysisUncheckedUpdateInput>
+  }
+
+  /**
+   * OutpatientHemodialysis delete
+   */
+  export type OutpatientHemodialysisDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
+    /**
+     * Filter which OutpatientHemodialysis to delete.
+     */
+    where: OutpatientHemodialysisWhereUniqueInput
+  }
+
+  /**
+   * OutpatientHemodialysis deleteMany
+   */
+  export type OutpatientHemodialysisDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OutpatientHemodialyses to delete
+     */
+    where?: OutpatientHemodialysisWhereInput
+    /**
+     * Limit how many OutpatientHemodialyses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * OutpatientHemodialysis.patient
+   */
+  export type OutpatientHemodialysis$patientArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Patient
+     */
+    select?: PatientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Patient
+     */
+    omit?: PatientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PatientInclude<ExtArgs> | null
+    where?: PatientWhereInput
+  }
+
+  /**
+   * OutpatientHemodialysis without action
+   */
+  export type OutpatientHemodialysisDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OutpatientHemodialysis
+     */
+    select?: OutpatientHemodialysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OutpatientHemodialysis
+     */
+    omit?: OutpatientHemodialysisOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutpatientHemodialysisInclude<ExtArgs> | null
   }
 
 
@@ -40042,6 +46099,7 @@ export namespace Prisma {
     consultationDate: 'consultationDate',
     status: 'status',
     visitType: 'visitType',
+    consultationType: 'consultationType',
     chiefComplaint: 'chiefComplaint',
     bloodPressure: 'bloodPressure',
     heartRate: 'heartRate',
@@ -40084,6 +46142,138 @@ export namespace Prisma {
   };
 
   export type InternalMedicineProfileScalarFieldEnum = (typeof InternalMedicineProfileScalarFieldEnum)[keyof typeof InternalMedicineProfileScalarFieldEnum]
+
+
+  export const HematologyProfileScalarFieldEnum: {
+    id: 'id',
+    episodeId: 'episodeId',
+    vitalSignsFrequency: 'vitalSignsFrequency',
+    bleedingWatch: 'bleedingWatch',
+    painWatch: 'painWatch',
+    temperatureWatch: 'temperatureWatch',
+    hemodynamicWatch: 'hemodynamicWatch',
+    pendingBloodProducts: 'pendingBloodProducts',
+    pendingStudies: 'pendingStudies',
+    isolationType: 'isolationType',
+    oxygenSupport: 'oxygenSupport',
+    hematologicSummary: 'hematologicSummary',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt'
+  };
+
+  export type HematologyProfileScalarFieldEnum = (typeof HematologyProfileScalarFieldEnum)[keyof typeof HematologyProfileScalarFieldEnum]
+
+
+  export const EmergencyProfileScalarFieldEnum: {
+    id: 'id',
+    episodeId: 'episodeId',
+    amc: 'amc',
+    specialty: 'specialty',
+    relevantLabsStudies: 'relevantLabsStudies',
+    interestsPending: 'interestsPending',
+    triageLevel: 'triageLevel',
+    clinicalStatus: 'clinicalStatus',
+    oxygenSupport: 'oxygenSupport',
+    dispositionPlan: 'dispositionPlan',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt'
+  };
+
+  export type EmergencyProfileScalarFieldEnum = (typeof EmergencyProfileScalarFieldEnum)[keyof typeof EmergencyProfileScalarFieldEnum]
+
+
+  export const BiopsyRecordScalarFieldEnum: {
+    id: 'id',
+    residencyId: 'residencyId',
+    patientId: 'patientId',
+    status: 'status',
+    patientName: 'patientName',
+    phone: 'phone',
+    labsStatus: 'labsStatus',
+    needleStatus: 'needleStatus',
+    kitStatus: 'kitStatus',
+    scheduledDate: 'scheduledDate',
+    senasaAuth: 'senasaAuth',
+    note: 'note',
+    performedDate: 'performedDate',
+    complications: 'complications',
+    report: 'report',
+    highlightTag: 'highlightTag',
+    createdBy: 'createdBy',
+    createdByName: 'createdByName',
+    createdByRole: 'createdByRole',
+    createdAt: 'createdAt',
+    updatedBy: 'updatedBy',
+    updatedByName: 'updatedByName',
+    updatedByRole: 'updatedByRole',
+    updatedAt: 'updatedAt',
+    performedBy: 'performedBy',
+    performedByName: 'performedByName',
+    performedByRole: 'performedByRole',
+    performedAt: 'performedAt'
+  };
+
+  export type BiopsyRecordScalarFieldEnum = (typeof BiopsyRecordScalarFieldEnum)[keyof typeof BiopsyRecordScalarFieldEnum]
+
+
+  export const OutpatientHemodialysisScalarFieldEnum: {
+    id: 'id',
+    residencyId: 'residencyId',
+    patientId: 'patientId',
+    firstName: 'firstName',
+    lastName: 'lastName',
+    expedienteNumber: 'expedienteNumber',
+    age: 'age',
+    sex: 'sex',
+    phone: 'phone',
+    cedula: 'cedula',
+    bloodType: 'bloodType',
+    diagnosisAndTime: 'diagnosisAndTime',
+    medications: 'medications',
+    allergies: 'allergies',
+    allergyReaction: 'allergyReaction',
+    transfusions: 'transfusions',
+    referredFromCenter: 'referredFromCenter',
+    firstTimeInCenter: 'firstTimeInCenter',
+    otherDialysisModality: 'otherDialysisModality',
+    pathologicalHistory: 'pathologicalHistory',
+    surgicalHistory: 'surgicalHistory',
+    familyHistory: 'familyHistory',
+    habitCoffee: 'habitCoffee',
+    habitTobacco: 'habitTobacco',
+    habitAlcohol: 'habitAlcohol',
+    habitDrugs: 'habitDrugs',
+    habitOther: 'habitOther',
+    viralHiv: 'viralHiv',
+    viralHbsag: 'viralHbsag',
+    viralHvc: 'viralHvc',
+    labHgb: 'labHgb',
+    labHct: 'labHct',
+    labUrea: 'labUrea',
+    labCr: 'labCr',
+    labK: 'labK',
+    labBloodType: 'labBloodType',
+    labOther: 'labOther',
+    imagingSonography: 'imagingSonography',
+    imagingCt: 'imagingCt',
+    imagingOther: 'imagingOther',
+    accessAvFistula: 'accessAvFistula',
+    accessGraft: 'accessGraft',
+    accessTunneledCatheter: 'accessTunneledCatheter',
+    accessFavi: 'accessFavi',
+    clinicalNotes: 'clinicalNotes',
+    isActive: 'isActive',
+    createdBy: 'createdBy',
+    createdByName: 'createdByName',
+    createdByRole: 'createdByRole',
+    createdAt: 'createdAt',
+    updatedBy: 'updatedBy',
+    updatedByName: 'updatedByName',
+    updatedByRole: 'updatedByRole',
+    updatedAt: 'updatedAt'
+  };
+
+  export type OutpatientHemodialysisScalarFieldEnum = (typeof OutpatientHemodialysisScalarFieldEnum)[keyof typeof OutpatientHemodialysisScalarFieldEnum]
 
 
   export const SurgicalProfileScalarFieldEnum: {
@@ -40702,6 +46892,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceListRelationFilter
     woundCares?: WoundCareListRelationFilter
     hemodialysisItems?: HemodialysisItemListRelationFilter
+    biopsyRecords?: BiopsyRecordListRelationFilter
+    outpatientHemodialyses?: OutpatientHemodialysisListRelationFilter
   }
 
   export type ResidencyOrderByWithRelationInput = {
@@ -40739,6 +46931,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceOrderByRelationAggregateInput
     woundCares?: WoundCareOrderByRelationAggregateInput
     hemodialysisItems?: HemodialysisItemOrderByRelationAggregateInput
+    biopsyRecords?: BiopsyRecordOrderByRelationAggregateInput
+    outpatientHemodialyses?: OutpatientHemodialysisOrderByRelationAggregateInput
   }
 
   export type ResidencyWhereUniqueInput = Prisma.AtLeast<{
@@ -40779,6 +46973,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceListRelationFilter
     woundCares?: WoundCareListRelationFilter
     hemodialysisItems?: HemodialysisItemListRelationFilter
+    biopsyRecords?: BiopsyRecordListRelationFilter
+    outpatientHemodialyses?: OutpatientHemodialysisListRelationFilter
   }, "id" | "slug">
 
   export type ResidencyOrderByWithAggregationInput = {
@@ -41223,6 +47419,8 @@ export namespace Prisma {
     allergies?: AllergyListRelationFilter
     medicalHistory?: XOR<MedicalHistoryNullableScalarRelationFilter, MedicalHistoryWhereInput> | null
     viralSerologies?: ViralSerologyListRelationFilter
+    biopsyRecords?: BiopsyRecordListRelationFilter
+    outpatientHemodialyses?: OutpatientHemodialysisListRelationFilter
   }
 
   export type PatientOrderByWithRelationInput = {
@@ -41247,6 +47445,8 @@ export namespace Prisma {
     allergies?: AllergyOrderByRelationAggregateInput
     medicalHistory?: MedicalHistoryOrderByWithRelationInput
     viralSerologies?: ViralSerologyOrderByRelationAggregateInput
+    biopsyRecords?: BiopsyRecordOrderByRelationAggregateInput
+    outpatientHemodialyses?: OutpatientHemodialysisOrderByRelationAggregateInput
   }
 
   export type PatientWhereUniqueInput = Prisma.AtLeast<{
@@ -41275,6 +47475,8 @@ export namespace Prisma {
     allergies?: AllergyListRelationFilter
     medicalHistory?: XOR<MedicalHistoryNullableScalarRelationFilter, MedicalHistoryWhereInput> | null
     viralSerologies?: ViralSerologyListRelationFilter
+    biopsyRecords?: BiopsyRecordListRelationFilter
+    outpatientHemodialyses?: OutpatientHemodialysisListRelationFilter
   }, "id" | "residencyId_expedienteNumber">
 
   export type PatientOrderByWithAggregationInput = {
@@ -41374,6 +47576,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessListRelationFilter
     internalMedicineProfile?: XOR<InternalMedicineProfileNullableScalarRelationFilter, InternalMedicineProfileWhereInput> | null
     surgicalProfile?: XOR<SurgicalProfileNullableScalarRelationFilter, SurgicalProfileWhereInput> | null
+    hematologyProfile?: XOR<HematologyProfileNullableScalarRelationFilter, HematologyProfileWhereInput> | null
+    emergencyProfile?: XOR<EmergencyProfileNullableScalarRelationFilter, EmergencyProfileWhereInput> | null
     antibiotics?: EpisodeAntibioticListRelationFilter
     surgicalDevices?: SurgicalDeviceListRelationFilter
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryListRelationFilter
@@ -41430,6 +47634,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessOrderByRelationAggregateInput
     internalMedicineProfile?: InternalMedicineProfileOrderByWithRelationInput
     surgicalProfile?: SurgicalProfileOrderByWithRelationInput
+    hematologyProfile?: HematologyProfileOrderByWithRelationInput
+    emergencyProfile?: EmergencyProfileOrderByWithRelationInput
     antibiotics?: EpisodeAntibioticOrderByRelationAggregateInput
     surgicalDevices?: SurgicalDeviceOrderByRelationAggregateInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryOrderByRelationAggregateInput
@@ -41489,6 +47695,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessListRelationFilter
     internalMedicineProfile?: XOR<InternalMedicineProfileNullableScalarRelationFilter, InternalMedicineProfileWhereInput> | null
     surgicalProfile?: XOR<SurgicalProfileNullableScalarRelationFilter, SurgicalProfileWhereInput> | null
+    hematologyProfile?: XOR<HematologyProfileNullableScalarRelationFilter, HematologyProfileWhereInput> | null
+    emergencyProfile?: XOR<EmergencyProfileNullableScalarRelationFilter, EmergencyProfileWhereInput> | null
     antibiotics?: EpisodeAntibioticListRelationFilter
     surgicalDevices?: SurgicalDeviceListRelationFilter
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryListRelationFilter
@@ -41587,6 +47795,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFilter<"Consultation"> | Date | string
     status?: StringFilter<"Consultation"> | string
     visitType?: StringFilter<"Consultation"> | string
+    consultationType?: StringFilter<"Consultation"> | string
     chiefComplaint?: StringFilter<"Consultation"> | string
     bloodPressure?: StringNullableFilter<"Consultation"> | string | null
     heartRate?: IntNullableFilter<"Consultation"> | number | null
@@ -41620,6 +47829,7 @@ export namespace Prisma {
     consultationDate?: SortOrder
     status?: SortOrder
     visitType?: SortOrder
+    consultationType?: SortOrder
     chiefComplaint?: SortOrder
     bloodPressure?: SortOrderInput | SortOrder
     heartRate?: SortOrderInput | SortOrder
@@ -41656,6 +47866,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFilter<"Consultation"> | Date | string
     status?: StringFilter<"Consultation"> | string
     visitType?: StringFilter<"Consultation"> | string
+    consultationType?: StringFilter<"Consultation"> | string
     chiefComplaint?: StringFilter<"Consultation"> | string
     bloodPressure?: StringNullableFilter<"Consultation"> | string | null
     heartRate?: IntNullableFilter<"Consultation"> | number | null
@@ -41689,6 +47900,7 @@ export namespace Prisma {
     consultationDate?: SortOrder
     status?: SortOrder
     visitType?: SortOrder
+    consultationType?: SortOrder
     chiefComplaint?: SortOrder
     bloodPressure?: SortOrderInput | SortOrder
     heartRate?: SortOrderInput | SortOrder
@@ -41727,6 +47939,7 @@ export namespace Prisma {
     consultationDate?: DateTimeWithAggregatesFilter<"Consultation"> | Date | string
     status?: StringWithAggregatesFilter<"Consultation"> | string
     visitType?: StringWithAggregatesFilter<"Consultation"> | string
+    consultationType?: StringWithAggregatesFilter<"Consultation"> | string
     chiefComplaint?: StringWithAggregatesFilter<"Consultation"> | string
     bloodPressure?: StringNullableWithAggregatesFilter<"Consultation"> | string | null
     heartRate?: IntNullableWithAggregatesFilter<"Consultation"> | number | null
@@ -41846,6 +48059,674 @@ export namespace Prisma {
     dischargeGoal?: StringNullableWithAggregatesFilter<"InternalMedicineProfile"> | string | null
     updatedBy?: StringWithAggregatesFilter<"InternalMedicineProfile"> | string
     updatedAt?: DateTimeWithAggregatesFilter<"InternalMedicineProfile"> | Date | string
+  }
+
+  export type HematologyProfileWhereInput = {
+    AND?: HematologyProfileWhereInput | HematologyProfileWhereInput[]
+    OR?: HematologyProfileWhereInput[]
+    NOT?: HematologyProfileWhereInput | HematologyProfileWhereInput[]
+    id?: StringFilter<"HematologyProfile"> | string
+    episodeId?: StringFilter<"HematologyProfile"> | string
+    vitalSignsFrequency?: StringFilter<"HematologyProfile"> | string
+    bleedingWatch?: StringNullableFilter<"HematologyProfile"> | string | null
+    painWatch?: StringNullableFilter<"HematologyProfile"> | string | null
+    temperatureWatch?: StringNullableFilter<"HematologyProfile"> | string | null
+    hemodynamicWatch?: StringNullableFilter<"HematologyProfile"> | string | null
+    pendingBloodProducts?: StringNullableFilter<"HematologyProfile"> | string | null
+    pendingStudies?: StringNullableFilter<"HematologyProfile"> | string | null
+    isolationType?: StringFilter<"HematologyProfile"> | string
+    oxygenSupport?: StringFilter<"HematologyProfile"> | string
+    hematologicSummary?: StringNullableFilter<"HematologyProfile"> | string | null
+    updatedBy?: StringFilter<"HematologyProfile"> | string
+    updatedAt?: DateTimeFilter<"HematologyProfile"> | Date | string
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+  }
+
+  export type HematologyProfileOrderByWithRelationInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    vitalSignsFrequency?: SortOrder
+    bleedingWatch?: SortOrderInput | SortOrder
+    painWatch?: SortOrderInput | SortOrder
+    temperatureWatch?: SortOrderInput | SortOrder
+    hemodynamicWatch?: SortOrderInput | SortOrder
+    pendingBloodProducts?: SortOrderInput | SortOrder
+    pendingStudies?: SortOrderInput | SortOrder
+    isolationType?: SortOrder
+    oxygenSupport?: SortOrder
+    hematologicSummary?: SortOrderInput | SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+    episode?: EpisodeOrderByWithRelationInput
+  }
+
+  export type HematologyProfileWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    episodeId?: string
+    AND?: HematologyProfileWhereInput | HematologyProfileWhereInput[]
+    OR?: HematologyProfileWhereInput[]
+    NOT?: HematologyProfileWhereInput | HematologyProfileWhereInput[]
+    vitalSignsFrequency?: StringFilter<"HematologyProfile"> | string
+    bleedingWatch?: StringNullableFilter<"HematologyProfile"> | string | null
+    painWatch?: StringNullableFilter<"HematologyProfile"> | string | null
+    temperatureWatch?: StringNullableFilter<"HematologyProfile"> | string | null
+    hemodynamicWatch?: StringNullableFilter<"HematologyProfile"> | string | null
+    pendingBloodProducts?: StringNullableFilter<"HematologyProfile"> | string | null
+    pendingStudies?: StringNullableFilter<"HematologyProfile"> | string | null
+    isolationType?: StringFilter<"HematologyProfile"> | string
+    oxygenSupport?: StringFilter<"HematologyProfile"> | string
+    hematologicSummary?: StringNullableFilter<"HematologyProfile"> | string | null
+    updatedBy?: StringFilter<"HematologyProfile"> | string
+    updatedAt?: DateTimeFilter<"HematologyProfile"> | Date | string
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+  }, "id" | "episodeId">
+
+  export type HematologyProfileOrderByWithAggregationInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    vitalSignsFrequency?: SortOrder
+    bleedingWatch?: SortOrderInput | SortOrder
+    painWatch?: SortOrderInput | SortOrder
+    temperatureWatch?: SortOrderInput | SortOrder
+    hemodynamicWatch?: SortOrderInput | SortOrder
+    pendingBloodProducts?: SortOrderInput | SortOrder
+    pendingStudies?: SortOrderInput | SortOrder
+    isolationType?: SortOrder
+    oxygenSupport?: SortOrder
+    hematologicSummary?: SortOrderInput | SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+    _count?: HematologyProfileCountOrderByAggregateInput
+    _max?: HematologyProfileMaxOrderByAggregateInput
+    _min?: HematologyProfileMinOrderByAggregateInput
+  }
+
+  export type HematologyProfileScalarWhereWithAggregatesInput = {
+    AND?: HematologyProfileScalarWhereWithAggregatesInput | HematologyProfileScalarWhereWithAggregatesInput[]
+    OR?: HematologyProfileScalarWhereWithAggregatesInput[]
+    NOT?: HematologyProfileScalarWhereWithAggregatesInput | HematologyProfileScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"HematologyProfile"> | string
+    episodeId?: StringWithAggregatesFilter<"HematologyProfile"> | string
+    vitalSignsFrequency?: StringWithAggregatesFilter<"HematologyProfile"> | string
+    bleedingWatch?: StringNullableWithAggregatesFilter<"HematologyProfile"> | string | null
+    painWatch?: StringNullableWithAggregatesFilter<"HematologyProfile"> | string | null
+    temperatureWatch?: StringNullableWithAggregatesFilter<"HematologyProfile"> | string | null
+    hemodynamicWatch?: StringNullableWithAggregatesFilter<"HematologyProfile"> | string | null
+    pendingBloodProducts?: StringNullableWithAggregatesFilter<"HematologyProfile"> | string | null
+    pendingStudies?: StringNullableWithAggregatesFilter<"HematologyProfile"> | string | null
+    isolationType?: StringWithAggregatesFilter<"HematologyProfile"> | string
+    oxygenSupport?: StringWithAggregatesFilter<"HematologyProfile"> | string
+    hematologicSummary?: StringNullableWithAggregatesFilter<"HematologyProfile"> | string | null
+    updatedBy?: StringWithAggregatesFilter<"HematologyProfile"> | string
+    updatedAt?: DateTimeWithAggregatesFilter<"HematologyProfile"> | Date | string
+  }
+
+  export type EmergencyProfileWhereInput = {
+    AND?: EmergencyProfileWhereInput | EmergencyProfileWhereInput[]
+    OR?: EmergencyProfileWhereInput[]
+    NOT?: EmergencyProfileWhereInput | EmergencyProfileWhereInput[]
+    id?: StringFilter<"EmergencyProfile"> | string
+    episodeId?: StringFilter<"EmergencyProfile"> | string
+    amc?: StringNullableFilter<"EmergencyProfile"> | string | null
+    specialty?: StringNullableFilter<"EmergencyProfile"> | string | null
+    relevantLabsStudies?: StringNullableFilter<"EmergencyProfile"> | string | null
+    interestsPending?: StringNullableFilter<"EmergencyProfile"> | string | null
+    triageLevel?: StringFilter<"EmergencyProfile"> | string
+    clinicalStatus?: StringFilter<"EmergencyProfile"> | string
+    oxygenSupport?: StringFilter<"EmergencyProfile"> | string
+    dispositionPlan?: StringNullableFilter<"EmergencyProfile"> | string | null
+    updatedBy?: StringFilter<"EmergencyProfile"> | string
+    updatedAt?: DateTimeFilter<"EmergencyProfile"> | Date | string
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+  }
+
+  export type EmergencyProfileOrderByWithRelationInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    amc?: SortOrderInput | SortOrder
+    specialty?: SortOrderInput | SortOrder
+    relevantLabsStudies?: SortOrderInput | SortOrder
+    interestsPending?: SortOrderInput | SortOrder
+    triageLevel?: SortOrder
+    clinicalStatus?: SortOrder
+    oxygenSupport?: SortOrder
+    dispositionPlan?: SortOrderInput | SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+    episode?: EpisodeOrderByWithRelationInput
+  }
+
+  export type EmergencyProfileWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    episodeId?: string
+    AND?: EmergencyProfileWhereInput | EmergencyProfileWhereInput[]
+    OR?: EmergencyProfileWhereInput[]
+    NOT?: EmergencyProfileWhereInput | EmergencyProfileWhereInput[]
+    amc?: StringNullableFilter<"EmergencyProfile"> | string | null
+    specialty?: StringNullableFilter<"EmergencyProfile"> | string | null
+    relevantLabsStudies?: StringNullableFilter<"EmergencyProfile"> | string | null
+    interestsPending?: StringNullableFilter<"EmergencyProfile"> | string | null
+    triageLevel?: StringFilter<"EmergencyProfile"> | string
+    clinicalStatus?: StringFilter<"EmergencyProfile"> | string
+    oxygenSupport?: StringFilter<"EmergencyProfile"> | string
+    dispositionPlan?: StringNullableFilter<"EmergencyProfile"> | string | null
+    updatedBy?: StringFilter<"EmergencyProfile"> | string
+    updatedAt?: DateTimeFilter<"EmergencyProfile"> | Date | string
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+  }, "id" | "episodeId">
+
+  export type EmergencyProfileOrderByWithAggregationInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    amc?: SortOrderInput | SortOrder
+    specialty?: SortOrderInput | SortOrder
+    relevantLabsStudies?: SortOrderInput | SortOrder
+    interestsPending?: SortOrderInput | SortOrder
+    triageLevel?: SortOrder
+    clinicalStatus?: SortOrder
+    oxygenSupport?: SortOrder
+    dispositionPlan?: SortOrderInput | SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+    _count?: EmergencyProfileCountOrderByAggregateInput
+    _max?: EmergencyProfileMaxOrderByAggregateInput
+    _min?: EmergencyProfileMinOrderByAggregateInput
+  }
+
+  export type EmergencyProfileScalarWhereWithAggregatesInput = {
+    AND?: EmergencyProfileScalarWhereWithAggregatesInput | EmergencyProfileScalarWhereWithAggregatesInput[]
+    OR?: EmergencyProfileScalarWhereWithAggregatesInput[]
+    NOT?: EmergencyProfileScalarWhereWithAggregatesInput | EmergencyProfileScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EmergencyProfile"> | string
+    episodeId?: StringWithAggregatesFilter<"EmergencyProfile"> | string
+    amc?: StringNullableWithAggregatesFilter<"EmergencyProfile"> | string | null
+    specialty?: StringNullableWithAggregatesFilter<"EmergencyProfile"> | string | null
+    relevantLabsStudies?: StringNullableWithAggregatesFilter<"EmergencyProfile"> | string | null
+    interestsPending?: StringNullableWithAggregatesFilter<"EmergencyProfile"> | string | null
+    triageLevel?: StringWithAggregatesFilter<"EmergencyProfile"> | string
+    clinicalStatus?: StringWithAggregatesFilter<"EmergencyProfile"> | string
+    oxygenSupport?: StringWithAggregatesFilter<"EmergencyProfile"> | string
+    dispositionPlan?: StringNullableWithAggregatesFilter<"EmergencyProfile"> | string | null
+    updatedBy?: StringWithAggregatesFilter<"EmergencyProfile"> | string
+    updatedAt?: DateTimeWithAggregatesFilter<"EmergencyProfile"> | Date | string
+  }
+
+  export type BiopsyRecordWhereInput = {
+    AND?: BiopsyRecordWhereInput | BiopsyRecordWhereInput[]
+    OR?: BiopsyRecordWhereInput[]
+    NOT?: BiopsyRecordWhereInput | BiopsyRecordWhereInput[]
+    id?: StringFilter<"BiopsyRecord"> | string
+    residencyId?: StringFilter<"BiopsyRecord"> | string
+    patientId?: StringNullableFilter<"BiopsyRecord"> | string | null
+    status?: StringFilter<"BiopsyRecord"> | string
+    patientName?: StringFilter<"BiopsyRecord"> | string
+    phone?: StringNullableFilter<"BiopsyRecord"> | string | null
+    labsStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    needleStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    kitStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    scheduledDate?: StringNullableFilter<"BiopsyRecord"> | string | null
+    senasaAuth?: StringNullableFilter<"BiopsyRecord"> | string | null
+    note?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedDate?: StringNullableFilter<"BiopsyRecord"> | string | null
+    complications?: StringNullableFilter<"BiopsyRecord"> | string | null
+    report?: StringNullableFilter<"BiopsyRecord"> | string | null
+    highlightTag?: StringFilter<"BiopsyRecord"> | string
+    createdBy?: StringFilter<"BiopsyRecord"> | string
+    createdByName?: StringFilter<"BiopsyRecord"> | string
+    createdByRole?: StringFilter<"BiopsyRecord"> | string
+    createdAt?: DateTimeFilter<"BiopsyRecord"> | Date | string
+    updatedBy?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedByName?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedByRole?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedAt?: DateTimeNullableFilter<"BiopsyRecord"> | Date | string | null
+    performedBy?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedByName?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedByRole?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedAt?: DateTimeNullableFilter<"BiopsyRecord"> | Date | string | null
+    residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
+    patient?: XOR<PatientNullableScalarRelationFilter, PatientWhereInput> | null
+  }
+
+  export type BiopsyRecordOrderByWithRelationInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrderInput | SortOrder
+    status?: SortOrder
+    patientName?: SortOrder
+    phone?: SortOrderInput | SortOrder
+    labsStatus?: SortOrderInput | SortOrder
+    needleStatus?: SortOrderInput | SortOrder
+    kitStatus?: SortOrderInput | SortOrder
+    scheduledDate?: SortOrderInput | SortOrder
+    senasaAuth?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    performedDate?: SortOrderInput | SortOrder
+    complications?: SortOrderInput | SortOrder
+    report?: SortOrderInput | SortOrder
+    highlightTag?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedByName?: SortOrderInput | SortOrder
+    updatedByRole?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    performedBy?: SortOrderInput | SortOrder
+    performedByName?: SortOrderInput | SortOrder
+    performedByRole?: SortOrderInput | SortOrder
+    performedAt?: SortOrderInput | SortOrder
+    residency?: ResidencyOrderByWithRelationInput
+    patient?: PatientOrderByWithRelationInput
+  }
+
+  export type BiopsyRecordWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: BiopsyRecordWhereInput | BiopsyRecordWhereInput[]
+    OR?: BiopsyRecordWhereInput[]
+    NOT?: BiopsyRecordWhereInput | BiopsyRecordWhereInput[]
+    residencyId?: StringFilter<"BiopsyRecord"> | string
+    patientId?: StringNullableFilter<"BiopsyRecord"> | string | null
+    status?: StringFilter<"BiopsyRecord"> | string
+    patientName?: StringFilter<"BiopsyRecord"> | string
+    phone?: StringNullableFilter<"BiopsyRecord"> | string | null
+    labsStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    needleStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    kitStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    scheduledDate?: StringNullableFilter<"BiopsyRecord"> | string | null
+    senasaAuth?: StringNullableFilter<"BiopsyRecord"> | string | null
+    note?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedDate?: StringNullableFilter<"BiopsyRecord"> | string | null
+    complications?: StringNullableFilter<"BiopsyRecord"> | string | null
+    report?: StringNullableFilter<"BiopsyRecord"> | string | null
+    highlightTag?: StringFilter<"BiopsyRecord"> | string
+    createdBy?: StringFilter<"BiopsyRecord"> | string
+    createdByName?: StringFilter<"BiopsyRecord"> | string
+    createdByRole?: StringFilter<"BiopsyRecord"> | string
+    createdAt?: DateTimeFilter<"BiopsyRecord"> | Date | string
+    updatedBy?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedByName?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedByRole?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedAt?: DateTimeNullableFilter<"BiopsyRecord"> | Date | string | null
+    performedBy?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedByName?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedByRole?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedAt?: DateTimeNullableFilter<"BiopsyRecord"> | Date | string | null
+    residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
+    patient?: XOR<PatientNullableScalarRelationFilter, PatientWhereInput> | null
+  }, "id">
+
+  export type BiopsyRecordOrderByWithAggregationInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrderInput | SortOrder
+    status?: SortOrder
+    patientName?: SortOrder
+    phone?: SortOrderInput | SortOrder
+    labsStatus?: SortOrderInput | SortOrder
+    needleStatus?: SortOrderInput | SortOrder
+    kitStatus?: SortOrderInput | SortOrder
+    scheduledDate?: SortOrderInput | SortOrder
+    senasaAuth?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    performedDate?: SortOrderInput | SortOrder
+    complications?: SortOrderInput | SortOrder
+    report?: SortOrderInput | SortOrder
+    highlightTag?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedByName?: SortOrderInput | SortOrder
+    updatedByRole?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    performedBy?: SortOrderInput | SortOrder
+    performedByName?: SortOrderInput | SortOrder
+    performedByRole?: SortOrderInput | SortOrder
+    performedAt?: SortOrderInput | SortOrder
+    _count?: BiopsyRecordCountOrderByAggregateInput
+    _max?: BiopsyRecordMaxOrderByAggregateInput
+    _min?: BiopsyRecordMinOrderByAggregateInput
+  }
+
+  export type BiopsyRecordScalarWhereWithAggregatesInput = {
+    AND?: BiopsyRecordScalarWhereWithAggregatesInput | BiopsyRecordScalarWhereWithAggregatesInput[]
+    OR?: BiopsyRecordScalarWhereWithAggregatesInput[]
+    NOT?: BiopsyRecordScalarWhereWithAggregatesInput | BiopsyRecordScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BiopsyRecord"> | string
+    residencyId?: StringWithAggregatesFilter<"BiopsyRecord"> | string
+    patientId?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    status?: StringWithAggregatesFilter<"BiopsyRecord"> | string
+    patientName?: StringWithAggregatesFilter<"BiopsyRecord"> | string
+    phone?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    labsStatus?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    needleStatus?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    kitStatus?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    scheduledDate?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    senasaAuth?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    note?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    performedDate?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    complications?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    report?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    highlightTag?: StringWithAggregatesFilter<"BiopsyRecord"> | string
+    createdBy?: StringWithAggregatesFilter<"BiopsyRecord"> | string
+    createdByName?: StringWithAggregatesFilter<"BiopsyRecord"> | string
+    createdByRole?: StringWithAggregatesFilter<"BiopsyRecord"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"BiopsyRecord"> | Date | string
+    updatedBy?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    updatedByName?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    updatedByRole?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"BiopsyRecord"> | Date | string | null
+    performedBy?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    performedByName?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    performedByRole?: StringNullableWithAggregatesFilter<"BiopsyRecord"> | string | null
+    performedAt?: DateTimeNullableWithAggregatesFilter<"BiopsyRecord"> | Date | string | null
+  }
+
+  export type OutpatientHemodialysisWhereInput = {
+    AND?: OutpatientHemodialysisWhereInput | OutpatientHemodialysisWhereInput[]
+    OR?: OutpatientHemodialysisWhereInput[]
+    NOT?: OutpatientHemodialysisWhereInput | OutpatientHemodialysisWhereInput[]
+    id?: StringFilter<"OutpatientHemodialysis"> | string
+    residencyId?: StringFilter<"OutpatientHemodialysis"> | string
+    patientId?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    firstName?: StringFilter<"OutpatientHemodialysis"> | string
+    lastName?: StringFilter<"OutpatientHemodialysis"> | string
+    expedienteNumber?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    age?: IntNullableFilter<"OutpatientHemodialysis"> | number | null
+    sex?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    phone?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    cedula?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    bloodType?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    diagnosisAndTime?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    medications?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    allergies?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    allergyReaction?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    transfusions?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    referredFromCenter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    firstTimeInCenter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    otherDialysisModality?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    pathologicalHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    surgicalHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    familyHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitCoffee?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitTobacco?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitAlcohol?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitDrugs?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHiv?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHbsag?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHvc?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labHgb?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labHct?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labUrea?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labCr?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labK?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labBloodType?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingSonography?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingCt?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessAvFistula?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessGraft?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessTunneledCatheter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessFavi?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    clinicalNotes?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    isActive?: BoolFilter<"OutpatientHemodialysis"> | boolean
+    createdBy?: StringFilter<"OutpatientHemodialysis"> | string
+    createdByName?: StringFilter<"OutpatientHemodialysis"> | string
+    createdByRole?: StringFilter<"OutpatientHemodialysis"> | string
+    createdAt?: DateTimeFilter<"OutpatientHemodialysis"> | Date | string
+    updatedBy?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedByName?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedByRole?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedAt?: DateTimeNullableFilter<"OutpatientHemodialysis"> | Date | string | null
+    residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
+    patient?: XOR<PatientNullableScalarRelationFilter, PatientWhereInput> | null
+  }
+
+  export type OutpatientHemodialysisOrderByWithRelationInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrderInput | SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    expedienteNumber?: SortOrderInput | SortOrder
+    age?: SortOrderInput | SortOrder
+    sex?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    cedula?: SortOrderInput | SortOrder
+    bloodType?: SortOrderInput | SortOrder
+    diagnosisAndTime?: SortOrderInput | SortOrder
+    medications?: SortOrderInput | SortOrder
+    allergies?: SortOrderInput | SortOrder
+    allergyReaction?: SortOrderInput | SortOrder
+    transfusions?: SortOrderInput | SortOrder
+    referredFromCenter?: SortOrderInput | SortOrder
+    firstTimeInCenter?: SortOrderInput | SortOrder
+    otherDialysisModality?: SortOrderInput | SortOrder
+    pathologicalHistory?: SortOrderInput | SortOrder
+    surgicalHistory?: SortOrderInput | SortOrder
+    familyHistory?: SortOrderInput | SortOrder
+    habitCoffee?: SortOrderInput | SortOrder
+    habitTobacco?: SortOrderInput | SortOrder
+    habitAlcohol?: SortOrderInput | SortOrder
+    habitDrugs?: SortOrderInput | SortOrder
+    habitOther?: SortOrderInput | SortOrder
+    viralHiv?: SortOrderInput | SortOrder
+    viralHbsag?: SortOrderInput | SortOrder
+    viralHvc?: SortOrderInput | SortOrder
+    labHgb?: SortOrderInput | SortOrder
+    labHct?: SortOrderInput | SortOrder
+    labUrea?: SortOrderInput | SortOrder
+    labCr?: SortOrderInput | SortOrder
+    labK?: SortOrderInput | SortOrder
+    labBloodType?: SortOrderInput | SortOrder
+    labOther?: SortOrderInput | SortOrder
+    imagingSonography?: SortOrderInput | SortOrder
+    imagingCt?: SortOrderInput | SortOrder
+    imagingOther?: SortOrderInput | SortOrder
+    accessAvFistula?: SortOrderInput | SortOrder
+    accessGraft?: SortOrderInput | SortOrder
+    accessTunneledCatheter?: SortOrderInput | SortOrder
+    accessFavi?: SortOrderInput | SortOrder
+    clinicalNotes?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedByName?: SortOrderInput | SortOrder
+    updatedByRole?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    residency?: ResidencyOrderByWithRelationInput
+    patient?: PatientOrderByWithRelationInput
+  }
+
+  export type OutpatientHemodialysisWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: OutpatientHemodialysisWhereInput | OutpatientHemodialysisWhereInput[]
+    OR?: OutpatientHemodialysisWhereInput[]
+    NOT?: OutpatientHemodialysisWhereInput | OutpatientHemodialysisWhereInput[]
+    residencyId?: StringFilter<"OutpatientHemodialysis"> | string
+    patientId?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    firstName?: StringFilter<"OutpatientHemodialysis"> | string
+    lastName?: StringFilter<"OutpatientHemodialysis"> | string
+    expedienteNumber?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    age?: IntNullableFilter<"OutpatientHemodialysis"> | number | null
+    sex?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    phone?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    cedula?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    bloodType?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    diagnosisAndTime?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    medications?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    allergies?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    allergyReaction?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    transfusions?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    referredFromCenter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    firstTimeInCenter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    otherDialysisModality?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    pathologicalHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    surgicalHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    familyHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitCoffee?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitTobacco?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitAlcohol?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitDrugs?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHiv?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHbsag?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHvc?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labHgb?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labHct?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labUrea?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labCr?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labK?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labBloodType?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingSonography?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingCt?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessAvFistula?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessGraft?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessTunneledCatheter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessFavi?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    clinicalNotes?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    isActive?: BoolFilter<"OutpatientHemodialysis"> | boolean
+    createdBy?: StringFilter<"OutpatientHemodialysis"> | string
+    createdByName?: StringFilter<"OutpatientHemodialysis"> | string
+    createdByRole?: StringFilter<"OutpatientHemodialysis"> | string
+    createdAt?: DateTimeFilter<"OutpatientHemodialysis"> | Date | string
+    updatedBy?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedByName?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedByRole?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedAt?: DateTimeNullableFilter<"OutpatientHemodialysis"> | Date | string | null
+    residency?: XOR<ResidencyScalarRelationFilter, ResidencyWhereInput>
+    patient?: XOR<PatientNullableScalarRelationFilter, PatientWhereInput> | null
+  }, "id">
+
+  export type OutpatientHemodialysisOrderByWithAggregationInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrderInput | SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    expedienteNumber?: SortOrderInput | SortOrder
+    age?: SortOrderInput | SortOrder
+    sex?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    cedula?: SortOrderInput | SortOrder
+    bloodType?: SortOrderInput | SortOrder
+    diagnosisAndTime?: SortOrderInput | SortOrder
+    medications?: SortOrderInput | SortOrder
+    allergies?: SortOrderInput | SortOrder
+    allergyReaction?: SortOrderInput | SortOrder
+    transfusions?: SortOrderInput | SortOrder
+    referredFromCenter?: SortOrderInput | SortOrder
+    firstTimeInCenter?: SortOrderInput | SortOrder
+    otherDialysisModality?: SortOrderInput | SortOrder
+    pathologicalHistory?: SortOrderInput | SortOrder
+    surgicalHistory?: SortOrderInput | SortOrder
+    familyHistory?: SortOrderInput | SortOrder
+    habitCoffee?: SortOrderInput | SortOrder
+    habitTobacco?: SortOrderInput | SortOrder
+    habitAlcohol?: SortOrderInput | SortOrder
+    habitDrugs?: SortOrderInput | SortOrder
+    habitOther?: SortOrderInput | SortOrder
+    viralHiv?: SortOrderInput | SortOrder
+    viralHbsag?: SortOrderInput | SortOrder
+    viralHvc?: SortOrderInput | SortOrder
+    labHgb?: SortOrderInput | SortOrder
+    labHct?: SortOrderInput | SortOrder
+    labUrea?: SortOrderInput | SortOrder
+    labCr?: SortOrderInput | SortOrder
+    labK?: SortOrderInput | SortOrder
+    labBloodType?: SortOrderInput | SortOrder
+    labOther?: SortOrderInput | SortOrder
+    imagingSonography?: SortOrderInput | SortOrder
+    imagingCt?: SortOrderInput | SortOrder
+    imagingOther?: SortOrderInput | SortOrder
+    accessAvFistula?: SortOrderInput | SortOrder
+    accessGraft?: SortOrderInput | SortOrder
+    accessTunneledCatheter?: SortOrderInput | SortOrder
+    accessFavi?: SortOrderInput | SortOrder
+    clinicalNotes?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedByName?: SortOrderInput | SortOrder
+    updatedByRole?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _count?: OutpatientHemodialysisCountOrderByAggregateInput
+    _avg?: OutpatientHemodialysisAvgOrderByAggregateInput
+    _max?: OutpatientHemodialysisMaxOrderByAggregateInput
+    _min?: OutpatientHemodialysisMinOrderByAggregateInput
+    _sum?: OutpatientHemodialysisSumOrderByAggregateInput
+  }
+
+  export type OutpatientHemodialysisScalarWhereWithAggregatesInput = {
+    AND?: OutpatientHemodialysisScalarWhereWithAggregatesInput | OutpatientHemodialysisScalarWhereWithAggregatesInput[]
+    OR?: OutpatientHemodialysisScalarWhereWithAggregatesInput[]
+    NOT?: OutpatientHemodialysisScalarWhereWithAggregatesInput | OutpatientHemodialysisScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"OutpatientHemodialysis"> | string
+    residencyId?: StringWithAggregatesFilter<"OutpatientHemodialysis"> | string
+    patientId?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    firstName?: StringWithAggregatesFilter<"OutpatientHemodialysis"> | string
+    lastName?: StringWithAggregatesFilter<"OutpatientHemodialysis"> | string
+    expedienteNumber?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    age?: IntNullableWithAggregatesFilter<"OutpatientHemodialysis"> | number | null
+    sex?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    phone?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    cedula?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    bloodType?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    diagnosisAndTime?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    medications?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    allergies?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    allergyReaction?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    transfusions?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    referredFromCenter?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    firstTimeInCenter?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    otherDialysisModality?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    pathologicalHistory?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    surgicalHistory?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    familyHistory?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    habitCoffee?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    habitTobacco?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    habitAlcohol?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    habitDrugs?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    habitOther?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    viralHiv?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    viralHbsag?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    viralHvc?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    labHgb?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    labHct?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    labUrea?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    labCr?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    labK?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    labBloodType?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    labOther?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    imagingSonography?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    imagingCt?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    imagingOther?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    accessAvFistula?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    accessGraft?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    accessTunneledCatheter?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    accessFavi?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    clinicalNotes?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    isActive?: BoolWithAggregatesFilter<"OutpatientHemodialysis"> | boolean
+    createdBy?: StringWithAggregatesFilter<"OutpatientHemodialysis"> | string
+    createdByName?: StringWithAggregatesFilter<"OutpatientHemodialysis"> | string
+    createdByRole?: StringWithAggregatesFilter<"OutpatientHemodialysis"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"OutpatientHemodialysis"> | Date | string
+    updatedBy?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    updatedByName?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    updatedByRole?: StringNullableWithAggregatesFilter<"OutpatientHemodialysis"> | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"OutpatientHemodialysis"> | Date | string | null
   }
 
   export type SurgicalProfileWhereInput = {
@@ -43750,6 +50631,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateInput = {
@@ -43787,6 +50670,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUpdateInput = {
@@ -43824,6 +50709,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateInput = {
@@ -43861,6 +50748,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyCreateManyInput = {
@@ -44382,6 +51271,8 @@ export namespace Prisma {
     allergies?: AllergyCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateInput = {
@@ -44405,6 +51296,8 @@ export namespace Prisma {
     allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryUncheckedCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUpdateInput = {
@@ -44428,6 +51321,8 @@ export namespace Prisma {
     allergies?: AllergyUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateInput = {
@@ -44451,6 +51346,8 @@ export namespace Prisma {
     allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUncheckedUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientCreateManyInput = {
@@ -44553,6 +51450,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -44606,6 +51505,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -44659,6 +51560,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -44712,6 +51615,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -44829,6 +51734,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -44862,6 +51768,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -44889,6 +51796,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -44922,6 +51830,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -44952,6 +51861,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -44979,6 +51889,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -45009,6 +51920,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -45146,6 +52058,840 @@ export namespace Prisma {
     dischargeGoal?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HematologyProfileCreateInput = {
+    id?: string
+    vitalSignsFrequency?: string
+    bleedingWatch?: string | null
+    painWatch?: string | null
+    temperatureWatch?: string | null
+    hemodynamicWatch?: string | null
+    pendingBloodProducts?: string | null
+    pendingStudies?: string | null
+    isolationType?: string
+    oxygenSupport?: string
+    hematologicSummary?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+    episode: EpisodeCreateNestedOneWithoutHematologyProfileInput
+  }
+
+  export type HematologyProfileUncheckedCreateInput = {
+    id?: string
+    episodeId: string
+    vitalSignsFrequency?: string
+    bleedingWatch?: string | null
+    painWatch?: string | null
+    temperatureWatch?: string | null
+    hemodynamicWatch?: string | null
+    pendingBloodProducts?: string | null
+    pendingStudies?: string | null
+    isolationType?: string
+    oxygenSupport?: string
+    hematologicSummary?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+  }
+
+  export type HematologyProfileUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vitalSignsFrequency?: StringFieldUpdateOperationsInput | string
+    bleedingWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    painWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    temperatureWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    hemodynamicWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingBloodProducts?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    isolationType?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    hematologicSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episode?: EpisodeUpdateOneRequiredWithoutHematologyProfileNestedInput
+  }
+
+  export type HematologyProfileUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    vitalSignsFrequency?: StringFieldUpdateOperationsInput | string
+    bleedingWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    painWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    temperatureWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    hemodynamicWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingBloodProducts?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    isolationType?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    hematologicSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HematologyProfileCreateManyInput = {
+    id?: string
+    episodeId: string
+    vitalSignsFrequency?: string
+    bleedingWatch?: string | null
+    painWatch?: string | null
+    temperatureWatch?: string | null
+    hemodynamicWatch?: string | null
+    pendingBloodProducts?: string | null
+    pendingStudies?: string | null
+    isolationType?: string
+    oxygenSupport?: string
+    hematologicSummary?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+  }
+
+  export type HematologyProfileUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vitalSignsFrequency?: StringFieldUpdateOperationsInput | string
+    bleedingWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    painWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    temperatureWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    hemodynamicWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingBloodProducts?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    isolationType?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    hematologicSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HematologyProfileUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    vitalSignsFrequency?: StringFieldUpdateOperationsInput | string
+    bleedingWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    painWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    temperatureWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    hemodynamicWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingBloodProducts?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    isolationType?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    hematologicSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmergencyProfileCreateInput = {
+    id?: string
+    amc?: string | null
+    specialty?: string | null
+    relevantLabsStudies?: string | null
+    interestsPending?: string | null
+    triageLevel?: string
+    clinicalStatus?: string
+    oxygenSupport?: string
+    dispositionPlan?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+    episode: EpisodeCreateNestedOneWithoutEmergencyProfileInput
+  }
+
+  export type EmergencyProfileUncheckedCreateInput = {
+    id?: string
+    episodeId: string
+    amc?: string | null
+    specialty?: string | null
+    relevantLabsStudies?: string | null
+    interestsPending?: string | null
+    triageLevel?: string
+    clinicalStatus?: string
+    oxygenSupport?: string
+    dispositionPlan?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+  }
+
+  export type EmergencyProfileUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amc?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    relevantLabsStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    interestsPending?: NullableStringFieldUpdateOperationsInput | string | null
+    triageLevel?: StringFieldUpdateOperationsInput | string
+    clinicalStatus?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    dispositionPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episode?: EpisodeUpdateOneRequiredWithoutEmergencyProfileNestedInput
+  }
+
+  export type EmergencyProfileUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    amc?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    relevantLabsStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    interestsPending?: NullableStringFieldUpdateOperationsInput | string | null
+    triageLevel?: StringFieldUpdateOperationsInput | string
+    clinicalStatus?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    dispositionPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmergencyProfileCreateManyInput = {
+    id?: string
+    episodeId: string
+    amc?: string | null
+    specialty?: string | null
+    relevantLabsStudies?: string | null
+    interestsPending?: string | null
+    triageLevel?: string
+    clinicalStatus?: string
+    oxygenSupport?: string
+    dispositionPlan?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+  }
+
+  export type EmergencyProfileUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amc?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    relevantLabsStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    interestsPending?: NullableStringFieldUpdateOperationsInput | string | null
+    triageLevel?: StringFieldUpdateOperationsInput | string
+    clinicalStatus?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    dispositionPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmergencyProfileUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    amc?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    relevantLabsStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    interestsPending?: NullableStringFieldUpdateOperationsInput | string | null
+    triageLevel?: StringFieldUpdateOperationsInput | string
+    clinicalStatus?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    dispositionPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BiopsyRecordCreateInput = {
+    id?: string
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+    residency: ResidencyCreateNestedOneWithoutBiopsyRecordsInput
+    patient?: PatientCreateNestedOneWithoutBiopsyRecordsInput
+  }
+
+  export type BiopsyRecordUncheckedCreateInput = {
+    id?: string
+    residencyId: string
+    patientId?: string | null
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+  }
+
+  export type BiopsyRecordUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    residency?: ResidencyUpdateOneRequiredWithoutBiopsyRecordsNestedInput
+    patient?: PatientUpdateOneWithoutBiopsyRecordsNestedInput
+  }
+
+  export type BiopsyRecordUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BiopsyRecordCreateManyInput = {
+    id?: string
+    residencyId: string
+    patientId?: string | null
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+  }
+
+  export type BiopsyRecordUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BiopsyRecordUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OutpatientHemodialysisCreateInput = {
+    id?: string
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    residency: ResidencyCreateNestedOneWithoutOutpatientHemodialysesInput
+    patient?: PatientCreateNestedOneWithoutOutpatientHemodialysesInput
+  }
+
+  export type OutpatientHemodialysisUncheckedCreateInput = {
+    id?: string
+    residencyId: string
+    patientId?: string | null
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type OutpatientHemodialysisUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    residency?: ResidencyUpdateOneRequiredWithoutOutpatientHemodialysesNestedInput
+    patient?: PatientUpdateOneWithoutOutpatientHemodialysesNestedInput
+  }
+
+  export type OutpatientHemodialysisUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OutpatientHemodialysisCreateManyInput = {
+    id?: string
+    residencyId: string
+    patientId?: string | null
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type OutpatientHemodialysisUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OutpatientHemodialysisUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SurgicalProfileCreateInput = {
@@ -47427,6 +55173,18 @@ export namespace Prisma {
     none?: HemodialysisItemWhereInput
   }
 
+  export type BiopsyRecordListRelationFilter = {
+    every?: BiopsyRecordWhereInput
+    some?: BiopsyRecordWhereInput
+    none?: BiopsyRecordWhereInput
+  }
+
+  export type OutpatientHemodialysisListRelationFilter = {
+    every?: OutpatientHemodialysisWhereInput
+    some?: OutpatientHemodialysisWhereInput
+    none?: OutpatientHemodialysisWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -47461,6 +55219,14 @@ export namespace Prisma {
   }
 
   export type HemodialysisItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BiopsyRecordOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type OutpatientHemodialysisOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -48200,6 +55966,16 @@ export namespace Prisma {
     isNot?: SurgicalProfileWhereInput | null
   }
 
+  export type HematologyProfileNullableScalarRelationFilter = {
+    is?: HematologyProfileWhereInput | null
+    isNot?: HematologyProfileWhereInput | null
+  }
+
+  export type EmergencyProfileNullableScalarRelationFilter = {
+    is?: EmergencyProfileWhereInput | null
+    isNot?: EmergencyProfileWhereInput | null
+  }
+
   export type EpisodeAntibioticListRelationFilter = {
     every?: EpisodeAntibioticWhereInput
     some?: EpisodeAntibioticWhereInput
@@ -48411,6 +56187,7 @@ export namespace Prisma {
     consultationDate?: SortOrder
     status?: SortOrder
     visitType?: SortOrder
+    consultationType?: SortOrder
     chiefComplaint?: SortOrder
     bloodPressure?: SortOrder
     heartRate?: SortOrder
@@ -48449,6 +56226,7 @@ export namespace Prisma {
     consultationDate?: SortOrder
     status?: SortOrder
     visitType?: SortOrder
+    consultationType?: SortOrder
     chiefComplaint?: SortOrder
     bloodPressure?: SortOrder
     heartRate?: SortOrder
@@ -48479,6 +56257,7 @@ export namespace Prisma {
     consultationDate?: SortOrder
     status?: SortOrder
     visitType?: SortOrder
+    consultationType?: SortOrder
     chiefComplaint?: SortOrder
     bloodPressure?: SortOrder
     heartRate?: SortOrder
@@ -48562,6 +56341,379 @@ export namespace Prisma {
     dischargeGoal?: SortOrder
     updatedBy?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type HematologyProfileCountOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    vitalSignsFrequency?: SortOrder
+    bleedingWatch?: SortOrder
+    painWatch?: SortOrder
+    temperatureWatch?: SortOrder
+    hemodynamicWatch?: SortOrder
+    pendingBloodProducts?: SortOrder
+    pendingStudies?: SortOrder
+    isolationType?: SortOrder
+    oxygenSupport?: SortOrder
+    hematologicSummary?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type HematologyProfileMaxOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    vitalSignsFrequency?: SortOrder
+    bleedingWatch?: SortOrder
+    painWatch?: SortOrder
+    temperatureWatch?: SortOrder
+    hemodynamicWatch?: SortOrder
+    pendingBloodProducts?: SortOrder
+    pendingStudies?: SortOrder
+    isolationType?: SortOrder
+    oxygenSupport?: SortOrder
+    hematologicSummary?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type HematologyProfileMinOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    vitalSignsFrequency?: SortOrder
+    bleedingWatch?: SortOrder
+    painWatch?: SortOrder
+    temperatureWatch?: SortOrder
+    hemodynamicWatch?: SortOrder
+    pendingBloodProducts?: SortOrder
+    pendingStudies?: SortOrder
+    isolationType?: SortOrder
+    oxygenSupport?: SortOrder
+    hematologicSummary?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EmergencyProfileCountOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    amc?: SortOrder
+    specialty?: SortOrder
+    relevantLabsStudies?: SortOrder
+    interestsPending?: SortOrder
+    triageLevel?: SortOrder
+    clinicalStatus?: SortOrder
+    oxygenSupport?: SortOrder
+    dispositionPlan?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EmergencyProfileMaxOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    amc?: SortOrder
+    specialty?: SortOrder
+    relevantLabsStudies?: SortOrder
+    interestsPending?: SortOrder
+    triageLevel?: SortOrder
+    clinicalStatus?: SortOrder
+    oxygenSupport?: SortOrder
+    dispositionPlan?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EmergencyProfileMinOrderByAggregateInput = {
+    id?: SortOrder
+    episodeId?: SortOrder
+    amc?: SortOrder
+    specialty?: SortOrder
+    relevantLabsStudies?: SortOrder
+    interestsPending?: SortOrder
+    triageLevel?: SortOrder
+    clinicalStatus?: SortOrder
+    oxygenSupport?: SortOrder
+    dispositionPlan?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PatientNullableScalarRelationFilter = {
+    is?: PatientWhereInput | null
+    isNot?: PatientWhereInput | null
+  }
+
+  export type BiopsyRecordCountOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrder
+    status?: SortOrder
+    patientName?: SortOrder
+    phone?: SortOrder
+    labsStatus?: SortOrder
+    needleStatus?: SortOrder
+    kitStatus?: SortOrder
+    scheduledDate?: SortOrder
+    senasaAuth?: SortOrder
+    note?: SortOrder
+    performedDate?: SortOrder
+    complications?: SortOrder
+    report?: SortOrder
+    highlightTag?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+    performedBy?: SortOrder
+    performedByName?: SortOrder
+    performedByRole?: SortOrder
+    performedAt?: SortOrder
+  }
+
+  export type BiopsyRecordMaxOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrder
+    status?: SortOrder
+    patientName?: SortOrder
+    phone?: SortOrder
+    labsStatus?: SortOrder
+    needleStatus?: SortOrder
+    kitStatus?: SortOrder
+    scheduledDate?: SortOrder
+    senasaAuth?: SortOrder
+    note?: SortOrder
+    performedDate?: SortOrder
+    complications?: SortOrder
+    report?: SortOrder
+    highlightTag?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+    performedBy?: SortOrder
+    performedByName?: SortOrder
+    performedByRole?: SortOrder
+    performedAt?: SortOrder
+  }
+
+  export type BiopsyRecordMinOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrder
+    status?: SortOrder
+    patientName?: SortOrder
+    phone?: SortOrder
+    labsStatus?: SortOrder
+    needleStatus?: SortOrder
+    kitStatus?: SortOrder
+    scheduledDate?: SortOrder
+    senasaAuth?: SortOrder
+    note?: SortOrder
+    performedDate?: SortOrder
+    complications?: SortOrder
+    report?: SortOrder
+    highlightTag?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+    performedBy?: SortOrder
+    performedByName?: SortOrder
+    performedByRole?: SortOrder
+    performedAt?: SortOrder
+  }
+
+  export type OutpatientHemodialysisCountOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    expedienteNumber?: SortOrder
+    age?: SortOrder
+    sex?: SortOrder
+    phone?: SortOrder
+    cedula?: SortOrder
+    bloodType?: SortOrder
+    diagnosisAndTime?: SortOrder
+    medications?: SortOrder
+    allergies?: SortOrder
+    allergyReaction?: SortOrder
+    transfusions?: SortOrder
+    referredFromCenter?: SortOrder
+    firstTimeInCenter?: SortOrder
+    otherDialysisModality?: SortOrder
+    pathologicalHistory?: SortOrder
+    surgicalHistory?: SortOrder
+    familyHistory?: SortOrder
+    habitCoffee?: SortOrder
+    habitTobacco?: SortOrder
+    habitAlcohol?: SortOrder
+    habitDrugs?: SortOrder
+    habitOther?: SortOrder
+    viralHiv?: SortOrder
+    viralHbsag?: SortOrder
+    viralHvc?: SortOrder
+    labHgb?: SortOrder
+    labHct?: SortOrder
+    labUrea?: SortOrder
+    labCr?: SortOrder
+    labK?: SortOrder
+    labBloodType?: SortOrder
+    labOther?: SortOrder
+    imagingSonography?: SortOrder
+    imagingCt?: SortOrder
+    imagingOther?: SortOrder
+    accessAvFistula?: SortOrder
+    accessGraft?: SortOrder
+    accessTunneledCatheter?: SortOrder
+    accessFavi?: SortOrder
+    clinicalNotes?: SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OutpatientHemodialysisAvgOrderByAggregateInput = {
+    age?: SortOrder
+  }
+
+  export type OutpatientHemodialysisMaxOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    expedienteNumber?: SortOrder
+    age?: SortOrder
+    sex?: SortOrder
+    phone?: SortOrder
+    cedula?: SortOrder
+    bloodType?: SortOrder
+    diagnosisAndTime?: SortOrder
+    medications?: SortOrder
+    allergies?: SortOrder
+    allergyReaction?: SortOrder
+    transfusions?: SortOrder
+    referredFromCenter?: SortOrder
+    firstTimeInCenter?: SortOrder
+    otherDialysisModality?: SortOrder
+    pathologicalHistory?: SortOrder
+    surgicalHistory?: SortOrder
+    familyHistory?: SortOrder
+    habitCoffee?: SortOrder
+    habitTobacco?: SortOrder
+    habitAlcohol?: SortOrder
+    habitDrugs?: SortOrder
+    habitOther?: SortOrder
+    viralHiv?: SortOrder
+    viralHbsag?: SortOrder
+    viralHvc?: SortOrder
+    labHgb?: SortOrder
+    labHct?: SortOrder
+    labUrea?: SortOrder
+    labCr?: SortOrder
+    labK?: SortOrder
+    labBloodType?: SortOrder
+    labOther?: SortOrder
+    imagingSonography?: SortOrder
+    imagingCt?: SortOrder
+    imagingOther?: SortOrder
+    accessAvFistula?: SortOrder
+    accessGraft?: SortOrder
+    accessTunneledCatheter?: SortOrder
+    accessFavi?: SortOrder
+    clinicalNotes?: SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OutpatientHemodialysisMinOrderByAggregateInput = {
+    id?: SortOrder
+    residencyId?: SortOrder
+    patientId?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    expedienteNumber?: SortOrder
+    age?: SortOrder
+    sex?: SortOrder
+    phone?: SortOrder
+    cedula?: SortOrder
+    bloodType?: SortOrder
+    diagnosisAndTime?: SortOrder
+    medications?: SortOrder
+    allergies?: SortOrder
+    allergyReaction?: SortOrder
+    transfusions?: SortOrder
+    referredFromCenter?: SortOrder
+    firstTimeInCenter?: SortOrder
+    otherDialysisModality?: SortOrder
+    pathologicalHistory?: SortOrder
+    surgicalHistory?: SortOrder
+    familyHistory?: SortOrder
+    habitCoffee?: SortOrder
+    habitTobacco?: SortOrder
+    habitAlcohol?: SortOrder
+    habitDrugs?: SortOrder
+    habitOther?: SortOrder
+    viralHiv?: SortOrder
+    viralHbsag?: SortOrder
+    viralHvc?: SortOrder
+    labHgb?: SortOrder
+    labHct?: SortOrder
+    labUrea?: SortOrder
+    labCr?: SortOrder
+    labK?: SortOrder
+    labBloodType?: SortOrder
+    labOther?: SortOrder
+    imagingSonography?: SortOrder
+    imagingCt?: SortOrder
+    imagingOther?: SortOrder
+    accessAvFistula?: SortOrder
+    accessGraft?: SortOrder
+    accessTunneledCatheter?: SortOrder
+    accessFavi?: SortOrder
+    clinicalNotes?: SortOrder
+    isActive?: SortOrder
+    createdBy?: SortOrder
+    createdByName?: SortOrder
+    createdByRole?: SortOrder
+    createdAt?: SortOrder
+    updatedBy?: SortOrder
+    updatedByName?: SortOrder
+    updatedByRole?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OutpatientHemodialysisSumOrderByAggregateInput = {
+    age?: SortOrder
   }
 
   export type SurgicalProfileCountOrderByAggregateInput = {
@@ -49653,6 +57805,20 @@ export namespace Prisma {
     connect?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
   }
 
+  export type BiopsyRecordCreateNestedManyWithoutResidencyInput = {
+    create?: XOR<BiopsyRecordCreateWithoutResidencyInput, BiopsyRecordUncheckedCreateWithoutResidencyInput> | BiopsyRecordCreateWithoutResidencyInput[] | BiopsyRecordUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: BiopsyRecordCreateOrConnectWithoutResidencyInput | BiopsyRecordCreateOrConnectWithoutResidencyInput[]
+    createMany?: BiopsyRecordCreateManyResidencyInputEnvelope
+    connect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+  }
+
+  export type OutpatientHemodialysisCreateNestedManyWithoutResidencyInput = {
+    create?: XOR<OutpatientHemodialysisCreateWithoutResidencyInput, OutpatientHemodialysisUncheckedCreateWithoutResidencyInput> | OutpatientHemodialysisCreateWithoutResidencyInput[] | OutpatientHemodialysisUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: OutpatientHemodialysisCreateOrConnectWithoutResidencyInput | OutpatientHemodialysisCreateOrConnectWithoutResidencyInput[]
+    createMany?: OutpatientHemodialysisCreateManyResidencyInputEnvelope
+    connect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutResidencyInput = {
     create?: XOR<UserCreateWithoutResidencyInput, UserUncheckedCreateWithoutResidencyInput> | UserCreateWithoutResidencyInput[] | UserUncheckedCreateWithoutResidencyInput[]
     connectOrCreate?: UserCreateOrConnectWithoutResidencyInput | UserCreateOrConnectWithoutResidencyInput[]
@@ -49707,6 +57873,20 @@ export namespace Prisma {
     connectOrCreate?: HemodialysisItemCreateOrConnectWithoutResidencyInput | HemodialysisItemCreateOrConnectWithoutResidencyInput[]
     createMany?: HemodialysisItemCreateManyResidencyInputEnvelope
     connect?: HemodialysisItemWhereUniqueInput | HemodialysisItemWhereUniqueInput[]
+  }
+
+  export type BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput = {
+    create?: XOR<BiopsyRecordCreateWithoutResidencyInput, BiopsyRecordUncheckedCreateWithoutResidencyInput> | BiopsyRecordCreateWithoutResidencyInput[] | BiopsyRecordUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: BiopsyRecordCreateOrConnectWithoutResidencyInput | BiopsyRecordCreateOrConnectWithoutResidencyInput[]
+    createMany?: BiopsyRecordCreateManyResidencyInputEnvelope
+    connect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+  }
+
+  export type OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput = {
+    create?: XOR<OutpatientHemodialysisCreateWithoutResidencyInput, OutpatientHemodialysisUncheckedCreateWithoutResidencyInput> | OutpatientHemodialysisCreateWithoutResidencyInput[] | OutpatientHemodialysisUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: OutpatientHemodialysisCreateOrConnectWithoutResidencyInput | OutpatientHemodialysisCreateOrConnectWithoutResidencyInput[]
+    createMany?: OutpatientHemodialysisCreateManyResidencyInputEnvelope
+    connect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -49861,6 +58041,34 @@ export namespace Prisma {
     deleteMany?: HemodialysisItemScalarWhereInput | HemodialysisItemScalarWhereInput[]
   }
 
+  export type BiopsyRecordUpdateManyWithoutResidencyNestedInput = {
+    create?: XOR<BiopsyRecordCreateWithoutResidencyInput, BiopsyRecordUncheckedCreateWithoutResidencyInput> | BiopsyRecordCreateWithoutResidencyInput[] | BiopsyRecordUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: BiopsyRecordCreateOrConnectWithoutResidencyInput | BiopsyRecordCreateOrConnectWithoutResidencyInput[]
+    upsert?: BiopsyRecordUpsertWithWhereUniqueWithoutResidencyInput | BiopsyRecordUpsertWithWhereUniqueWithoutResidencyInput[]
+    createMany?: BiopsyRecordCreateManyResidencyInputEnvelope
+    set?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    disconnect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    delete?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    connect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    update?: BiopsyRecordUpdateWithWhereUniqueWithoutResidencyInput | BiopsyRecordUpdateWithWhereUniqueWithoutResidencyInput[]
+    updateMany?: BiopsyRecordUpdateManyWithWhereWithoutResidencyInput | BiopsyRecordUpdateManyWithWhereWithoutResidencyInput[]
+    deleteMany?: BiopsyRecordScalarWhereInput | BiopsyRecordScalarWhereInput[]
+  }
+
+  export type OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput = {
+    create?: XOR<OutpatientHemodialysisCreateWithoutResidencyInput, OutpatientHemodialysisUncheckedCreateWithoutResidencyInput> | OutpatientHemodialysisCreateWithoutResidencyInput[] | OutpatientHemodialysisUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: OutpatientHemodialysisCreateOrConnectWithoutResidencyInput | OutpatientHemodialysisCreateOrConnectWithoutResidencyInput[]
+    upsert?: OutpatientHemodialysisUpsertWithWhereUniqueWithoutResidencyInput | OutpatientHemodialysisUpsertWithWhereUniqueWithoutResidencyInput[]
+    createMany?: OutpatientHemodialysisCreateManyResidencyInputEnvelope
+    set?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    disconnect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    delete?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    connect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    update?: OutpatientHemodialysisUpdateWithWhereUniqueWithoutResidencyInput | OutpatientHemodialysisUpdateWithWhereUniqueWithoutResidencyInput[]
+    updateMany?: OutpatientHemodialysisUpdateManyWithWhereWithoutResidencyInput | OutpatientHemodialysisUpdateManyWithWhereWithoutResidencyInput[]
+    deleteMany?: OutpatientHemodialysisScalarWhereInput | OutpatientHemodialysisScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutResidencyNestedInput = {
     create?: XOR<UserCreateWithoutResidencyInput, UserUncheckedCreateWithoutResidencyInput> | UserCreateWithoutResidencyInput[] | UserUncheckedCreateWithoutResidencyInput[]
     connectOrCreate?: UserCreateOrConnectWithoutResidencyInput | UserCreateOrConnectWithoutResidencyInput[]
@@ -49971,6 +58179,34 @@ export namespace Prisma {
     update?: HemodialysisItemUpdateWithWhereUniqueWithoutResidencyInput | HemodialysisItemUpdateWithWhereUniqueWithoutResidencyInput[]
     updateMany?: HemodialysisItemUpdateManyWithWhereWithoutResidencyInput | HemodialysisItemUpdateManyWithWhereWithoutResidencyInput[]
     deleteMany?: HemodialysisItemScalarWhereInput | HemodialysisItemScalarWhereInput[]
+  }
+
+  export type BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput = {
+    create?: XOR<BiopsyRecordCreateWithoutResidencyInput, BiopsyRecordUncheckedCreateWithoutResidencyInput> | BiopsyRecordCreateWithoutResidencyInput[] | BiopsyRecordUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: BiopsyRecordCreateOrConnectWithoutResidencyInput | BiopsyRecordCreateOrConnectWithoutResidencyInput[]
+    upsert?: BiopsyRecordUpsertWithWhereUniqueWithoutResidencyInput | BiopsyRecordUpsertWithWhereUniqueWithoutResidencyInput[]
+    createMany?: BiopsyRecordCreateManyResidencyInputEnvelope
+    set?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    disconnect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    delete?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    connect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    update?: BiopsyRecordUpdateWithWhereUniqueWithoutResidencyInput | BiopsyRecordUpdateWithWhereUniqueWithoutResidencyInput[]
+    updateMany?: BiopsyRecordUpdateManyWithWhereWithoutResidencyInput | BiopsyRecordUpdateManyWithWhereWithoutResidencyInput[]
+    deleteMany?: BiopsyRecordScalarWhereInput | BiopsyRecordScalarWhereInput[]
+  }
+
+  export type OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput = {
+    create?: XOR<OutpatientHemodialysisCreateWithoutResidencyInput, OutpatientHemodialysisUncheckedCreateWithoutResidencyInput> | OutpatientHemodialysisCreateWithoutResidencyInput[] | OutpatientHemodialysisUncheckedCreateWithoutResidencyInput[]
+    connectOrCreate?: OutpatientHemodialysisCreateOrConnectWithoutResidencyInput | OutpatientHemodialysisCreateOrConnectWithoutResidencyInput[]
+    upsert?: OutpatientHemodialysisUpsertWithWhereUniqueWithoutResidencyInput | OutpatientHemodialysisUpsertWithWhereUniqueWithoutResidencyInput[]
+    createMany?: OutpatientHemodialysisCreateManyResidencyInputEnvelope
+    set?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    disconnect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    delete?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    connect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    update?: OutpatientHemodialysisUpdateWithWhereUniqueWithoutResidencyInput | OutpatientHemodialysisUpdateWithWhereUniqueWithoutResidencyInput[]
+    updateMany?: OutpatientHemodialysisUpdateManyWithWhereWithoutResidencyInput | OutpatientHemodialysisUpdateManyWithWhereWithoutResidencyInput[]
+    deleteMany?: OutpatientHemodialysisScalarWhereInput | OutpatientHemodialysisScalarWhereInput[]
   }
 
   export type ResidencyCreateNestedOneWithoutPaymentsInput = {
@@ -50269,6 +58505,20 @@ export namespace Prisma {
     connect?: ViralSerologyWhereUniqueInput | ViralSerologyWhereUniqueInput[]
   }
 
+  export type BiopsyRecordCreateNestedManyWithoutPatientInput = {
+    create?: XOR<BiopsyRecordCreateWithoutPatientInput, BiopsyRecordUncheckedCreateWithoutPatientInput> | BiopsyRecordCreateWithoutPatientInput[] | BiopsyRecordUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: BiopsyRecordCreateOrConnectWithoutPatientInput | BiopsyRecordCreateOrConnectWithoutPatientInput[]
+    createMany?: BiopsyRecordCreateManyPatientInputEnvelope
+    connect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+  }
+
+  export type OutpatientHemodialysisCreateNestedManyWithoutPatientInput = {
+    create?: XOR<OutpatientHemodialysisCreateWithoutPatientInput, OutpatientHemodialysisUncheckedCreateWithoutPatientInput> | OutpatientHemodialysisCreateWithoutPatientInput[] | OutpatientHemodialysisUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: OutpatientHemodialysisCreateOrConnectWithoutPatientInput | OutpatientHemodialysisCreateOrConnectWithoutPatientInput[]
+    createMany?: OutpatientHemodialysisCreateManyPatientInputEnvelope
+    connect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+  }
+
   export type EpisodeUncheckedCreateNestedManyWithoutPatientInput = {
     create?: XOR<EpisodeCreateWithoutPatientInput, EpisodeUncheckedCreateWithoutPatientInput> | EpisodeCreateWithoutPatientInput[] | EpisodeUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutPatientInput | EpisodeCreateOrConnectWithoutPatientInput[]
@@ -50301,6 +58551,20 @@ export namespace Prisma {
     connectOrCreate?: ViralSerologyCreateOrConnectWithoutPatientInput | ViralSerologyCreateOrConnectWithoutPatientInput[]
     createMany?: ViralSerologyCreateManyPatientInputEnvelope
     connect?: ViralSerologyWhereUniqueInput | ViralSerologyWhereUniqueInput[]
+  }
+
+  export type BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<BiopsyRecordCreateWithoutPatientInput, BiopsyRecordUncheckedCreateWithoutPatientInput> | BiopsyRecordCreateWithoutPatientInput[] | BiopsyRecordUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: BiopsyRecordCreateOrConnectWithoutPatientInput | BiopsyRecordCreateOrConnectWithoutPatientInput[]
+    createMany?: BiopsyRecordCreateManyPatientInputEnvelope
+    connect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+  }
+
+  export type OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<OutpatientHemodialysisCreateWithoutPatientInput, OutpatientHemodialysisUncheckedCreateWithoutPatientInput> | OutpatientHemodialysisCreateWithoutPatientInput[] | OutpatientHemodialysisUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: OutpatientHemodialysisCreateOrConnectWithoutPatientInput | OutpatientHemodialysisCreateOrConnectWithoutPatientInput[]
+    createMany?: OutpatientHemodialysisCreateManyPatientInputEnvelope
+    connect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
   }
 
   export type ResidencyUpdateOneWithoutPatientsNestedInput = {
@@ -50379,6 +58643,34 @@ export namespace Prisma {
     deleteMany?: ViralSerologyScalarWhereInput | ViralSerologyScalarWhereInput[]
   }
 
+  export type BiopsyRecordUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<BiopsyRecordCreateWithoutPatientInput, BiopsyRecordUncheckedCreateWithoutPatientInput> | BiopsyRecordCreateWithoutPatientInput[] | BiopsyRecordUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: BiopsyRecordCreateOrConnectWithoutPatientInput | BiopsyRecordCreateOrConnectWithoutPatientInput[]
+    upsert?: BiopsyRecordUpsertWithWhereUniqueWithoutPatientInput | BiopsyRecordUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: BiopsyRecordCreateManyPatientInputEnvelope
+    set?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    disconnect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    delete?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    connect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    update?: BiopsyRecordUpdateWithWhereUniqueWithoutPatientInput | BiopsyRecordUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: BiopsyRecordUpdateManyWithWhereWithoutPatientInput | BiopsyRecordUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: BiopsyRecordScalarWhereInput | BiopsyRecordScalarWhereInput[]
+  }
+
+  export type OutpatientHemodialysisUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<OutpatientHemodialysisCreateWithoutPatientInput, OutpatientHemodialysisUncheckedCreateWithoutPatientInput> | OutpatientHemodialysisCreateWithoutPatientInput[] | OutpatientHemodialysisUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: OutpatientHemodialysisCreateOrConnectWithoutPatientInput | OutpatientHemodialysisCreateOrConnectWithoutPatientInput[]
+    upsert?: OutpatientHemodialysisUpsertWithWhereUniqueWithoutPatientInput | OutpatientHemodialysisUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: OutpatientHemodialysisCreateManyPatientInputEnvelope
+    set?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    disconnect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    delete?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    connect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    update?: OutpatientHemodialysisUpdateWithWhereUniqueWithoutPatientInput | OutpatientHemodialysisUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: OutpatientHemodialysisUpdateManyWithWhereWithoutPatientInput | OutpatientHemodialysisUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: OutpatientHemodialysisScalarWhereInput | OutpatientHemodialysisScalarWhereInput[]
+  }
+
   export type EpisodeUncheckedUpdateManyWithoutPatientNestedInput = {
     create?: XOR<EpisodeCreateWithoutPatientInput, EpisodeUncheckedCreateWithoutPatientInput> | EpisodeCreateWithoutPatientInput[] | EpisodeUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutPatientInput | EpisodeCreateOrConnectWithoutPatientInput[]
@@ -50443,6 +58735,34 @@ export namespace Prisma {
     update?: ViralSerologyUpdateWithWhereUniqueWithoutPatientInput | ViralSerologyUpdateWithWhereUniqueWithoutPatientInput[]
     updateMany?: ViralSerologyUpdateManyWithWhereWithoutPatientInput | ViralSerologyUpdateManyWithWhereWithoutPatientInput[]
     deleteMany?: ViralSerologyScalarWhereInput | ViralSerologyScalarWhereInput[]
+  }
+
+  export type BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<BiopsyRecordCreateWithoutPatientInput, BiopsyRecordUncheckedCreateWithoutPatientInput> | BiopsyRecordCreateWithoutPatientInput[] | BiopsyRecordUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: BiopsyRecordCreateOrConnectWithoutPatientInput | BiopsyRecordCreateOrConnectWithoutPatientInput[]
+    upsert?: BiopsyRecordUpsertWithWhereUniqueWithoutPatientInput | BiopsyRecordUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: BiopsyRecordCreateManyPatientInputEnvelope
+    set?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    disconnect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    delete?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    connect?: BiopsyRecordWhereUniqueInput | BiopsyRecordWhereUniqueInput[]
+    update?: BiopsyRecordUpdateWithWhereUniqueWithoutPatientInput | BiopsyRecordUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: BiopsyRecordUpdateManyWithWhereWithoutPatientInput | BiopsyRecordUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: BiopsyRecordScalarWhereInput | BiopsyRecordScalarWhereInput[]
+  }
+
+  export type OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<OutpatientHemodialysisCreateWithoutPatientInput, OutpatientHemodialysisUncheckedCreateWithoutPatientInput> | OutpatientHemodialysisCreateWithoutPatientInput[] | OutpatientHemodialysisUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: OutpatientHemodialysisCreateOrConnectWithoutPatientInput | OutpatientHemodialysisCreateOrConnectWithoutPatientInput[]
+    upsert?: OutpatientHemodialysisUpsertWithWhereUniqueWithoutPatientInput | OutpatientHemodialysisUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: OutpatientHemodialysisCreateManyPatientInputEnvelope
+    set?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    disconnect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    delete?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    connect?: OutpatientHemodialysisWhereUniqueInput | OutpatientHemodialysisWhereUniqueInput[]
+    update?: OutpatientHemodialysisUpdateWithWhereUniqueWithoutPatientInput | OutpatientHemodialysisUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: OutpatientHemodialysisUpdateManyWithWhereWithoutPatientInput | OutpatientHemodialysisUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: OutpatientHemodialysisScalarWhereInput | OutpatientHemodialysisScalarWhereInput[]
   }
 
   export type ResidencyCreateNestedOneWithoutEpisodesInput = {
@@ -50550,6 +58870,18 @@ export namespace Prisma {
     create?: XOR<SurgicalProfileCreateWithoutEpisodeInput, SurgicalProfileUncheckedCreateWithoutEpisodeInput>
     connectOrCreate?: SurgicalProfileCreateOrConnectWithoutEpisodeInput
     connect?: SurgicalProfileWhereUniqueInput
+  }
+
+  export type HematologyProfileCreateNestedOneWithoutEpisodeInput = {
+    create?: XOR<HematologyProfileCreateWithoutEpisodeInput, HematologyProfileUncheckedCreateWithoutEpisodeInput>
+    connectOrCreate?: HematologyProfileCreateOrConnectWithoutEpisodeInput
+    connect?: HematologyProfileWhereUniqueInput
+  }
+
+  export type EmergencyProfileCreateNestedOneWithoutEpisodeInput = {
+    create?: XOR<EmergencyProfileCreateWithoutEpisodeInput, EmergencyProfileUncheckedCreateWithoutEpisodeInput>
+    connectOrCreate?: EmergencyProfileCreateOrConnectWithoutEpisodeInput
+    connect?: EmergencyProfileWhereUniqueInput
   }
 
   export type EpisodeAntibioticCreateNestedManyWithoutEpisodeInput = {
@@ -50667,6 +58999,18 @@ export namespace Prisma {
     create?: XOR<SurgicalProfileCreateWithoutEpisodeInput, SurgicalProfileUncheckedCreateWithoutEpisodeInput>
     connectOrCreate?: SurgicalProfileCreateOrConnectWithoutEpisodeInput
     connect?: SurgicalProfileWhereUniqueInput
+  }
+
+  export type HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput = {
+    create?: XOR<HematologyProfileCreateWithoutEpisodeInput, HematologyProfileUncheckedCreateWithoutEpisodeInput>
+    connectOrCreate?: HematologyProfileCreateOrConnectWithoutEpisodeInput
+    connect?: HematologyProfileWhereUniqueInput
+  }
+
+  export type EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput = {
+    create?: XOR<EmergencyProfileCreateWithoutEpisodeInput, EmergencyProfileUncheckedCreateWithoutEpisodeInput>
+    connectOrCreate?: EmergencyProfileCreateOrConnectWithoutEpisodeInput
+    connect?: EmergencyProfileWhereUniqueInput
   }
 
   export type EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput = {
@@ -50907,6 +59251,26 @@ export namespace Prisma {
     update?: XOR<XOR<SurgicalProfileUpdateToOneWithWhereWithoutEpisodeInput, SurgicalProfileUpdateWithoutEpisodeInput>, SurgicalProfileUncheckedUpdateWithoutEpisodeInput>
   }
 
+  export type HematologyProfileUpdateOneWithoutEpisodeNestedInput = {
+    create?: XOR<HematologyProfileCreateWithoutEpisodeInput, HematologyProfileUncheckedCreateWithoutEpisodeInput>
+    connectOrCreate?: HematologyProfileCreateOrConnectWithoutEpisodeInput
+    upsert?: HematologyProfileUpsertWithoutEpisodeInput
+    disconnect?: HematologyProfileWhereInput | boolean
+    delete?: HematologyProfileWhereInput | boolean
+    connect?: HematologyProfileWhereUniqueInput
+    update?: XOR<XOR<HematologyProfileUpdateToOneWithWhereWithoutEpisodeInput, HematologyProfileUpdateWithoutEpisodeInput>, HematologyProfileUncheckedUpdateWithoutEpisodeInput>
+  }
+
+  export type EmergencyProfileUpdateOneWithoutEpisodeNestedInput = {
+    create?: XOR<EmergencyProfileCreateWithoutEpisodeInput, EmergencyProfileUncheckedCreateWithoutEpisodeInput>
+    connectOrCreate?: EmergencyProfileCreateOrConnectWithoutEpisodeInput
+    upsert?: EmergencyProfileUpsertWithoutEpisodeInput
+    disconnect?: EmergencyProfileWhereInput | boolean
+    delete?: EmergencyProfileWhereInput | boolean
+    connect?: EmergencyProfileWhereUniqueInput
+    update?: XOR<XOR<EmergencyProfileUpdateToOneWithWhereWithoutEpisodeInput, EmergencyProfileUpdateWithoutEpisodeInput>, EmergencyProfileUncheckedUpdateWithoutEpisodeInput>
+  }
+
   export type EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput = {
     create?: XOR<EpisodeAntibioticCreateWithoutEpisodeInput, EpisodeAntibioticUncheckedCreateWithoutEpisodeInput> | EpisodeAntibioticCreateWithoutEpisodeInput[] | EpisodeAntibioticUncheckedCreateWithoutEpisodeInput[]
     connectOrCreate?: EpisodeAntibioticCreateOrConnectWithoutEpisodeInput | EpisodeAntibioticCreateOrConnectWithoutEpisodeInput[]
@@ -51137,6 +59501,26 @@ export namespace Prisma {
     update?: XOR<XOR<SurgicalProfileUpdateToOneWithWhereWithoutEpisodeInput, SurgicalProfileUpdateWithoutEpisodeInput>, SurgicalProfileUncheckedUpdateWithoutEpisodeInput>
   }
 
+  export type HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput = {
+    create?: XOR<HematologyProfileCreateWithoutEpisodeInput, HematologyProfileUncheckedCreateWithoutEpisodeInput>
+    connectOrCreate?: HematologyProfileCreateOrConnectWithoutEpisodeInput
+    upsert?: HematologyProfileUpsertWithoutEpisodeInput
+    disconnect?: HematologyProfileWhereInput | boolean
+    delete?: HematologyProfileWhereInput | boolean
+    connect?: HematologyProfileWhereUniqueInput
+    update?: XOR<XOR<HematologyProfileUpdateToOneWithWhereWithoutEpisodeInput, HematologyProfileUpdateWithoutEpisodeInput>, HematologyProfileUncheckedUpdateWithoutEpisodeInput>
+  }
+
+  export type EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput = {
+    create?: XOR<EmergencyProfileCreateWithoutEpisodeInput, EmergencyProfileUncheckedCreateWithoutEpisodeInput>
+    connectOrCreate?: EmergencyProfileCreateOrConnectWithoutEpisodeInput
+    upsert?: EmergencyProfileUpsertWithoutEpisodeInput
+    disconnect?: EmergencyProfileWhereInput | boolean
+    delete?: EmergencyProfileWhereInput | boolean
+    connect?: EmergencyProfileWhereUniqueInput
+    update?: XOR<XOR<EmergencyProfileUpdateToOneWithWhereWithoutEpisodeInput, EmergencyProfileUpdateWithoutEpisodeInput>, EmergencyProfileUncheckedUpdateWithoutEpisodeInput>
+  }
+
   export type EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput = {
     create?: XOR<EpisodeAntibioticCreateWithoutEpisodeInput, EpisodeAntibioticUncheckedCreateWithoutEpisodeInput> | EpisodeAntibioticCreateWithoutEpisodeInput[] | EpisodeAntibioticUncheckedCreateWithoutEpisodeInput[]
     connectOrCreate?: EpisodeAntibioticCreateOrConnectWithoutEpisodeInput | EpisodeAntibioticCreateOrConnectWithoutEpisodeInput[]
@@ -51249,6 +59633,94 @@ export namespace Prisma {
     upsert?: EpisodeUpsertWithoutInternalMedicineProfileInput
     connect?: EpisodeWhereUniqueInput
     update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutInternalMedicineProfileInput, EpisodeUpdateWithoutInternalMedicineProfileInput>, EpisodeUncheckedUpdateWithoutInternalMedicineProfileInput>
+  }
+
+  export type EpisodeCreateNestedOneWithoutHematologyProfileInput = {
+    create?: XOR<EpisodeCreateWithoutHematologyProfileInput, EpisodeUncheckedCreateWithoutHematologyProfileInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutHematologyProfileInput
+    connect?: EpisodeWhereUniqueInput
+  }
+
+  export type EpisodeUpdateOneRequiredWithoutHematologyProfileNestedInput = {
+    create?: XOR<EpisodeCreateWithoutHematologyProfileInput, EpisodeUncheckedCreateWithoutHematologyProfileInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutHematologyProfileInput
+    upsert?: EpisodeUpsertWithoutHematologyProfileInput
+    connect?: EpisodeWhereUniqueInput
+    update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutHematologyProfileInput, EpisodeUpdateWithoutHematologyProfileInput>, EpisodeUncheckedUpdateWithoutHematologyProfileInput>
+  }
+
+  export type EpisodeCreateNestedOneWithoutEmergencyProfileInput = {
+    create?: XOR<EpisodeCreateWithoutEmergencyProfileInput, EpisodeUncheckedCreateWithoutEmergencyProfileInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutEmergencyProfileInput
+    connect?: EpisodeWhereUniqueInput
+  }
+
+  export type EpisodeUpdateOneRequiredWithoutEmergencyProfileNestedInput = {
+    create?: XOR<EpisodeCreateWithoutEmergencyProfileInput, EpisodeUncheckedCreateWithoutEmergencyProfileInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutEmergencyProfileInput
+    upsert?: EpisodeUpsertWithoutEmergencyProfileInput
+    connect?: EpisodeWhereUniqueInput
+    update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutEmergencyProfileInput, EpisodeUpdateWithoutEmergencyProfileInput>, EpisodeUncheckedUpdateWithoutEmergencyProfileInput>
+  }
+
+  export type ResidencyCreateNestedOneWithoutBiopsyRecordsInput = {
+    create?: XOR<ResidencyCreateWithoutBiopsyRecordsInput, ResidencyUncheckedCreateWithoutBiopsyRecordsInput>
+    connectOrCreate?: ResidencyCreateOrConnectWithoutBiopsyRecordsInput
+    connect?: ResidencyWhereUniqueInput
+  }
+
+  export type PatientCreateNestedOneWithoutBiopsyRecordsInput = {
+    create?: XOR<PatientCreateWithoutBiopsyRecordsInput, PatientUncheckedCreateWithoutBiopsyRecordsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutBiopsyRecordsInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type ResidencyUpdateOneRequiredWithoutBiopsyRecordsNestedInput = {
+    create?: XOR<ResidencyCreateWithoutBiopsyRecordsInput, ResidencyUncheckedCreateWithoutBiopsyRecordsInput>
+    connectOrCreate?: ResidencyCreateOrConnectWithoutBiopsyRecordsInput
+    upsert?: ResidencyUpsertWithoutBiopsyRecordsInput
+    connect?: ResidencyWhereUniqueInput
+    update?: XOR<XOR<ResidencyUpdateToOneWithWhereWithoutBiopsyRecordsInput, ResidencyUpdateWithoutBiopsyRecordsInput>, ResidencyUncheckedUpdateWithoutBiopsyRecordsInput>
+  }
+
+  export type PatientUpdateOneWithoutBiopsyRecordsNestedInput = {
+    create?: XOR<PatientCreateWithoutBiopsyRecordsInput, PatientUncheckedCreateWithoutBiopsyRecordsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutBiopsyRecordsInput
+    upsert?: PatientUpsertWithoutBiopsyRecordsInput
+    disconnect?: PatientWhereInput | boolean
+    delete?: PatientWhereInput | boolean
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutBiopsyRecordsInput, PatientUpdateWithoutBiopsyRecordsInput>, PatientUncheckedUpdateWithoutBiopsyRecordsInput>
+  }
+
+  export type ResidencyCreateNestedOneWithoutOutpatientHemodialysesInput = {
+    create?: XOR<ResidencyCreateWithoutOutpatientHemodialysesInput, ResidencyUncheckedCreateWithoutOutpatientHemodialysesInput>
+    connectOrCreate?: ResidencyCreateOrConnectWithoutOutpatientHemodialysesInput
+    connect?: ResidencyWhereUniqueInput
+  }
+
+  export type PatientCreateNestedOneWithoutOutpatientHemodialysesInput = {
+    create?: XOR<PatientCreateWithoutOutpatientHemodialysesInput, PatientUncheckedCreateWithoutOutpatientHemodialysesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutOutpatientHemodialysesInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type ResidencyUpdateOneRequiredWithoutOutpatientHemodialysesNestedInput = {
+    create?: XOR<ResidencyCreateWithoutOutpatientHemodialysesInput, ResidencyUncheckedCreateWithoutOutpatientHemodialysesInput>
+    connectOrCreate?: ResidencyCreateOrConnectWithoutOutpatientHemodialysesInput
+    upsert?: ResidencyUpsertWithoutOutpatientHemodialysesInput
+    connect?: ResidencyWhereUniqueInput
+    update?: XOR<XOR<ResidencyUpdateToOneWithWhereWithoutOutpatientHemodialysesInput, ResidencyUpdateWithoutOutpatientHemodialysesInput>, ResidencyUncheckedUpdateWithoutOutpatientHemodialysesInput>
+  }
+
+  export type PatientUpdateOneWithoutOutpatientHemodialysesNestedInput = {
+    create?: XOR<PatientCreateWithoutOutpatientHemodialysesInput, PatientUncheckedCreateWithoutOutpatientHemodialysesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutOutpatientHemodialysesInput
+    upsert?: PatientUpsertWithoutOutpatientHemodialysesInput
+    disconnect?: PatientWhereInput | boolean
+    delete?: PatientWhereInput | boolean
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutOutpatientHemodialysesInput, PatientUpdateWithoutOutpatientHemodialysesInput>, PatientUncheckedUpdateWithoutOutpatientHemodialysesInput>
   }
 
   export type EpisodeCreateNestedOneWithoutSurgicalProfileInput = {
@@ -52117,6 +60589,8 @@ export namespace Prisma {
     allergies?: AllergyCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutResidencyInput = {
@@ -52139,6 +60613,8 @@ export namespace Prisma {
     allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryUncheckedCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutResidencyInput = {
@@ -52197,6 +60673,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -52249,6 +60727,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -52271,6 +60751,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -52302,6 +60783,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -52533,6 +61015,198 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type BiopsyRecordCreateWithoutResidencyInput = {
+    id?: string
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+    patient?: PatientCreateNestedOneWithoutBiopsyRecordsInput
+  }
+
+  export type BiopsyRecordUncheckedCreateWithoutResidencyInput = {
+    id?: string
+    patientId?: string | null
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+  }
+
+  export type BiopsyRecordCreateOrConnectWithoutResidencyInput = {
+    where: BiopsyRecordWhereUniqueInput
+    create: XOR<BiopsyRecordCreateWithoutResidencyInput, BiopsyRecordUncheckedCreateWithoutResidencyInput>
+  }
+
+  export type BiopsyRecordCreateManyResidencyInputEnvelope = {
+    data: BiopsyRecordCreateManyResidencyInput | BiopsyRecordCreateManyResidencyInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OutpatientHemodialysisCreateWithoutResidencyInput = {
+    id?: string
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    patient?: PatientCreateNestedOneWithoutOutpatientHemodialysesInput
+  }
+
+  export type OutpatientHemodialysisUncheckedCreateWithoutResidencyInput = {
+    id?: string
+    patientId?: string | null
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type OutpatientHemodialysisCreateOrConnectWithoutResidencyInput = {
+    where: OutpatientHemodialysisWhereUniqueInput
+    create: XOR<OutpatientHemodialysisCreateWithoutResidencyInput, OutpatientHemodialysisUncheckedCreateWithoutResidencyInput>
+  }
+
+  export type OutpatientHemodialysisCreateManyResidencyInputEnvelope = {
+    data: OutpatientHemodialysisCreateManyResidencyInput | OutpatientHemodialysisCreateManyResidencyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithWhereUniqueWithoutResidencyInput = {
     where: UserWhereUniqueInput
     update: XOR<UserUpdateWithoutResidencyInput, UserUncheckedUpdateWithoutResidencyInput>
@@ -52689,6 +61363,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFilter<"Consultation"> | Date | string
     status?: StringFilter<"Consultation"> | string
     visitType?: StringFilter<"Consultation"> | string
+    consultationType?: StringFilter<"Consultation"> | string
     chiefComplaint?: StringFilter<"Consultation"> | string
     bloodPressure?: StringNullableFilter<"Consultation"> | string | null
     heartRate?: IntNullableFilter<"Consultation"> | number | null
@@ -52869,6 +61544,132 @@ export namespace Prisma {
     resolvedAt?: DateTimeNullableFilter<"HemodialysisItem"> | Date | string | null
   }
 
+  export type BiopsyRecordUpsertWithWhereUniqueWithoutResidencyInput = {
+    where: BiopsyRecordWhereUniqueInput
+    update: XOR<BiopsyRecordUpdateWithoutResidencyInput, BiopsyRecordUncheckedUpdateWithoutResidencyInput>
+    create: XOR<BiopsyRecordCreateWithoutResidencyInput, BiopsyRecordUncheckedCreateWithoutResidencyInput>
+  }
+
+  export type BiopsyRecordUpdateWithWhereUniqueWithoutResidencyInput = {
+    where: BiopsyRecordWhereUniqueInput
+    data: XOR<BiopsyRecordUpdateWithoutResidencyInput, BiopsyRecordUncheckedUpdateWithoutResidencyInput>
+  }
+
+  export type BiopsyRecordUpdateManyWithWhereWithoutResidencyInput = {
+    where: BiopsyRecordScalarWhereInput
+    data: XOR<BiopsyRecordUpdateManyMutationInput, BiopsyRecordUncheckedUpdateManyWithoutResidencyInput>
+  }
+
+  export type BiopsyRecordScalarWhereInput = {
+    AND?: BiopsyRecordScalarWhereInput | BiopsyRecordScalarWhereInput[]
+    OR?: BiopsyRecordScalarWhereInput[]
+    NOT?: BiopsyRecordScalarWhereInput | BiopsyRecordScalarWhereInput[]
+    id?: StringFilter<"BiopsyRecord"> | string
+    residencyId?: StringFilter<"BiopsyRecord"> | string
+    patientId?: StringNullableFilter<"BiopsyRecord"> | string | null
+    status?: StringFilter<"BiopsyRecord"> | string
+    patientName?: StringFilter<"BiopsyRecord"> | string
+    phone?: StringNullableFilter<"BiopsyRecord"> | string | null
+    labsStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    needleStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    kitStatus?: StringNullableFilter<"BiopsyRecord"> | string | null
+    scheduledDate?: StringNullableFilter<"BiopsyRecord"> | string | null
+    senasaAuth?: StringNullableFilter<"BiopsyRecord"> | string | null
+    note?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedDate?: StringNullableFilter<"BiopsyRecord"> | string | null
+    complications?: StringNullableFilter<"BiopsyRecord"> | string | null
+    report?: StringNullableFilter<"BiopsyRecord"> | string | null
+    highlightTag?: StringFilter<"BiopsyRecord"> | string
+    createdBy?: StringFilter<"BiopsyRecord"> | string
+    createdByName?: StringFilter<"BiopsyRecord"> | string
+    createdByRole?: StringFilter<"BiopsyRecord"> | string
+    createdAt?: DateTimeFilter<"BiopsyRecord"> | Date | string
+    updatedBy?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedByName?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedByRole?: StringNullableFilter<"BiopsyRecord"> | string | null
+    updatedAt?: DateTimeNullableFilter<"BiopsyRecord"> | Date | string | null
+    performedBy?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedByName?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedByRole?: StringNullableFilter<"BiopsyRecord"> | string | null
+    performedAt?: DateTimeNullableFilter<"BiopsyRecord"> | Date | string | null
+  }
+
+  export type OutpatientHemodialysisUpsertWithWhereUniqueWithoutResidencyInput = {
+    where: OutpatientHemodialysisWhereUniqueInput
+    update: XOR<OutpatientHemodialysisUpdateWithoutResidencyInput, OutpatientHemodialysisUncheckedUpdateWithoutResidencyInput>
+    create: XOR<OutpatientHemodialysisCreateWithoutResidencyInput, OutpatientHemodialysisUncheckedCreateWithoutResidencyInput>
+  }
+
+  export type OutpatientHemodialysisUpdateWithWhereUniqueWithoutResidencyInput = {
+    where: OutpatientHemodialysisWhereUniqueInput
+    data: XOR<OutpatientHemodialysisUpdateWithoutResidencyInput, OutpatientHemodialysisUncheckedUpdateWithoutResidencyInput>
+  }
+
+  export type OutpatientHemodialysisUpdateManyWithWhereWithoutResidencyInput = {
+    where: OutpatientHemodialysisScalarWhereInput
+    data: XOR<OutpatientHemodialysisUpdateManyMutationInput, OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyInput>
+  }
+
+  export type OutpatientHemodialysisScalarWhereInput = {
+    AND?: OutpatientHemodialysisScalarWhereInput | OutpatientHemodialysisScalarWhereInput[]
+    OR?: OutpatientHemodialysisScalarWhereInput[]
+    NOT?: OutpatientHemodialysisScalarWhereInput | OutpatientHemodialysisScalarWhereInput[]
+    id?: StringFilter<"OutpatientHemodialysis"> | string
+    residencyId?: StringFilter<"OutpatientHemodialysis"> | string
+    patientId?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    firstName?: StringFilter<"OutpatientHemodialysis"> | string
+    lastName?: StringFilter<"OutpatientHemodialysis"> | string
+    expedienteNumber?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    age?: IntNullableFilter<"OutpatientHemodialysis"> | number | null
+    sex?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    phone?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    cedula?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    bloodType?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    diagnosisAndTime?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    medications?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    allergies?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    allergyReaction?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    transfusions?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    referredFromCenter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    firstTimeInCenter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    otherDialysisModality?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    pathologicalHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    surgicalHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    familyHistory?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitCoffee?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitTobacco?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitAlcohol?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitDrugs?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    habitOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHiv?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHbsag?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    viralHvc?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labHgb?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labHct?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labUrea?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labCr?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labK?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labBloodType?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    labOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingSonography?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingCt?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    imagingOther?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessAvFistula?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessGraft?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessTunneledCatheter?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    accessFavi?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    clinicalNotes?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    isActive?: BoolFilter<"OutpatientHemodialysis"> | boolean
+    createdBy?: StringFilter<"OutpatientHemodialysis"> | string
+    createdByName?: StringFilter<"OutpatientHemodialysis"> | string
+    createdByRole?: StringFilter<"OutpatientHemodialysis"> | string
+    createdAt?: DateTimeFilter<"OutpatientHemodialysis"> | Date | string
+    updatedBy?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedByName?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedByRole?: StringNullableFilter<"OutpatientHemodialysis"> | string | null
+    updatedAt?: DateTimeNullableFilter<"OutpatientHemodialysis"> | Date | string | null
+  }
+
   export type ResidencyCreateWithoutPaymentsInput = {
     id?: string
     name: string
@@ -52903,6 +61704,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutPaymentsInput = {
@@ -52939,6 +61742,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutPaymentsInput = {
@@ -53036,6 +61841,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutPaymentsInput = {
@@ -53072,6 +61879,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type UserUpsertWithoutSubscriptionPaymentsInput = {
@@ -53159,6 +61968,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutUsersInput = {
@@ -53195,6 +62006,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutUsersInput = {
@@ -53296,6 +62109,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -53348,6 +62163,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -53370,6 +62187,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -53401,6 +62219,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -53525,6 +62344,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutUsersInput = {
@@ -53561,6 +62382,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type AuditLogUpsertWithWhereUniqueWithoutActorInput = {
@@ -53780,6 +62603,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutPatientsInput = {
@@ -53816,6 +62641,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutPatientsInput = {
@@ -53869,6 +62696,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -53921,6 +62750,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -53943,6 +62774,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -53974,6 +62806,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -54094,6 +62927,198 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type BiopsyRecordCreateWithoutPatientInput = {
+    id?: string
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+    residency: ResidencyCreateNestedOneWithoutBiopsyRecordsInput
+  }
+
+  export type BiopsyRecordUncheckedCreateWithoutPatientInput = {
+    id?: string
+    residencyId: string
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+  }
+
+  export type BiopsyRecordCreateOrConnectWithoutPatientInput = {
+    where: BiopsyRecordWhereUniqueInput
+    create: XOR<BiopsyRecordCreateWithoutPatientInput, BiopsyRecordUncheckedCreateWithoutPatientInput>
+  }
+
+  export type BiopsyRecordCreateManyPatientInputEnvelope = {
+    data: BiopsyRecordCreateManyPatientInput | BiopsyRecordCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OutpatientHemodialysisCreateWithoutPatientInput = {
+    id?: string
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    residency: ResidencyCreateNestedOneWithoutOutpatientHemodialysesInput
+  }
+
+  export type OutpatientHemodialysisUncheckedCreateWithoutPatientInput = {
+    id?: string
+    residencyId: string
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type OutpatientHemodialysisCreateOrConnectWithoutPatientInput = {
+    where: OutpatientHemodialysisWhereUniqueInput
+    create: XOR<OutpatientHemodialysisCreateWithoutPatientInput, OutpatientHemodialysisUncheckedCreateWithoutPatientInput>
+  }
+
+  export type OutpatientHemodialysisCreateManyPatientInputEnvelope = {
+    data: OutpatientHemodialysisCreateManyPatientInput | OutpatientHemodialysisCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ResidencyUpsertWithoutPatientsInput = {
     update: XOR<ResidencyUpdateWithoutPatientsInput, ResidencyUncheckedUpdateWithoutPatientsInput>
     create: XOR<ResidencyCreateWithoutPatientsInput, ResidencyUncheckedCreateWithoutPatientsInput>
@@ -54139,6 +63164,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutPatientsInput = {
@@ -54175,6 +63202,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type EpisodeUpsertWithWhereUniqueWithoutPatientInput = {
@@ -54303,6 +63332,38 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ViralSerology"> | Date | string
   }
 
+  export type BiopsyRecordUpsertWithWhereUniqueWithoutPatientInput = {
+    where: BiopsyRecordWhereUniqueInput
+    update: XOR<BiopsyRecordUpdateWithoutPatientInput, BiopsyRecordUncheckedUpdateWithoutPatientInput>
+    create: XOR<BiopsyRecordCreateWithoutPatientInput, BiopsyRecordUncheckedCreateWithoutPatientInput>
+  }
+
+  export type BiopsyRecordUpdateWithWhereUniqueWithoutPatientInput = {
+    where: BiopsyRecordWhereUniqueInput
+    data: XOR<BiopsyRecordUpdateWithoutPatientInput, BiopsyRecordUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type BiopsyRecordUpdateManyWithWhereWithoutPatientInput = {
+    where: BiopsyRecordScalarWhereInput
+    data: XOR<BiopsyRecordUpdateManyMutationInput, BiopsyRecordUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type OutpatientHemodialysisUpsertWithWhereUniqueWithoutPatientInput = {
+    where: OutpatientHemodialysisWhereUniqueInput
+    update: XOR<OutpatientHemodialysisUpdateWithoutPatientInput, OutpatientHemodialysisUncheckedUpdateWithoutPatientInput>
+    create: XOR<OutpatientHemodialysisCreateWithoutPatientInput, OutpatientHemodialysisUncheckedCreateWithoutPatientInput>
+  }
+
+  export type OutpatientHemodialysisUpdateWithWhereUniqueWithoutPatientInput = {
+    where: OutpatientHemodialysisWhereUniqueInput
+    data: XOR<OutpatientHemodialysisUpdateWithoutPatientInput, OutpatientHemodialysisUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type OutpatientHemodialysisUpdateManyWithWhereWithoutPatientInput = {
+    where: OutpatientHemodialysisScalarWhereInput
+    data: XOR<OutpatientHemodialysisUpdateManyMutationInput, OutpatientHemodialysisUncheckedUpdateManyWithoutPatientInput>
+  }
+
   export type ResidencyCreateWithoutEpisodesInput = {
     id?: string
     name: string
@@ -54337,6 +63398,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutEpisodesInput = {
@@ -54373,6 +63436,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutEpisodesInput = {
@@ -54400,6 +63465,8 @@ export namespace Prisma {
     allergies?: AllergyCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutEpisodesInput = {
@@ -54422,6 +63489,8 @@ export namespace Prisma {
     allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryUncheckedCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutEpisodesInput = {
@@ -54950,6 +64019,76 @@ export namespace Prisma {
     create: XOR<SurgicalProfileCreateWithoutEpisodeInput, SurgicalProfileUncheckedCreateWithoutEpisodeInput>
   }
 
+  export type HematologyProfileCreateWithoutEpisodeInput = {
+    id?: string
+    vitalSignsFrequency?: string
+    bleedingWatch?: string | null
+    painWatch?: string | null
+    temperatureWatch?: string | null
+    hemodynamicWatch?: string | null
+    pendingBloodProducts?: string | null
+    pendingStudies?: string | null
+    isolationType?: string
+    oxygenSupport?: string
+    hematologicSummary?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+  }
+
+  export type HematologyProfileUncheckedCreateWithoutEpisodeInput = {
+    id?: string
+    vitalSignsFrequency?: string
+    bleedingWatch?: string | null
+    painWatch?: string | null
+    temperatureWatch?: string | null
+    hemodynamicWatch?: string | null
+    pendingBloodProducts?: string | null
+    pendingStudies?: string | null
+    isolationType?: string
+    oxygenSupport?: string
+    hematologicSummary?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+  }
+
+  export type HematologyProfileCreateOrConnectWithoutEpisodeInput = {
+    where: HematologyProfileWhereUniqueInput
+    create: XOR<HematologyProfileCreateWithoutEpisodeInput, HematologyProfileUncheckedCreateWithoutEpisodeInput>
+  }
+
+  export type EmergencyProfileCreateWithoutEpisodeInput = {
+    id?: string
+    amc?: string | null
+    specialty?: string | null
+    relevantLabsStudies?: string | null
+    interestsPending?: string | null
+    triageLevel?: string
+    clinicalStatus?: string
+    oxygenSupport?: string
+    dispositionPlan?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+  }
+
+  export type EmergencyProfileUncheckedCreateWithoutEpisodeInput = {
+    id?: string
+    amc?: string | null
+    specialty?: string | null
+    relevantLabsStudies?: string | null
+    interestsPending?: string | null
+    triageLevel?: string
+    clinicalStatus?: string
+    oxygenSupport?: string
+    dispositionPlan?: string | null
+    updatedBy: string
+    updatedAt?: Date | string
+  }
+
+  export type EmergencyProfileCreateOrConnectWithoutEpisodeInput = {
+    where: EmergencyProfileWhereUniqueInput
+    create: XOR<EmergencyProfileCreateWithoutEpisodeInput, EmergencyProfileUncheckedCreateWithoutEpisodeInput>
+  }
+
   export type EpisodeAntibioticCreateWithoutEpisodeInput = {
     id?: string
     name: string
@@ -55129,6 +64268,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutEpisodesInput = {
@@ -55165,6 +64306,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type PatientUpsertWithoutEpisodesInput = {
@@ -55198,6 +64341,8 @@ export namespace Prisma {
     allergies?: AllergyUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutEpisodesInput = {
@@ -55220,6 +64365,8 @@ export namespace Prisma {
     allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUncheckedUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type AllergyUpsertWithWhereUniqueWithoutEpisodeInput = {
@@ -55706,6 +64853,88 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type HematologyProfileUpsertWithoutEpisodeInput = {
+    update: XOR<HematologyProfileUpdateWithoutEpisodeInput, HematologyProfileUncheckedUpdateWithoutEpisodeInput>
+    create: XOR<HematologyProfileCreateWithoutEpisodeInput, HematologyProfileUncheckedCreateWithoutEpisodeInput>
+    where?: HematologyProfileWhereInput
+  }
+
+  export type HematologyProfileUpdateToOneWithWhereWithoutEpisodeInput = {
+    where?: HematologyProfileWhereInput
+    data: XOR<HematologyProfileUpdateWithoutEpisodeInput, HematologyProfileUncheckedUpdateWithoutEpisodeInput>
+  }
+
+  export type HematologyProfileUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vitalSignsFrequency?: StringFieldUpdateOperationsInput | string
+    bleedingWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    painWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    temperatureWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    hemodynamicWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingBloodProducts?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    isolationType?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    hematologicSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HematologyProfileUncheckedUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vitalSignsFrequency?: StringFieldUpdateOperationsInput | string
+    bleedingWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    painWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    temperatureWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    hemodynamicWatch?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingBloodProducts?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    isolationType?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    hematologicSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmergencyProfileUpsertWithoutEpisodeInput = {
+    update: XOR<EmergencyProfileUpdateWithoutEpisodeInput, EmergencyProfileUncheckedUpdateWithoutEpisodeInput>
+    create: XOR<EmergencyProfileCreateWithoutEpisodeInput, EmergencyProfileUncheckedCreateWithoutEpisodeInput>
+    where?: EmergencyProfileWhereInput
+  }
+
+  export type EmergencyProfileUpdateToOneWithWhereWithoutEpisodeInput = {
+    where?: EmergencyProfileWhereInput
+    data: XOR<EmergencyProfileUpdateWithoutEpisodeInput, EmergencyProfileUncheckedUpdateWithoutEpisodeInput>
+  }
+
+  export type EmergencyProfileUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amc?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    relevantLabsStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    interestsPending?: NullableStringFieldUpdateOperationsInput | string | null
+    triageLevel?: StringFieldUpdateOperationsInput | string
+    clinicalStatus?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    dispositionPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmergencyProfileUncheckedUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amc?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    relevantLabsStudies?: NullableStringFieldUpdateOperationsInput | string | null
+    interestsPending?: NullableStringFieldUpdateOperationsInput | string | null
+    triageLevel?: StringFieldUpdateOperationsInput | string
+    clinicalStatus?: StringFieldUpdateOperationsInput | string
+    oxygenSupport?: StringFieldUpdateOperationsInput | string
+    dispositionPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type EpisodeAntibioticUpsertWithWhereUniqueWithoutEpisodeInput = {
     where: EpisodeAntibioticWhereUniqueInput
     update: XOR<EpisodeAntibioticUpdateWithoutEpisodeInput, EpisodeAntibioticUncheckedUpdateWithoutEpisodeInput>
@@ -55850,6 +65079,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutConsultationsInput = {
@@ -55886,6 +65117,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutConsultationsInput = {
@@ -55913,6 +65146,8 @@ export namespace Prisma {
     allergies?: AllergyCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutConsultationsInput = {
@@ -55935,6 +65170,8 @@ export namespace Prisma {
     allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryUncheckedCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutConsultationsInput = {
@@ -56032,6 +65269,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutConsultationsInput = {
@@ -56068,6 +65307,8 @@ export namespace Prisma {
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type PatientUpsertWithoutConsultationsInput = {
@@ -56101,6 +65342,8 @@ export namespace Prisma {
     allergies?: AllergyUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutConsultationsInput = {
@@ -56123,6 +65366,8 @@ export namespace Prisma {
     allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUncheckedUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type UserUpsertWithoutConsultationsInput = {
@@ -56222,6 +65467,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -56274,6 +65521,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -56342,6 +65591,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -56394,10 +65645,1036 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
     drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeCreateWithoutHematologyProfileInput = {
+    id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
+    admissionDate?: Date | string
+    admissionType: string
+    chiefComplaint?: string | null
+    status?: string
+    room?: string | null
+    bed?: string | null
+    attendingDoctor?: string | null
+    admittingDoctor?: string | null
+    primaryDiagnosis?: string | null
+    secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
+    currentTreatment?: string | null
+    treatmentUpdatedBy?: string | null
+    treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
+    baseDepartmentPlan?: string | null
+    anthropometryWeight?: number | null
+    anthropometryWeightUnit?: string | null
+    anthropometryHeightCm?: number | null
+    anthropometryUpdatedBy?: string | null
+    anthropometryUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    responsibleSince?: Date | string | null
+    residency?: ResidencyCreateNestedOneWithoutEpisodesInput
+    patient: PatientCreateNestedOneWithoutEpisodesInput
+    allergies?: AllergyCreateNestedManyWithoutEpisodeInput
+    notes?: NoteCreateNestedManyWithoutEpisodeInput
+    vitals?: VitalSignCreateNestedManyWithoutEpisodeInput
+    handoffs?: HandoffCreateNestedManyWithoutEpisodeInput
+    responsible?: UserCreateNestedOneWithoutEpisodesAtChargeInput
+    tasks?: TaskCreateNestedManyWithoutEpisodeInput
+    importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
+    gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
+    studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
+    viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
+    vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
+    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
+    surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
+    antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
+    surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeUncheckedCreateWithoutHematologyProfileInput = {
+    id?: string
+    residencyId?: string | null
+    patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
+    admissionDate?: Date | string
+    admissionType: string
+    chiefComplaint?: string | null
+    status?: string
+    room?: string | null
+    bed?: string | null
+    attendingDoctor?: string | null
+    admittingDoctor?: string | null
+    primaryDiagnosis?: string | null
+    secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
+    currentTreatment?: string | null
+    treatmentUpdatedBy?: string | null
+    treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
+    baseDepartmentPlan?: string | null
+    anthropometryWeight?: number | null
+    anthropometryWeightUnit?: string | null
+    anthropometryHeightCm?: number | null
+    anthropometryUpdatedBy?: string | null
+    anthropometryUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    responsibleId?: string | null
+    responsibleSince?: Date | string | null
+    allergies?: AllergyUncheckedCreateNestedManyWithoutEpisodeInput
+    notes?: NoteUncheckedCreateNestedManyWithoutEpisodeInput
+    vitals?: VitalSignUncheckedCreateNestedManyWithoutEpisodeInput
+    handoffs?: HandoffUncheckedCreateNestedManyWithoutEpisodeInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
+    importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
+    gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
+    studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
+    viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
+    vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
+    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
+    surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeCreateOrConnectWithoutHematologyProfileInput = {
+    where: EpisodeWhereUniqueInput
+    create: XOR<EpisodeCreateWithoutHematologyProfileInput, EpisodeUncheckedCreateWithoutHematologyProfileInput>
+  }
+
+  export type EpisodeUpsertWithoutHematologyProfileInput = {
+    update: XOR<EpisodeUpdateWithoutHematologyProfileInput, EpisodeUncheckedUpdateWithoutHematologyProfileInput>
+    create: XOR<EpisodeCreateWithoutHematologyProfileInput, EpisodeUncheckedCreateWithoutHematologyProfileInput>
+    where?: EpisodeWhereInput
+  }
+
+  export type EpisodeUpdateToOneWithWhereWithoutHematologyProfileInput = {
+    where?: EpisodeWhereInput
+    data: XOR<EpisodeUpdateWithoutHematologyProfileInput, EpisodeUncheckedUpdateWithoutHematologyProfileInput>
+  }
+
+  export type EpisodeUpdateWithoutHematologyProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    admissionType?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    bed?: NullableStringFieldUpdateOperationsInput | string | null
+    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryHeightCm?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    residency?: ResidencyUpdateOneWithoutEpisodesNestedInput
+    patient?: PatientUpdateOneRequiredWithoutEpisodesNestedInput
+    allergies?: AllergyUpdateManyWithoutEpisodeNestedInput
+    notes?: NoteUpdateManyWithoutEpisodeNestedInput
+    vitals?: VitalSignUpdateManyWithoutEpisodeNestedInput
+    handoffs?: HandoffUpdateManyWithoutEpisodeNestedInput
+    responsible?: UserUpdateOneWithoutEpisodesAtChargeNestedInput
+    tasks?: TaskUpdateManyWithoutEpisodeNestedInput
+    importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
+    gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
+    studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
+    viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
+    vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
+    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
+    surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
+    antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
+    surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeUncheckedUpdateWithoutHematologyProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    admissionType?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    bed?: NullableStringFieldUpdateOperationsInput | string | null
+    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryHeightCm?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergies?: AllergyUncheckedUpdateManyWithoutEpisodeNestedInput
+    notes?: NoteUncheckedUpdateManyWithoutEpisodeNestedInput
+    vitals?: VitalSignUncheckedUpdateManyWithoutEpisodeNestedInput
+    handoffs?: HandoffUncheckedUpdateManyWithoutEpisodeNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
+    importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
+    gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
+    studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
+    viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
+    vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
+    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
+    surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeCreateWithoutEmergencyProfileInput = {
+    id?: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
+    admissionDate?: Date | string
+    admissionType: string
+    chiefComplaint?: string | null
+    status?: string
+    room?: string | null
+    bed?: string | null
+    attendingDoctor?: string | null
+    admittingDoctor?: string | null
+    primaryDiagnosis?: string | null
+    secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
+    currentTreatment?: string | null
+    treatmentUpdatedBy?: string | null
+    treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
+    baseDepartmentPlan?: string | null
+    anthropometryWeight?: number | null
+    anthropometryWeightUnit?: string | null
+    anthropometryHeightCm?: number | null
+    anthropometryUpdatedBy?: string | null
+    anthropometryUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    responsibleSince?: Date | string | null
+    residency?: ResidencyCreateNestedOneWithoutEpisodesInput
+    patient: PatientCreateNestedOneWithoutEpisodesInput
+    allergies?: AllergyCreateNestedManyWithoutEpisodeInput
+    notes?: NoteCreateNestedManyWithoutEpisodeInput
+    vitals?: VitalSignCreateNestedManyWithoutEpisodeInput
+    handoffs?: HandoffCreateNestedManyWithoutEpisodeInput
+    responsible?: UserCreateNestedOneWithoutEpisodesAtChargeInput
+    tasks?: TaskCreateNestedManyWithoutEpisodeInput
+    importantAlerts?: ImportantAlertCreateNestedManyWithoutEpisodeInput
+    gfrRecords?: GfrRecordCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportCreateNestedManyWithoutEpisodeInput
+    studyReports?: StudyReportCreateNestedManyWithoutEpisodeInput
+    viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
+    vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
+    internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
+    surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
+    surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeUncheckedCreateWithoutEmergencyProfileInput = {
+    id?: string
+    residencyId?: string | null
+    patientId: string
+    serviceType?: string
+    consultingDepartment?: string | null
+    consultingResident?: string | null
+    hospitalAdmissionDate?: Date | string | null
+    admissionDate?: Date | string
+    admissionType: string
+    chiefComplaint?: string | null
+    status?: string
+    room?: string | null
+    bed?: string | null
+    attendingDoctor?: string | null
+    admittingDoctor?: string | null
+    primaryDiagnosis?: string | null
+    secondaryDiagnoses?: string | null
+    initialWeight?: number | null
+    initialWeightUnit?: string | null
+    currentTreatment?: string | null
+    treatmentUpdatedBy?: string | null
+    treatmentUpdatedAt?: Date | string | null
+    dischargeType?: string | null
+    baseDepartmentPlan?: string | null
+    anthropometryWeight?: number | null
+    anthropometryWeightUnit?: string | null
+    anthropometryHeightCm?: number | null
+    anthropometryUpdatedBy?: string | null
+    anthropometryUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    responsibleId?: string | null
+    responsibleSince?: Date | string | null
+    allergies?: AllergyUncheckedCreateNestedManyWithoutEpisodeInput
+    notes?: NoteUncheckedCreateNestedManyWithoutEpisodeInput
+    vitals?: VitalSignUncheckedCreateNestedManyWithoutEpisodeInput
+    handoffs?: HandoffUncheckedCreateNestedManyWithoutEpisodeInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutEpisodeInput
+    importantAlerts?: ImportantAlertUncheckedCreateNestedManyWithoutEpisodeInput
+    gfrRecords?: GfrRecordUncheckedCreateNestedManyWithoutEpisodeInput
+    labReports?: LabReportUncheckedCreateNestedManyWithoutEpisodeInput
+    studyReports?: StudyReportUncheckedCreateNestedManyWithoutEpisodeInput
+    viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
+    vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
+    internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
+    surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
+    drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeCreateOrConnectWithoutEmergencyProfileInput = {
+    where: EpisodeWhereUniqueInput
+    create: XOR<EpisodeCreateWithoutEmergencyProfileInput, EpisodeUncheckedCreateWithoutEmergencyProfileInput>
+  }
+
+  export type EpisodeUpsertWithoutEmergencyProfileInput = {
+    update: XOR<EpisodeUpdateWithoutEmergencyProfileInput, EpisodeUncheckedUpdateWithoutEmergencyProfileInput>
+    create: XOR<EpisodeCreateWithoutEmergencyProfileInput, EpisodeUncheckedCreateWithoutEmergencyProfileInput>
+    where?: EpisodeWhereInput
+  }
+
+  export type EpisodeUpdateToOneWithWhereWithoutEmergencyProfileInput = {
+    where?: EpisodeWhereInput
+    data: XOR<EpisodeUpdateWithoutEmergencyProfileInput, EpisodeUncheckedUpdateWithoutEmergencyProfileInput>
+  }
+
+  export type EpisodeUpdateWithoutEmergencyProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    admissionType?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    bed?: NullableStringFieldUpdateOperationsInput | string | null
+    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryHeightCm?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    residency?: ResidencyUpdateOneWithoutEpisodesNestedInput
+    patient?: PatientUpdateOneRequiredWithoutEpisodesNestedInput
+    allergies?: AllergyUpdateManyWithoutEpisodeNestedInput
+    notes?: NoteUpdateManyWithoutEpisodeNestedInput
+    vitals?: VitalSignUpdateManyWithoutEpisodeNestedInput
+    handoffs?: HandoffUpdateManyWithoutEpisodeNestedInput
+    responsible?: UserUpdateOneWithoutEpisodesAtChargeNestedInput
+    tasks?: TaskUpdateManyWithoutEpisodeNestedInput
+    importantAlerts?: ImportantAlertUpdateManyWithoutEpisodeNestedInput
+    gfrRecords?: GfrRecordUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUpdateManyWithoutEpisodeNestedInput
+    studyReports?: StudyReportUpdateManyWithoutEpisodeNestedInput
+    viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
+    vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
+    internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
+    surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
+    surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeUncheckedUpdateWithoutEmergencyProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    patientId?: StringFieldUpdateOperationsInput | string
+    serviceType?: StringFieldUpdateOperationsInput | string
+    consultingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    consultingResident?: NullableStringFieldUpdateOperationsInput | string | null
+    hospitalAdmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    admissionType?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    bed?: NullableStringFieldUpdateOperationsInput | string | null
+    attendingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    admittingDoctor?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryDiagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    secondaryDiagnoses?: NullableStringFieldUpdateOperationsInput | string | null
+    initialWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    initialWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    currentTreatment?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dischargeType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDepartmentPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryWeightUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryHeightCm?: NullableFloatFieldUpdateOperationsInput | number | null
+    anthropometryUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    anthropometryUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    responsibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    responsibleSince?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergies?: AllergyUncheckedUpdateManyWithoutEpisodeNestedInput
+    notes?: NoteUncheckedUpdateManyWithoutEpisodeNestedInput
+    vitals?: VitalSignUncheckedUpdateManyWithoutEpisodeNestedInput
+    handoffs?: HandoffUncheckedUpdateManyWithoutEpisodeNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutEpisodeNestedInput
+    importantAlerts?: ImportantAlertUncheckedUpdateManyWithoutEpisodeNestedInput
+    gfrRecords?: GfrRecordUncheckedUpdateManyWithoutEpisodeNestedInput
+    labReports?: LabReportUncheckedUpdateManyWithoutEpisodeNestedInput
+    studyReports?: StudyReportUncheckedUpdateManyWithoutEpisodeNestedInput
+    viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
+    vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
+    internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
+    surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
+    baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
+    drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type ResidencyCreateWithoutBiopsyRecordsInput = {
+    id?: string
+    name: string
+    slug: string
+    specialty?: string
+    interfaceMode?: $Enums.InterfaceMode
+    planName?: string
+    billingMode?: $Enums.BillingMode
+    monthlyPriceUsd?: number
+    individualPriceUsd?: number
+    maxActiveUsers?: number
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    billingContactEmail?: string | null
+    lastPaymentNote?: string | null
+    isActive?: boolean
+    teamMa?: string | null
+    teamR4?: string | null
+    teamR3?: string | null
+    teamR2?: string | null
+    teamR1?: string | null
+    teamAutoMode?: boolean
+    teamUpdatedBy?: string | null
+    teamUpdatedAt?: Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutResidencyInput
+    patients?: PatientCreateNestedManyWithoutResidencyInput
+    episodes?: EpisodeCreateNestedManyWithoutResidencyInput
+    consultations?: ConsultationCreateNestedManyWithoutResidencyInput
+    payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
+    surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
+    woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
+  }
+
+  export type ResidencyUncheckedCreateWithoutBiopsyRecordsInput = {
+    id?: string
+    name: string
+    slug: string
+    specialty?: string
+    interfaceMode?: $Enums.InterfaceMode
+    planName?: string
+    billingMode?: $Enums.BillingMode
+    monthlyPriceUsd?: number
+    individualPriceUsd?: number
+    maxActiveUsers?: number
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    billingContactEmail?: string | null
+    lastPaymentNote?: string | null
+    isActive?: boolean
+    teamMa?: string | null
+    teamR4?: string | null
+    teamR3?: string | null
+    teamR2?: string | null
+    teamR1?: string | null
+    teamAutoMode?: boolean
+    teamUpdatedBy?: string | null
+    teamUpdatedAt?: Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutResidencyInput
+    patients?: PatientUncheckedCreateNestedManyWithoutResidencyInput
+    episodes?: EpisodeUncheckedCreateNestedManyWithoutResidencyInput
+    consultations?: ConsultationUncheckedCreateNestedManyWithoutResidencyInput
+    payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
+    surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
+    woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
+  }
+
+  export type ResidencyCreateOrConnectWithoutBiopsyRecordsInput = {
+    where: ResidencyWhereUniqueInput
+    create: XOR<ResidencyCreateWithoutBiopsyRecordsInput, ResidencyUncheckedCreateWithoutBiopsyRecordsInput>
+  }
+
+  export type PatientCreateWithoutBiopsyRecordsInput = {
+    id?: string
+    expedienteNumber: string
+    cedula?: string | null
+    phone?: string | null
+    firstName: string
+    lastName: string
+    birthDate?: Date | string | null
+    age?: number | null
+    sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    residency?: ResidencyCreateNestedOneWithoutPatientsInput
+    episodes?: EpisodeCreateNestedManyWithoutPatientInput
+    consultations?: ConsultationCreateNestedManyWithoutPatientInput
+    allergies?: AllergyCreateNestedManyWithoutPatientInput
+    medicalHistory?: MedicalHistoryCreateNestedOneWithoutPatientInput
+    viralSerologies?: ViralSerologyCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutBiopsyRecordsInput = {
+    id?: string
+    residencyId?: string | null
+    expedienteNumber: string
+    cedula?: string | null
+    phone?: string | null
+    firstName: string
+    lastName: string
+    birthDate?: Date | string | null
+    age?: number | null
+    sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episodes?: EpisodeUncheckedCreateNestedManyWithoutPatientInput
+    consultations?: ConsultationUncheckedCreateNestedManyWithoutPatientInput
+    allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
+    medicalHistory?: MedicalHistoryUncheckedCreateNestedOneWithoutPatientInput
+    viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutBiopsyRecordsInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutBiopsyRecordsInput, PatientUncheckedCreateWithoutBiopsyRecordsInput>
+  }
+
+  export type ResidencyUpsertWithoutBiopsyRecordsInput = {
+    update: XOR<ResidencyUpdateWithoutBiopsyRecordsInput, ResidencyUncheckedUpdateWithoutBiopsyRecordsInput>
+    create: XOR<ResidencyCreateWithoutBiopsyRecordsInput, ResidencyUncheckedCreateWithoutBiopsyRecordsInput>
+    where?: ResidencyWhereInput
+  }
+
+  export type ResidencyUpdateToOneWithWhereWithoutBiopsyRecordsInput = {
+    where?: ResidencyWhereInput
+    data: XOR<ResidencyUpdateWithoutBiopsyRecordsInput, ResidencyUncheckedUpdateWithoutBiopsyRecordsInput>
+  }
+
+  export type ResidencyUpdateWithoutBiopsyRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    specialty?: StringFieldUpdateOperationsInput | string
+    interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
+    planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
+    maxActiveUsers?: IntFieldUpdateOperationsInput | number
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    billingContactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    teamMa?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR4?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR3?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR2?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR1?: NullableStringFieldUpdateOperationsInput | string | null
+    teamAutoMode?: BoolFieldUpdateOperationsInput | boolean
+    teamUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    teamUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutResidencyNestedInput
+    patients?: PatientUpdateManyWithoutResidencyNestedInput
+    episodes?: EpisodeUpdateManyWithoutResidencyNestedInput
+    consultations?: ConsultationUpdateManyWithoutResidencyNestedInput
+    payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
+    surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
+    woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
+  }
+
+  export type ResidencyUncheckedUpdateWithoutBiopsyRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    specialty?: StringFieldUpdateOperationsInput | string
+    interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
+    planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
+    maxActiveUsers?: IntFieldUpdateOperationsInput | number
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    billingContactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    teamMa?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR4?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR3?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR2?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR1?: NullableStringFieldUpdateOperationsInput | string | null
+    teamAutoMode?: BoolFieldUpdateOperationsInput | boolean
+    teamUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    teamUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutResidencyNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutResidencyNestedInput
+    episodes?: EpisodeUncheckedUpdateManyWithoutResidencyNestedInput
+    consultations?: ConsultationUncheckedUpdateManyWithoutResidencyNestedInput
+    payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
+    surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
+    woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
+  }
+
+  export type PatientUpsertWithoutBiopsyRecordsInput = {
+    update: XOR<PatientUpdateWithoutBiopsyRecordsInput, PatientUncheckedUpdateWithoutBiopsyRecordsInput>
+    create: XOR<PatientCreateWithoutBiopsyRecordsInput, PatientUncheckedCreateWithoutBiopsyRecordsInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutBiopsyRecordsInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutBiopsyRecordsInput, PatientUncheckedUpdateWithoutBiopsyRecordsInput>
+  }
+
+  export type PatientUpdateWithoutBiopsyRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: StringFieldUpdateOperationsInput | string
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    residency?: ResidencyUpdateOneWithoutPatientsNestedInput
+    episodes?: EpisodeUpdateManyWithoutPatientNestedInput
+    consultations?: ConsultationUpdateManyWithoutPatientNestedInput
+    allergies?: AllergyUpdateManyWithoutPatientNestedInput
+    medicalHistory?: MedicalHistoryUpdateOneWithoutPatientNestedInput
+    viralSerologies?: ViralSerologyUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutBiopsyRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    expedienteNumber?: StringFieldUpdateOperationsInput | string
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episodes?: EpisodeUncheckedUpdateManyWithoutPatientNestedInput
+    consultations?: ConsultationUncheckedUpdateManyWithoutPatientNestedInput
+    allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
+    medicalHistory?: MedicalHistoryUncheckedUpdateOneWithoutPatientNestedInput
+    viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type ResidencyCreateWithoutOutpatientHemodialysesInput = {
+    id?: string
+    name: string
+    slug: string
+    specialty?: string
+    interfaceMode?: $Enums.InterfaceMode
+    planName?: string
+    billingMode?: $Enums.BillingMode
+    monthlyPriceUsd?: number
+    individualPriceUsd?: number
+    maxActiveUsers?: number
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    billingContactEmail?: string | null
+    lastPaymentNote?: string | null
+    isActive?: boolean
+    teamMa?: string | null
+    teamR4?: string | null
+    teamR3?: string | null
+    teamR2?: string | null
+    teamR1?: string | null
+    teamAutoMode?: boolean
+    teamUpdatedBy?: string | null
+    teamUpdatedAt?: Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutResidencyInput
+    patients?: PatientCreateNestedManyWithoutResidencyInput
+    episodes?: EpisodeCreateNestedManyWithoutResidencyInput
+    consultations?: ConsultationCreateNestedManyWithoutResidencyInput
+    payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
+    surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
+    woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+  }
+
+  export type ResidencyUncheckedCreateWithoutOutpatientHemodialysesInput = {
+    id?: string
+    name: string
+    slug: string
+    specialty?: string
+    interfaceMode?: $Enums.InterfaceMode
+    planName?: string
+    billingMode?: $Enums.BillingMode
+    monthlyPriceUsd?: number
+    individualPriceUsd?: number
+    maxActiveUsers?: number
+    planStatus?: $Enums.PlanStatus
+    subscriptionEndsAt?: Date | string | null
+    billingContactEmail?: string | null
+    lastPaymentNote?: string | null
+    isActive?: boolean
+    teamMa?: string | null
+    teamR4?: string | null
+    teamR3?: string | null
+    teamR2?: string | null
+    teamR1?: string | null
+    teamAutoMode?: boolean
+    teamUpdatedBy?: string | null
+    teamUpdatedAt?: Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutResidencyInput
+    patients?: PatientUncheckedCreateNestedManyWithoutResidencyInput
+    episodes?: EpisodeUncheckedCreateNestedManyWithoutResidencyInput
+    consultations?: ConsultationUncheckedCreateNestedManyWithoutResidencyInput
+    payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
+    surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
+    woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+  }
+
+  export type ResidencyCreateOrConnectWithoutOutpatientHemodialysesInput = {
+    where: ResidencyWhereUniqueInput
+    create: XOR<ResidencyCreateWithoutOutpatientHemodialysesInput, ResidencyUncheckedCreateWithoutOutpatientHemodialysesInput>
+  }
+
+  export type PatientCreateWithoutOutpatientHemodialysesInput = {
+    id?: string
+    expedienteNumber: string
+    cedula?: string | null
+    phone?: string | null
+    firstName: string
+    lastName: string
+    birthDate?: Date | string | null
+    age?: number | null
+    sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    residency?: ResidencyCreateNestedOneWithoutPatientsInput
+    episodes?: EpisodeCreateNestedManyWithoutPatientInput
+    consultations?: ConsultationCreateNestedManyWithoutPatientInput
+    allergies?: AllergyCreateNestedManyWithoutPatientInput
+    medicalHistory?: MedicalHistoryCreateNestedOneWithoutPatientInput
+    viralSerologies?: ViralSerologyCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutOutpatientHemodialysesInput = {
+    id?: string
+    residencyId?: string | null
+    expedienteNumber: string
+    cedula?: string | null
+    phone?: string | null
+    firstName: string
+    lastName: string
+    birthDate?: Date | string | null
+    age?: number | null
+    sex: string
+    bloodType?: string | null
+    bloodTypeRecordedBy?: string | null
+    bloodTypeUpdatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episodes?: EpisodeUncheckedCreateNestedManyWithoutPatientInput
+    consultations?: ConsultationUncheckedCreateNestedManyWithoutPatientInput
+    allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
+    medicalHistory?: MedicalHistoryUncheckedCreateNestedOneWithoutPatientInput
+    viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutOutpatientHemodialysesInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutOutpatientHemodialysesInput, PatientUncheckedCreateWithoutOutpatientHemodialysesInput>
+  }
+
+  export type ResidencyUpsertWithoutOutpatientHemodialysesInput = {
+    update: XOR<ResidencyUpdateWithoutOutpatientHemodialysesInput, ResidencyUncheckedUpdateWithoutOutpatientHemodialysesInput>
+    create: XOR<ResidencyCreateWithoutOutpatientHemodialysesInput, ResidencyUncheckedCreateWithoutOutpatientHemodialysesInput>
+    where?: ResidencyWhereInput
+  }
+
+  export type ResidencyUpdateToOneWithWhereWithoutOutpatientHemodialysesInput = {
+    where?: ResidencyWhereInput
+    data: XOR<ResidencyUpdateWithoutOutpatientHemodialysesInput, ResidencyUncheckedUpdateWithoutOutpatientHemodialysesInput>
+  }
+
+  export type ResidencyUpdateWithoutOutpatientHemodialysesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    specialty?: StringFieldUpdateOperationsInput | string
+    interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
+    planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
+    maxActiveUsers?: IntFieldUpdateOperationsInput | number
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    billingContactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    teamMa?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR4?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR3?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR2?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR1?: NullableStringFieldUpdateOperationsInput | string | null
+    teamAutoMode?: BoolFieldUpdateOperationsInput | boolean
+    teamUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    teamUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutResidencyNestedInput
+    patients?: PatientUpdateManyWithoutResidencyNestedInput
+    episodes?: EpisodeUpdateManyWithoutResidencyNestedInput
+    consultations?: ConsultationUpdateManyWithoutResidencyNestedInput
+    payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
+    surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
+    woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+  }
+
+  export type ResidencyUncheckedUpdateWithoutOutpatientHemodialysesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    specialty?: StringFieldUpdateOperationsInput | string
+    interfaceMode?: EnumInterfaceModeFieldUpdateOperationsInput | $Enums.InterfaceMode
+    planName?: StringFieldUpdateOperationsInput | string
+    billingMode?: EnumBillingModeFieldUpdateOperationsInput | $Enums.BillingMode
+    monthlyPriceUsd?: IntFieldUpdateOperationsInput | number
+    individualPriceUsd?: IntFieldUpdateOperationsInput | number
+    maxActiveUsers?: IntFieldUpdateOperationsInput | number
+    planStatus?: EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    billingContactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastPaymentNote?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    teamMa?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR4?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR3?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR2?: NullableStringFieldUpdateOperationsInput | string | null
+    teamR1?: NullableStringFieldUpdateOperationsInput | string | null
+    teamAutoMode?: BoolFieldUpdateOperationsInput | boolean
+    teamUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    teamUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgicalStatsExtra?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutResidencyNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutResidencyNestedInput
+    episodes?: EpisodeUncheckedUpdateManyWithoutResidencyNestedInput
+    consultations?: ConsultationUncheckedUpdateManyWithoutResidencyNestedInput
+    payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
+    surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
+    woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+  }
+
+  export type PatientUpsertWithoutOutpatientHemodialysesInput = {
+    update: XOR<PatientUpdateWithoutOutpatientHemodialysesInput, PatientUncheckedUpdateWithoutOutpatientHemodialysesInput>
+    create: XOR<PatientCreateWithoutOutpatientHemodialysesInput, PatientUncheckedCreateWithoutOutpatientHemodialysesInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutOutpatientHemodialysesInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutOutpatientHemodialysesInput, PatientUncheckedUpdateWithoutOutpatientHemodialysesInput>
+  }
+
+  export type PatientUpdateWithoutOutpatientHemodialysesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: StringFieldUpdateOperationsInput | string
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    residency?: ResidencyUpdateOneWithoutPatientsNestedInput
+    episodes?: EpisodeUpdateManyWithoutPatientNestedInput
+    consultations?: ConsultationUpdateManyWithoutPatientNestedInput
+    allergies?: AllergyUpdateManyWithoutPatientNestedInput
+    medicalHistory?: MedicalHistoryUpdateOneWithoutPatientNestedInput
+    viralSerologies?: ViralSerologyUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutOutpatientHemodialysesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: NullableStringFieldUpdateOperationsInput | string | null
+    expedienteNumber?: StringFieldUpdateOperationsInput | string
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: StringFieldUpdateOperationsInput | string
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeRecordedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodTypeUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episodes?: EpisodeUncheckedUpdateManyWithoutPatientNestedInput
+    consultations?: ConsultationUncheckedUpdateManyWithoutPatientNestedInput
+    allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
+    medicalHistory?: MedicalHistoryUncheckedUpdateOneWithoutPatientNestedInput
+    viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type EpisodeCreateWithoutSurgicalProfileInput = {
@@ -56446,6 +66723,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -56498,6 +66777,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -56566,6 +66847,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -56618,6 +66901,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -56671,6 +66956,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
     drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
@@ -56723,6 +67010,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
     drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
@@ -56791,6 +67080,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
     drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
@@ -56843,6 +67134,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
     drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -56882,6 +67175,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutSurgicalDevicesInput = {
@@ -56918,6 +67213,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutSurgicalDevicesInput = {
@@ -56972,6 +67269,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
     drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
@@ -57024,6 +67323,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
     drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
@@ -57079,6 +67380,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutSurgicalDevicesInput = {
@@ -57115,6 +67418,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type EpisodeUpsertWithoutSurgicalDevicesInput = {
@@ -57175,6 +67480,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
     drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
@@ -57227,6 +67534,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
     drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -57266,6 +67575,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutWoundCaresInput = {
@@ -57302,6 +67613,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     hemodialysisItems?: HemodialysisItemUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutWoundCaresInput = {
@@ -57378,6 +67691,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutWoundCaresInput = {
@@ -57414,6 +67729,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     hemodialysisItems?: HemodialysisItemUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type WoundCareLogUpsertWithWhereUniqueWithoutWoundCareInput = {
@@ -57582,6 +67899,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     drains?: EpisodeDrainCreateNestedManyWithoutEpisodeInput
@@ -57634,6 +67953,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     drains?: EpisodeDrainUncheckedCreateNestedManyWithoutEpisodeInput
@@ -57702,6 +68023,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     drains?: EpisodeDrainUpdateManyWithoutEpisodeNestedInput
@@ -57754,6 +68077,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     drains?: EpisodeDrainUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -57806,6 +68131,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -57858,6 +68185,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -57956,6 +68285,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -58008,6 +68339,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -58141,6 +68474,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyUncheckedCreateWithoutHemodialysisItemsInput = {
@@ -58177,6 +68512,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedCreateNestedManyWithoutResidencyInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutResidencyInput
     woundCares?: WoundCareUncheckedCreateNestedManyWithoutResidencyInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutResidencyInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutResidencyInput
   }
 
   export type ResidencyCreateOrConnectWithoutHemodialysisItemsInput = {
@@ -58229,6 +68566,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutResidencyNestedInput
   }
 
   export type ResidencyUncheckedUpdateWithoutHemodialysisItemsInput = {
@@ -58265,6 +68604,8 @@ export namespace Prisma {
     payments?: SubscriptionPaymentUncheckedUpdateManyWithoutResidencyNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutResidencyNestedInput
     woundCares?: WoundCareUncheckedUpdateManyWithoutResidencyNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutResidencyNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyNestedInput
   }
 
   export type PatientCreateWithoutMedicalHistoryInput = {
@@ -58287,6 +68628,8 @@ export namespace Prisma {
     consultations?: ConsultationCreateNestedManyWithoutPatientInput
     allergies?: AllergyCreateNestedManyWithoutPatientInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutMedicalHistoryInput = {
@@ -58309,6 +68652,8 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedCreateNestedManyWithoutPatientInput
     allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutMedicalHistoryInput = {
@@ -58347,6 +68692,8 @@ export namespace Prisma {
     consultations?: ConsultationUpdateManyWithoutPatientNestedInput
     allergies?: AllergyUpdateManyWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutMedicalHistoryInput = {
@@ -58369,6 +68716,8 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedUpdateManyWithoutPatientNestedInput
     allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type EpisodeCreateWithoutImportantAlertsInput = {
@@ -58417,6 +68766,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -58469,6 +68820,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -58537,6 +68890,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -58589,6 +68944,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -58641,6 +68998,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -58693,6 +69052,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -58761,6 +69122,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -58813,6 +69176,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -58865,6 +69230,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -58917,6 +69284,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -58985,6 +69354,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -59037,6 +69408,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -59089,6 +69462,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -59141,6 +69516,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -59209,6 +69586,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -59261,6 +69640,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -59287,6 +69668,8 @@ export namespace Prisma {
     consultations?: ConsultationCreateNestedManyWithoutPatientInput
     allergies?: AllergyCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryCreateNestedOneWithoutPatientInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutViralSerologiesInput = {
@@ -59309,6 +69692,8 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedCreateNestedManyWithoutPatientInput
     allergies?: AllergyUncheckedCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryUncheckedCreateNestedOneWithoutPatientInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutViralSerologiesInput = {
@@ -59362,6 +69747,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -59414,6 +69801,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -59456,6 +69845,8 @@ export namespace Prisma {
     consultations?: ConsultationUpdateManyWithoutPatientNestedInput
     allergies?: AllergyUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUpdateOneWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutViralSerologiesInput = {
@@ -59478,6 +69869,8 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedUpdateManyWithoutPatientNestedInput
     allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUncheckedUpdateOneWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type EpisodeUpsertWithoutViralSerologiesInput = {
@@ -59537,6 +69930,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -59589,6 +69984,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -59641,6 +70038,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -59693,6 +70092,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -59761,6 +70162,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -59813,6 +70216,8 @@ export namespace Prisma {
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -59839,6 +70244,8 @@ export namespace Prisma {
     consultations?: ConsultationCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutAllergiesInput = {
@@ -59861,6 +70268,8 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedCreateNestedManyWithoutPatientInput
     medicalHistory?: MedicalHistoryUncheckedCreateNestedOneWithoutPatientInput
     viralSerologies?: ViralSerologyUncheckedCreateNestedManyWithoutPatientInput
+    biopsyRecords?: BiopsyRecordUncheckedCreateNestedManyWithoutPatientInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutAllergiesInput = {
@@ -59914,6 +70323,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -59966,6 +70377,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -60008,6 +70421,8 @@ export namespace Prisma {
     consultations?: ConsultationUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutAllergiesInput = {
@@ -60030,6 +70445,8 @@ export namespace Prisma {
     consultations?: ConsultationUncheckedUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUncheckedUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type EpisodeUpsertWithoutAllergiesInput = {
@@ -60089,6 +70506,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -60141,6 +70560,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -60193,6 +70614,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -60245,6 +70668,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -60313,6 +70738,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -60365,6 +70792,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -60417,6 +70846,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -60469,6 +70900,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -60537,6 +70970,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -60589,6 +71024,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -60641,6 +71078,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -60693,6 +71132,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -60761,6 +71202,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -60813,6 +71256,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -60865,6 +71310,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryCreateNestedManyWithoutEpisodeInput
@@ -60917,6 +71364,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedCreateNestedManyWithoutEpisodeInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedCreateNestedOneWithoutEpisodeInput
     surgicalProfile?: SurgicalProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    hematologyProfile?: HematologyProfileUncheckedCreateNestedOneWithoutEpisodeInput
+    emergencyProfile?: EmergencyProfileUncheckedCreateNestedOneWithoutEpisodeInput
     antibiotics?: EpisodeAntibioticUncheckedCreateNestedManyWithoutEpisodeInput
     surgicalDevices?: SurgicalDeviceUncheckedCreateNestedManyWithoutEpisodeInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedCreateNestedManyWithoutEpisodeInput
@@ -60985,6 +71434,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -61037,6 +71488,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -61119,6 +71572,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -61219,6 +71673,92 @@ export namespace Prisma {
     resolvedAt?: Date | string | null
   }
 
+  export type BiopsyRecordCreateManyResidencyInput = {
+    id?: string
+    patientId?: string | null
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+  }
+
+  export type OutpatientHemodialysisCreateManyResidencyInput = {
+    id?: string
+    patientId?: string | null
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+  }
+
   export type UserUpdateWithoutResidencyInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -61295,6 +71835,8 @@ export namespace Prisma {
     allergies?: AllergyUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutResidencyInput = {
@@ -61317,6 +71859,8 @@ export namespace Prisma {
     allergies?: AllergyUncheckedUpdateManyWithoutPatientNestedInput
     medicalHistory?: MedicalHistoryUncheckedUpdateOneWithoutPatientNestedInput
     viralSerologies?: ViralSerologyUncheckedUpdateManyWithoutPatientNestedInput
+    biopsyRecords?: BiopsyRecordUncheckedUpdateManyWithoutPatientNestedInput
+    outpatientHemodialyses?: OutpatientHemodialysisUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateManyWithoutResidencyInput = {
@@ -61382,6 +71926,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -61434,6 +71980,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -61481,6 +72029,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -61512,6 +72061,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -61541,6 +72091,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -61801,6 +72352,264 @@ export namespace Prisma {
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type BiopsyRecordUpdateWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    patient?: PatientUpdateOneWithoutBiopsyRecordsNestedInput
+  }
+
+  export type BiopsyRecordUncheckedUpdateWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BiopsyRecordUncheckedUpdateManyWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OutpatientHemodialysisUpdateWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    patient?: PatientUpdateOneWithoutOutpatientHemodialysesNestedInput
+  }
+
+  export type OutpatientHemodialysisUncheckedUpdateWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OutpatientHemodialysisUncheckedUpdateManyWithoutResidencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type AuditLogCreateManyActorInput = {
     id?: bigint | number
     seq: bigint | number
@@ -61863,6 +72672,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -62006,6 +72816,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -62058,6 +72870,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -62105,6 +72919,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -62136,6 +72951,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -62165,6 +72981,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -62286,6 +73103,7 @@ export namespace Prisma {
     consultationDate?: Date | string
     status?: string
     visitType?: string
+    consultationType?: string
     chiefComplaint: string
     bloodPressure?: string | null
     heartRate?: number | null
@@ -62326,6 +73144,92 @@ export namespace Prisma {
     details?: string | null
     recordedBy: string
     updatedAt?: Date | string
+  }
+
+  export type BiopsyRecordCreateManyPatientInput = {
+    id?: string
+    residencyId: string
+    status?: string
+    patientName: string
+    phone?: string | null
+    labsStatus?: string | null
+    needleStatus?: string | null
+    kitStatus?: string | null
+    scheduledDate?: string | null
+    senasaAuth?: string | null
+    note?: string | null
+    performedDate?: string | null
+    complications?: string | null
+    report?: string | null
+    highlightTag?: string
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
+    performedBy?: string | null
+    performedByName?: string | null
+    performedByRole?: string | null
+    performedAt?: Date | string | null
+  }
+
+  export type OutpatientHemodialysisCreateManyPatientInput = {
+    id?: string
+    residencyId: string
+    firstName: string
+    lastName: string
+    expedienteNumber?: string | null
+    age?: number | null
+    sex?: string | null
+    phone?: string | null
+    cedula?: string | null
+    bloodType?: string | null
+    diagnosisAndTime?: string | null
+    medications?: string | null
+    allergies?: string | null
+    allergyReaction?: string | null
+    transfusions?: string | null
+    referredFromCenter?: string | null
+    firstTimeInCenter?: string | null
+    otherDialysisModality?: string | null
+    pathologicalHistory?: string | null
+    surgicalHistory?: string | null
+    familyHistory?: string | null
+    habitCoffee?: string | null
+    habitTobacco?: string | null
+    habitAlcohol?: string | null
+    habitDrugs?: string | null
+    habitOther?: string | null
+    viralHiv?: string | null
+    viralHbsag?: string | null
+    viralHvc?: string | null
+    labHgb?: string | null
+    labHct?: string | null
+    labUrea?: string | null
+    labCr?: string | null
+    labK?: string | null
+    labBloodType?: string | null
+    labOther?: string | null
+    imagingSonography?: string | null
+    imagingCt?: string | null
+    imagingOther?: string | null
+    accessAvFistula?: string | null
+    accessGraft?: string | null
+    accessTunneledCatheter?: string | null
+    accessFavi?: string | null
+    clinicalNotes?: string | null
+    isActive?: boolean
+    createdBy: string
+    createdByName: string
+    createdByRole: string
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedByName?: string | null
+    updatedByRole?: string | null
+    updatedAt?: Date | string | null
   }
 
   export type EpisodeUpdateWithoutPatientInput = {
@@ -62374,6 +73278,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUpdateManyWithoutEpisodeNestedInput
@@ -62426,6 +73332,8 @@ export namespace Prisma {
     vascularAccesses?: VascularAccessUncheckedUpdateManyWithoutEpisodeNestedInput
     internalMedicineProfile?: InternalMedicineProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     surgicalProfile?: SurgicalProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    hematologyProfile?: HematologyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
+    emergencyProfile?: EmergencyProfileUncheckedUpdateOneWithoutEpisodeNestedInput
     antibiotics?: EpisodeAntibioticUncheckedUpdateManyWithoutEpisodeNestedInput
     surgicalDevices?: SurgicalDeviceUncheckedUpdateManyWithoutEpisodeNestedInput
     baseDepartmentPlanEntries?: BaseDepartmentPlanEntryUncheckedUpdateManyWithoutEpisodeNestedInput
@@ -62473,6 +73381,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -62504,6 +73413,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -62533,6 +73443,7 @@ export namespace Prisma {
     consultationDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
     visitType?: StringFieldUpdateOperationsInput | string
+    consultationType?: StringFieldUpdateOperationsInput | string
     chiefComplaint?: StringFieldUpdateOperationsInput | string
     bloodPressure?: NullableStringFieldUpdateOperationsInput | string | null
     heartRate?: NullableIntFieldUpdateOperationsInput | number | null
@@ -62615,6 +73526,264 @@ export namespace Prisma {
     details?: NullableStringFieldUpdateOperationsInput | string | null
     recordedBy?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BiopsyRecordUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    residency?: ResidencyUpdateOneRequiredWithoutBiopsyRecordsNestedInput
+  }
+
+  export type BiopsyRecordUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BiopsyRecordUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    patientName?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    labsStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    needleStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    kitStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduledDate?: NullableStringFieldUpdateOperationsInput | string | null
+    senasaAuth?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    performedDate?: NullableStringFieldUpdateOperationsInput | string | null
+    complications?: NullableStringFieldUpdateOperationsInput | string | null
+    report?: NullableStringFieldUpdateOperationsInput | string | null
+    highlightTag?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    performedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    performedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OutpatientHemodialysisUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    residency?: ResidencyUpdateOneRequiredWithoutOutpatientHemodialysesNestedInput
+  }
+
+  export type OutpatientHemodialysisUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OutpatientHemodialysisUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    residencyId?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    expedienteNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    sex?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    cedula?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    diagnosisAndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    medications?: NullableStringFieldUpdateOperationsInput | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    allergyReaction?: NullableStringFieldUpdateOperationsInput | string | null
+    transfusions?: NullableStringFieldUpdateOperationsInput | string | null
+    referredFromCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    firstTimeInCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    otherDialysisModality?: NullableStringFieldUpdateOperationsInput | string | null
+    pathologicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    surgicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    habitCoffee?: NullableStringFieldUpdateOperationsInput | string | null
+    habitTobacco?: NullableStringFieldUpdateOperationsInput | string | null
+    habitAlcohol?: NullableStringFieldUpdateOperationsInput | string | null
+    habitDrugs?: NullableStringFieldUpdateOperationsInput | string | null
+    habitOther?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHiv?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHbsag?: NullableStringFieldUpdateOperationsInput | string | null
+    viralHvc?: NullableStringFieldUpdateOperationsInput | string | null
+    labHgb?: NullableStringFieldUpdateOperationsInput | string | null
+    labHct?: NullableStringFieldUpdateOperationsInput | string | null
+    labUrea?: NullableStringFieldUpdateOperationsInput | string | null
+    labCr?: NullableStringFieldUpdateOperationsInput | string | null
+    labK?: NullableStringFieldUpdateOperationsInput | string | null
+    labBloodType?: NullableStringFieldUpdateOperationsInput | string | null
+    labOther?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingSonography?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingCt?: NullableStringFieldUpdateOperationsInput | string | null
+    imagingOther?: NullableStringFieldUpdateOperationsInput | string | null
+    accessAvFistula?: NullableStringFieldUpdateOperationsInput | string | null
+    accessGraft?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTunneledCatheter?: NullableStringFieldUpdateOperationsInput | string | null
+    accessFavi?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdByName?: StringFieldUpdateOperationsInput | string
+    createdByRole?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AllergyCreateManyEpisodeInput = {
