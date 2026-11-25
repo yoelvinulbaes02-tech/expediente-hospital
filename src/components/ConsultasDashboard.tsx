@@ -15,6 +15,12 @@ type ConsultaItem = {
   visitType: string
   chiefComplaint: string
   diagnosis: string | null
+  treatmentPlan: string | null
+  nextAppointment: string | null
+  notes: string | null
+  weight: number | null
+  weightUnit: string | null
+  heightCm: number | null
   doctorId: string | null
   doctorName: string | null
   doctorRole: string | null
@@ -83,6 +89,33 @@ function fmtFechaHora(iso: string): string {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+function fmtSoloFecha(iso: string): string {
+  return new Date(iso).toLocaleDateString('es-DO', {
+    timeZone: 'America/Santo_Domingo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
+}
+
+function construirResumenSeguimiento(c: {
+  treatmentPlan: string | null
+  nextAppointment: string | null
+  notes: string | null
+}): string {
+  const partes: string[] = []
+  if (c.treatmentPlan?.trim()) {
+    partes.push(c.treatmentPlan.trim())
+  }
+  if (c.nextAppointment) {
+    partes.push(`Próxima cita: ${fmtSoloFecha(c.nextAppointment)}`)
+  }
+  if (c.notes?.trim()) {
+    partes.push(`Seguimiento: ${c.notes.trim()}`)
+  }
+  return partes.join(' · ')
 }
 
 export function ConsultasDashboard({
@@ -221,7 +254,9 @@ export function ConsultasDashboard({
 
     for (const c of cerradasOrdenadas) {
       const textoExtra = normalizarTextoClinico(
-        [c.chiefComplaint, c.diagnosis, c.doctorName].filter(Boolean).join(' ')
+        [c.chiefComplaint, c.diagnosis, c.treatmentPlan, c.notes, c.doctorName]
+          .filter(Boolean)
+          .join(' ')
       )
       const existente = mapa.get(c.patient.id)
       if (!existente) {
@@ -267,7 +302,7 @@ export function ConsultasDashboard({
     setPatientMode('existing')
     setSelectedExistingId(patientId)
     setSourceConsultationId(consultaOrigen.id)
-    setMotivoInput(consultaOrigen.chiefComplaint || '')
+    setMotivoInput('Control de seguimiento')
     setVisitTypeInput('Seguimiento')
     setInitialStatusInput('EN_CONSULTA')
     setMostrarFormulario(true)
@@ -583,20 +618,25 @@ export function ConsultasDashboard({
             </div>
           )}
 
-          {/* COPIA SIMPLE DE EXPEDIENTE ANTERIOR EN 1 CLIC */}
+          {/* COPIA DE DATOS BASE DEL EXPEDIENTE ANTERIOR (SOLO PACIENTE/REGISTRO, ANTECEDENTES Y ANTROPOMETRÍA) */}
           {expedientesPreviosDelPaciente.length > 0 && (
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/50 p-3.5 space-y-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                  Expedientes anteriores ({expedientesPreviosDelPaciente.length}) · Ordenados por fecha
-                </p>
+                <div>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                    Visitas anteriores ({expedientesPreviosDelPaciente.length}) · Ordenadas por fecha
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Solo se copiarán: datos del paciente y registro, antecedentes y antropometría (peso/talla), todos modificables.
+                  </p>
+                </div>
                 {plantillaSeleccionada && (
                   <button
                     type="button"
                     onClick={() => setSourceConsultationId('')}
                     className="text-[11px] font-bold text-red-600 hover:underline cursor-pointer"
                   >
-                    ✕ Quitar copia (empezar en blanco)
+                    ✕ Quitar selección
                   </button>
                 )}
               </div>
@@ -604,6 +644,9 @@ export function ConsultasDashboard({
               <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1">
                 {expedientesPreviosDelPaciente.map((prev, idx) => {
                   const seleccionado = sourceConsultationId === prev.id
+                  const pesoStr =
+                    prev.weight !== null ? `${prev.weight} ${prev.weightUnit ?? 'kg'}` : 'Sin peso'
+                  const tallaStr = prev.heightCm !== null ? `${prev.heightCm} cm` : 'Sin talla'
                   return (
                     <div
                       key={prev.id}
@@ -621,8 +664,9 @@ export function ConsultasDashboard({
                             {prev.doctorRole ? ` (${etiquetaRolClinico(prev.doctorRole)})` : ''}
                           </span>
                         </p>
-                        <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate">
-                          {prev.diagnosis ? `Dx: ${prev.diagnosis}` : prev.chiefComplaint}
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate tabular-nums">
+                          Antropometría: {pesoStr} · {tallaStr}
+                          {prev.diagnosis ? ` · Dx: ${prev.diagnosis}` : ''}
                         </p>
                       </div>
                       <button
@@ -632,7 +676,7 @@ export function ConsultasDashboard({
                           setVisitTypeInput('Seguimiento')
                           setInitialStatusInput('EN_CONSULTA')
                           if (!motivoInput.trim()) {
-                            setMotivoInput(prev.chiefComplaint || '')
+                            setMotivoInput('Control de seguimiento')
                           }
                         }}
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold cursor-pointer shrink-0 ${
@@ -642,7 +686,7 @@ export function ConsultasDashboard({
                         }`}
                       >
                         <ClipboardCopy className="w-3 h-3" />
-                        <span>{seleccionado ? '✓ Copiado al nuevo' : 'Copiar datos al nuevo'}</span>
+                        <span>{seleccionado ? '✓ Datos base copiados' : 'Copiar datos base'}</span>
                       </button>
                     </div>
                   )
@@ -916,16 +960,19 @@ export function ConsultasDashboard({
           ) : (
             cerradosAgrupadosPorPaciente.map(({ patient, consultas: listaPaciente }) => {
               const masReciente = listaPaciente[0]
+              const planUltimaVisita = masReciente
+                ? construirResumenSeguimiento(masReciente)
+                : ''
               return (
                 <details
                   key={patient.id}
                   open={Boolean(busqueda.trim())}
                   className="group/pac bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden"
                 >
-                  <summary className="list-none cursor-pointer px-4 py-3 flex flex-wrap items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-700/40 [&::-webkit-details-marker]:hidden">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <ChevronDown className="w-4 h-4 text-slate-500 transition-transform group-open/pac:rotate-0 -rotate-90 shrink-0" />
-                      <div className="min-w-0">
+                  <summary className="list-none cursor-pointer px-4 py-3.5 flex flex-col sm:flex-row sm:items-start justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-700/40 [&::-webkit-details-marker]:hidden">
+                    <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                      <ChevronDown className="w-4 h-4 text-slate-500 transition-transform group-open/pac:rotate-0 -rotate-90 shrink-0 mt-1" />
+                      <div className="min-w-0 flex-1 space-y-1.5">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-bold text-slate-900 dark:text-white">
                             {patient.firstName} {patient.lastName}
@@ -933,13 +980,41 @@ export function ConsultasDashboard({
                           <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold tabular-nums">
                             {listaPaciente.length} expediente{listaPaciente.length === 1 ? '' : 's'}
                           </span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 tabular-nums">
+                            Exp: {patient.expedienteNumber}
+                            {patient.age !== null ? ` · ${patient.age} años` : ''}
+                          </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate tabular-nums">
-                          Exp: {patient.expedienteNumber}
-                          {patient.age !== null ? ` · ${patient.age} años` : ''}
-                          {masReciente ? ` · Última visita: ${fmtFechaHora(masReciente.consultationDate)}` : ''}
-                          {masReciente?.diagnosis ? ` · Dx: ${masReciente.diagnosis}` : ''}
-                        </p>
+
+                        {masReciente && (
+                          <div className="rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700/80 px-3 py-2 text-xs space-y-1">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-slate-600 dark:text-slate-300">
+                              <span className="tabular-nums">
+                                <strong>Última visita:</strong>{' '}
+                                {fmtFechaHora(masReciente.consultationDate)}
+                              </span>
+                              <span>
+                                <strong>Médico que lo vio:</strong>{' '}
+                                {masReciente.doctorName || 'Sin asignar'}
+                                {masReciente.doctorRole
+                                  ? ` (${etiquetaRolClinico(masReciente.doctorRole)})`
+                                  : ''}
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-slate-800 dark:text-slate-100">
+                              <strong className="text-emerald-700 dark:text-emerald-400">DX:</strong>{' '}
+                              {masReciente.diagnosis?.trim() || 'Sin diagnóstico registrado'}
+                            </p>
+
+                            <p className="text-xs text-slate-700 dark:text-slate-200 line-clamp-2 whitespace-pre-line">
+                              <strong className="text-teal-700 dark:text-teal-400">
+                                Plan de seguimiento:
+                              </strong>{' '}
+                              {planUltimaVisita || 'Sin plan de seguimiento registrado'}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -950,7 +1025,7 @@ export function ConsultasDashboard({
                           e.preventDefault()
                           abrirNuevaVisitaConCopia(patient.id, masReciente)
                         }}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-300 text-[11px] font-bold cursor-pointer shrink-0"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-300 text-[11px] font-bold cursor-pointer shrink-0 self-start"
                       >
                         <PlusCircle className="w-3.5 h-3.5" />
                         <span>+ Nueva visita</span>
@@ -961,12 +1036,13 @@ export function ConsultasDashboard({
                   <div className="border-t border-slate-200 dark:border-slate-700 divide-y divide-slate-200/80 dark:divide-slate-700/80 bg-slate-50/50 dark:bg-slate-900/40">
                     {listaPaciente.map((c, idx) => {
                       const meta = ESTADO_META[c.status] ?? ESTADO_META.COMPLETADA
+                      const planItem = construirResumenSeguimiento(c)
                       return (
                         <div
                           key={c.id}
-                          className="px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3"
+                          className="px-4 py-3 flex flex-col md:flex-row md:items-start justify-between gap-3"
                         >
-                          <div className="min-w-0 space-y-1">
+                          <div className="min-w-0 space-y-1 flex-1">
                             <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                               <span className="font-bold text-slate-800 dark:text-slate-100 tabular-nums">
                                 #{idx + 1} · {fmtFechaHora(c.consultationDate)}
@@ -977,17 +1053,27 @@ export function ConsultasDashboard({
                                 {meta.label}
                               </span>
                             </div>
-                            <p className="text-xs text-slate-700 dark:text-slate-200">
-                              <strong>Motivo:</strong> {c.chiefComplaint}
-                            </p>
-                            {c.diagnosis && (
-                              <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
-                                Dx: {c.diagnosis}
-                              </p>
-                            )}
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                              Médico: <strong>{c.doctorName || 'Sin asignar'}</strong>
+
+                            <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                              <strong>Médico que lo vio:</strong>{' '}
+                              {c.doctorName || 'Sin asignar'}
                               {c.doctorRole ? ` (${etiquetaRolClinico(c.doctorRole)})` : ''}
+                            </p>
+
+                            <p className="text-xs text-slate-800 dark:text-slate-100">
+                              <strong className="text-emerald-700 dark:text-emerald-400">DX:</strong>{' '}
+                              {c.diagnosis?.trim() || 'Sin diagnóstico registrado'}
+                            </p>
+
+                            <p className="text-xs text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
+                              <strong className="text-teal-700 dark:text-teal-400">
+                                Plan de seguimiento:
+                              </strong>{' '}
+                              {planItem || 'Sin plan de seguimiento registrado'}
+                            </p>
+
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                              <strong>Motivo:</strong> {c.chiefComplaint}
                             </p>
                           </div>
 
@@ -1002,10 +1088,11 @@ export function ConsultasDashboard({
                               <button
                                 type="button"
                                 onClick={() => abrirNuevaVisitaConCopia(patient.id, c)}
+                                title="Abre nueva visita copiando únicamente datos del paciente, antecedentes y antropometría"
                                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-300 cursor-pointer whitespace-nowrap"
                               >
                                 <ClipboardCopy className="w-3 h-3" />
-                                <span>Copiar a nueva</span>
+                                <span>+ Nueva visita</span>
                               </button>
                             )}
                           </div>

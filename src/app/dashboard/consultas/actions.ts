@@ -48,6 +48,7 @@ async function exigirAccesoConsulta(consultationId?: string) {
         notes: true,
         doctorId: true,
         doctorName: true,
+        consultationDate: true,
         createdBy: true,
         updatedBy: true,
       },
@@ -238,7 +239,8 @@ export async function crearConsulta(formData: FormData): Promise<{
       }
     }
 
-    // Si se eligió copiar datos de un expediente anterior, traerlo de forma segura
+    // Si se eligió usar una consulta previa como base, traer únicamente datos antropométricos
+    // (los datos del paciente y antecedentes se heredan al vincular al mismo patientId)
     const plantilla = sourceConsultationId
       ? await prisma.consultation.findFirst({
           where: {
@@ -246,10 +248,16 @@ export async function crearConsulta(formData: FormData): Promise<{
             residencyId,
             patientId,
           },
+          select: {
+            id: true,
+            weight: true,
+            weightUnit: true,
+            heightCm: true,
+          },
         })
       : null
 
-    const chiefComplaint = chiefComplaintInput || plantilla?.chiefComplaint?.trim() || ''
+    const chiefComplaint = chiefComplaintInput || (plantilla ? 'Control de seguimiento' : '')
     if (chiefComplaint.length < 2) {
       return { ok: false, error: 'Escribe el motivo de la consulta.' }
     }
@@ -264,24 +272,13 @@ export async function crearConsulta(formData: FormData): Promise<{
           })
         : null
 
+    const pesoBase = plantilla?.weight ?? consultaPrevia?.weight ?? null
+    const unidadPesoBase = plantilla?.weightUnit ?? consultaPrevia?.weightUnit ?? 'kg'
+    const tallaBase = plantilla?.heightCm ?? consultaPrevia?.heightCm ?? null
+
     const seccionesIniciales: SeccionConsultaKey[] = ['motivo']
-    if (plantilla) {
-      if (
-        plantilla.bloodPressure ||
-        plantilla.heartRate !== null ||
-        plantilla.temperature !== null ||
-        plantilla.oxygenSat !== null ||
-        plantilla.weight !== null ||
-        plantilla.heightCm !== null
-      ) {
-        seccionesIniciales.push('signos')
-      }
-      if (plantilla.historyIllness) seccionesIniciales.push('enfermedad')
-      if (plantilla.physicalExam) seccionesIniciales.push('examen')
-      if (plantilla.diagnosis) seccionesIniciales.push('diagnostico')
-      if (plantilla.treatmentPlan) seccionesIniciales.push('receta')
-      if (plantilla.labOrders) seccionesIniciales.push('laboratorio')
-      if (plantilla.notes) seccionesIniciales.push('notas')
+    if (pesoBase !== null || tallaBase !== null) {
+      seccionesIniciales.push('antropometria')
     }
 
     const consulta = await prisma.consultation.create({
@@ -295,19 +292,19 @@ export async function crearConsulta(formData: FormData): Promise<{
         visitType:
           matchedExistingPatient && visitType === 'Primera vez' ? 'Seguimiento' : visitType,
         chiefComplaint,
-        bloodPressure: plantilla?.bloodPressure ?? null,
-        heartRate: plantilla?.heartRate ?? null,
-        temperature: plantilla?.temperature ?? null,
-        oxygenSat: plantilla?.oxygenSat ?? null,
-        weight: plantilla?.weight ?? consultaPrevia?.weight ?? null,
-        weightUnit: plantilla?.weightUnit ?? consultaPrevia?.weightUnit ?? 'kg',
-        heightCm: plantilla?.heightCm ?? consultaPrevia?.heightCm ?? null,
-        historyIllness: plantilla?.historyIllness ?? null,
-        physicalExam: plantilla?.physicalExam ?? null,
-        diagnosis: plantilla?.diagnosis ?? null,
-        treatmentPlan: plantilla?.treatmentPlan ?? null,
-        labOrders: plantilla?.labOrders ?? null,
-        notes: plantilla?.notes ?? null,
+        bloodPressure: null,
+        heartRate: null,
+        temperature: null,
+        oxygenSat: null,
+        weight: pesoBase,
+        weightUnit: unidadPesoBase,
+        heightCm: tallaBase,
+        historyIllness: null,
+        physicalExam: null,
+        diagnosis: null,
+        treatmentPlan: null,
+        labOrders: null,
+        notes: null,
         createdBy: ctx.user.email,
       },
     })
@@ -331,9 +328,9 @@ export async function crearConsulta(formData: FormData): Promise<{
         authorRole: String(ctx.user.role),
       },
       reason: plantilla
-        ? `Nueva consulta creada copiando datos de consulta previa (${plantilla.id})`
+        ? `Nueva consulta creada copiando datos del paciente, antecedentes y antropometría (${plantilla.id})`
         : matchedExistingPatient
-          ? 'Nueva consulta vinculada a expediente existente (antecedentes preservados)'
+          ? 'Nueva consulta vinculada a expediente existente (datos, antecedentes y antropometría preservados)'
           : 'Nueva consulta registrada',
     })
 
@@ -447,64 +444,133 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
   }
 }
 
-export async function guardarDatosPacienteConsulta(formData: FormData): Promise<void> {
-  const consultationId = String(formData.get('consultationId') ?? '')
-  const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
-  if (!consulta) return
+export async function guardarDatosPacienteConsulta(formData: FormData): Promise<{
+  ok: boolean
+  error?: string
+}> {
+  try {
+    const consultationId = String(formData.get('consultationId') ?? '')
+    const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
+    if (!consulta) return { ok: false, error: 'Consulta no encontrada.' }
 
-  const firstName = String(formData.get('firstName') ?? '').trim()
-  const lastName = String(formData.get('lastName') ?? '').trim()
-  const ageRaw = String(formData.get('age') ?? '').trim()
-  const age = ageRaw ? parseInt(ageRaw, 10) : null
-  const sex = String(formData.get('sex') ?? 'Femenino').trim()
-  const phone = String(formData.get('phone') ?? '').trim() || null
-  const cedula = String(formData.get('cedula') ?? '').trim() || null
-  const bloodType = String(formData.get('bloodType') ?? '').trim().toUpperCase() || null
+    const firstName = String(formData.get('firstName') ?? '').trim()
+    const lastName = String(formData.get('lastName') ?? '').trim()
+    const expedienteNumber = String(formData.get('expedienteNumber') ?? '').trim()
+    const ageRaw = String(formData.get('age') ?? '').trim()
+    const age = ageRaw ? parseInt(ageRaw, 10) : null
+    const sex = String(formData.get('sex') ?? 'Femenino').trim() || 'Femenino'
+    const phone = String(formData.get('phone') ?? '').trim() || null
+    const cedula = String(formData.get('cedula') ?? '').trim() || null
+    const bloodTypeRaw = String(formData.get('bloodType') ?? '').trim().toUpperCase()
+    const bloodType = bloodTypeRaw || null
+    const consultationDateStr = String(formData.get('consultationDate') ?? '').trim()
 
-  if (firstName.length < 2 || lastName.length < 2) return
+    if (firstName.length < 2 || lastName.length < 2) {
+      return { ok: false, error: 'El nombre y apellido deben tener al menos 2 caracteres.' }
+    }
 
-  await prisma.patient.update({
-    where: { id: consulta.patientId },
-    data: {
-      firstName,
-      lastName,
-      age: age !== null && !isNaN(age) ? age : null,
-      sex,
-      phone,
-      cedula,
-      ...(bloodType
-        ? {
-            bloodType,
-            bloodTypeRecordedBy: ctx.user.email,
-            bloodTypeUpdatedAt: new Date(),
-          }
-        : {}),
-    },
-  })
+    if (expedienteNumber.length < 1) {
+      return { ok: false, error: 'El número de expediente es obligatorio.' }
+    }
 
-  await logAudit({
-    actorId: ctx.user.id,
-    actorRole: String(ctx.user.role),
-    action: 'update',
-    entity: 'patient',
-    entityId: consulta.patientId,
-    patientId: consulta.patientId,
-    newValue: {
-      firstName,
-      lastName,
-      age,
-      sex,
-      phone,
-      cedula,
-      bloodType,
-      authorName: ctx.user.fullName,
-      authorRole: String(ctx.user.role),
-    },
-    reason: 'Datos del paciente actualizados desde Consulta Externa',
-  })
+    const pacienteActual = await prisma.patient.findUnique({
+      where: { id: consulta.patientId },
+      select: { expedienteNumber: true, bloodType: true },
+    })
 
-  revalidatePath(`/dashboard/consultas/${consultationId}`)
-  revalidatePath('/dashboard')
+    if (pacienteActual && expedienteNumber !== pacienteActual.expedienteNumber) {
+      const duplicado = await prisma.patient.findFirst({
+        where: {
+          residencyId: consulta.residencyId,
+          expedienteNumber,
+          id: { not: consulta.patientId },
+        },
+        select: { id: true },
+      })
+      if (duplicado) {
+        return { ok: false, error: `Ya existe otro paciente con el expediente ${expedienteNumber}.` }
+      }
+    }
+
+    let nuevaFechaConsulta: Date | null = null
+    if (consultationDateStr) {
+      const parsed = new Date(`${consultationDateStr}:00-04:00`)
+      if (Number.isNaN(parsed.getTime())) {
+        return { ok: false, error: 'La fecha y hora de registro no es válida.' }
+      }
+      nuevaFechaConsulta = parsed
+    }
+
+    await prisma.patient.update({
+      where: { id: consulta.patientId },
+      data: {
+        firstName,
+        lastName,
+        expedienteNumber,
+        age: age !== null && !isNaN(age) ? age : null,
+        sex,
+        phone,
+        cedula,
+        bloodType,
+        ...(bloodType !== (pacienteActual?.bloodType ?? null)
+          ? {
+              bloodTypeRecordedBy: bloodType ? ctx.user.email : null,
+              bloodTypeUpdatedAt: new Date(),
+            }
+          : {}),
+      },
+    })
+
+    const puedeEditarFechaConsulta =
+      nuevaFechaConsulta &&
+      consulta.status !== 'COMPLETADA' &&
+      consulta.status !== 'CANCELADA' &&
+      puedeEditarNotasConsulta(consulta, ctx.user)
+
+    if (puedeEditarFechaConsulta && nuevaFechaConsulta) {
+      await prisma.consultation.update({
+        where: { id: consultationId },
+        data: {
+          consultationDate: nuevaFechaConsulta,
+          updatedBy: ctx.user.email,
+        },
+      })
+    }
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole: String(ctx.user.role),
+      action: 'update',
+      entity: 'patient',
+      entityId: consulta.patientId,
+      patientId: consulta.patientId,
+      newValue: {
+        firstName,
+        lastName,
+        expedienteNumber,
+        age,
+        sex,
+        phone,
+        cedula,
+        bloodType,
+        ...(puedeEditarFechaConsulta && nuevaFechaConsulta
+          ? { consultationDate: nuevaFechaConsulta.toISOString() }
+          : {}),
+        authorName: ctx.user.fullName,
+        authorRole: String(ctx.user.role),
+      },
+      reason: 'Datos del paciente y registro actualizados desde Consulta Externa',
+    })
+
+    revalidatePath(`/dashboard/consultas/${consultationId}`)
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: unknown) {
+    return {
+      ok: false,
+      error: (e as Error)?.message || 'No se pudieron guardar los datos del paciente.',
+    }
+  }
 }
 
 export async function guardarAntecedentesConsulta(formData: FormData): Promise<{
@@ -676,6 +742,8 @@ export async function iniciarNuevaAtencionConsulta(
     const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
     if (!consulta) return { ok: false, error: 'Consulta no encontrada.' }
 
+    // Solo copiar datos antropométricos (peso, unidad y talla);
+    // los datos del paciente, registro y antecedentes se heredan por patientId
     const ultimaPrevia = !copiarDatos
       ? await prisma.consultation.findFirst({
           where: { residencyId: consulta.residencyId, patientId: consulta.patientId },
@@ -684,26 +752,17 @@ export async function iniciarNuevaAtencionConsulta(
         })
       : null
 
+    const pesoBase = copiarDatos ? consulta.weight : ultimaPrevia?.weight ?? null
+    const unidadPesoBase = copiarDatos
+      ? consulta.weightUnit ?? 'kg'
+      : ultimaPrevia?.weightUnit ?? 'kg'
+    const tallaBase = copiarDatos ? consulta.heightCm : ultimaPrevia?.heightCm ?? null
+
     const esMedicoOAdmin = ROLES_MEDICOS.includes(ctx.user.role) || ctx.user.role === 'ADMIN'
 
     const seccionesCopiadas: SeccionConsultaKey[] = ['motivo']
-    if (copiarDatos) {
-      if (
-        consulta.bloodPressure ||
-        consulta.heartRate !== null ||
-        consulta.temperature !== null ||
-        consulta.oxygenSat !== null ||
-        consulta.weight !== null ||
-        consulta.heightCm !== null
-      ) {
-        seccionesCopiadas.push('signos')
-      }
-      if (consulta.historyIllness) seccionesCopiadas.push('enfermedad')
-      if (consulta.physicalExam) seccionesCopiadas.push('examen')
-      if (consulta.diagnosis) seccionesCopiadas.push('diagnostico')
-      if (consulta.treatmentPlan) seccionesCopiadas.push('receta')
-      if (consulta.labOrders) seccionesCopiadas.push('laboratorio')
-      if (consulta.notes) seccionesCopiadas.push('notas')
+    if (pesoBase !== null || tallaBase !== null) {
+      seccionesCopiadas.push('antropometria')
     }
 
     const nueva = await prisma.consultation.create({
@@ -715,24 +774,20 @@ export async function iniciarNuevaAtencionConsulta(
         consultationDate: new Date(),
         status: 'EN_CONSULTA',
         visitType: 'Seguimiento',
-        chiefComplaint: copiarDatos
-          ? consulta.chiefComplaint || 'Control de seguimiento'
-          : 'Control de seguimiento',
-        bloodPressure: copiarDatos ? consulta.bloodPressure : null,
-        heartRate: copiarDatos ? consulta.heartRate : null,
-        temperature: copiarDatos ? consulta.temperature : null,
-        oxygenSat: copiarDatos ? consulta.oxygenSat : null,
-        weight: copiarDatos ? consulta.weight : ultimaPrevia?.weight ?? null,
-        weightUnit: copiarDatos
-          ? consulta.weightUnit ?? 'kg'
-          : ultimaPrevia?.weightUnit ?? 'kg',
-        heightCm: copiarDatos ? consulta.heightCm : ultimaPrevia?.heightCm ?? null,
-        historyIllness: copiarDatos ? consulta.historyIllness : null,
-        physicalExam: copiarDatos ? consulta.physicalExam : null,
-        diagnosis: copiarDatos ? consulta.diagnosis : null,
-        treatmentPlan: copiarDatos ? consulta.treatmentPlan : null,
-        labOrders: copiarDatos ? consulta.labOrders : null,
-        notes: copiarDatos ? consulta.notes : null,
+        chiefComplaint: 'Control de seguimiento',
+        bloodPressure: null,
+        heartRate: null,
+        temperature: null,
+        oxygenSat: null,
+        weight: pesoBase,
+        weightUnit: unidadPesoBase,
+        heightCm: tallaBase,
+        historyIllness: null,
+        physicalExam: null,
+        diagnosis: null,
+        treatmentPlan: null,
+        labOrders: null,
+        notes: null,
         createdBy: ctx.user.email,
       },
     })
@@ -753,9 +808,8 @@ export async function iniciarNuevaAtencionConsulta(
         authorName: ctx.user.fullName,
         authorRole: String(ctx.user.role),
       },
-      reason: copiarDatos
-        ? 'Nueva consulta creada copiando datos de expediente anterior (expediente previo intacto)'
-        : 'Nueva atención generada manteniendo expediente previo intacto',
+      reason:
+        'Nueva consulta creada copiando únicamente datos del paciente, antecedentes y antropometría (expediente previo intacto)',
     })
 
     revalidatePath('/dashboard')

@@ -25,6 +25,7 @@ export function etiquetaRolClinico(rol?: string | null): string {
 }
 
 export type SeccionConsultaKey =
+  | 'antropometria'
   | 'signos'
   | 'motivo'
   | 'enfermedad'

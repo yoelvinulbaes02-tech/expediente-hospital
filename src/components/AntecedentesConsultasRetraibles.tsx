@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, ChevronDown, Pencil } from 'lucide-react'
 import {
@@ -37,6 +37,8 @@ export function AntecedentesConsultasRetraibles({
   const [error, setError] = useState<string | null>(null)
   const dirtyRef = useRef(false)
   const datosRef = useRef(datos)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const mountedRef = useRef(true)
 
   const tieneDatos = Boolean(
     datos.pathological.trim() ||
@@ -46,47 +48,81 @@ export function AntecedentesConsultasRetraibles({
       datos.habits.trim()
   )
 
-  const guardarAhora = async (cerrarLuego = false) => {
-    if (!puedeEditar) return
-    if (!dirtyRef.current) {
-      if (cerrarLuego) setEditando(false)
-      return
-    }
-    const actual = datosRef.current
-    const fd = new FormData()
-    fd.set('consultationId', consultationId)
-    fd.set('pathological', actual.pathological)
-    fd.set('medications', actual.medications)
-    fd.set('surgical', actual.surgical)
-    fd.set('family', actual.family)
-    fd.set('habits', actual.habits)
-
-    setGuardando(true)
-    setError(null)
-    try {
-      const res = await guardarAntecedentesConsulta(fd)
-      if (!res.ok) {
-        setError(res.error ?? 'No se pudieron guardar los antecedentes.')
+  const guardarAhora = useCallback(
+    async (cerrarLuego = false) => {
+      if (!puedeEditar) return
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+      if (!dirtyRef.current) {
+        if (cerrarLuego && mountedRef.current) setEditando(false)
         return
       }
+      const actual = datosRef.current
+      const fd = new FormData()
+      fd.set('consultationId', consultationId)
+      fd.set('pathological', actual.pathological)
+      fd.set('medications', actual.medications)
+      fd.set('surgical', actual.surgical)
+      fd.set('family', actual.family)
+      fd.set('habits', actual.habits)
+
       dirtyRef.current = false
-      setDatos((prev) => {
-        const next = {
-          ...prev,
-          authorName: res.authorName ?? prev.authorName,
-          authorRole: res.authorRole ?? prev.authorRole,
-          updatedAtIso: res.updatedAtIso ?? new Date().toISOString(),
+      if (mountedRef.current) {
+        setGuardando(true)
+        setError(null)
+      }
+      try {
+        const res = await guardarAntecedentesConsulta(fd)
+        if (!res.ok) {
+          dirtyRef.current = true
+          if (mountedRef.current) {
+            setError(res.error ?? 'No se pudieron guardar los antecedentes.')
+          }
+          return
         }
-        datosRef.current = next
-        return next
-      })
-      setEstadoMsg('Guardado automático')
-      if (cerrarLuego) setEditando(false)
-      router.refresh()
-    } finally {
-      setGuardando(false)
+        if (!mountedRef.current) return
+        setDatos((prev) => {
+          const next = {
+            ...prev,
+            authorName: res.authorName ?? prev.authorName,
+            authorRole: res.authorRole ?? prev.authorRole,
+            updatedAtIso: res.updatedAtIso ?? new Date().toISOString(),
+          }
+          datosRef.current = next
+          return next
+        })
+        setEstadoMsg('Guardado automático')
+        if (cerrarLuego) {
+          setEditando(false)
+          router.refresh()
+        }
+      } finally {
+        if (mountedRef.current) setGuardando(false)
+      }
+    },
+    [consultationId, puedeEditar, router]
+  )
+
+  useEffect(() => {
+    mountedRef.current = true
+    const flush = () => {
+      if (dirtyRef.current && puedeEditar) {
+        void guardarAhora(false)
+      }
     }
-  }
+    const onVisChange = () => {
+      if (document.visibilityState === 'hidden') flush()
+    }
+    document.addEventListener('visibilitychange', onVisChange)
+    return () => {
+      mountedRef.current = false
+      document.removeEventListener('visibilitychange', onVisChange)
+      if (timerRef.current) clearTimeout(timerRef.current)
+      flush()
+    }
+  }, [guardarAhora, puedeEditar])
 
   const actualizarCampo = (
     campo: 'pathological' | 'medications' | 'surgical' | 'family' | 'habits',
@@ -99,6 +135,10 @@ export function AntecedentesConsultasRetraibles({
       datosRef.current = next
       return next
     })
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      void guardarAhora(false)
+    }, 700)
   }
 
   return (

@@ -217,9 +217,10 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
   track('signos', 'heartRate', consulta.heartRate, heartRate)
   track('signos', 'temperature', consulta.temperature, temperature)
   track('signos', 'oxygenSat', consulta.oxygenSat, oxygenSat)
-  track('signos', 'weight', consulta.weight, weight)
-  track('signos', 'weightUnit', consulta.weightUnit ?? 'kg', weightUnit)
-  track('signos', 'heightCm', consulta.heightCm, heightCm)
+
+  track('antropometria', 'weight', consulta.weight, weight)
+  track('antropometria', 'weightUnit', consulta.weightUnit ?? 'kg', weightUnit)
+  track('antropometria', 'heightCm', consulta.heightCm, heightCm)
 
   track('motivo', 'visitType', consulta.visitType, visitType)
   track('motivo', 'chiefComplaint', consulta.chiefComplaint, chiefComplaint)
@@ -273,7 +274,9 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
   const asignarAutor =
     !consulta.doctorId &&
     esMedicoOAdmin &&
-    (escribeNotasClinicas || changedSections.some((s) => s !== 'signos') || !yaTieneNotas)
+    (escribeNotasClinicas ||
+      changedSections.some((s) => s !== 'signos' && s !== 'antropometria') ||
+      !yaTieneNotas)
 
   const updated = await prisma.consultation.update({
     where: { id: consultationId },

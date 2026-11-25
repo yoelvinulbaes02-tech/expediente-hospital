@@ -217,6 +217,7 @@ export function FormularioConsultaClinica({
 
   const [metaSecciones, setMetaSecciones] = useState<MapaMetaSecciones>(metaSeccionesInicial)
   const [editandoSeccion, setEditandoSeccion] = useState<Record<SeccionConsultaKey, boolean>>({
+    antropometria: false,
     signos: false,
     motivo: false,
     enfermedad: false,
@@ -387,32 +388,29 @@ export function FormularioConsultaClinica({
     const origen = visitasPrevias.find((v) => v.id === visitaSeleccionadaId)
     if (!origen) return
 
+    if (origen.weight === null && origen.heightCm === null) {
+      setFeedback({
+        tipo: 'error',
+        texto: `La visita del ${fmtFechaHora(origen.consultationDate)} no tiene peso ni talla registrados.`,
+      })
+      return
+    }
+
     dirtyRef.current = true
     setForm((prev) => {
       const next: FormState = {
         ...prev,
-        visitType: prev.visitType === 'Primera vez' ? 'Seguimiento' : prev.visitType,
-        chiefComplaint: origen.chiefComplaint || prev.chiefComplaint,
-        bloodPressure: origen.bloodPressure ?? '',
-        heartRate: origen.heartRate !== null ? String(origen.heartRate) : '',
-        temperature: origen.temperature !== null ? String(origen.temperature) : '',
-        oxygenSat: origen.oxygenSat !== null ? String(origen.oxygenSat) : '',
-        weight: origen.weight !== null ? String(origen.weight) : '',
-        weightUnit: origen.weightUnit ?? 'kg',
-        heightCm: origen.heightCm !== null ? String(origen.heightCm) : '',
-        historyIllness: origen.historyIllness ?? '',
-        physicalExam: origen.physicalExam ?? '',
-        diagnosis: origen.diagnosis ?? '',
-        treatmentPlan: origen.treatmentPlan ?? '',
-        labOrders: origen.labOrders ?? '',
-        notes: origen.notes ?? '',
+        weight: origen.weight !== null ? String(origen.weight) : prev.weight,
+        weightUnit: origen.weightUnit ?? prev.weightUnit ?? 'kg',
+        heightCm: origen.heightCm !== null ? String(origen.heightCm) : prev.heightCm,
       }
       formRef.current = next
       return next
     })
+    setEditandoSeccion((prev) => ({ ...prev, antropometria: true }))
     setFeedback({
       tipo: 'ok',
-      texto: `Datos copiados de la consulta del ${fmtFechaHora(origen.consultationDate)}. Edita solo lo que cambió.`,
+      texto: `Datos antropométricos copiados de la visita del ${fmtFechaHora(origen.consultationDate)}. Puedes modificarlos si es necesario.`,
     })
     setTimeout(() => {
       void ejecutarAutosave(false)
@@ -494,7 +492,7 @@ export function FormularioConsultaClinica({
 
   return (
     <div className="space-y-4">
-      {/* BANNER SUPERIOR PARA COPIAR A UN EXPEDIENTE NUEVO SI ESTE YA CERRÓ O PERTENECE A OTRO MÉDICO */}
+      {/* BANNER SUPERIOR PARA ABRIR UNA NUEVA VISITA HEREDANDO DATOS DEL PACIENTE, ANTECEDENTES Y ANTROPOMETRÍA */}
       {puedeCrearNuevaAtencion && (esConsultaCerrada || bloqueadoPorAutoria) && (
         <div className="bg-white dark:bg-slate-800 border border-teal-200 dark:border-teal-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <div className="space-y-0.5">
@@ -504,7 +502,7 @@ export function FormularioConsultaClinica({
                 : 'Expediente cerrado y archivado · Registro histórico intacto'}
             </p>
             <p className="text-[11px] text-slate-600 dark:text-slate-300">
-              Si el paciente regresó contigo, abre una nueva visita copiando estos datos para editar solo lo que cambió.
+              Si el paciente regresó, abre una nueva visita heredando solo sus datos, antecedentes y antropometría (todos modificables).
             </p>
           </div>
           <button
@@ -515,17 +513,17 @@ export function FormularioConsultaClinica({
           >
             <PlusCircle className="w-4 h-4" />
             <span>
-              {creandoNueva ? 'Creando...' : '+ Nueva visita copiando estos datos'}
+              {creandoNueva ? 'Creando...' : '+ Nueva visita (datos base y antropometría)'}
             </span>
           </button>
         </div>
       )}
 
-      {/* BARRA SIMPLE DE COPIADO DE VISITA ANTERIOR DENTRO DE UNA CONSULTA ABIERTA */}
+      {/* BARRA PARA TRAER ÚNICAMENTE ANTROPOMETRÍA (PESO / TALLA) DE UNA VISITA ANTERIOR */}
       {camposActualesEditables && visitasPrevias.length > 0 && (
         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 flex flex-wrap items-center gap-2.5 print:hidden">
           <span className="text-xs font-bold text-slate-700 dark:text-slate-200 shrink-0">
-            Copiar visita anterior:
+            Copiar antropometría previa:
           </span>
           <select
             value={visitaSeleccionadaId}
@@ -535,7 +533,9 @@ export function FormularioConsultaClinica({
             {visitasPrevias.map((v, idx) => (
               <option key={v.id} value={v.id}>
                 #{idx + 1} · {fmtFechaHora(v.consultationDate)} ·{' '}
-                {v.doctorName || 'Sin médico'} · {v.diagnosis || v.chiefComplaint}
+                {v.weight !== null ? `${v.weight} ${v.weightUnit ?? 'kg'}` : 'Sin peso'} /{' '}
+                {v.heightCm !== null ? `${v.heightCm} cm` : 'Sin talla'} ·{' '}
+                {v.doctorName || 'Sin médico'}
               </option>
             ))}
           </select>
@@ -545,7 +545,7 @@ export function FormularioConsultaClinica({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold cursor-pointer shrink-0"
           >
             <ClipboardCopy className="w-3.5 h-3.5" />
-            <span>Pegar en esta consulta</span>
+            <span>Copiar peso y talla</span>
           </button>
           {visitaSeleccionadaId && (
             <Link
@@ -608,13 +608,13 @@ export function FormularioConsultaClinica({
           </div>
         )}
 
-        {/* 1. SIGNOS VITALES Y ANTROPOMETRÍA */}
+        {/* 1. DATOS ANTROPOMÉTRICOS (SE COPIAN DE VISITA ANTERIOR Y SON MODIFICABLES) */}
         <AcapiteClinico
-          titulo="Signos Vitales y Antropometría"
-          meta={metaSecciones.signos}
+          titulo="Datos Antropométricos"
+          meta={metaSecciones.antropometria}
           puedeEditar={camposActualesEditables}
-          editando={editandoSeccion.signos}
-          onToggleEditar={() => void toggleSeccion('signos')}
+          editando={editandoSeccion.antropometria}
+          onToggleEditar={() => void toggleSeccion('antropometria')}
           bloqueadoPorAutoria={bloqueadoPorAutoria}
           autorNotas={autorNotas}
           badgeExtra={
@@ -625,8 +625,92 @@ export function FormularioConsultaClinica({
             ) : null
           }
         >
+          {editandoSeccion.antropometria && camposActualesEditables ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Peso
+                </label>
+                <div className="flex gap-1">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={form.weight}
+                    onChange={(e) => actualizarCampo('weight', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="70"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                  <select
+                    value={form.weightUnit}
+                    onChange={(e) => actualizarCampo('weightUnit', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    className="px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white"
+                  >
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Talla (cm)
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  value={form.heightCm}
+                  onChange={(e) => actualizarCampo('heightCm', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  placeholder="170"
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                />
+              </div>
+              <div className="flex flex-col justify-end">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
+                  <span className="block text-[10px] text-slate-500">IMC calculado</span>
+                  <strong className="text-sm text-teal-700 dark:text-teal-300 tabular-nums">
+                    {imc ? `${imc} kg/m²` : '—'}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-2.5 text-xs">
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">Peso</span>
+                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
+                  {form.weight ? `${form.weight} ${form.weightUnit}` : '—'}
+                </strong>
+              </div>
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">Talla</span>
+                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
+                  {form.heightCm ? `${form.heightCm} cm` : '—'}
+                </strong>
+              </div>
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
+                <span className="block text-[10px] text-slate-500">IMC</span>
+                <strong className="text-sm text-teal-700 dark:text-teal-300 tabular-nums">
+                  {imc ? `${imc} kg/m²` : '—'}
+                </strong>
+              </div>
+            </div>
+          )}
+        </AcapiteClinico>
+
+        {/* 2. SIGNOS VITALES DE ESTA CONSULTA */}
+        <AcapiteClinico
+          titulo="Signos Vitales"
+          meta={metaSecciones.signos}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.signos}
+          onToggleEditar={() => void toggleSeccion('signos')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
+        >
           {editandoSeccion.signos && camposActualesEditables ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                   Presión Arterial
@@ -679,48 +763,9 @@ export function FormularioConsultaClinica({
                   className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
                 />
               </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                  Peso
-                </label>
-                <div className="flex gap-1">
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={form.weight}
-                    onChange={(e) => actualizarCampo('weight', e.target.value)}
-                    onBlur={() => void ejecutarAutosave(false)}
-                    placeholder="70"
-                    className="w-full px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
-                  />
-                  <select
-                    value={form.weightUnit}
-                    onChange={(e) => actualizarCampo('weightUnit', e.target.value)}
-                    onBlur={() => void ejecutarAutosave(false)}
-                    className="px-1.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white"
-                  >
-                    <option value="kg">kg</option>
-                    <option value="lb">lb</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
-                  Talla (cm)
-                </label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={form.heightCm}
-                  onChange={(e) => actualizarCampo('heightCm', e.target.value)}
-                  onBlur={() => void ejecutarAutosave(false)}
-                  placeholder="170"
-                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
-                />
-              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
                 <span className="block text-[10px] text-slate-500">TA</span>
                 <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
@@ -743,18 +788,6 @@ export function FormularioConsultaClinica({
                 <span className="block text-[10px] text-slate-500">SpO2</span>
                 <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
                   {form.oxygenSat ? `${form.oxygenSat}%` : '—'}
-                </strong>
-              </div>
-              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
-                <span className="block text-[10px] text-slate-500">Peso</span>
-                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
-                  {form.weight ? `${form.weight} ${form.weightUnit}` : '—'}
-                </strong>
-              </div>
-              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2">
-                <span className="block text-[10px] text-slate-500">Talla</span>
-                <strong className="text-sm text-slate-900 dark:text-white tabular-nums">
-                  {form.heightCm ? `${form.heightCm} cm` : '—'}
                 </strong>
               </div>
             </div>

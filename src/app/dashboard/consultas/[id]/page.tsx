@@ -7,6 +7,7 @@ import { BannerAlergias } from '@/components/BannerAlergias'
 import { PrintButton } from '@/components/PrintButton'
 import { FormularioConsultaClinica } from '@/components/FormularioConsultaClinica'
 import { AntecedentesConsultasRetraibles } from '@/components/AntecedentesConsultasRetraibles'
+import { DatosPacienteConsultaCard } from '@/components/DatosPacienteConsultaCard'
 import {
   type AntecedentesConsultaState,
   type HistorialVisitaResumen,
@@ -19,7 +20,6 @@ import {
 } from '@/lib/consultas-auth'
 import {
   agregarAlergiaConsulta,
-  guardarDatosPacienteConsulta,
   marcarSinAlergiasConsulta,
 } from '../actions'
 
@@ -32,6 +32,21 @@ const fmtFecha = (d: Date) =>
     hour: '2-digit',
     minute: '2-digit',
   })
+
+function fmtFechaLocalInput(d: Date): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Santo_Domingo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d)
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '00'
+  const hour = get('hour') === '24' ? '00' : get('hour')
+  return `${get('year')}-${get('month')}-${get('day')}T${hour}:${get('minute')}`
+}
 
 function parseAuditJson(raw: unknown): Record<string, unknown> | null {
   if (!raw) return null
@@ -139,6 +154,7 @@ export default async function ConsultaDetallePage({
   // Construir el último modificador por cada acápite (nombre, rol, fecha/hora)
   const metaSecciones: MapaMetaSecciones = {}
   const seccionesValidas: SeccionConsultaKey[] = [
+    'antropometria',
     'signos',
     'motivo',
     'enfermedad',
@@ -175,7 +191,15 @@ export default async function ConsultaDetallePage({
       }
     } else {
       // Compatibilidad con registros anteriores que no guardaban changedSections
-      if (data.bloodPressure !== undefined || data.weight !== undefined) {
+      if (data.weight !== undefined || data.heightCm !== undefined) {
+        metaSecciones.antropometria = { byName, byRole, atIso }
+      }
+      if (
+        data.bloodPressure !== undefined ||
+        data.heartRate !== undefined ||
+        data.temperature !== undefined ||
+        data.oxygenSat !== undefined
+      ) {
         metaSecciones.signos = { byName, byRole, atIso }
       }
       if (data.chiefComplaint !== undefined || data.visitType !== undefined) {
@@ -202,13 +226,17 @@ export default async function ConsultaDetallePage({
 
   if (fallbackMeta) {
     if (
+      !metaSecciones.antropometria &&
+      (consulta.weight !== null || consulta.heightCm !== null)
+    ) {
+      metaSecciones.antropometria = fallbackMeta
+    }
+    if (
       !metaSecciones.signos &&
       (consulta.bloodPressure ||
         consulta.heartRate !== null ||
         consulta.temperature !== null ||
-        consulta.oxygenSat !== null ||
-        consulta.weight !== null ||
-        consulta.heightCm !== null)
+        consulta.oxygenSat !== null)
     ) {
       metaSecciones.signos = fallbackMeta
     }
@@ -367,57 +395,28 @@ export default async function ConsultaDetallePage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* COLUMNA IZQUIERDA: DATOS, ALERGIAS Y ANTECEDENTES */}
           <div className="lg:col-span-1 space-y-5 print:hidden">
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Datos del Paciente y Registro
-                </h2>
-                {puedeEditar && (
-                  <details className="relative">
-                    <summary className="list-none cursor-pointer text-xs font-semibold text-teal-700 hover:underline">
-                      ✏️ Editar
-                    </summary>
-                    <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-300 dark:border-slate-600 shadow-xl z-30">
-                      <form action={guardarDatosPacienteConsulta} className="space-y-2">
-                        <input type="hidden" name="consultationId" value={consulta.id} />
-                        <input name="firstName" defaultValue={consulta.patient.firstName} required placeholder="Nombres" className="w-full px-2.5 py-1.5 border rounded text-xs" />
-                        <input name="lastName" defaultValue={consulta.patient.lastName} required placeholder="Apellidos" className="w-full px-2.5 py-1.5 border rounded text-xs" />
-                        <div className="grid grid-cols-2 gap-2">
-                          <input name="age" type="number" defaultValue={consulta.patient.age ?? ''} placeholder="Edad" className="w-full px-2 py-1.5 border rounded text-xs" />
-                          <select name="sex" defaultValue={consulta.patient.sex} className="w-full px-2 py-1.5 border rounded text-xs bg-white text-slate-900">
-                            <option value="Femenino">Femenino</option>
-                            <option value="Masculino">Masculino</option>
-                          </select>
-                        </div>
-                        <input name="phone" defaultValue={consulta.patient.phone ?? ''} placeholder="Teléfono" className="w-full px-2.5 py-1.5 border rounded text-xs" />
-                        <input name="cedula" defaultValue={consulta.patient.cedula ?? ''} placeholder="Cédula" className="w-full px-2.5 py-1.5 border rounded text-xs" />
-                        <input name="bloodType" defaultValue={consulta.patient.bloodType ?? ''} placeholder="Tipo de sangre (Ej. O+)" className="w-full px-2.5 py-1.5 border rounded text-xs" />
-                        <button type="submit" className="w-full bg-teal-600 text-white text-xs font-bold py-2 rounded-lg cursor-pointer">
-                          Guardar Cambios
-                        </button>
-                      </form>
-                    </div>
-                  </details>
-                )}
-              </div>
-
-              <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1.5">
-                <p><strong>Expediente:</strong> {consulta.patient.expedienteNumber}</p>
-                <p><strong>Teléfono:</strong> {consulta.patient.phone || 'No registrado'}</p>
-                <p><strong>Cédula:</strong> {consulta.patient.cedula || 'No registrada'}</p>
-                <p><strong>Grupo Sanguíneo:</strong> {consulta.patient.bloodType || 'Pendiente'}</p>
-                <p className="tabular-nums"><strong>Fecha y hora:</strong> {fmtFecha(consulta.consultationDate)}</p>
-                <p>
-                  <strong>Médico / Firma:</strong>{' '}
-                  {consulta.doctorName || 'Por asignar'}
-                  {consulta.doctor?.role ? ` (${etiquetaRolClinico(String(consulta.doctor.role))})` : ''}
-                </p>
-                <p>
-                  <strong>Estado:</strong>{' '}
-                  {ETIQUETA_ESTADO_CONSULTA[consulta.status] ?? consulta.status}
-                </p>
-              </div>
-            </div>
+            <DatosPacienteConsultaCard
+              consultationId={consulta.id}
+              puedeEditar={puedeEditar}
+              puedeEditarFechaRegistro={puedeEditarNotas}
+              paciente={{
+                firstName: consulta.patient.firstName,
+                lastName: consulta.patient.lastName,
+                expedienteNumber: consulta.patient.expedienteNumber,
+                age: consulta.patient.age,
+                sex: consulta.patient.sex,
+                phone: consulta.patient.phone,
+                cedula: consulta.patient.cedula,
+                bloodType: consulta.patient.bloodType,
+              }}
+              registro={{
+                consultationDateLabel: fmtFecha(consulta.consultationDate),
+                consultationDateLocal: fmtFechaLocalInput(consulta.consultationDate),
+                doctorName: consulta.doctorName,
+                doctorRole: consulta.doctor?.role ? String(consulta.doctor.role) : null,
+                estadoLabel: ETIQUETA_ESTADO_CONSULTA[consulta.status] ?? consulta.status,
+              }}
+            />
 
             {puedeEditar && (
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 space-y-3">
