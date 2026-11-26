@@ -36,6 +36,8 @@ function createOfflinePrismaProxy(): PrismaClient {
         }
       }
       if (prop === '$connect' || prop === '$disconnect') return async () => {}
+      if (prop === '$executeRaw' || prop === '$executeRawUnsafe') return async () => 0
+      if (prop === '$queryRaw' || prop === '$queryRawUnsafe') return async () => []
       if (typeof prop === 'symbol') return undefined
       return emptyModel
     },

@@ -6,11 +6,17 @@ import { useRouter } from 'next/navigation'
 import { Check, ChevronDown, ClipboardCopy, Lock, Pencil, PlusCircle } from 'lucide-react'
 import {
   TIPOS_CONSULTA_EXTERNA,
+  type ConsultaImagingData,
+  type ConsultaLabsData,
   type HistorialVisitaResumen,
   type MapaMetaSecciones,
   type SeccionAutorMeta,
   type SeccionConsultaKey,
   etiquetaRolClinico,
+  imagenesVacias,
+  labsVacios,
+  tieneImagenesConsulta,
+  tieneLaboratoriosConsulta,
 } from '@/lib/consultas-auth'
 import {
   cambiarTipoConsulta,
@@ -35,7 +41,8 @@ type ConsultaEditable = {
   physicalExam: string | null
   diagnosis: string | null
   treatmentPlan: string | null
-  labOrders: string | null
+  labs: ConsultaLabsData
+  imaging: ConsultaImagingData
   nextAppointment: string | null
   notes: string | null
 }
@@ -56,7 +63,8 @@ type FormState = {
   physicalExam: string
   diagnosis: string
   treatmentPlan: string
-  labOrders: string
+  labs: ConsultaLabsData
+  imaging: ConsultaImagingData
   notes: string
 }
 
@@ -223,7 +231,8 @@ export function FormularioConsultaClinica({
     physicalExam: consulta.physicalExam ?? '',
     diagnosis: consulta.diagnosis ?? '',
     treatmentPlan: consulta.treatmentPlan ?? '',
-    labOrders: consulta.labOrders ?? '',
+    labs: consulta.labs ?? labsVacios(),
+    imaging: consulta.imaging ?? imagenesVacias(),
     notes: consulta.notes ?? '',
   })
 
@@ -237,6 +246,7 @@ export function FormularioConsultaClinica({
     diagnostico: false,
     receta: false,
     laboratorio: false,
+    imagenes: false,
     notas: false,
   })
 
@@ -387,6 +397,38 @@ export function FormularioConsultaClinica({
     }, 700)
   }
 
+  const actualizarLab = <K extends keyof ConsultaLabsData>(campo: K, valor: string) => {
+    if (!camposActualesEditables) return
+    dirtyRef.current = true
+    setFeedback(null)
+    setForm((prev) => {
+      const next = { ...prev, labs: { ...prev.labs, [campo]: valor } }
+      formRef.current = next
+      return next
+    })
+
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      void ejecutarAutosave(false)
+    }, 700)
+  }
+
+  const actualizarImagen = <K extends keyof ConsultaImagingData>(campo: K, valor: string) => {
+    if (!camposActualesEditables) return
+    dirtyRef.current = true
+    setFeedback(null)
+    setForm((prev) => {
+      const next = { ...prev, imaging: { ...prev.imaging, [campo]: valor } }
+      formRef.current = next
+      return next
+    })
+
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      void ejecutarAutosave(false)
+    }, 700)
+  }
+
   const toggleSeccion = async (sec: SeccionConsultaKey) => {
     if (!camposActualesEditables) return
     const estabaEditando = editandoSeccion[sec]
@@ -459,7 +501,8 @@ export function FormularioConsultaClinica({
       fd.set('physicalExam', actual.physicalExam)
       fd.set('diagnosis', actual.diagnosis)
       fd.set('treatmentPlan', actual.treatmentPlan)
-      fd.set('labOrders', actual.labOrders)
+      fd.set('labsJson', JSON.stringify(actual.labs))
+      fd.set('imagingJson', JSON.stringify(actual.imaging))
       fd.set('notes', actual.notes)
 
       const res = await guardarConsultaClinica(fd)
@@ -1054,9 +1097,9 @@ export function FormularioConsultaClinica({
           )}
         </AcapiteClinico>
 
-        {/* 6. RECETA MÉDICA / PLAN TERAPÉUTICO */}
+        {/* 6. PLAN TERAPÉUTICO / INDICACIONES */}
         <AcapiteClinico
-          titulo="Receta Médica / Plan Terapéutico e Indicaciones"
+          titulo="Plan Terapéutico / Indicaciones"
           meta={metaSecciones.receta}
           puedeEditar={camposActualesEditables}
           editando={editandoSeccion.receta}
@@ -1075,32 +1118,319 @@ export function FormularioConsultaClinica({
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
             />
           ) : (
-            renderTextoLectura(form.treatmentPlan, 'Sin receta o plan terapéutico registrado.')
+            renderTextoLectura(form.treatmentPlan, 'Sin plan terapéutico ni indicaciones registradas.')
           )}
         </AcapiteClinico>
 
-        {/* 7. ÓRDENES DE LABORATORIO / ESTUDIOS */}
+        {/* 7. LABORATORIOS */}
         <AcapiteClinico
-          titulo="Órdenes de Laboratorio / Estudios"
+          titulo="Laboratorios"
           meta={metaSecciones.laboratorio}
           puedeEditar={camposActualesEditables}
           editando={editandoSeccion.laboratorio}
           onToggleEditar={() => void toggleSeccion('laboratorio')}
           bloqueadoPorAutoria={bloqueadoPorAutoria}
           autorNotas={autorNotas}
+          badgeExtra={
+            tieneLaboratoriosConsulta(form.labs) ? (
+              <span className="px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-800 text-[10px] font-bold text-teal-800 dark:text-teal-300 tabular-nums">
+                {form.labs.date || 'Registrado'}
+              </span>
+            ) : null
+          }
         >
           {editandoSeccion.laboratorio && camposActualesEditables ? (
-            <textarea
-              rows={3}
-              autoFocus
-              value={form.labOrders}
-              onChange={(e) => actualizarCampo('labOrders', e.target.value)}
-              onBlur={() => void ejecutarAutosave(false)}
-              placeholder="Hemograma, química sanguínea, HbA1c, perfil lipídico, radiografía..."
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-            />
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Fecha
+                  </label>
+                  <input
+                    type="date"
+                    value={form.labs.date}
+                    onChange={(e) => actualizarLab('date', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Hemoglobina (g/dL)
+                  </label>
+                  <input
+                    value={form.labs.hgb}
+                    onChange={(e) => actualizarLab('hgb', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. 11.4"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Creatinina (mg/dL)
+                  </label>
+                  <input
+                    value={form.labs.creatinine}
+                    onChange={(e) => actualizarLab('creatinine', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. 1.2"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Urea / BUN
+                  </label>
+                  <input
+                    value={form.labs.urea}
+                    onChange={(e) => actualizarLab('urea', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. 42 mg/dL"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Glucosa / HbA1c
+                  </label>
+                  <input
+                    value={form.labs.glucose}
+                    onChange={(e) => actualizarLab('glucose', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. 98 mg/dL · 6.4%"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Potasio (K+)
+                  </label>
+                  <input
+                    value={form.labs.potassium}
+                    onChange={(e) => actualizarLab('potassium', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. 4.3 mEq/L"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Examen de Orina / Proteinuria
+                  </label>
+                  <input
+                    value={form.labs.ego}
+                    onChange={(e) => actualizarLab('ego', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. EGO sin piuria · RAC 45 mg/g"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Otros laboratorios / Resultados detallados
+                </label>
+                <textarea
+                  rows={3}
+                  value={form.labs.detail}
+                  onChange={(e) => actualizarLab('detail', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  placeholder="Leucocitos, plaquetas, sodio, calcio, fósforo, PTH, perfil lipídico, urocultivo, serologías..."
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                />
+              </div>
+            </div>
+          ) : tieneLaboratoriosConsulta(form.labs) ? (
+            <div className="space-y-2.5">
+              {(form.labs.date ||
+                form.labs.hgb ||
+                form.labs.creatinine ||
+                form.labs.urea ||
+                form.labs.glucose ||
+                form.labs.potassium ||
+                form.labs.ego) && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  {form.labs.date && (
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                      <span className="block text-[10px] text-slate-500">Fecha</span>
+                      <strong className="text-slate-900 dark:text-white tabular-nums">{form.labs.date}</strong>
+                    </div>
+                  )}
+                  {form.labs.hgb && (
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                      <span className="block text-[10px] text-slate-500">Hgb</span>
+                      <strong className="text-slate-900 dark:text-white tabular-nums">{form.labs.hgb}</strong>
+                    </div>
+                  )}
+                  {form.labs.creatinine && (
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                      <span className="block text-[10px] text-slate-500">Creatinina</span>
+                      <strong className="text-slate-900 dark:text-white tabular-nums">{form.labs.creatinine}</strong>
+                    </div>
+                  )}
+                  {form.labs.urea && (
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                      <span className="block text-[10px] text-slate-500">Urea / BUN</span>
+                      <strong className="text-slate-900 dark:text-white tabular-nums">{form.labs.urea}</strong>
+                    </div>
+                  )}
+                  {form.labs.glucose && (
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                      <span className="block text-[10px] text-slate-500">Glucosa / HbA1c</span>
+                      <strong className="text-slate-900 dark:text-white tabular-nums">{form.labs.glucose}</strong>
+                    </div>
+                  )}
+                  {form.labs.potassium && (
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                      <span className="block text-[10px] text-slate-500">Potasio (K+)</span>
+                      <strong className="text-slate-900 dark:text-white tabular-nums">{form.labs.potassium}</strong>
+                    </div>
+                  )}
+                  {form.labs.ego && (
+                    <div className="col-span-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                      <span className="block text-[10px] text-slate-500">Orina / Proteinuria</span>
+                      <strong className="text-slate-900 dark:text-white">{form.labs.ego}</strong>
+                    </div>
+                  )}
+                </div>
+              )}
+              {form.labs.detail && (
+                <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap leading-relaxed">
+                  {form.labs.detail}
+                </p>
+              )}
+            </div>
           ) : (
-            renderTextoLectura(form.labOrders, 'Sin órdenes de laboratorio o estudios.')
+            <p className="text-xs text-slate-400 italic">Sin laboratorios registrados.</p>
+          )}
+        </AcapiteClinico>
+
+        {/* 8. ESTUDIOS DE IMÁGENES */}
+        <AcapiteClinico
+          titulo="Estudios de Imágenes"
+          meta={metaSecciones.imagenes}
+          puedeEditar={camposActualesEditables}
+          editando={editandoSeccion.imagenes}
+          onToggleEditar={() => void toggleSeccion('imagenes')}
+          bloqueadoPorAutoria={bloqueadoPorAutoria}
+          autorNotas={autorNotas}
+          badgeExtra={
+            tieneImagenesConsulta(form.imaging) ? (
+              <span className="px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-800 text-[10px] font-bold text-teal-800 dark:text-teal-300 tabular-nums">
+                {form.imaging.date || 'Registrado'}
+              </span>
+            ) : null
+          }
+        >
+          {editandoSeccion.imagenes && camposActualesEditables ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Fecha del estudio
+                  </label>
+                  <input
+                    type="date"
+                    value={form.imaging.date}
+                    onChange={(e) => actualizarImagen('date', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white tabular-nums"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Sonografía / Ecografía
+                  </label>
+                  <input
+                    value={form.imaging.sonography}
+                    onChange={(e) => actualizarImagen('sonography', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. Sonografía renal: riñones simétricos, sin hidronefrosis"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    Radiografía (Rx)
+                  </label>
+                  <input
+                    value={form.imaging.xray}
+                    onChange={(e) => actualizarImagen('xray', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. Rx tórax PA: silueta cardíaca y campos pulmonares normales"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    TAC / Resonancia Magnética
+                  </label>
+                  <input
+                    value={form.imaging.ctMri}
+                    onChange={(e) => actualizarImagen('ctMri', e.target.value)}
+                    onBlur={() => void ejecutarAutosave(false)}
+                    placeholder="Ej. UROTAC simple sin litiasis ni masas"
+                    className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  Otros estudios de imagen / Conclusiones
+                </label>
+                <textarea
+                  rows={3}
+                  value={form.imaging.other}
+                  onChange={(e) => actualizarImagen('other', e.target.value)}
+                  onBlur={() => void ejecutarAutosave(false)}
+                  placeholder="Ecocardiograma, Doppler vascular, gammagrafía, hallazgos relevantes..."
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                />
+              </div>
+            </div>
+          ) : tieneImagenesConsulta(form.imaging) ? (
+            <div className="space-y-2 text-sm text-slate-800 dark:text-slate-100">
+              {form.imaging.date && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
+                  Fecha: <strong className="text-slate-800 dark:text-slate-200">{form.imaging.date}</strong>
+                </p>
+              )}
+              {form.imaging.sonography && (
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    Sonografía / Ecografía
+                  </span>
+                  <p className="text-sm whitespace-pre-wrap">{form.imaging.sonography}</p>
+                </div>
+              )}
+              {form.imaging.xray && (
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    Radiografía (Rx)
+                  </span>
+                  <p className="text-sm whitespace-pre-wrap">{form.imaging.xray}</p>
+                </div>
+              )}
+              {form.imaging.ctMri && (
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    TAC / Resonancia Magnética
+                  </span>
+                  <p className="text-sm whitespace-pre-wrap">{form.imaging.ctMri}</p>
+                </div>
+              )}
+              {form.imaging.other && (
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    Otros estudios / Conclusiones
+                  </span>
+                  <p className="text-sm whitespace-pre-wrap">{form.imaging.other}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400 italic">Sin estudios de imágenes registrados.</p>
           )}
         </AcapiteClinico>
 

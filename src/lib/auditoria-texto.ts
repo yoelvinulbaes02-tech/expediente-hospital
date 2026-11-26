@@ -257,17 +257,20 @@ export function describirRegistro(log: {
         o.consultationType !== n.consultationType
           ? `Tipo de consulta: ${String(o.consultationType)} → ${String(n.consultationType)}`
           : ''
+      const motivoLimpio = log.reason
+        ? log.reason.replace(/\breceta\b/gi, 'plan terapéutico / indicaciones')
+        : ''
       return {
         que:
           n.status === 'COMPLETADA' && o.status !== 'COMPLETADA'
             ? 'Finalizó y firmó la consulta externa'
             : cambioTipo
               ? 'Cambió el tipo / estatus de consulta externa'
-              : log.reason
-                ? log.reason
-                : 'Actualizó la ficha clínica de consulta externa',
+              : motivoLimpio || 'Actualizó la ficha clínica de consulta externa',
         detalle: unir(
           cambioTipo,
+          'labs' in n && 'Laboratorios actualizados',
+          'imaging' in n && 'Estudios de imágenes actualizados',
           lleno(n.diagnosis) && `Dx: ${cortar(String(n.diagnosis), 90)}`,
           lleno(n.chiefComplaint) && `Motivo: ${cortar(String(n.chiefComplaint), 90)}`
         ),

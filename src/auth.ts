@@ -9,6 +9,12 @@ import {
   generarNonceSesion,
   registrarNuevaSesionYEviccionarExceso,
 } from '@/lib/session-control'
+import {
+  HEMODIALISIS_DEMO_ADMIN_EMAIL,
+  HEMODIALISIS_DEMO_DOCTOR_EMAIL,
+  HEMODIALISIS_DEMO_PASSWORD,
+  asegurarResidenciaHemodialisisDemo,
+} from '@/lib/hemodialisis-bootstrap'
 
 const VENTANA_BLOQUEO_MS = 15 * 60 * 1000
 const MAX_INTENTOS_POR_IP = 20
@@ -77,9 +83,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const emailInput = String(credentials.email).trim().toLowerCase()
-        const user = await prisma.user.findFirst({
+        let user = await prisma.user.findFirst({
           where: { email: { equals: emailInput, mode: 'insensitive' } },
         })
+
+        if (
+          !user &&
+          (emailInput === HEMODIALISIS_DEMO_ADMIN_EMAIL ||
+            emailInput === HEMODIALISIS_DEMO_DOCTOR_EMAIL) &&
+          String(credentials.password) === HEMODIALISIS_DEMO_PASSWORD
+        ) {
+          const inicializado = await asegurarResidenciaHemodialisisDemo()
+          if (inicializado) {
+            user = await prisma.user.findFirst({
+              where: { email: { equals: emailInput, mode: 'insensitive' } },
+            })
+          }
+        }
 
         if (!user || !user.isActive) return null
 

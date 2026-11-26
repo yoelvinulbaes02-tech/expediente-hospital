@@ -15,7 +15,10 @@ import {
   type SeccionAutorMeta,
   type SeccionConsultaKey,
   etiquetaRolClinico,
+  parsearLabsEImagenesConsulta,
   puedeEditarNotasConsulta,
+  tieneImagenesConsulta,
+  tieneLaboratoriosConsulta,
   tieneNotasClinicasEscritas,
 } from '@/lib/consultas-auth'
 import {
@@ -151,6 +154,8 @@ export default async function ConsultaDetallePage({
     }),
   ])
 
+  const parsedLabsImagenes = parsearLabsEImagenesConsulta(consulta.labOrders)
+
   // Construir el último modificador por cada acápite (nombre, rol, fecha/hora)
   const metaSecciones: MapaMetaSecciones = {}
   const seccionesValidas: SeccionConsultaKey[] = [
@@ -162,6 +167,7 @@ export default async function ConsultaDetallePage({
     'diagnostico',
     'receta',
     'laboratorio',
+    'imagenes',
     'notas',
   ]
 
@@ -215,6 +221,12 @@ export default async function ConsultaDetallePage({
       if (data.treatmentPlan !== undefined) {
         metaSecciones.receta = { byName, byRole, atIso }
       }
+      if (data.labs !== undefined) {
+        metaSecciones.laboratorio = { byName, byRole, atIso }
+      }
+      if (data.imaging !== undefined) {
+        metaSecciones.imagenes = { byName, byRole, atIso }
+      }
     }
   }
 
@@ -249,7 +261,12 @@ export default async function ConsultaDetallePage({
     if (!metaSecciones.examen && consulta.physicalExam) metaSecciones.examen = fallbackMeta
     if (!metaSecciones.diagnostico && consulta.diagnosis) metaSecciones.diagnostico = fallbackMeta
     if (!metaSecciones.receta && consulta.treatmentPlan) metaSecciones.receta = fallbackMeta
-    if (!metaSecciones.laboratorio && consulta.labOrders) metaSecciones.laboratorio = fallbackMeta
+    if (!metaSecciones.laboratorio && tieneLaboratoriosConsulta(parsedLabsImagenes.labs)) {
+      metaSecciones.laboratorio = fallbackMeta
+    }
+    if (!metaSecciones.imagenes && tieneImagenesConsulta(parsedLabsImagenes.imaging)) {
+      metaSecciones.imagenes = fallbackMeta
+    }
     if (!metaSecciones.notas && consulta.notes) metaSecciones.notas = fallbackMeta
   }
 
@@ -346,12 +363,12 @@ export default async function ConsultaDetallePage({
         </div>
       </div>
 
-      {/* CABECERA SOLO PARA IMPRESIÓN DE RECETA / RESUMEN */}
+      {/* CABECERA SOLO PARA IMPRESIÓN DE RESUMEN E INDICACIONES */}
       {suscripcionBloqueada ? (
         <div className="hidden print:block max-w-4xl mx-auto p-8 m-8 border-2 border-red-400 rounded-xl text-center">
           <h1 className="text-lg font-bold text-red-900">Impresión de consulta bloqueada</h1>
           <p className="text-sm text-red-800 mt-2">
-            La suscripción está vencida o suspendida. Renueva el plan en Mi Suscripción para habilitar la impresión de resúmenes y recetas.
+            La suscripción está vencida o suspendida. Renueva el plan en Mi Suscripción para habilitar la impresión de resúmenes e indicaciones.
           </p>
         </div>
       ) : (
@@ -483,7 +500,8 @@ export default async function ConsultaDetallePage({
                 physicalExam: consulta.physicalExam,
                 diagnosis: consulta.diagnosis,
                 treatmentPlan: consulta.treatmentPlan,
-                labOrders: consulta.labOrders,
+                labs: parsedLabsImagenes.labs,
+                imaging: parsedLabsImagenes.imaging,
                 nextAppointment: consulta.nextAppointment
                   ? consulta.nextAppointment.toISOString().slice(0, 10)
                   : null,

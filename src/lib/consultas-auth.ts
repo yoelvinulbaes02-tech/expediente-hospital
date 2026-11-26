@@ -33,6 +33,7 @@ export type SeccionConsultaKey =
   | 'diagnostico'
   | 'receta'
   | 'laboratorio'
+  | 'imagenes'
   | 'notas'
 
 export type SeccionAutorMeta = {
@@ -42,6 +43,158 @@ export type SeccionAutorMeta = {
 }
 
 export type MapaMetaSecciones = Partial<Record<SeccionConsultaKey, SeccionAutorMeta>>
+
+export type ConsultaLabsData = {
+  date: string
+  hgb: string
+  creatinine: string
+  urea: string
+  glucose: string
+  potassium: string
+  ego: string
+  detail: string
+}
+
+export type ConsultaImagingData = {
+  date: string
+  sonography: string
+  xray: string
+  ctMri: string
+  other: string
+}
+
+export function labsVacios(): ConsultaLabsData {
+  return {
+    date: '',
+    hgb: '',
+    creatinine: '',
+    urea: '',
+    glucose: '',
+    potassium: '',
+    ego: '',
+    detail: '',
+  }
+}
+
+export function imagenesVacias(): ConsultaImagingData {
+  return {
+    date: '',
+    sonography: '',
+    xray: '',
+    ctMri: '',
+    other: '',
+  }
+}
+
+function limpiarTexto(v: unknown): string {
+  return typeof v === 'string' ? v.trim() : ''
+}
+
+export function normalizarLabsConsulta(raw?: Partial<ConsultaLabsData> | null): ConsultaLabsData {
+  return {
+    date: limpiarTexto(raw?.date),
+    hgb: limpiarTexto(raw?.hgb),
+    creatinine: limpiarTexto(raw?.creatinine),
+    urea: limpiarTexto(raw?.urea),
+    glucose: limpiarTexto(raw?.glucose),
+    potassium: limpiarTexto(raw?.potassium),
+    ego: limpiarTexto(raw?.ego),
+    detail: limpiarTexto(raw?.detail),
+  }
+}
+
+export function normalizarImagenesConsulta(
+  raw?: Partial<ConsultaImagingData> | null
+): ConsultaImagingData {
+  return {
+    date: limpiarTexto(raw?.date),
+    sonography: limpiarTexto(raw?.sonography),
+    xray: limpiarTexto(raw?.xray),
+    ctMri: limpiarTexto(raw?.ctMri),
+    other: limpiarTexto(raw?.other),
+  }
+}
+
+export function tieneLaboratoriosConsulta(labs: ConsultaLabsData): boolean {
+  return Boolean(
+    labs.date ||
+      labs.hgb ||
+      labs.creatinine ||
+      labs.urea ||
+      labs.glucose ||
+      labs.potassium ||
+      labs.ego ||
+      labs.detail
+  )
+}
+
+export function tieneImagenesConsulta(imaging: ConsultaImagingData): boolean {
+  return Boolean(
+    imaging.date ||
+      imaging.sonography ||
+      imaging.xray ||
+      imaging.ctMri ||
+      imaging.other
+  )
+}
+
+export function parsearLabsEImagenesConsulta(raw?: string | null): {
+  labs: ConsultaLabsData
+  imaging: ConsultaImagingData
+  legacyOrders?: string
+} {
+  const texto = (raw ?? '').trim()
+  if (!texto) {
+    return { labs: labsVacios(), imaging: imagenesVacias() }
+  }
+
+  if (texto.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(texto) as {
+        __v?: number
+        labs?: Partial<ConsultaLabsData>
+        imaging?: Partial<ConsultaImagingData>
+        legacyOrders?: string
+      }
+      if (parsed && typeof parsed === 'object' && parsed.__v === 2) {
+        return {
+          labs: normalizarLabsConsulta(parsed.labs),
+          imaging: normalizarImagenesConsulta(parsed.imaging),
+          legacyOrders: limpiarTexto(parsed.legacyOrders) || undefined,
+        }
+      }
+    } catch {
+      // Continuar como texto heredado si no es JSON válido
+    }
+  }
+
+  return {
+    labs: labsVacios(),
+    imaging: imagenesVacias(),
+    legacyOrders: texto,
+  }
+}
+
+export function serializarLabsEImagenesConsulta(
+  labsInput?: Partial<ConsultaLabsData> | null,
+  imagingInput?: Partial<ConsultaImagingData> | null,
+  legacyOrders?: string | null
+): string | null {
+  const labs = normalizarLabsConsulta(labsInput)
+  const imaging = normalizarImagenesConsulta(imagingInput)
+  const legacy = limpiarTexto(legacyOrders)
+
+  if (!tieneLaboratoriosConsulta(labs) && !tieneImagenesConsulta(imaging) && !legacy) {
+    return null
+  }
+
+  return JSON.stringify({
+    __v: 2,
+    labs,
+    imaging,
+    ...(legacy ? { legacyOrders: legacy } : {}),
+  })
+}
 
 export type AntecedentesConsultaState = {
   pathological: string

@@ -12,6 +12,7 @@ import {
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import type { BillingMode, InterfaceMode, PlanStatus, Prisma } from '@/generated/prisma'
+import { asegurarEnumHemodialisis } from '@/lib/hemodialisis-bootstrap'
 
 async function exigirSuperAdmin() {
   const ctx = await obtenerContextoResidencia()
@@ -118,6 +119,10 @@ export async function crearResidenciaConAdmin(formData: FormData): Promise<void>
   const passwordHash = await bcrypt.hash(adminPassword, 12)
   const subscriptionEndsAt = new Date(Date.now() + diasVigencia * 24 * 60 * 60 * 1000)
 
+  if (interfaceMode === 'HEMODIALISIS') {
+    await asegurarEnumHemodialisis()
+  }
+
   const creada = await prisma.$transaction(async (tx) => {
     const res = await tx.residency.create({
       data: {
@@ -219,6 +224,10 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
     : '/dashboard/plataforma'
 
   try {
+    if (interfaceMode === 'HEMODIALISIS') {
+      await asegurarEnumHemodialisis()
+    }
+
     await prisma.residency.update({
       where: { id: residencyId },
       data: {

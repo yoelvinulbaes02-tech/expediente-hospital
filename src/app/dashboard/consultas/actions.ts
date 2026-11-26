@@ -493,6 +493,31 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
     const accion =
       accionRaw === 'finalizar' || accionRaw === 'reabrir' ? accionRaw : 'guardar'
 
+    const labsJsonRaw = String(formData.get('labsJson') ?? '').trim()
+    const imagingJsonRaw = String(formData.get('imagingJson') ?? '').trim()
+    let labs: Record<string, string> | undefined
+    let imaging: Record<string, string> | undefined
+    if (labsJsonRaw) {
+      try {
+        const parsed = JSON.parse(labsJsonRaw)
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          labs = parsed as Record<string, string>
+        }
+      } catch {
+        // Ignorar JSON inválido
+      }
+    }
+    if (imagingJsonRaw) {
+      try {
+        const parsed = JSON.parse(imagingJsonRaw)
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          imaging = parsed as Record<string, string>
+        }
+      } catch {
+        // Ignorar JSON inválido
+      }
+    }
+
     return await persistirConsultaClinica({
       consultationId: String(formData.get('consultationId') ?? ''),
       accion,
@@ -510,7 +535,8 @@ export async function guardarConsultaClinica(formData: FormData): Promise<{
       physicalExam: String(formData.get('physicalExam') ?? ''),
       diagnosis: String(formData.get('diagnosis') ?? ''),
       treatmentPlan: String(formData.get('treatmentPlan') ?? ''),
-      labOrders: String(formData.get('labOrders') ?? ''),
+      ...(labs ? { labs } : {}),
+      ...(imaging ? { imaging } : {}),
       notes: String(formData.get('notes') ?? ''),
       nextAppointment: String(formData.get('nextAppointment') ?? ''),
     })

@@ -5,6 +5,7 @@ import {
   obtenerAlertasCuentasCompartidas,
   registrarCierreSesionNonce,
 } from '@/lib/session-control'
+import { asegurarResidenciaHemodialisisDemo } from '@/lib/hemodialisis-bootstrap'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { InputPassword } from '@/components/InputPassword'
@@ -113,6 +114,29 @@ export default async function PlataformaPage({
   const filtroResidencia = (resId ?? '').trim()
   const filtroAlcance = alcance === 'INDIVIDUAL' || alcance === 'RESIDENCY' ? alcance : ''
   const filtroTextoPago = (pq ?? '').trim()
+
+  const tieneResidenciaHd = await prisma.residency
+    .findFirst({
+      where: { OR: [{ slug: 'hemodialisis' }, { interfaceMode: 'HEMODIALISIS' }] },
+      select: { id: true },
+    })
+    .catch(() => null)
+
+  if (!tieneResidenciaHd) {
+    const esBaseDemo = await prisma.user
+      .findFirst({
+        where: {
+          email: {
+            in: ['admin@hospital.test', 'admin.consulta@hospital.test', 'superadmin@nexo.test'],
+          },
+        },
+        select: { id: true },
+      })
+      .catch(() => null)
+    if (esBaseDemo) {
+      await asegurarResidenciaHemodialisisDemo()
+    }
+  }
 
   const [
     residencias,

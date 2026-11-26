@@ -3,8 +3,16 @@ import { logAudit } from '@/lib/audit'
 import { ROLES_CLINICOS, ROLES_MEDICOS } from '@/lib/permisos'
 import {
   TIPOS_CONSULTA_EXTERNA,
+  type ConsultaImagingData,
+  type ConsultaLabsData,
   type SeccionConsultaKey,
+  normalizarImagenesConsulta,
+  normalizarLabsConsulta,
+  parsearLabsEImagenesConsulta,
   puedeEditarNotasConsulta,
+  serializarLabsEImagenesConsulta,
+  tieneImagenesConsulta,
+  tieneLaboratoriosConsulta,
   tieneNotasClinicasEscritas,
 } from '@/lib/consultas-auth'
 import { obtenerContextoResidencia, verificarEscrituraResidencia } from '@/lib/tenant'
@@ -28,8 +36,23 @@ export type PayloadConsultaClinica = {
   diagnosis?: string | null
   treatmentPlan?: string | null
   labOrders?: string | null
+  labs?: Partial<ConsultaLabsData> | null
+  imaging?: Partial<ConsultaImagingData> | null
   notes?: string | null
   nextAppointment?: string | null
+}
+
+const ETIQUETAS_SECCION_AUDITORIA: Record<SeccionConsultaKey, string> = {
+  antropometria: 'antropometría',
+  signos: 'signos vitales',
+  motivo: 'motivo / tipo',
+  enfermedad: 'enfermedad actual',
+  examen: 'examen físico',
+  diagnostico: 'diagnóstico',
+  receta: 'plan terapéutico / indicaciones',
+  laboratorio: 'laboratorios',
+  imagenes: 'estudios de imágenes',
+  notas: 'notas internas',
 }
 
 function aTextoOpcional(v: unknown): string | null {
@@ -191,8 +214,20 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
     payload.treatmentPlan !== undefined
       ? aTextoOpcional(payload.treatmentPlan)
       : consulta.treatmentPlan
-  const labOrders =
-    payload.labOrders !== undefined ? aTextoOpcional(payload.labOrders) : consulta.labOrders
+
+  const parsedAnterior = parsearLabsEImagenesConsulta(consulta.labOrders)
+  const usaLabsEImagenes = payload.labs !== undefined || payload.imaging !== undefined
+  const labsNuevos =
+    payload.labs !== undefined ? normalizarLabsConsulta(payload.labs) : parsedAnterior.labs
+  const imagingNuevos =
+    payload.imaging !== undefined ? normalizarImagenesConsulta(payload.imaging) : parsedAnterior.imaging
+
+  const labOrders = usaLabsEImagenes
+    ? serializarLabsEImagenesConsulta(labsNuevos, imagingNuevos, parsedAnterior.legacyOrders)
+    : payload.labOrders !== undefined
+      ? aTextoOpcional(payload.labOrders)
+      : consulta.labOrders
+
   const notes = payload.notes !== undefined ? aTextoOpcional(payload.notes) : consulta.notes
 
   let nextAppointment = consulta.nextAppointment
@@ -244,7 +279,39 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
   track('examen', 'physicalExam', consulta.physicalExam, physicalExam)
   track('diagnostico', 'diagnosis', consulta.diagnosis, diagnosis)
   track('receta', 'treatmentPlan', consulta.treatmentPlan, treatmentPlan)
-  track('laboratorio', 'labOrders', consulta.labOrders, labOrders)
+
+  if (usaLabsEImagenes) {
+    const labsOldChanged: Record<string, string> = {}
+    const labsNewChanged: Record<string, string> = {}
+    for (const k of Object.keys(labsNuevos) as (keyof ConsultaLabsData)[]) {
+      if (parsedAnterior.labs[k] !== labsNuevos[k]) {
+        labsOldChanged[k] = parsedAnterior.labs[k]
+        labsNewChanged[k] = labsNuevos[k]
+      }
+    }
+    if (Object.keys(labsNewChanged).length > 0) {
+      oldDiff.labs = labsOldChanged
+      newDiff.labs = labsNewChanged
+      changedSections.push('laboratorio')
+    }
+
+    const imgOldChanged: Record<string, string> = {}
+    const imgNewChanged: Record<string, string> = {}
+    for (const k of Object.keys(imagingNuevos) as (keyof ConsultaImagingData)[]) {
+      if (parsedAnterior.imaging[k] !== imagingNuevos[k]) {
+        imgOldChanged[k] = parsedAnterior.imaging[k]
+        imgNewChanged[k] = imagingNuevos[k]
+      }
+    }
+    if (Object.keys(imgNewChanged).length > 0) {
+      oldDiff.imaging = imgOldChanged
+      newDiff.imaging = imgNewChanged
+      changedSections.push('imagenes')
+    }
+  } else {
+    track('laboratorio', 'labOrders', consulta.labOrders, labOrders)
+  }
+
   track('notas', 'notes', consulta.notes, notes)
 
   const nuevoEstado =
@@ -279,7 +346,8 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
       physicalExam ||
       diagnosis ||
       treatmentPlan ||
-      labOrders ||
+      tieneLaboratoriosConsulta(labsNuevos) ||
+      tieneImagenesConsulta(imagingNuevos) ||
       notes ||
       accion === 'finalizar'
   )
@@ -322,6 +390,10 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
     },
   })
 
+  const seccionesEtiquetadas = changedSections.map(
+    (s) => ETIQUETAS_SECCION_AUDITORIA[s] ?? s
+  )
+
   await logAudit({
     actorId: ctx.user.id,
     actorRole: String(ctx.user.role),
@@ -341,7 +413,7 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
         ? 'Consulta médica finalizada y firmada'
         : accion === 'reabrir'
           ? 'Consulta reabierta por su médico autor'
-          : `Actualización automática de consulta (${changedSections.join(', ') || 'estado'})`,
+          : `Actualización automática de consulta (${seccionesEtiquetadas.join(', ') || 'estado'})`,
   })
 
   revalidatePath('/dashboard')
