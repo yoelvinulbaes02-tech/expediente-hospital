@@ -765,7 +765,8 @@ exports.InterfaceMode = exports.$Enums.InterfaceMode = {
   CIRUGIA: 'CIRUGIA',
   ORTOPEDIA: 'ORTOPEDIA',
   EMERGENCIA: 'EMERGENCIA',
-  HEMATOLOGIA: 'HEMATOLOGIA'
+  HEMATOLOGIA: 'HEMATOLOGIA',
+  HEMODIALISIS: 'HEMODIALISIS'
 };
 
 exports.BillingMode = exports.$Enums.BillingMode = {

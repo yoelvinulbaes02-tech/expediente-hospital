@@ -26,6 +26,7 @@ enum InterfaceMode {
   ORTOPEDIA
   EMERGENCIA
   HEMATOLOGIA
+  HEMODIALISIS
 }
 
 enum PlanStatus {

@@ -64,28 +64,22 @@ export const TIPOS_CONSULTA_EXTERNA = [
 
 export type TipoConsultaExterna = (typeof TIPOS_CONSULTA_EXTERNA)[number]
 
-export const ANALITICAS_BIOPSIA = [
-  'Pendiente',
-  'Pendiente urocultivo',
-  'Pendiente todo',
-  'Listo',
-  'Completo',
-] as const
+export const ANALITICAS_BIOPSIA = ['Completo', 'Pendiente'] as const
 
 export const AGUJA_BIOPSIA = [
   'Utilizar la del centro',
   'Disponible en el centro',
-  'Lista',
+  'Externa',
   'Pendiente',
 ] as const
 
 export const KIT_BIOPSIA = ['Pendiente', 'Listo'] as const
 
-export const SENASA_BIOPSIA = [
+export const ARS_BIOPSIA = [
   'Pendiente',
   'En proceso',
   'Autorizada',
-  'El centro se hará responsable',
+  'Privado',
 ] as const
 
 export type BiopsyRecordItem = {

@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { InputPassword } from '@/components/InputPassword'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { CheckCircle2, ShieldAlert } from 'lucide-react'
+import { CheckCircle2, ChevronDown, ShieldAlert } from 'lucide-react'
 import {
   actualizarResidencia,
   crearResidenciaConAdmin,
@@ -373,8 +373,8 @@ export default async function PlataformaPage({
         </div>
 
         {/* MONITOR ANTI-CUENTAS COMPARTIDAS */}
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
+        <details className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <summary className="list-none cursor-pointer px-6 py-4 flex flex-wrap items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
             <div className="flex items-start gap-2.5">
               <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
@@ -387,7 +387,7 @@ export default async function PlataformaPage({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs tabular-nums">
+            <div className="flex flex-wrap items-center gap-2 text-xs tabular-nums">
               <span
                 className={`px-2.5 py-1 rounded-lg font-bold border ${
                   resumenCuentasCompartidas.totalExpulsiones24h > 0
@@ -406,101 +406,108 @@ export default async function PlataformaPage({
               >
                 Alertas activas: {resumenCuentasCompartidas.alertas.length}
               </span>
-            </div>
-          </div>
-
-          {resumenCuentasCompartidas.alertas.length === 0 ? (
-            <div className="px-6 py-5 flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-950/20">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span>
-                Sin indicios recientes de uso compartido. Ninguna cuenta ha superado el límite de 2 sesiones simultáneas ni ha presentado actividad anómala de dispositivos.
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-semibold">
+                <ChevronDown className="w-4 h-4 transition-transform -rotate-90 group-open:rotate-0" />
+                <span className="group-open:hidden">Expandir</span>
+                <span className="hidden group-open:inline">Contraer</span>
               </span>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                  <tr>
-                    <th className="px-4 py-3">Usuario / Rol</th>
-                    <th className="px-4 py-3">Residencia / Cobro</th>
-                    <th className="px-4 py-3">Expulsiones (&gt;2 sesiones)</th>
-                    <th className="px-4 py-3">IPs y Dispositivos (24h)</th>
-                    <th className="px-4 py-3">Último evento</th>
-                    <th className="px-4 py-3 text-right">Acción</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                  {resumenCuentasCompartidas.alertas.map((alerta) => (
-                    <tr key={alerta.userId} className="hover:bg-amber-50/40 dark:hover:bg-slate-700/30">
-                      <td className="px-4 py-3">
-                        <p className="font-bold text-slate-900 dark:text-white">{alerta.fullName}</p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                          {alerta.email} · <span className="font-semibold">{alerta.role}</span>
-                        </p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="font-semibold text-slate-800 dark:text-slate-200">
-                          {alerta.residencyName}
-                        </p>
-                        <span
-                          className={`inline-block mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                            alerta.billingMode === 'INDIVIDUAL'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          {alerta.billingMode === 'INDIVIDUAL' ? 'Individual' : 'Grupal'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 tabular-nums">
-                        <span
-                          className={`px-2 py-0.5 rounded font-bold ${
-                            alerta.evictions24h > 0
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          24h: {alerta.evictions24h} · 7d: {alerta.evictions7d}
-                        </span>
-                        <span className="block text-[11px] text-slate-500 mt-0.5">
-                          Accesos 24h: {alerta.logins24h}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">
-                          {alerta.uniqueIps24h} IP(s) · {alerta.uniqueDevices24h} equipo(s)
-                        </p>
-                        {alerta.dispositivos24h.length > 0 && (
-                          <p className="text-[11px] text-slate-500 truncate max-w-xs" title={alerta.dispositivos24h.join(', ')}>
-                            {alerta.dispositivos24h.join(', ')}
-                          </p>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 tabular-nums whitespace-nowrap">
-                        <span>{fmtFechaHora(new Date(alerta.lastEventAt))}</span>
-                        <span className="block font-mono text-[11px] text-slate-400">
-                          {alerta.lastIp ?? 'IP no disponible'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {alerta.residencyId ? (
-                          <Link
-                            href={`/dashboard/plataforma/residencia/${alerta.residencyId}`}
-                            className="inline-block px-2.5 py-1 rounded border border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold whitespace-nowrap"
-                          >
-                            Ver usuarios →
-                          </Link>
-                        ) : (
-                          <span className="text-slate-400">—</span>
-                        )}
-                      </td>
+          </summary>
+
+          <div className="border-t border-slate-200 dark:border-slate-700">
+            {resumenCuentasCompartidas.alertas.length === 0 ? (
+              <div className="px-6 py-5 flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-950/20">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>
+                  Sin indicios recientes de uso compartido. Ninguna cuenta ha superado el límite de 2 sesiones simultáneas ni ha presentado actividad anómala de dispositivos.
+                </span>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                    <tr>
+                      <th className="px-4 py-3">Usuario / Rol</th>
+                      <th className="px-4 py-3">Residencia / Cobro</th>
+                      <th className="px-4 py-3">Expulsiones (&gt;2 sesiones)</th>
+                      <th className="px-4 py-3">IPs y Dispositivos (24h)</th>
+                      <th className="px-4 py-3">Último evento</th>
+                      <th className="px-4 py-3 text-right">Acción</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {resumenCuentasCompartidas.alertas.map((alerta) => (
+                      <tr key={alerta.userId} className="hover:bg-amber-50/40 dark:hover:bg-slate-700/30">
+                        <td className="px-4 py-3">
+                          <p className="font-bold text-slate-900 dark:text-white">{alerta.fullName}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            {alerta.email} · <span className="font-semibold">{alerta.role}</span>
+                          </p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="font-semibold text-slate-800 dark:text-slate-200">
+                            {alerta.residencyName}
+                          </p>
+                          <span
+                            className={`inline-block mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                              alerta.billingMode === 'INDIVIDUAL'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            {alerta.billingMode === 'INDIVIDUAL' ? 'Individual' : 'Grupal'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 tabular-nums">
+                          <span
+                            className={`px-2 py-0.5 rounded font-bold ${
+                              alerta.evictions24h > 0
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
+                          >
+                            24h: {alerta.evictions24h} · 7d: {alerta.evictions7d}
+                          </span>
+                          <span className="block text-[11px] text-slate-500 mt-0.5">
+                            Accesos 24h: {alerta.logins24h}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">
+                            {alerta.uniqueIps24h} IP(s) · {alerta.uniqueDevices24h} equipo(s)
+                          </p>
+                          {alerta.dispositivos24h.length > 0 && (
+                            <p className="text-[11px] text-slate-500 truncate max-w-xs" title={alerta.dispositivos24h.join(', ')}>
+                              {alerta.dispositivos24h.join(', ')}
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300 tabular-nums whitespace-nowrap">
+                          <span>{fmtFechaHora(new Date(alerta.lastEventAt))}</span>
+                          <span className="block font-mono text-[11px] text-slate-400">
+                            {alerta.lastIp ?? 'IP no disponible'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {alerta.residencyId ? (
+                            <Link
+                              href={`/dashboard/plataforma/residencia/${alerta.residencyId}`}
+                              className="inline-block px-2.5 py-1 rounded border border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold whitespace-nowrap"
+                            >
+                              Ver usuarios →
+                            </Link>
+                          ) : (
+                            <span className="text-slate-400">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </details>
 
         {/* COLA DE PAGOS PENDIENTES (SI EXISTIERA ALGUNO LEGACY) */}
         {pagosPendientes.length > 0 && (
@@ -559,24 +566,41 @@ export default async function PlataformaPage({
         )}
 
         {/* HISTORIAL GLOBAL DE PAGOS RECIBIDOS (MENSUAL AUTOMÁTICO + FILTRO POR MES + REINICIO DE PRUEBAS) */}
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 space-y-3">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-              <div>
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                  💳 Pagos Recibidos en la Plataforma ({historialPagos.length})
-                  {viendoPruebas && (
-                    <span className="ml-2 text-[11px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
-                      Viendo pruebas archivadas
-                    </span>
-                  )}
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Se reinicia automáticamente en $0.00 cada 1ro de mes conservando el historial de todos los meses anteriores para consulta por mes.
-                </p>
-              </div>
+        <details
+          open={Boolean(
+            filtroResidencia ||
+              filtroAlcance ||
+              filtroTextoPago ||
+              filtroMes !== mesActual ||
+              viendoPruebas
+          )}
+          className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden"
+        >
+          <summary className="list-none cursor-pointer px-6 py-4 flex flex-wrap items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                💳 Pagos Recibidos en la Plataforma ({historialPagos.length})
+                {viendoPruebas && (
+                  <span className="ml-2 text-[11px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
+                    Viendo pruebas archivadas
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Se reinicia automáticamente en $0.00 cada 1ro de mes conservando el historial de todos los meses anteriores para consulta por mes.
+              </p>
+            </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-200 shrink-0">
+              <ChevronDown className="w-4 h-4 transition-transform -rotate-90 group-open:rotate-0" />
+              <span className="group-open:hidden">Expandir</span>
+              <span className="hidden group-open:inline">Contraer</span>
+            </span>
+          </summary>
+
+          <div className="border-t border-slate-200 dark:border-slate-700">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 space-y-3">
+              <div className="flex flex-wrap items-center justify-end gap-2">
                 {archivadosPruebaCount > 0 && (
                   <Link
                     href={
@@ -614,224 +638,232 @@ export default async function PlataformaPage({
                   </div>
                 </details>
               </div>
+
+              {/* BARRA DE MESES CON INGRESOS + FILTROS */}
+              {mesesDisponibles.length > 0 && !viendoPruebas && (
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1">
+                    Cierre por mes:
+                  </span>
+                  {mesesDisponibles.map((m) => {
+                    const activo = filtroMes === m.key
+                    return (
+                      <Link
+                        key={m.key}
+                        href={`/dashboard/plataforma?mes=${m.key}${
+                          filtroResidencia ? `&resId=${encodeURIComponent(filtroResidencia)}` : ''
+                        }${filtroAlcance ? `&alcance=${filtroAlcance}` : ''}${
+                          filtroTextoPago ? `&pq=${encodeURIComponent(filtroTextoPago)}` : ''
+                        }`}
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors tabular-nums ${
+                          activo
+                            ? 'bg-emerald-600 text-white border-emerald-700'
+                            : 'bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        {m.label}
+                        {m.key === mesActual ? ' (Actual)' : ''}: ${m.total.toFixed(2)} ({m.count})
+                      </Link>
+                    )
+                  })}
+                  <Link
+                    href={`/dashboard/plataforma?mes=todos${
+                      filtroResidencia ? `&resId=${encodeURIComponent(filtroResidencia)}` : ''
+                    }${filtroAlcance ? `&alcance=${filtroAlcance}` : ''}${
+                      filtroTextoPago ? `&pq=${encodeURIComponent(filtroTextoPago)}` : ''
+                    }`}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
+                      filtroMes === 'todos'
+                        ? 'bg-slate-800 text-white border-slate-900'
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    Todos los meses (${totalIngresosUsd.toFixed(2)})
+                  </Link>
+                </div>
+              )}
+
+              <form method="get" action="/dashboard/plataforma" className="flex flex-wrap items-center gap-2">
+                <select
+                  name="mes"
+                  defaultValue={filtroMes}
+                  className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
+                >
+                  {mesesDisponibles.map((m) => (
+                    <option key={m.key} value={m.key}>
+                      {m.label}
+                      {m.key === mesActual ? ' (Mes actual)' : ''} · ${m.total.toFixed(2)} ({m.count})
+                    </option>
+                  ))}
+                  <option value="todos">Todos los meses (Histórico)</option>
+                </select>
+
+                <select
+                  name="resId"
+                  defaultValue={filtroResidencia}
+                  className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                >
+                  <option value="">Todas las residencias</option>
+                  {residencias.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  name="alcance"
+                  defaultValue={filtroAlcance}
+                  className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                >
+                  <option value="">Todos los alcances</option>
+                  <option value="INDIVIDUAL">Solo Individual</option>
+                  <option value="RESIDENCY">Solo Grupal</option>
+                </select>
+
+                <input
+                  name="pq"
+                  defaultValue={filtroTextoPago}
+                  placeholder="🔍 Buscar usuario, correo o ref..."
+                  className="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white w-52 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                <button
+                  type="submit"
+                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold cursor-pointer"
+                >
+                  Filtrar
+                </button>
+                {(filtroResidencia || filtroAlcance || filtroTextoPago || filtroMes !== mesActual || viendoPruebas) && (
+                  <Link
+                    href="/dashboard/plataforma"
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  >
+                    Mes actual
+                  </Link>
+                )}
+              </form>
             </div>
 
-            {/* BARRA DE MESES CON INGRESOS + FILTROS */}
-            {mesesDisponibles.length > 0 && !viendoPruebas && (
-              <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1">
-                  Cierre por mes:
-                </span>
-                {mesesDisponibles.map((m) => {
-                  const activo = filtroMes === m.key
-                  return (
-                    <Link
-                      key={m.key}
-                      href={`/dashboard/plataforma?mes=${m.key}${
-                        filtroResidencia ? `&resId=${encodeURIComponent(filtroResidencia)}` : ''
-                      }${filtroAlcance ? `&alcance=${filtroAlcance}` : ''}${
-                        filtroTextoPago ? `&pq=${encodeURIComponent(filtroTextoPago)}` : ''
-                      }`}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors tabular-nums ${
-                        activo
-                          ? 'bg-emerald-600 text-white border-emerald-700'
-                          : 'bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      {m.label}
-                      {m.key === mesActual ? ' (Actual)' : ''}: ${m.total.toFixed(2)} ({m.count})
-                    </Link>
-                  )
-                })}
-                <Link
-                  href={`/dashboard/plataforma?mes=todos${
-                    filtroResidencia ? `&resId=${encodeURIComponent(filtroResidencia)}` : ''
-                  }${filtroAlcance ? `&alcance=${filtroAlcance}` : ''}${
-                    filtroTextoPago ? `&pq=${encodeURIComponent(filtroTextoPago)}` : ''
-                  }`}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
-                    filtroMes === 'todos'
-                      ? 'bg-slate-800 text-white border-slate-900'
-                      : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  Todos los meses (${totalIngresosUsd.toFixed(2)})
-                </Link>
-              </div>
-            )}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs">
+                  <tr>
+                    <th className="px-4 py-3">Fecha y Hora</th>
+                    <th className="px-4 py-3">Residencia</th>
+                    <th className="px-4 py-3">Quién Pagó / Alcance</th>
+                    <th className="px-4 py-3">Período</th>
+                    <th className="px-4 py-3">Monto</th>
+                    <th className="px-4 py-3">Método y Referencia</th>
+                    <th className="px-4 py-3">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  {historialPagos.map((p) => {
+                    const nombrePagador =
+                      p.user?.fullName ??
+                      mapaNombrePorEmail.get(p.requestedBy.toLowerCase()) ??
+                      p.requestedBy
 
-            <form method="get" action="/dashboard/plataforma" className="flex flex-wrap items-center gap-2">
-              <select
-                name="mes"
-                defaultValue={filtroMes}
-                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-semibold"
-              >
-                {mesesDisponibles.map((m) => (
-                  <option key={m.key} value={m.key}>
-                    {m.label}
-                    {m.key === mesActual ? ' (Mes actual)' : ''} · ${m.total.toFixed(2)} ({m.count})
-                  </option>
-                ))}
-                <option value="todos">Todos los meses (Histórico)</option>
-              </select>
-
-              <select
-                name="resId"
-                defaultValue={filtroResidencia}
-                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-              >
-                <option value="">Todas las residencias</option>
-                {residencias.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                name="alcance"
-                defaultValue={filtroAlcance}
-                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-              >
-                <option value="">Todos los alcances</option>
-                <option value="INDIVIDUAL">Solo Individual</option>
-                <option value="RESIDENCY">Solo Grupal</option>
-              </select>
-
-              <input
-                name="pq"
-                defaultValue={filtroTextoPago}
-                placeholder="🔍 Buscar usuario, correo o ref..."
-                className="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white w-52 outline-none focus:ring-2 focus:ring-blue-500"
-              />
-
-              <button
-                type="submit"
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold cursor-pointer"
-              >
-                Filtrar
-              </button>
-              {(filtroResidencia || filtroAlcance || filtroTextoPago || filtroMes !== mesActual || viendoPruebas) && (
-                <Link
-                  href="/dashboard/plataforma"
-                  className="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
-                >
-                  Mes actual
-                </Link>
-              )}
-            </form>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs">
-                <tr>
-                  <th className="px-4 py-3">Fecha y Hora</th>
-                  <th className="px-4 py-3">Residencia</th>
-                  <th className="px-4 py-3">Quién Pagó / Alcance</th>
-                  <th className="px-4 py-3">Período</th>
-                  <th className="px-4 py-3">Monto</th>
-                  <th className="px-4 py-3">Método y Referencia</th>
-                  <th className="px-4 py-3">Estado</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                {historialPagos.map((p) => {
-                  const nombrePagador =
-                    p.user?.fullName ??
-                    mapaNombrePorEmail.get(p.requestedBy.toLowerCase()) ??
-                    p.requestedBy
-
-                  return (
-                    <tr key={p.id}>
-                      <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums whitespace-nowrap">
-                        {fmtFechaHora(p.createdAt)}
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        <Link
-                          href={`/dashboard/plataforma/residencia/${p.residency.id}`}
-                          className="font-bold text-blue-700 dark:text-blue-400 hover:underline"
-                        >
-                          {p.residency.name}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        <div className="flex flex-wrap items-center gap-1.5">
+                    return (
+                      <tr key={p.id}>
+                        <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300 tabular-nums whitespace-nowrap">
+                          {fmtFechaHora(p.createdAt)}
+                        </td>
+                        <td className="px-4 py-3 text-xs">
+                          <Link
+                            href={`/dashboard/plataforma/residencia/${p.residency.id}`}
+                            className="font-bold text-blue-700 dark:text-blue-400 hover:underline"
+                          >
+                            {p.residency.name}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3 text-xs">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span
+                              className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
+                                p.billingScope === 'INDIVIDUAL'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-slate-100 text-slate-700'
+                              }`}
+                            >
+                              {p.billingScope === 'INDIVIDUAL' ? 'Individual' : 'Grupal'}
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {nombrePagador}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            {p.requestedBy}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3 text-xs tabular-nums whitespace-nowrap">
+                          {p.periodMonths} mes(es)
+                        </td>
+                        <td className="px-4 py-3 text-xs font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums whitespace-nowrap">
+                          ${p.amountUsd.toFixed(2)} USD
+                        </td>
+                        <td className="px-4 py-3 text-xs">
+                          <span className="capitalize font-semibold text-slate-800 dark:text-slate-200">
+                            {p.method}
+                          </span>
+                          <span className="block font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                            {p.reference ?? '—'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs">
                           <span
-                            className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
-                              p.billingScope === 'INDIVIDUAL'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-slate-100 text-slate-700'
+                            className={`px-2 py-0.5 rounded font-bold ${
+                              p.status === 'APROBADO'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : p.status === 'RECHAZADO'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-amber-100 text-amber-800'
                             }`}
                           >
-                            {p.billingScope === 'INDIVIDUAL' ? 'Individual' : 'Grupal'}
+                            {p.status}
                           </span>
-                          <span className="font-bold text-slate-900 dark:text-white">
-                            {nombrePagador}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                          {p.requestedBy}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3 text-xs tabular-nums whitespace-nowrap">
-                        {p.periodMonths} mes(es)
-                      </td>
-                      <td className="px-4 py-3 text-xs font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums whitespace-nowrap">
-                        ${p.amountUsd.toFixed(2)} USD
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        <span className="capitalize font-semibold text-slate-800 dark:text-slate-200">
-                          {p.method}
-                        </span>
-                        <span className="block font-mono text-[11px] text-slate-500 dark:text-slate-400">
-                          {p.reference ?? '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        <span
-                          className={`px-2 py-0.5 rounded font-bold ${
-                            p.status === 'APROBADO'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : p.status === 'RECHAZADO'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {p.status}
-                        </span>
-                        {p.reviewedBy === 'paypal-automatico' && (
-                          <span className="block text-[10px] text-slate-400 mt-0.5">
-                            Automático
-                          </span>
-                        )}
+                          {p.reviewedBy === 'paypal-automatico' && (
+                            <span className="block text-[10px] text-slate-400 mt-0.5">
+                              Automático
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  {historialPagos.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
+                        No hay pagos registrados con los filtros actuales.
                       </td>
                     </tr>
-                  )
-                })}
-                {historialPagos.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
-                      No hay pagos registrados con los filtros actuales.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </details>
 
         {/* DAR DE ALTA NUEVA RESIDENCIA + ADMIN INICIAL */}
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 space-y-4">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Registrar Nueva Residencia / Servicio
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Crea un espacio aislado con su propia interfaz, su modalidad de cobro (Grupal o Individual por usuario) y su cuenta administradora inicial.
-            </p>
-          </div>
+        <details className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <summary className="list-none cursor-pointer px-6 py-4 flex flex-wrap items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                Registrar Nueva Residencia / Servicio
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Crea un espacio aislado con su propia interfaz, su modalidad de cobro (Grupal o Individual por usuario) y su cuenta administradora inicial.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-200 shrink-0">
+              <ChevronDown className="w-4 h-4 transition-transform -rotate-90 group-open:rotate-0" />
+              <span className="group-open:hidden">Expandir</span>
+              <span className="hidden group-open:inline">Contraer</span>
+            </span>
+          </summary>
 
+          <div className="border-t border-slate-200 dark:border-slate-700 p-6">
           <form action={crearResidenciaConAdmin} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -873,6 +905,7 @@ export default async function PlataformaPage({
                 <option value="ORTOPEDIA">Interfaz de Ortopedia y Traumatología</option>
                 <option value="EMERGENCIA">Interfaz de Emergencia (Trauma Shock / Observación)</option>
                 <option value="HEMATOLOGIA">Interfaz de Hematología (Sala y Pase)</option>
+                <option value="HEMODIALISIS">Interfaz de Hemodiálisis (Unidad Ambulatoria)</option>
               </select>
             </div>
 
@@ -1052,21 +1085,28 @@ export default async function PlataformaPage({
               </button>
             </div>
           </form>
-        </div>
+          </div>
+        </details>
 
         {/* LISTADO DE RESIDENCIAS */}
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-x-auto">
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2">
+        <details className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <summary className="list-none cursor-pointer px-6 py-4 flex flex-wrap items-center justify-between gap-2 hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                Residencias y Servicios Registrados
+                Residencias y Servicios Registrados ({residencias.length})
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Cada residencia mantiene sus usuarios, pagos y modalidad completamente aislados. Pulsa &quot;Gestionar Usuarios&quot; para controlar suscripciones individuales dentro de esa residencia.
               </p>
             </div>
-          </div>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-200 shrink-0">
+              <ChevronDown className="w-4 h-4 transition-transform -rotate-90 group-open:rotate-0" />
+              <span className="group-open:hidden">Expandir</span>
+              <span className="hidden group-open:inline">Contraer</span>
+            </span>
+          </summary>
 
+          <div className="border-t border-slate-200 dark:border-slate-700 overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs">
               <tr>
@@ -1088,7 +1128,7 @@ export default async function PlataformaPage({
                       <div className="flex flex-wrap items-center gap-1.5">
                         <p className="font-bold text-slate-900 dark:text-white">{r.name}</p>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
                             esIndividual
                               ? 'bg-blue-50 text-blue-800 border-blue-200'
                               : tarifaGrupal.esDinamico
@@ -1121,7 +1161,9 @@ export default async function PlataformaPage({
                       <p>
                         {r.interfaceMode === 'CONSULTAS'
                           ? `Consultas: ${r._count.consultations}`
-                          : `Episodios: ${r._count.episodes}`}
+                          : r.interfaceMode === 'HEMODIALISIS'
+                            ? `Unidad Hemodiálisis`
+                            : `Episodios: ${r._count.episodes}`}
                       </p>
                     </td>
 
@@ -1145,6 +1187,7 @@ export default async function PlataformaPage({
                           <option value="ORTOPEDIA">Ortopedia y Traumatología</option>
                           <option value="EMERGENCIA">Emergencia</option>
                           <option value="HEMATOLOGIA">Hematología</option>
+                          <option value="HEMODIALISIS">Hemodiálisis (Ambulatoria)</option>
                           <option value="CONSULTAS">Consultas Externas</option>
                         </select>
                         <select
@@ -1248,7 +1291,8 @@ export default async function PlataformaPage({
               })}
             </tbody>
           </table>
-        </div>
+          </div>
+        </details>
       </main>
     </div>
   )

@@ -16,8 +16,8 @@ import {
 import {
   AGUJA_BIOPSIA,
   ANALITICAS_BIOPSIA,
+  ARS_BIOPSIA,
   KIT_BIOPSIA,
-  SENASA_BIOPSIA,
   etiquetaRolClinico,
   normalizarTextoClinico,
   type BiopsyRecordItem,
@@ -39,15 +39,22 @@ type PacienteResumen = {
   phone: string | null
 }
 
-const HIGHLIGHT_OPTIONS: { value: BiopsyRecordItem['highlightTag']; label: string; rowClass: string }[] = [
-  { value: 'normal', label: 'Normal', rowClass: 'bg-white dark:bg-slate-800' },
-  { value: 'programada', label: 'Lista / Programada', rowClass: 'bg-emerald-50/70 dark:bg-emerald-950/20' },
-  { value: 'alerta', label: 'Atención / Pospuesta', rowClass: 'bg-amber-50/80 dark:bg-amber-950/20' },
-  { value: 'completada', label: 'Completada', rowClass: 'bg-teal-50/70 dark:bg-teal-950/20' },
-]
-
-function rowBgFor(tag: BiopsyRecordItem['highlightTag']): string {
-  return HIGHLIGHT_OPTIONS.find((h) => h.value === tag)?.rowClass ?? 'bg-white dark:bg-slate-800'
+function parseLabsStatus(raw?: string | null): {
+  status: 'Completo' | 'Pendiente'
+  detail: string
+} {
+  const val = (raw ?? '').trim()
+  const lower = val.toLowerCase()
+  if (lower === 'completo' || lower === 'listo') {
+    return { status: 'Completo', detail: '' }
+  }
+  if (lower.startsWith('pendiente:')) {
+    return { status: 'Pendiente', detail: val.slice('pendiente:'.length).trim() }
+  }
+  if (lower && lower !== 'pendiente') {
+    return { status: 'Pendiente', detail: val }
+  }
+  return { status: 'Pendiente', detail: '' }
 }
 
 function fmtFechaHora(iso?: string | null): string {
@@ -60,6 +67,173 @@ function fmtFechaHora(iso?: string | null): string {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+function EditBiopsiaAgendadaForm({
+  item,
+  isPending,
+  onSubmit,
+  onCancel,
+}: {
+  item: BiopsyRecordItem
+  isPending: boolean
+  onSubmit: (formData: FormData) => void
+  onCancel: () => void
+}) {
+  const parsedLabs = parseLabsStatus(item.labsStatus)
+  const [labsStatus, setLabsStatus] = useState<'Completo' | 'Pendiente'>(parsedLabs.status)
+  const [labsDetail, setLabsDetail] = useState(parsedLabs.detail)
+  const needleEsLegacy =
+    Boolean(item.needleStatus) &&
+    !AGUJA_BIOPSIA.includes(item.needleStatus as (typeof AGUJA_BIOPSIA)[number])
+  const arsEsLegacy =
+    Boolean(item.senasaAuth) &&
+    !ARS_BIOPSIA.includes(item.senasaAuth as (typeof ARS_BIOPSIA)[number])
+
+  return (
+    <form
+      action={onSubmit}
+      className="space-y-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-blue-200 dark:border-blue-800"
+    >
+      <input type="hidden" name="id" value={item.id} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div>
+          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Nombre *</label>
+          <input
+            name="patientName"
+            required
+            defaultValue={item.patientName}
+            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Teléfono</label>
+          <input
+            name="phone"
+            defaultValue={item.phone ?? ''}
+            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Analíticas</label>
+          <select
+            name="labsStatus"
+            value={labsStatus}
+            onChange={(e) => {
+              const next = e.target.value === 'Completo' ? 'Completo' : 'Pendiente'
+              setLabsStatus(next)
+              if (next === 'Completo') setLabsDetail('')
+            }}
+            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          >
+            {ANALITICAS_BIOPSIA.map((op) => (
+              <option key={op} value={op}>
+                {op}
+              </option>
+            ))}
+          </select>
+        </div>
+        {labsStatus === 'Pendiente' && (
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+              ¿Qué está pendiente? *
+            </label>
+            <input
+              name="labsPendingDetail"
+              required
+              value={labsDetail}
+              onChange={(e) => setLabsDetail(e.target.value)}
+              placeholder="Ej. Urocultivo, TP/TPT, Hb..."
+              className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            />
+          </div>
+        )}
+        <div>
+          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Aguja</label>
+          <select
+            name="needleStatus"
+            defaultValue={item.needleStatus ?? 'Utilizar la del centro'}
+            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          >
+            {needleEsLegacy && item.needleStatus && (
+              <option value={item.needleStatus}>{item.needleStatus}</option>
+            )}
+            {AGUJA_BIOPSIA.map((op) => (
+              <option key={op} value={op}>
+                {op}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Kit</label>
+          <select
+            name="kitStatus"
+            defaultValue={item.kitStatus ?? 'Pendiente'}
+            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          >
+            {KIT_BIOPSIA.map((op) => (
+              <option key={op} value={op}>
+                {op}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Cita</label>
+          <input
+            name="scheduledDate"
+            defaultValue={item.scheduledDate ?? ''}
+            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+            Autorización de ARS
+          </label>
+          <select
+            name="senasaAuth"
+            defaultValue={item.senasaAuth ?? 'Pendiente'}
+            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          >
+            {arsEsLegacy && item.senasaAuth && (
+              <option value={item.senasaAuth}>{item.senasaAuth}</option>
+            )}
+            {ARS_BIOPSIA.map((op) => (
+              <option key={op} value={op}>
+                {op}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Nota</label>
+        <textarea
+          name="note"
+          rows={2}
+          defaultValue={item.note ?? ''}
+          className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+        />
+      </div>
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-3 py-1 border rounded text-xs font-semibold text-slate-600 cursor-pointer"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold cursor-pointer"
+        >
+          Guardar cambios
+        </button>
+      </div>
+    </form>
+  )
 }
 
 export function BiopsiasConsultaPanel({
@@ -80,6 +254,8 @@ export function BiopsiasConsultaPanel({
   const [selectedPatientId, setSelectedPatientId] = useState('')
   const [nuevoNombre, setNuevoNombre] = useState('')
   const [nuevoTelefono, setNuevoTelefono] = useState('')
+  const [nuevoLabsStatus, setNuevoLabsStatus] = useState<'Completo' | 'Pendiente'>('Pendiente')
+  const [nuevoLabsDetalle, setNuevoLabsDetalle] = useState('')
   const [editId, setEditId] = useState<string | null>(null)
   const [realizarId, setRealizarId] = useState<string | null>(null)
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
@@ -141,6 +317,8 @@ export function BiopsiasConsultaPanel({
       setSelectedPatientId('')
       setNuevoNombre('')
       setNuevoTelefono('')
+      setNuevoLabsStatus('Pendiente')
+      setNuevoLabsDetalle('')
       setMensaje({ tipo: 'ok', texto: 'Paciente agregado a la Agenda de Biopsia.' })
       router.refresh()
     })
@@ -199,7 +377,7 @@ export function BiopsiasConsultaPanel({
             <span>Agenda y Resultados de Biopsias</span>
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Seguimiento de pacientes agendados (analíticas, aguja, kit, cita, autorización SENASA) y reporte posterior de biopsias realizadas.
+            Seguimiento de pacientes agendados (analíticas, aguja, kit, cita, autorización de ARS) y reporte posterior de biopsias realizadas.
           </p>
         </div>
 
@@ -314,7 +492,12 @@ export function BiopsiasConsultaPanel({
               </label>
               <select
                 name="labsStatus"
-                defaultValue="Pendiente"
+                value={nuevoLabsStatus}
+                onChange={(e) => {
+                  const next = e.target.value === 'Completo' ? 'Completo' : 'Pendiente'
+                  setNuevoLabsStatus(next)
+                  if (next === 'Completo') setNuevoLabsDetalle('')
+                }}
                 className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
               >
                 {ANALITICAS_BIOPSIA.map((op) => (
@@ -324,6 +507,22 @@ export function BiopsiasConsultaPanel({
                 ))}
               </select>
             </div>
+
+            {nuevoLabsStatus === 'Pendiente' && (
+              <div className="md:col-span-2">
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Especificar qué analíticas están pendientes *
+                </label>
+                <input
+                  name="labsPendingDetail"
+                  required
+                  value={nuevoLabsDetalle}
+                  onChange={(e) => setNuevoLabsDetalle(e.target.value)}
+                  placeholder="Ej. Urocultivo, TP/TPT, plaquetas, serología..."
+                  className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -373,33 +572,16 @@ export function BiopsiasConsultaPanel({
 
             <div>
               <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Autorización SENASA
+                Autorización de ARS
               </label>
               <select
                 name="senasaAuth"
                 defaultValue="Pendiente"
                 className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
               >
-                {SENASA_BIOPSIA.map((op) => (
+                {ARS_BIOPSIA.map((op) => (
                   <option key={op} value={op}>
                     {op}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Prioridad / Color de fila
-              </label>
-              <select
-                name="highlightTag"
-                defaultValue="normal"
-                className="w-full px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-              >
-                {HIGHLIGHT_OPTIONS.map((op) => (
-                  <option key={op.value} value={op.value}>
-                    {op.label}
                   </option>
                 ))}
               </select>
@@ -464,98 +646,79 @@ export function BiopsiasConsultaPanel({
               const editando = editId === item.id
               const marcandoRealizada = realizarId === item.id
               return (
-                <div key={item.id} className={`p-3.5 sm:p-4 space-y-3 ${rowBgFor(item.highlightTag)}`}>
+                <div key={item.id} className="p-3.5 sm:p-4 space-y-3 bg-white dark:bg-slate-800">
                   {editando ? (
-                    <form action={handleActualizar} className="space-y-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <input type="hidden" name="id" value={item.id} />
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Nombre *</label>
-                          <input name="patientName" required defaultValue={item.patientName} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Teléfono</label>
-                          <input name="phone" defaultValue={item.phone ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums" />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Analíticas</label>
-                          <input name="labsStatus" list="biopsia-analiticas" defaultValue={item.labsStatus ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Aguja</label>
-                          <input name="needleStatus" list="biopsia-aguja" defaultValue={item.needleStatus ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Kit</label>
-                          <select name="kitStatus" defaultValue={item.kitStatus ?? 'Pendiente'} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                            {KIT_BIOPSIA.map((op) => (
-                              <option key={op} value={op}>{op}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Cita</label>
-                          <input name="scheduledDate" defaultValue={item.scheduledDate ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums" />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Autorización SENASA</label>
-                          <input name="senasaAuth" list="biopsia-senasa" defaultValue={item.senasaAuth ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Color / Estado visual</label>
-                          <select name="highlightTag" defaultValue={item.highlightTag} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                            {HIGHLIGHT_OPTIONS.map((op) => (
-                              <option key={op.value} value={op.value}>{op.label}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Nota</label>
-                        <textarea name="note" rows={2} defaultValue={item.note ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <button type="button" onClick={() => setEditId(null)} className="px-3 py-1 border rounded text-xs font-semibold text-slate-600 cursor-pointer">
-                          Cancelar
-                        </button>
-                        <button type="submit" disabled={isPending} className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold cursor-pointer">
-                          Guardar cambios
-                        </button>
-                      </div>
-                    </form>
+                    <EditBiopsiaAgendadaForm
+                      item={item}
+                      isPending={isPending}
+                      onSubmit={handleActualizar}
+                      onCancel={() => setEditId(null)}
+                    />
                   ) : (
                     <>
                       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 flex-1 text-xs">
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Nombre</span>
-                            <span className="font-bold text-slate-900 dark:text-white">{item.patientName}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Nombre
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {item.patientName}
+                            </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Teléfono</span>
-                            <span className="text-slate-700 dark:text-slate-200 tabular-nums">{item.phone || 'PEND'}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Teléfono
+                            </span>
+                            <span className="text-slate-700 dark:text-slate-200 tabular-nums">
+                              {item.phone || 'PEND'}
+                            </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Analíticas</span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-100">{item.labsStatus || 'Pendiente'}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Analíticas
+                            </span>
+                            <span className="font-semibold text-slate-800 dark:text-slate-100">
+                              {item.labsStatus || 'Pendiente'}
+                            </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Aguja</span>
-                            <span className="text-slate-700 dark:text-slate-200">{item.needleStatus || '—'}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Aguja
+                            </span>
+                            <span className="text-slate-700 dark:text-slate-200">
+                              {item.needleStatus || '—'}
+                            </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Kit</span>
-                            <span className={`font-bold ${item.kitStatus === 'Listo' ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Kit
+                            </span>
+                            <span
+                              className={`font-bold ${
+                                item.kitStatus === 'Listo'
+                                  ? 'text-emerald-700 dark:text-emerald-400'
+                                  : 'text-amber-700 dark:text-amber-400'
+                              }`}
+                            >
                               {item.kitStatus || 'Pendiente'}
                             </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Cita</span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-100 tabular-nums">{item.scheduledDate || 'Pendiente'}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Cita
+                            </span>
+                            <span className="font-semibold text-slate-800 dark:text-slate-100 tabular-nums">
+                              {item.scheduledDate || 'Pendiente'}
+                            </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">SENASA</span>
-                            <span className="text-slate-800 dark:text-slate-100">{item.senasaAuth || 'Pendiente'}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              ARS
+                            </span>
+                            <span className="text-slate-800 dark:text-slate-100">
+                              {item.senasaAuth || 'Pendiente'}
+                            </span>
                           </div>
                         </div>
 
@@ -588,16 +751,19 @@ export function BiopsiasConsultaPanel({
                       </div>
 
                       {item.note && (
-                        <p className="text-xs text-slate-700 dark:text-slate-300 bg-white/70 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                        <p className="text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
                           <strong>Nota:</strong> {item.note}
                         </p>
                       )}
 
                       <p className="text-[10px] text-slate-400 tabular-nums">
-                        Registrado por {item.createdByName} ({etiquetaRolClinico(item.createdByRole)}) · {fmtFechaHora(item.createdAt)}
+                        Registrado por {item.createdByName} ({etiquetaRolClinico(item.createdByRole)}) ·{' '}
+                        {fmtFechaHora(item.createdAt)}
                         {item.updatedByName && item.updatedAt
                           ? ` · Editado por ${item.updatedByName}${
-                              item.updatedByRole ? ` (${etiquetaRolClinico(item.updatedByRole)})` : ''
+                              item.updatedByRole
+                                ? ` (${etiquetaRolClinico(item.updatedByRole)})`
+                                : ''
                             } · ${fmtFechaHora(item.updatedAt)}`
                           : ''}
                       </p>
@@ -708,35 +874,78 @@ export function BiopsiasConsultaPanel({
               return (
                 <div key={item.id} className="p-3.5 sm:p-4 space-y-2.5 bg-white dark:bg-slate-800">
                   {editando ? (
-                    <form action={handleActualizar} className="space-y-3 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-teal-200 dark:border-teal-800">
+                    <form
+                      action={handleActualizar}
+                      className="space-y-3 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-teal-200 dark:border-teal-800"
+                    >
                       <input type="hidden" name="id" value={item.id} />
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Nombre *</label>
-                          <input name="patientName" required defaultValue={item.patientName} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
+                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                            Nombre *
+                          </label>
+                          <input
+                            name="patientName"
+                            required
+                            defaultValue={item.patientName}
+                            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                          />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Teléfono</label>
-                          <input name="phone" defaultValue={item.phone ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums" />
+                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                            Teléfono
+                          </label>
+                          <input
+                            name="phone"
+                            defaultValue={item.phone ?? ''}
+                            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums"
+                          />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Fecha de realización</label>
-                          <input name="performedDate" defaultValue={item.performedDate ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums" />
+                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                            Fecha de realización
+                          </label>
+                          <input
+                            name="performedDate"
+                            defaultValue={item.performedDate ?? ''}
+                            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white tabular-nums"
+                          />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Complicaciones</label>
-                          <input name="complications" defaultValue={item.complications ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
+                          <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                            Complicaciones
+                          </label>
+                          <input
+                            name="complications"
+                            defaultValue={item.complications ?? ''}
+                            className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                          />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Reporte Histopatológico / Preliminar</label>
-                        <textarea name="report" rows={3} defaultValue={item.report ?? ''} className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
+                        <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                          Reporte Histopatológico / Preliminar
+                        </label>
+                        <textarea
+                          name="report"
+                          rows={3}
+                          defaultValue={item.report ?? ''}
+                          className="w-full px-2 py-1.5 border rounded text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                        />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <button type="button" onClick={() => setEditId(null)} className="px-3 py-1 border rounded text-xs font-semibold text-slate-600 cursor-pointer">
+                        <button
+                          type="button"
+                          onClick={() => setEditId(null)}
+                          className="px-3 py-1 border rounded text-xs font-semibold text-slate-600 cursor-pointer"
+                        >
                           Cancelar
                         </button>
-                        <button type="submit" disabled={isPending} className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded text-xs font-bold cursor-pointer">
+                        <button
+                          type="submit"
+                          disabled={isPending}
+                          className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded text-xs font-bold cursor-pointer"
+                        >
                           Guardar cambios
                         </button>
                       </div>
@@ -746,19 +955,33 @@ export function BiopsiasConsultaPanel({
                       <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1 text-xs">
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Nombre</span>
-                            <span className="font-bold text-slate-900 dark:text-white">{item.patientName}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Nombre
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {item.patientName}
+                            </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Teléfono</span>
-                            <span className="text-slate-700 dark:text-slate-200 tabular-nums">{item.phone || '—'}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Teléfono
+                            </span>
+                            <span className="text-slate-700 dark:text-slate-200 tabular-nums">
+                              {item.phone || '—'}
+                            </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Fecha de realización</span>
-                            <span className="font-bold text-teal-800 dark:text-teal-300 tabular-nums">{item.performedDate || '—'}</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Fecha de realización
+                            </span>
+                            <span className="font-bold text-teal-800 dark:text-teal-300 tabular-nums">
+                              {item.performedDate || '—'}
+                            </span>
                           </div>
                           <div>
-                            <span className="block text-[10px] font-bold uppercase text-slate-400">Complicaciones</span>
+                            <span className="block text-[10px] font-bold uppercase text-slate-400">
+                              Complicaciones
+                            </span>
                             <span
                               className={`font-semibold ${
                                 item.complications &&
@@ -806,7 +1029,9 @@ export function BiopsiasConsultaPanel({
                         {item.performedAt ? ` · ${fmtFechaHora(item.performedAt)}` : ''}
                         {item.updatedByName && item.updatedAt
                           ? ` · Última modificación: ${item.updatedByName}${
-                              item.updatedByRole ? ` (${etiquetaRolClinico(item.updatedByRole)})` : ''
+                              item.updatedByRole
+                                ? ` (${etiquetaRolClinico(item.updatedByRole)})`
+                                : ''
                             } · ${fmtFechaHora(item.updatedAt)}`
                           : ''}
                       </p>
@@ -818,22 +1043,6 @@ export function BiopsiasConsultaPanel({
           </div>
         )}
       </details>
-
-      <datalist id="biopsia-analiticas">
-        {ANALITICAS_BIOPSIA.map((op) => (
-          <option key={op} value={op} />
-        ))}
-      </datalist>
-      <datalist id="biopsia-aguja">
-        {AGUJA_BIOPSIA.map((op) => (
-          <option key={op} value={op} />
-        ))}
-      </datalist>
-      <datalist id="biopsia-senasa">
-        {SENASA_BIOPSIA.map((op) => (
-          <option key={op} value={op} />
-        ))}
-      </datalist>
     </div>
   )
 }

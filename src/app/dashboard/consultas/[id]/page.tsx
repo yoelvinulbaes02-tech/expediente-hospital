@@ -456,6 +456,7 @@ export default async function ConsultaDetallePage({
           <div className="lg:col-span-2">
             <FormularioConsultaClinica
               puedeEditar={puedeEditarNotas}
+              puedeCambiarTipo={puedeEditar && consulta.status !== 'CANCELADA'}
               puedeCrearNuevaAtencion={puedeEditar}
               autorNotas={autorNotas}
               bloqueadoPorAutoria={bloqueadoPorAutoria}

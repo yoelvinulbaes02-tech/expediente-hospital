@@ -66,6 +66,23 @@ async function main() {
     },
   })
 
+  const residenciaHemodialisis = await prisma.residency.upsert({
+    where: { slug: 'hemodialisis' },
+    update: {},
+    create: {
+      name: 'Unidad de Hemodiálisis Ambulatoria',
+      slug: 'hemodialisis',
+      specialty: 'Hemodiálisis / Nefrología',
+      interfaceMode: 'HEMODIALISIS',
+      planName: 'Plan Residencia Mensual',
+      monthlyPriceUsd: 49,
+      maxActiveUsers: 40,
+      planStatus: 'ACTIVE',
+      subscriptionEndsAt: en30Dias,
+      billingContactEmail: 'admin.hd@hospital.test',
+    },
+  })
+
   await prisma.user.createMany({
     data: [
       { email: 'superadmin@nexo.test', passwordHash, fullName: 'Propietario NEXO', role: 'SUPERADMIN' },
@@ -82,6 +99,9 @@ async function main() {
       // Usuarios demo para la interfaz de Medicina Interna
       { email: 'admin.mi@hospital.test', passwordHash, fullName: 'Admin Medicina Interna', role: 'ADMIN', residencyId: residenciaMedicinaInterna.id },
       { email: 'mi@hospital.test', passwordHash, fullName: 'Dr. Roberto Castillo (Med. Interna)', role: 'DOCTOR', residencyId: residenciaMedicinaInterna.id },
+      // Usuarios demo para la nueva residencia de Hemodiálisis Ambulatoria
+      { email: 'admin.hd@hospital.test', passwordHash, fullName: 'Admin Hemodiálisis', role: 'ADMIN', residencyId: residenciaHemodialisis.id },
+      { email: 'hd@hospital.test', passwordHash, fullName: 'Dra. Patricia Vargas (Hemodiálisis)', role: 'DOCTOR', residencyId: residenciaHemodialisis.id },
     ],
     skipDuplicates: true,
   })

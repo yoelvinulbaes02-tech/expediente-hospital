@@ -40,6 +40,7 @@ function parseInterfaceMode(raw: string): InterfaceMode {
   if (raw === 'ORTOPEDIA') return 'ORTOPEDIA'
   if (raw === 'EMERGENCIA') return 'EMERGENCIA'
   if (raw === 'HEMATOLOGIA') return 'HEMATOLOGIA'
+  if (raw === 'HEMODIALISIS') return 'HEMODIALISIS'
   return 'CONSULTAS'
 }
 
@@ -251,7 +252,7 @@ export async function actualizarResidencia(formData: FormData): Promise<void> {
     console.error('Error al actualizar residencia:', err)
     redirect(
       `${targetErrorUrl}?error=${encodeURIComponent(
-        'No se pudo guardar la configuración. Verifica que hayas ejecutado npx prisma db push en la base de datos activa para habilitar todas las interfaces (EMERGENCIA, HEMATOLOGIA, etc.).'
+        'No se pudo guardar la configuración. Verifica que hayas ejecutado npx prisma db push en la base de datos activa para habilitar todas las interfaces (EMERGENCIA, HEMATOLOGIA, HEMODIALISIS, etc.).'
       )}`
     )
   }

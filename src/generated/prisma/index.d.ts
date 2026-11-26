@@ -203,7 +203,8 @@ export const InterfaceMode: {
   CIRUGIA: 'CIRUGIA',
   ORTOPEDIA: 'ORTOPEDIA',
   EMERGENCIA: 'EMERGENCIA',
-  HEMATOLOGIA: 'HEMATOLOGIA'
+  HEMATOLOGIA: 'HEMATOLOGIA',
+  HEMODIALISIS: 'HEMODIALISIS'
 };
 
 export type InterfaceMode = (typeof InterfaceMode)[keyof typeof InterfaceMode]

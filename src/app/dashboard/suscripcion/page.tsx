@@ -135,7 +135,9 @@ export default async function SuscripcionPage({
                         ? 'Emergencia'
                         : interfaceModeStr === 'HEMATOLOGIA'
                           ? 'Hematología'
-                          : 'Hospitalización / Nefrología'}
+                          : interfaceModeStr === 'HEMODIALISIS'
+                            ? 'Unidad de Hemodiálisis'
+                            : 'Hospitalización / Nefrología'}
             </p>
           </div>
 

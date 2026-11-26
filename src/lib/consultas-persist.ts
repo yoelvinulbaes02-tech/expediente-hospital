@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
 import { ROLES_CLINICOS, ROLES_MEDICOS } from '@/lib/permisos'
 import {
+  TIPOS_CONSULTA_EXTERNA,
   type SeccionConsultaKey,
   puedeEditarNotasConsulta,
   tieneNotasClinicasEscritas,
@@ -151,10 +152,15 @@ export async function persistirConsultaClinica(payload: PayloadConsultaClinica):
       ? String(payload.visitType).trim() || 'Primera vez'
       : consulta.visitType
 
-  const consultationType =
+  const consultationTypeRaw =
     payload.consultationType !== undefined
-      ? String(payload.consultationType).trim() || 'Consulta general'
+      ? String(payload.consultationType).trim()
       : consulta.consultationType || 'Consulta general'
+  const consultationType = TIPOS_CONSULTA_EXTERNA.includes(
+    consultationTypeRaw as (typeof TIPOS_CONSULTA_EXTERNA)[number]
+  )
+    ? consultationTypeRaw
+    : consulta.consultationType || 'Consulta general'
 
   const bloodPressure =
     payload.bloodPressure !== undefined ? aTextoOpcional(payload.bloodPressure) : consulta.bloodPressure

@@ -35,8 +35,8 @@ const ENTIDADES: Record<string, string> = {
   hemodialysis_item: 'un registro de Hemodiálisis',
   consultation: 'una consulta externa',
   medical_history: 'antecedentes clínicos',
-  biopsy_record: 'una biopsia en consulta',
-  outpatient_hemodialysis: 'un expediente de hemodiálisis ambulatoria',
+  biopsy_record: 'una biopsia en Nefrología',
+  outpatient_hemodialysis: 'un expediente de Hemodiálisis',
   emergencia_guardia: 'el parte de guardia de Emergencia',
   emergency_profile: 'el perfil clínico de Emergencia',
   hematology_profile: 'el perfil clínico de Hematología',
@@ -250,19 +250,29 @@ export function describirRegistro(log: {
         ),
       }
 
-    case 'consultation:update':
+    case 'consultation:update': {
+      const cambioTipo =
+        lleno(o.consultationType) &&
+        lleno(n.consultationType) &&
+        o.consultationType !== n.consultationType
+          ? `Tipo de consulta: ${String(o.consultationType)} → ${String(n.consultationType)}`
+          : ''
       return {
         que:
           n.status === 'COMPLETADA' && o.status !== 'COMPLETADA'
             ? 'Finalizó y firmó la consulta externa'
-            : log.reason
-              ? log.reason
-              : 'Actualizó la ficha clínica de consulta externa',
+            : cambioTipo
+              ? 'Cambió el tipo / estatus de consulta externa'
+              : log.reason
+                ? log.reason
+                : 'Actualizó la ficha clínica de consulta externa',
         detalle: unir(
+          cambioTipo,
           lleno(n.diagnosis) && `Dx: ${cortar(String(n.diagnosis), 90)}`,
           lleno(n.chiefComplaint) && `Motivo: ${cortar(String(n.chiefComplaint), 90)}`
         ),
       }
+    }
 
     case 'medical_history:update':
       return {
@@ -272,11 +282,11 @@ export function describirRegistro(log: {
 
     case 'biopsy_record:create':
       return {
-        que: 'Agendó una biopsia en Consulta Externa',
+        que: 'Agendó una biopsia en Nefrología',
         detalle: unir(
           lleno(n.patientName) && String(n.patientName),
           lleno(n.scheduledDate) && `Cita: ${String(n.scheduledDate)}`,
-          lleno(n.senasaAuth) && `SENASA: ${String(n.senasaAuth)}`
+          lleno(n.senasaAuth) && `ARS: ${String(n.senasaAuth)}`
         ),
       }
 
@@ -287,7 +297,7 @@ export function describirRegistro(log: {
             ? 'Registró resultado de biopsia realizada'
             : n.status === 'agendada' && o.status === 'realizada'
               ? 'Reabrió biopsia a la agenda'
-              : 'Actualizó registro de biopsia en consulta',
+              : 'Actualizó registro de biopsia en Nefrología',
         detalle: log.reason
           ? log.reason
           : unir(
@@ -298,7 +308,7 @@ export function describirRegistro(log: {
 
     case 'outpatient_hemodialysis:create':
       return {
-        que: 'Creó expediente de Hemodiálisis en Consulta Externa',
+        que: 'Creó expediente en Unidad de Hemodiálisis',
         detalle: unir(
           lleno(n.patientName) && String(n.patientName),
           lleno(n.diagnosisAndTime) && cortar(String(n.diagnosisAndTime), 100)
@@ -309,10 +319,10 @@ export function describirRegistro(log: {
       return {
         que:
           n.isActive === false && o.isActive === true
-            ? 'Archivó expediente de Hemodiálisis en consulta'
+            ? 'Archivó expediente de Hemodiálisis'
             : n.isActive === true && o.isActive === false
-              ? 'Reactivó expediente de Hemodiálisis en consulta'
-              : 'Actualizó expediente de Hemodiálisis en consulta',
+              ? 'Reactivó expediente de Hemodiálisis'
+              : 'Actualizó expediente de Hemodiálisis',
         detalle: log.reason
           ? log.reason
           : lleno(n.patientName)

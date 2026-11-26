@@ -3,18 +3,21 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Microscope } from 'lucide-react'
 import { BannerAlergias } from '@/components/BannerAlergias'
 import { completarTareaDesdeDashboard, entregarLote } from '@/app/dashboard/actions-lote'
 import { TeamServicioCard } from '@/components/TeamServicioCard'
 import { CirugiaResumenPanel, type ResumenCirugiaStats } from '@/components/CirugiaResumenPanel'
 import { CurasPanel, type CuraPacienteItem } from '@/components/CurasPanel'
 import { HemodialisisPanel, type HemodialisisItemData } from '@/components/HemodialisisPanel'
+import { BiopsiasConsultaPanel } from '@/components/BiopsiasConsultaPanel'
 import { EmergenciaGuardiaPanel } from '@/components/EmergenciaGuardiaPanel'
 import { EmergenciaTablaPanel } from '@/components/EmergenciaTablaPanel'
 import { HematologiaResumenPanel } from '@/components/HematologiaResumenPanel'
 import { ESTADOS_CIRUGIA, type TeamServicioData } from '@/lib/cirugia-constants'
 import { ESTADOS_ORTOPEDIA } from '@/lib/ortopedia-constants'
 import type { EmergenciaGuardiaAutoStats, EmergenciaGuardiaData } from '@/lib/emergencia-constants'
+import type { BiopsyRecordItem } from '@/lib/consultas-auth'
 
 type TareaPendienteResumen = {
   id: string
@@ -166,13 +169,16 @@ export function ListaPacientes({
   emergenciaAutoStats,
   curas = [],
   hemodialisisItems = [],
+  biopsiasRecords = [],
+  pacientesCatalogo = [],
+  suscripcionBloqueada = false,
   ahoraIso = '',
 }: {
   episodes: Episodio[]
   userId: string
   miEmail: string
   doctores: Doctor[]
-  vistaInicial?: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis'
+  vistaInicial?: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis' | 'biopsias'
   puedeMarcarTareas?: boolean
   puedeEditarServicio?: boolean
   interfaceMode?:
@@ -191,6 +197,17 @@ export function ListaPacientes({
   emergenciaAutoStats?: EmergenciaGuardiaAutoStats
   curas?: CuraPacienteItem[]
   hemodialisisItems?: HemodialisisItemData[]
+  biopsiasRecords?: BiopsyRecordItem[]
+  pacientesCatalogo?: Array<{
+    id: string
+    firstName: string
+    lastName: string
+    expedienteNumber: string
+    age: number | null
+    sex: string
+    phone: string | null
+  }>
+  suscripcionBloqueada?: boolean
   ahoraIso?: string
 }) {
   const esMedicinaInterna = interfaceMode === 'MEDICINA_INTERNA'
@@ -201,10 +218,12 @@ export function ListaPacientes({
   const esHematologia = interfaceMode === 'HEMATOLOGIA'
   const esNefrologia = interfaceMode === 'HOSPITALIZACION'
   const router = useRouter()
-  const [areaGuardia, setAreaGuardia] = useState<'propio' | 'interconsulta' | 'curas' | 'hemodialisis'>(
+  const [areaGuardia, setAreaGuardia] = useState<
+    'propio' | 'interconsulta' | 'curas' | 'hemodialisis' | 'biopsias'
+  >(
     vistaInicial === 'curas' && !esCirugiaBase
       ? 'propio'
-      : vistaInicial === 'hemodialisis' && !esNefrologia
+      : (vistaInicial === 'hemodialisis' || vistaInicial === 'biopsias') && !esNefrologia
         ? 'propio'
         : vistaInicial
   )
@@ -222,8 +241,14 @@ export function ListaPacientes({
     () => hemodialisisItems.filter((i) => i.isActive).length,
     [hemodialisisItems]
   )
+  const biopsiasAgendadasCount = useMemo(
+    () => biopsiasRecords.filter((b) => b.status === 'agendada').length,
+    [biopsiasRecords]
+  )
 
-  const cambiarArea = (nuevaArea: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis') => {
+  const cambiarArea = (
+    nuevaArea: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis' | 'biopsias'
+  ) => {
     setAreaGuardia(nuevaArea)
     setSeleccionados([])
     if (typeof window !== 'undefined') {
@@ -234,6 +259,8 @@ export function ListaPacientes({
         url.searchParams.set('vista', 'curas')
       } else if (nuevaArea === 'hemodialisis') {
         url.searchParams.set('vista', 'hemodialisis')
+      } else if (nuevaArea === 'biopsias') {
+        url.searchParams.set('vista', 'biopsias')
       } else {
         url.searchParams.delete('vista')
       }
@@ -387,7 +414,11 @@ export function ListaPacientes({
         id="lista-pacientes"
         className="scroll-mt-20 flex flex-wrap items-center justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
       >
-        <div className={`grid gap-2 w-full sm:w-auto ${esCirugiaBase || esNefrologia ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        <div
+          className={`grid gap-2 w-full sm:w-auto ${
+            esNefrologia ? 'grid-cols-2 sm:grid-cols-4' : esCirugiaBase ? 'grid-cols-3' : 'grid-cols-2'
+          }`}
+        >
           <button
             type="button"
             onClick={() => cambiarArea('propio')}
@@ -451,6 +482,30 @@ export function ListaPacientes({
               </span>
             </button>
           )}
+
+          {esNefrologia && (
+            <button
+              type="button"
+              onClick={() => cambiarArea('biopsias')}
+              className={`py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                areaGuardia === 'biopsias'
+                  ? 'bg-teal-700 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              <Microscope className="w-4 h-4 shrink-0" />
+              <span>Biopsias</span>
+              <span
+                className={`px-2 py-0.5 rounded-md text-xs font-bold tabular-nums ${
+                  areaGuardia === 'biopsias'
+                    ? 'bg-teal-900 text-white'
+                    : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'
+                }`}
+              >
+                {biopsiasAgendadasCount}
+              </span>
+            </button>
+          )}
         </div>
 
         {esEmergencia ? (
@@ -470,7 +525,7 @@ export function ListaPacientes({
               </Link>
             )}
           </div>
-        ) : (
+        ) : areaGuardia !== 'biopsias' ? (
           <Link
             href={
               areaGuardia === 'interconsulta'
@@ -492,7 +547,7 @@ export function ListaPacientes({
                 ? 'Ingresar Interconsulta'
                 : 'Ingresar Paciente de Sala'}
           </Link>
-        )}
+        ) : null}
       </div>
 
       {/* PASE DE VISITA HEMATOLOGÍA */}
@@ -541,6 +596,13 @@ export function ListaPacientes({
           items={hemodialisisItems}
           puedeRegistrar={puedeMarcarTareas}
           ahoraIso={ahoraIso}
+        />
+      ) : esNefrologia && areaGuardia === 'biopsias' ? (
+        <BiopsiasConsultaPanel
+          records={biopsiasRecords}
+          pacientes={pacientesCatalogo}
+          puedeRegistrar={puedeMarcarTareas}
+          suscripcionBloqueada={suscripcionBloqueada}
         />
       ) : (
         <>

@@ -8,12 +8,12 @@ import {
   TIPOS_CONSULTA_EXTERNA,
   etiquetaRolClinico,
   normalizarTextoClinico,
-  type BiopsyRecordItem,
-  type OutpatientHemodialysisItem,
 } from '@/lib/consultas-auth'
-import { cambiarEstadoConsulta, crearConsulta } from '@/app/dashboard/consultas/actions'
-import { BiopsiasConsultaPanel } from '@/components/BiopsiasConsultaPanel'
-import { HemodialisisConsultaPanel } from '@/components/HemodialisisConsultaPanel'
+import {
+  cambiarEstadoConsulta,
+  cambiarTipoConsulta,
+  crearConsulta,
+} from '@/app/dashboard/consultas/actions'
 
 type ConsultaItem = {
   id: string
@@ -138,10 +138,7 @@ export function ConsultasDashboard({
   puedeRegistrar,
   suscripcionBloqueada,
   consultaRecienCerrada = false,
-  biopsias = [],
-  hemodialisis = [],
   historialActividad = [],
-  vistaInicial = 'consultas',
 }: {
   consultas: ConsultaItem[]
   pacientes: PacienteResumen[]
@@ -151,8 +148,6 @@ export function ConsultasDashboard({
   puedeRegistrar: boolean
   suscripcionBloqueada: boolean
   consultaRecienCerrada?: boolean
-  biopsias?: BiopsyRecordItem[]
-  hemodialisis?: OutpatientHemodialysisItem[]
   historialActividad?: Array<{
     id: string
     actorName: string
@@ -161,10 +156,8 @@ export function ConsultasDashboard({
     que: string
     detalle: string
   }>
-  vistaInicial?: 'consultas' | 'biopsias' | 'hemodialisis'
 }) {
   const router = useRouter()
-  const [areaTab, setAreaTab] = useState<'consultas' | 'biopsias' | 'hemodialisis'>(vistaInicial)
   const [busqueda, setBusqueda] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [patientMode, setPatientMode] = useState<'new' | 'existing'>('new')
@@ -179,28 +172,6 @@ export function ConsultasDashboard({
   const [abrirAlCrear, setAbrirAlCrear] = useState(true)
   const [enviando, setEnviando] = useState(false)
   const [actualizandoId, setActualizandoId] = useState<string | null>(null)
-
-  const cambiarAreaTab = (tab: 'consultas' | 'biopsias' | 'hemodialisis') => {
-    setAreaTab(tab)
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href)
-      if (tab === 'consultas') {
-        url.searchParams.delete('vista')
-      } else {
-        url.searchParams.set('vista', tab)
-      }
-      window.history.replaceState(null, '', url.pathname + url.search)
-    }
-  }
-
-  const biopsiasAgendadasCount = useMemo(
-    () => biopsias.filter((b) => b.status === 'agendada').length,
-    [biopsias]
-  )
-  const hemodialisisActivosCount = useMemo(
-    () => hemodialisis.filter((h) => h.isActive).length,
-    [hemodialisis]
-  )
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(
     consultaRecienCerrada
       ? {
@@ -350,7 +321,6 @@ export function ConsultasDashboard({
   const defaultFechaHora = new Date().toISOString().slice(0, 16)
 
   const abrirNuevaVisitaConCopia = (patientId: string, consultaOrigen: ConsultaItem) => {
-    setAreaTab('consultas')
     setPatientMode('existing')
     setSelectedExistingId(patientId)
     setSourceConsultationId(consultaOrigen.id)
@@ -370,6 +340,25 @@ export function ConsultasDashboard({
       if (!res.ok) {
         setMensaje({ tipo: 'error', texto: res.error ?? 'No se pudo cambiar el estado.' })
       } else {
+        router.refresh()
+      }
+    } finally {
+      setActualizandoId(null)
+    }
+  }
+
+  const handleCambiarTipo = async (id: string, nuevoTipo: string) => {
+    setActualizandoId(id)
+    setMensaje(null)
+    try {
+      const res = await cambiarTipoConsulta(id, nuevoTipo)
+      if (!res.ok) {
+        setMensaje({ tipo: 'error', texto: res.error ?? 'No se pudo cambiar el tipo de consulta.' })
+      } else {
+        setMensaje({
+          tipo: 'ok',
+          texto: `Tipo de consulta / estatus actualizado a "${nuevoTipo}".`,
+        })
         router.refresh()
       }
     } finally {
@@ -424,43 +413,7 @@ export function ConsultasDashboard({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl">
-            <button
-              type="button"
-              onClick={() => cambiarAreaTab('consultas')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
-                areaTab === 'consultas'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
-              }`}
-            >
-              Consultas ({consultasActivas.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => cambiarAreaTab('biopsias')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
-                areaTab === 'biopsias'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
-              }`}
-            >
-              Biopsias ({biopsiasAgendadasCount})
-            </button>
-            <button
-              type="button"
-              onClick={() => cambiarAreaTab('hemodialisis')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
-                areaTab === 'hemodialisis'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
-              }`}
-            >
-              Hemodiálisis ({hemodialisisActivosCount})
-            </button>
-          </div>
-
-          {areaTab === 'consultas' && puedeRegistrar && !suscripcionBloqueada && (
+          {puedeRegistrar && !suscripcionBloqueada && (
             <button
               type="button"
               onClick={() => {
@@ -476,23 +429,6 @@ export function ConsultasDashboard({
           )}
         </div>
       </div>
-
-      {areaTab === 'biopsias' ? (
-        <BiopsiasConsultaPanel
-          records={biopsias}
-          pacientes={catalogoPacientes}
-          puedeRegistrar={puedeRegistrar}
-          suscripcionBloqueada={suscripcionBloqueada}
-        />
-      ) : areaTab === 'hemodialisis' ? (
-        <HemodialisisConsultaPanel
-          records={hemodialisis}
-          pacientes={catalogoPacientes}
-          puedeRegistrar={puedeRegistrar}
-          suscripcionBloqueada={suscripcionBloqueada}
-        />
-      ) : (
-        <>
       {mensaje && (
         <div
           className={`px-4 py-3 rounded-lg border text-sm flex justify-between items-center gap-3 ${
@@ -1022,6 +958,27 @@ export function ConsultasDashboard({
               </div>
 
               <div className="flex flex-wrap items-center gap-2 shrink-0">
+                {puedeRegistrar && !suscripcionBloqueada && c.status !== 'CANCELADA' && (
+                  <select
+                    aria-label="Cambiar tipo de consulta o estatus"
+                    disabled={procesando}
+                    value={c.consultationType || 'Consulta general'}
+                    onChange={(e) => void handleCambiarTipo(c.id, e.target.value)}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-teal-300 dark:border-teal-700 bg-teal-50/70 dark:bg-teal-950/30 text-teal-900 dark:text-teal-200 cursor-pointer disabled:opacity-50"
+                  >
+                    {!TIPOS_CONSULTA_EXTERNA.includes(
+                      c.consultationType as (typeof TIPOS_CONSULTA_EXTERNA)[number]
+                    ) && (
+                      <option value={c.consultationType}>{c.consultationType}</option>
+                    )}
+                    {TIPOS_CONSULTA_EXTERNA.map((tipo) => (
+                      <option key={tipo} value={tipo}>
+                        {tipo}
+                      </option>
+                    ))}
+                  </select>
+                )}
+
                 {puedeRegistrar && !suscripcionBloqueada && c.status === 'PROGRAMADA' && (
                   <button
                     type="button"
@@ -1226,6 +1183,26 @@ export function ConsultasDashboard({
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            {puedeRegistrar && !suscripcionBloqueada && c.status !== 'CANCELADA' && (
+                              <select
+                                aria-label="Cambiar tipo de consulta o estatus"
+                                disabled={actualizandoId === c.id}
+                                value={c.consultationType || 'Consulta general'}
+                                onChange={(e) => void handleCambiarTipo(c.id, e.target.value)}
+                                className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-teal-300 dark:border-teal-700 bg-teal-50/70 dark:bg-teal-950/30 text-teal-900 dark:text-teal-200 cursor-pointer disabled:opacity-50"
+                              >
+                                {!TIPOS_CONSULTA_EXTERNA.includes(
+                                  c.consultationType as (typeof TIPOS_CONSULTA_EXTERNA)[number]
+                                ) && (
+                                  <option value={c.consultationType}>{c.consultationType}</option>
+                                )}
+                                {TIPOS_CONSULTA_EXTERNA.map((tipo) => (
+                                  <option key={tipo} value={tipo}>
+                                    {tipo}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
                             <Link
                               href={`/dashboard/consultas/${c.id}`}
                               className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white dark:bg-slate-700 dark:hover:bg-slate-600 whitespace-nowrap"
@@ -1254,8 +1231,6 @@ export function ConsultasDashboard({
           )}
         </div>
       </details>
-        </>
-      )}
 
       {historialActividad.length > 0 && (
         <details className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
@@ -1264,7 +1239,7 @@ export function ConsultasDashboard({
               <ChevronDown className="w-4 h-4 text-slate-500 transition-transform group-open:rotate-0 -rotate-90 shrink-0" />
               <History className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
               <span>
-                Historial reciente de modificaciones · Consultas, Biopsias y Hemodiálisis ({historialActividad.length})
+                Historial reciente de modificaciones · Consultas Externas ({historialActividad.length})
               </span>
             </span>
             <span className="text-[11px] text-slate-500 dark:text-slate-400 group-open:hidden">

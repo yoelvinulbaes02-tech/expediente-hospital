@@ -13,6 +13,7 @@ import {
   etiquetaRolClinico,
 } from '@/lib/consultas-auth'
 import {
+  cambiarTipoConsulta,
   guardarConsultaClinica,
   iniciarNuevaAtencionConsulta,
 } from '@/app/dashboard/consultas/actions'
@@ -186,6 +187,7 @@ function AcapiteClinico({
 export function FormularioConsultaClinica({
   consulta,
   puedeEditar,
+  puedeCambiarTipo = false,
   puedeCrearNuevaAtencion = false,
   autorNotas,
   bloqueadoPorAutoria = false,
@@ -195,6 +197,7 @@ export function FormularioConsultaClinica({
 }: {
   consulta: ConsultaEditable
   puedeEditar: boolean
+  puedeCambiarTipo?: boolean
   puedeCrearNuevaAtencion?: boolean
   autorNotas?: string | null
   bloqueadoPorAutoria?: boolean
@@ -241,6 +244,7 @@ export function FormularioConsultaClinica({
   const [ultimaHoraGuardado, setUltimaHoraGuardado] = useState<string | null>(null)
   const [finalizando, setFinalizando] = useState(false)
   const [creandoNueva, setCreandoNueva] = useState(false)
+  const [cambiandoTipo, setCambiandoTipo] = useState(false)
   const [feedback, setFeedback] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
 
   const visitasPrevias = [...historialVisitas]
@@ -487,6 +491,43 @@ export function FormularioConsultaClinica({
     }
   }
 
+  const handleCambiarTipoRapido = async (nuevoTipo: string) => {
+    if (camposActualesEditables) {
+      actualizarCampo('consultationType', nuevoTipo)
+      return
+    }
+    if (!puedeCambiarTipo) return
+    setCambiandoTipo(true)
+    setFeedback(null)
+    try {
+      const res = await cambiarTipoConsulta(consulta.id, nuevoTipo)
+      if (!res.ok) {
+        setFeedback({ tipo: 'error', texto: res.error ?? 'No se pudo cambiar el tipo de consulta.' })
+        return
+      }
+      setForm((prev) => {
+        const next = { ...prev, consultationType: nuevoTipo }
+        formRef.current = next
+        return next
+      })
+      setMetaSecciones((prev) => ({
+        ...prev,
+        motivo: {
+          byName: usuarioActual.fullName,
+          byRole: usuarioActual.role,
+          atIso: new Date().toISOString(),
+        },
+      }))
+      setFeedback({
+        tipo: 'ok',
+        texto: `Tipo de consulta / estatus actualizado a "${nuevoTipo}".`,
+      })
+      router.refresh()
+    } finally {
+      setCambiandoTipo(false)
+    }
+  }
+
   const renderTextoLectura = (texto: string, vacio: string, bold = false) =>
     texto.trim() ? (
       <p
@@ -598,6 +639,42 @@ export function FormularioConsultaClinica({
               </span>
             )}
           </div>
+        </div>
+
+        {/* CAMBIO RÁPIDO DE TIPO DE CONSULTA / ESTATUS (EJ. PRE-DIÁLISIS -> HEMODIÁLISIS) */}
+        <div className="rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 print:hidden">
+          <div>
+            <p className="text-xs font-bold text-teal-900 dark:text-teal-200">
+              Tipo de consulta / Estatus del paciente
+            </p>
+            <p className="text-[11px] text-slate-600 dark:text-slate-300">
+              Modificable en cualquier momento de la evolución (ej. de Pre-diálisis a Hemodiálisis).
+            </p>
+          </div>
+          {camposActualesEditables || puedeCambiarTipo ? (
+            <select
+              aria-label="Tipo de consulta o estatus del paciente"
+              disabled={cambiandoTipo}
+              value={form.consultationType}
+              onChange={(e) => void handleCambiarTipoRapido(e.target.value)}
+              className="px-3 py-1.5 border border-teal-300 dark:border-teal-700 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 text-teal-900 dark:text-teal-200 cursor-pointer disabled:opacity-50"
+            >
+              {!TIPOS_CONSULTA_EXTERNA.includes(
+                form.consultationType as (typeof TIPOS_CONSULTA_EXTERNA)[number]
+              ) && (
+                <option value={form.consultationType}>{form.consultationType}</option>
+              )}
+              {TIPOS_CONSULTA_EXTERNA.map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {tipo}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span className="px-2.5 py-1 rounded-md bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-800 text-xs font-bold text-teal-800 dark:text-teal-300">
+              {form.consultationType || 'Consulta general'}
+            </span>
+          )}
         </div>
 
         {bloqueadoPorAutoria && (

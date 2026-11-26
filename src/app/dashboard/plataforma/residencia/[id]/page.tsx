@@ -51,9 +51,14 @@ const INTERFACES_DISPONIBLES = [
     descripcion: 'Sala de hematología, pase de visita con diagnósticos, vigilancia clínica, hemocomponentes y estudios pendientes.',
   },
   {
+    id: 'HEMODIALISIS',
+    nombre: 'Unidad de Hemodiálisis Ambulatoria',
+    descripcion: 'Expediente exclusivo de pacientes en hemodiálisis crónica: antecedentes, virales, labs, accesos vasculares e historial.',
+  },
+  {
     id: 'CONSULTAS',
     nombre: 'Consultas Externas',
-    descripcion: 'Agenda ambulatoria, citas médicas, tipo de consulta, biopsias y hemodiálisis ambulatoria.',
+    descripcion: 'Agenda ambulatoria, citas médicas, tipo de consulta y seguimiento clínico.',
   },
 ] as const
 
@@ -247,7 +252,7 @@ export default async function ControlResidenciaSuperAdminPage({
               Interfaz Clínica y Tarifas Base de {residency.name}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Interfaces clínicas disponibles actualmente en NEXO: 7 módulos completos. Selecciona cuál usa esta residencia.
+              Interfaces clínicas disponibles actualmente en NEXO: 8 módulos completos. Selecciona cuál usa esta residencia.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mt-3">
               {INTERFACES_DISPONIBLES.map((iface) => {
@@ -312,6 +317,7 @@ export default async function ControlResidenciaSuperAdminPage({
                 <option value="ORTOPEDIA">Ortopedia y Traumatología</option>
                 <option value="EMERGENCIA">Emergencia</option>
                 <option value="HEMATOLOGIA">Hematología</option>
+                <option value="HEMODIALISIS">Unidad de Hemodiálisis Ambulatoria</option>
                 <option value="CONSULTAS">Consultas Externas</option>
               </select>
             </div>

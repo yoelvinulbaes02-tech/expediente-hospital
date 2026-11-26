@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { ListaPacientes } from '@/components/ListaPacientes'
 import { ConsultasDashboard } from '@/components/ConsultasDashboard'
+import { HemodialisisConsultaPanel } from '@/components/HemodialisisConsultaPanel'
+import { ChevronDown, History } from 'lucide-react'
 import { ROLES_CLINICOS } from '@/lib/permisos'
 import { obtenerContextoResidencia } from '@/lib/tenant'
 import { registrarCierreSesionNonce } from '@/lib/session-control'
@@ -26,9 +28,10 @@ import {
   type EmergenciaGuardiaData,
 } from '@/lib/emergencia-constants'
 import { describirRegistro } from '@/lib/auditoria-texto'
-import type {
-  BiopsyRecordItem,
-  OutpatientHemodialysisItem,
+import {
+  etiquetaRolClinico,
+  type BiopsyRecordItem,
+  type OutpatientHemodialysisItem,
 } from '@/lib/consultas-auth'
 import { LegalFooter } from '@/components/LegalFooter'
 import Image from 'next/image'
@@ -65,6 +68,7 @@ export default async function DashboardPage({
   const { doc, vista, cerrada } = await searchParams
   const filtroDoc = doc || ''
   const esModoConsultas = ctx.interfaceMode === 'CONSULTAS'
+  const esModoHemodialisis = ctx.interfaceMode === 'HEMODIALISIS'
   const esModoMedicinaInterna = ctx.interfaceMode === 'MEDICINA_INTERNA'
   const esModoCirugia = ctx.interfaceMode === 'CIRUGIA'
   const esModoOrtopedia = ctx.interfaceMode === 'ORTOPEDIA'
@@ -73,27 +77,23 @@ export default async function DashboardPage({
   const esModoQuirurgicoBase = esModoCirugia || esModoOrtopedia
   const esModoNefrologia =
     !esModoConsultas &&
+    !esModoHemodialisis &&
     !esModoMedicinaInterna &&
     !esModoQuirurgicoBase &&
     !esModoEmergencia &&
     !esModoHematologia
   const requiereTeamServicio = esModoMedicinaInterna || esModoQuirurgicoBase
 
-  const vistaInicial: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis' =
+  const vistaInicial: 'propio' | 'interconsulta' | 'curas' | 'hemodialisis' | 'biopsias' =
     vista === 'curas' && esModoQuirurgicoBase
       ? 'curas'
       : vista === 'hemodialisis' && esModoNefrologia
         ? 'hemodialisis'
-        : vista === 'interconsulta'
-          ? 'interconsulta'
-          : 'propio'
-
-  const vistaConsultaInicial: 'consultas' | 'biopsias' | 'hemodialisis' =
-    vista === 'biopsias'
-      ? 'biopsias'
-      : vista === 'hemodialisis'
-        ? 'hemodialisis'
-        : 'consultas'
+        : vista === 'biopsias' && esModoNefrologia
+          ? 'biopsias'
+          : vista === 'interconsulta'
+            ? 'interconsulta'
+            : 'propio'
 
   const userId = ctx.user.id
   const userRole = String(ctx.user.role)
@@ -106,7 +106,7 @@ export default async function DashboardPage({
   const puedeEditarServicio = (ROLES_CLINICOS.includes(userRole) || esAdmin) && !suscripcionBloqueada
 
   const [episodesBase, doctores, turnosPendientes, consultas, pacientesClinica] = await Promise.all([
-    esModoConsultas
+    esModoConsultas || esModoHemodialisis
       ? Promise.resolve([])
       : prisma.episode.findMany({
           where: {
@@ -133,13 +133,13 @@ export default async function DashboardPage({
         residencyId: residency.id,
         isActive: true,
         role: { in: ['DOCTOR', 'RESIDENT'] },
-        ...(esModoConsultas ? {} : { id: { not: userId } }),
+        ...(esModoConsultas || esModoHemodialisis ? {} : { id: { not: userId } }),
       },
       select: { id: true, fullName: true, email: true },
       orderBy: { fullName: 'asc' },
     }),
 
-    esModoConsultas
+    esModoConsultas || esModoHemodialisis
       ? Promise.resolve(0)
       : prisma.handoff.count({
           where: {
@@ -174,7 +174,7 @@ export default async function DashboardPage({
         })
       : Promise.resolve([]),
 
-    esModoConsultas
+    esModoConsultas || esModoNefrologia || esModoHemodialisis
       ? prisma.patient.findMany({
           where: { residencyId: residency.id },
           select: {
@@ -477,24 +477,14 @@ export default async function DashboardPage({
   }
 
   let biopsiasSerializadas: BiopsyRecordItem[] = []
-  let hdOutpatientSerializados: OutpatientHemodialysisItem[] = []
-  if (esModoConsultas) {
-    const [biopsiasDb, hdOutpatientDb] = await Promise.all([
-      prisma.biopsyRecord
-        .findMany({
-          where: { residencyId: residency.id },
-          orderBy: [{ status: 'asc' }, { scheduledDate: 'asc' }, { createdAt: 'desc' }],
-          take: 500,
-        })
-        .catch(() => []),
-      prisma.outpatientHemodialysis
-        .findMany({
-          where: { residencyId: residency.id },
-          orderBy: [{ isActive: 'desc' }, { updatedAt: 'desc' }, { createdAt: 'desc' }],
-          take: 500,
-        })
-        .catch(() => []),
-    ])
+  if (esModoNefrologia) {
+    const biopsiasDb = await prisma.biopsyRecord
+      .findMany({
+        where: { residencyId: residency.id },
+        orderBy: [{ status: 'asc' }, { scheduledDate: 'asc' }, { createdAt: 'desc' }],
+        take: 500,
+      })
+      .catch(() => [])
 
     biopsiasSerializadas = biopsiasDb.map((b) => ({
       id: b.id,
@@ -511,12 +501,7 @@ export default async function DashboardPage({
       performedDate: b.performedDate,
       complications: b.complications,
       report: b.report,
-      highlightTag:
-        b.highlightTag === 'programada' ||
-        b.highlightTag === 'alerta' ||
-        b.highlightTag === 'completada'
-          ? b.highlightTag
-          : 'normal',
+      highlightTag: 'normal',
       createdByName: b.createdByName,
       createdByRole: b.createdByRole,
       createdAt: b.createdAt.toISOString(),
@@ -527,6 +512,42 @@ export default async function DashboardPage({
       performedByRole: b.performedByRole,
       performedAt: b.performedAt ? b.performedAt.toISOString() : null,
     }))
+  }
+
+  type ActividadAuditItem = {
+    id: string
+    actorName: string
+    actorRole: string
+    atIso: string
+    que: string
+    detalle: string
+  }
+
+  let hdOutpatientSerializados: OutpatientHemodialysisItem[] = []
+  let historialActividadHemodialisis: ActividadAuditItem[] = []
+  if (esModoHemodialisis) {
+    const [hdOutpatientDb, auditHdDb] = await Promise.all([
+      prisma.outpatientHemodialysis
+        .findMany({
+          where: { residencyId: residency.id },
+          orderBy: [{ isActive: 'desc' }, { updatedAt: 'desc' }, { createdAt: 'desc' }],
+          take: 500,
+        })
+        .catch(() => []),
+      prisma.auditLog
+        .findMany({
+          where: {
+            entity: { in: ['outpatient_hemodialysis', 'patient'] },
+            actor: { residencyId: residency.id },
+          },
+          orderBy: { seq: 'desc' },
+          take: 40,
+          include: {
+            actor: { select: { fullName: true, email: true, role: true } },
+          },
+        })
+        .catch(() => []),
+    ])
 
     hdOutpatientSerializados = hdOutpatientDb.map((h) => ({
       id: h.id,
@@ -581,15 +602,18 @@ export default async function DashboardPage({
       updatedByRole: h.updatedByRole,
       updatedAt: h.updatedAt ? h.updatedAt.toISOString() : null,
     }))
-  }
 
-  type ActividadAuditItem = {
-    id: string
-    actorName: string
-    actorRole: string
-    atIso: string
-    que: string
-    detalle: string
+    historialActividadHemodialisis = auditHdDb.map((log) => {
+      const desc = describirRegistro(log)
+      return {
+        id: String(log.id),
+        actorName: log.actor.fullName || log.actor.email,
+        actorRole: String(log.actorRole || log.actor.role),
+        atIso: log.serverTs.toISOString(),
+        que: desc.que,
+        detalle: desc.detalle,
+      }
+    })
   }
 
   let historialActividadConsultas: ActividadAuditItem[] = []
@@ -603,7 +627,7 @@ export default async function DashboardPage({
         .findMany({
           where: {
             entity: {
-              in: ['consultation', 'biopsy_record', 'outpatient_hemodialysis', 'medical_history', 'patient'],
+              in: ['consultation', 'medical_history', 'patient'],
             },
             actor: { residencyId: residency.id },
           },
@@ -1062,7 +1086,7 @@ export default async function DashboardPage({
         </Link>
 
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
-          {!esModoConsultas && (
+          {!esModoConsultas && !esModoHemodialisis && (
             <Link
               href="/dashboard/turnos-pendientes"
               aria-label="Turnos pendientes"
@@ -1099,7 +1123,7 @@ export default async function DashboardPage({
               </>
             )}
 
-            {!esModoConsultas && (
+            {!esModoConsultas && !esModoHemodialisis && (
               <Link
                 href="/dashboard/turnos-pendientes"
                 className="relative bg-amber-500 text-white px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors shadow-sm"
@@ -1214,11 +1238,70 @@ export default async function DashboardPage({
             puedeRegistrar={puedeRegistrar}
             suscripcionBloqueada={suscripcionBloqueada}
             consultaRecienCerrada={cerrada === '1'}
-            biopsias={biopsiasSerializadas}
-            hemodialisis={hdOutpatientSerializados}
             historialActividad={historialActividadConsultas}
-            vistaInicial={vistaConsultaInicial}
           />
+        ) : esModoHemodialisis ? (
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+              <p className="text-xs font-semibold text-cyan-700 dark:text-cyan-400">
+                Unidad de Hemodiálisis · {residency.specialty}
+              </p>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                {residency.name}
+              </h2>
+            </div>
+
+            <HemodialisisConsultaPanel
+              records={hdOutpatientSerializados}
+              pacientes={pacientesClinica}
+              puedeRegistrar={puedeRegistrar}
+              suscripcionBloqueada={suscripcionBloqueada}
+            />
+
+            {historialActividadHemodialisis.length > 0 && (
+              <details className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+                <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2 hover:bg-slate-50/70 dark:hover:bg-slate-700/30 [&::-webkit-details-marker]:hidden">
+                  <span className="inline-flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-100">
+                    <ChevronDown className="w-4 h-4 text-slate-500 transition-transform group-open:rotate-0 -rotate-90 shrink-0" />
+                    <History className="w-4 h-4 text-cyan-700 dark:text-cyan-400 shrink-0" />
+                    <span>
+                      Historial reciente de modificaciones · Unidad de Hemodiálisis (
+                      {historialActividadHemodialisis.length})
+                    </span>
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 group-open:hidden">
+                    Ver registro
+                  </span>
+                </summary>
+                <div className="border-t border-slate-200 dark:border-slate-700 max-h-72 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                  {historialActividadHemodialisis.map((item) => (
+                    <div key={item.id} className="px-4 py-2.5 text-xs space-y-0.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-slate-600 dark:text-slate-300 tabular-nums">
+                        <span>
+                          <strong className="text-slate-900 dark:text-white">{item.actorName}</strong> (
+                          {etiquetaRolClinico(item.actorRole)})
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {new Date(item.atIso).toLocaleString('es-DO', {
+                            timeZone: 'America/Santo_Domingo',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+                      <p className="font-semibold text-slate-800 dark:text-slate-100">{item.que}</p>
+                      {item.detalle && (
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300">{item.detalle}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+          </div>
         ) : (
           <ListaPacientes
             key={vistaInicial}
@@ -1229,6 +1312,7 @@ export default async function DashboardPage({
             vistaInicial={vistaInicial}
             puedeMarcarTareas={puedeRegistrar}
             puedeEditarServicio={puedeEditarServicio}
+            suscripcionBloqueada={suscripcionBloqueada}
             interfaceMode={
               esModoEmergencia
                 ? 'EMERGENCIA'
@@ -1251,6 +1335,8 @@ export default async function DashboardPage({
             emergenciaAutoStats={emergenciaAutoStats}
             curas={curasSerializadas}
             hemodialisisItems={hemodialisisSerializados}
+            biopsiasRecords={biopsiasSerializadas}
+            pacientesCatalogo={pacientesClinica}
             ahoraIso={ahoraIso}
           />
         )}

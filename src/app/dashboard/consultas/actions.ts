@@ -4,6 +4,10 @@ import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
 import { ROLES_CLINICOS, ROLES_MEDICOS } from '@/lib/permisos'
 import {
+  AGUJA_BIOPSIA,
+  ARS_BIOPSIA,
+  KIT_BIOPSIA,
+  TIPOS_CONSULTA_EXTERNA,
   normalizarNombreCompleto,
   puedeEditarNotasConsulta,
   type SeccionConsultaKey,
@@ -81,8 +85,12 @@ export async function crearConsulta(formData: FormData): Promise<{
 
     const patientMode = String(formData.get('patientMode') ?? 'new')
     const visitType = String(formData.get('visitType') ?? 'Primera vez').trim() || 'Primera vez'
-    const consultationType =
-      String(formData.get('consultationType') ?? 'Consulta general').trim() || 'Consulta general'
+    const consultationTypeRaw = String(formData.get('consultationType') ?? 'Consulta general').trim()
+    const consultationType = TIPOS_CONSULTA_EXTERNA.includes(
+      consultationTypeRaw as (typeof TIPOS_CONSULTA_EXTERNA)[number]
+    )
+      ? consultationTypeRaw
+      : 'Consulta general'
     const chiefComplaintInput = String(formData.get('chiefComplaint') ?? '').trim()
     const consultationDateStr = String(formData.get('consultationDate') ?? '').trim()
     const doctorIdInput = String(formData.get('doctorId') ?? '').trim()
@@ -406,6 +414,67 @@ export async function cambiarEstadoConsulta(
     return { ok: true }
   } catch (e: unknown) {
     return { ok: false, error: (e as Error)?.message || 'Error actualizando el estado.' }
+  }
+}
+
+export async function cambiarTipoConsulta(
+  consultationId: string,
+  nuevoTipo: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const tipoLimpio = String(nuevoTipo ?? '').trim()
+    if (
+      !TIPOS_CONSULTA_EXTERNA.includes(
+        tipoLimpio as (typeof TIPOS_CONSULTA_EXTERNA)[number]
+      )
+    ) {
+      return { ok: false, error: 'Tipo de consulta no válido.' }
+    }
+
+    const { ctx, consulta } = await exigirAccesoConsulta(consultationId)
+    if (!consulta) return { ok: false, error: 'Consulta no encontrada.' }
+    if (!ctx.esSuperAdmin && ctx.interfaceMode !== 'CONSULTAS') {
+      return { ok: false, error: 'Esta acción solo está disponible en Consulta Externa.' }
+    }
+    if (consulta.status === 'CANCELADA') {
+      return { ok: false, error: 'No se puede cambiar el estatus de una consulta cancelada.' }
+    }
+
+    const tipoAnterior = consulta.consultationType || 'Consulta general'
+    if (tipoAnterior === tipoLimpio) {
+      return { ok: true }
+    }
+
+    await prisma.consultation.update({
+      where: { id: consultationId },
+      data: {
+        consultationType: tipoLimpio,
+        updatedBy: ctx.user.email,
+      },
+    })
+
+    await logAudit({
+      actorId: ctx.user.id,
+      actorRole: String(ctx.user.role),
+      action: 'update',
+      entity: 'consultation',
+      entityId: consultationId,
+      patientId: consulta.patientId,
+      oldValue: { consultationType: tipoAnterior },
+      newValue: {
+        consultationType: tipoLimpio,
+        changedSections: ['motivo'],
+        authorName: ctx.user.fullName,
+        authorRole: String(ctx.user.role),
+      },
+      reason: `Tipo de consulta / estatus actualizado: ${tipoAnterior} → ${tipoLimpio}`,
+    })
+
+    revalidatePath('/dashboard')
+    revalidatePath(`/dashboard/consultas/${consultationId}`)
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: (e as Error)?.message || 'No se pudo cambiar el tipo de consulta.' }
   }
 }
 
@@ -850,13 +919,27 @@ export async function iniciarNuevaAtencionConsulta(
   }
 }
 
-// ─── APARTADO DE BIOPSIAS (AGENDA Y RESULTADOS) EN CONSULTA EXTERNA ───
+// ─── APARTADO DE BIOPSIAS (AGENDA Y RESULTADOS) EN NEFROLOGÍA ───
+function componerAnaliticasBiopsia(formData: FormData): string {
+  const estado = String(formData.get('labsStatus') ?? '').trim()
+  const detalle = String(formData.get('labsPendingDetail') ?? '').trim()
+  if (estado === 'Completo') return 'Completo'
+  if (estado === 'Pendiente') {
+    return detalle ? `Pendiente: ${detalle}` : 'Pendiente'
+  }
+  if (detalle) return `Pendiente: ${detalle}`
+  return estado || 'Pendiente'
+}
+
 export async function crearBiopsiaConsulta(formData: FormData): Promise<{
   ok: boolean
   error?: string
 }> {
   try {
     const { ctx } = await exigirAccesoConsulta()
+    if (!ctx.esSuperAdmin && ctx.interfaceMode !== 'HOSPITALIZACION') {
+      return { ok: false, error: 'El módulo de Biopsias corresponde únicamente a Nefrología.' }
+    }
     const residencyId = ctx.residency!.id
 
     const patientIdRaw = String(formData.get('patientId') ?? '').trim()
@@ -875,16 +958,21 @@ export async function crearBiopsiaConsulta(formData: FormData): Promise<{
     }
 
     const phone = String(formData.get('phone') ?? '').trim() || null
-    const labsStatus = String(formData.get('labsStatus') ?? '').trim() || 'Pendiente'
-    const needleStatus = String(formData.get('needleStatus') ?? '').trim() || 'Utilizar la del centro'
-    const kitStatus = String(formData.get('kitStatus') ?? '').trim() || 'Pendiente'
+    const labsStatus = componerAnaliticasBiopsia(formData)
+    const needleRaw = String(formData.get('needleStatus') ?? 'Utilizar la del centro').trim()
+    const needleStatus = AGUJA_BIOPSIA.includes(needleRaw as (typeof AGUJA_BIOPSIA)[number])
+      ? needleRaw
+      : 'Utilizar la del centro'
+    const kitRaw = String(formData.get('kitStatus') ?? 'Pendiente').trim()
+    const kitStatus = KIT_BIOPSIA.includes(kitRaw as (typeof KIT_BIOPSIA)[number])
+      ? kitRaw
+      : 'Pendiente'
     const scheduledDate = String(formData.get('scheduledDate') ?? '').trim() || 'Pendiente'
-    const senasaAuth = String(formData.get('senasaAuth') ?? '').trim() || 'Pendiente'
+    const arsRaw = String(formData.get('senasaAuth') ?? 'Pendiente').trim()
+    const senasaAuth = ARS_BIOPSIA.includes(arsRaw as (typeof ARS_BIOPSIA)[number])
+      ? arsRaw
+      : 'Pendiente'
     const note = String(formData.get('note') ?? '').trim() || null
-    const highlightTagRaw = String(formData.get('highlightTag') ?? 'normal').trim()
-    const highlightTag = ['normal', 'programada', 'alerta', 'completada'].includes(highlightTagRaw)
-      ? highlightTagRaw
-      : 'normal'
 
     const actorName = ctx.user.fullName || ctx.user.email
     const actorRole = String(ctx.user.role)
@@ -902,7 +990,7 @@ export async function crearBiopsiaConsulta(formData: FormData): Promise<{
         scheduledDate,
         senasaAuth,
         note,
-        highlightTag,
+        highlightTag: 'normal',
         createdBy: ctx.user.email,
         createdByName: actorName,
         createdByRole: actorRole,
@@ -925,9 +1013,8 @@ export async function crearBiopsiaConsulta(formData: FormData): Promise<{
         scheduledDate,
         senasaAuth,
         note,
-        highlightTag,
       },
-      reason: `Paciente agendado en Biopsias: ${patientName}`,
+      reason: `Paciente agendado en Biopsias (Nefrología): ${patientName}`,
     })
 
     revalidatePath('/dashboard')
@@ -943,6 +1030,9 @@ export async function actualizarBiopsiaConsulta(formData: FormData): Promise<{
 }> {
   try {
     const { ctx } = await exigirAccesoConsulta()
+    if (!ctx.esSuperAdmin && ctx.interfaceMode !== 'HOSPITALIZACION') {
+      return { ok: false, error: 'El módulo de Biopsias corresponde únicamente a Nefrología.' }
+    }
     const residencyId = ctx.residency!.id
     const id = String(formData.get('id') ?? '').trim()
     if (!id) return { ok: false, error: 'Registro no especificado.' }
@@ -958,19 +1048,42 @@ export async function actualizarBiopsiaConsulta(formData: FormData): Promise<{
     }
 
     const phone = String(formData.get('phone') ?? '').trim() || null
-    const labsStatus = String(formData.get('labsStatus') ?? '').trim() || null
-    const needleStatus = String(formData.get('needleStatus') ?? '').trim() || null
-    const kitStatus = String(formData.get('kitStatus') ?? '').trim() || null
-    const scheduledDate = String(formData.get('scheduledDate') ?? '').trim() || null
-    const senasaAuth = String(formData.get('senasaAuth') ?? '').trim() || null
-    const note = String(formData.get('note') ?? '').trim() || null
+    const labsStatus =
+      previo.status === 'agendada' ? componerAnaliticasBiopsia(formData) : previo.labsStatus
+    const needleRaw = String(formData.get('needleStatus') ?? '').trim()
+    const needleStatus =
+      previo.status === 'agendada'
+        ? AGUJA_BIOPSIA.includes(needleRaw as (typeof AGUJA_BIOPSIA)[number]) ||
+          needleRaw === (previo.needleStatus ?? '')
+          ? needleRaw || previo.needleStatus
+          : 'Utilizar la del centro'
+        : previo.needleStatus
+    const kitRaw = String(formData.get('kitStatus') ?? '').trim()
+    const kitStatus =
+      previo.status === 'agendada'
+        ? KIT_BIOPSIA.includes(kitRaw as (typeof KIT_BIOPSIA)[number])
+          ? kitRaw
+          : previo.kitStatus
+        : previo.kitStatus
+    const scheduledDate =
+      previo.status === 'agendada'
+        ? String(formData.get('scheduledDate') ?? '').trim() || null
+        : previo.scheduledDate
+    const arsRaw = String(formData.get('senasaAuth') ?? '').trim()
+    const senasaAuth =
+      previo.status === 'agendada'
+        ? ARS_BIOPSIA.includes(arsRaw as (typeof ARS_BIOPSIA)[number]) ||
+          arsRaw === (previo.senasaAuth ?? '')
+          ? arsRaw || previo.senasaAuth
+          : 'Pendiente'
+        : previo.senasaAuth
+    const note =
+      previo.status === 'agendada'
+        ? String(formData.get('note') ?? '').trim() || null
+        : previo.note
     const performedDate = String(formData.get('performedDate') ?? '').trim() || null
     const complications = String(formData.get('complications') ?? '').trim() || null
     const report = String(formData.get('report') ?? '').trim() || null
-    const highlightTagRaw = String(formData.get('highlightTag') ?? previo.highlightTag).trim()
-    const highlightTag = ['normal', 'programada', 'alerta', 'completada'].includes(highlightTagRaw)
-      ? highlightTagRaw
-      : previo.highlightTag
 
     const actorName = ctx.user.fullName || ctx.user.email
     const actorRole = String(ctx.user.role)
@@ -989,7 +1102,7 @@ export async function actualizarBiopsiaConsulta(formData: FormData): Promise<{
         performedDate: previo.status === 'realizada' ? performedDate : previo.performedDate,
         complications: previo.status === 'realizada' ? complications : previo.complications,
         report: previo.status === 'realizada' ? report : previo.report,
-        highlightTag,
+        highlightTag: previo.status === 'realizada' ? 'completada' : 'normal',
         updatedBy: ctx.user.email,
         updatedByName: actorName,
         updatedByRole: actorRole,
@@ -1029,7 +1142,6 @@ export async function actualizarBiopsiaConsulta(formData: FormData): Promise<{
         performedDate,
         complications,
         report,
-        highlightTag,
       },
       reason: `Biopsia actualizada (${patientName})`,
     })
@@ -1047,6 +1159,9 @@ export async function marcarBiopsiaRealizada(formData: FormData): Promise<{
 }> {
   try {
     const { ctx } = await exigirAccesoConsulta()
+    if (!ctx.esSuperAdmin && ctx.interfaceMode !== 'HOSPITALIZACION') {
+      return { ok: false, error: 'El módulo de Biopsias corresponde únicamente a Nefrología.' }
+    }
     const residencyId = ctx.residency!.id
     const id = String(formData.get('id') ?? '').trim()
     if (!id) return { ok: false, error: 'Registro no especificado.' }
@@ -1117,6 +1232,9 @@ export async function reabrirBiopsiaAgendada(formData: FormData): Promise<{
 }> {
   try {
     const { ctx } = await exigirAccesoConsulta()
+    if (!ctx.esSuperAdmin && ctx.interfaceMode !== 'HOSPITALIZACION') {
+      return { ok: false, error: 'El módulo de Biopsias corresponde únicamente a Nefrología.' }
+    }
     const residencyId = ctx.residency!.id
     const id = String(formData.get('id') ?? '').trim()
     const previo = await prisma.biopsyRecord.findFirst({
@@ -1131,7 +1249,7 @@ export async function reabrirBiopsiaAgendada(formData: FormData): Promise<{
       where: { id: previo.id },
       data: {
         status: 'agendada',
-        highlightTag: 'programada',
+        highlightTag: 'normal',
         updatedBy: ctx.user.email,
         updatedByName: actorName,
         updatedByRole: actorRole,
@@ -1158,7 +1276,7 @@ export async function reabrirBiopsiaAgendada(formData: FormData): Promise<{
   }
 }
 
-// ─── APARTADO DE HEMODIÁLISIS AMBULATORIA (CONSULTA EXTERNA) ───
+// ─── APARTADO DE UNIDAD DE HEMODIÁLISIS AMBULATORIA ───
 function leerCamposHemodialisisConsulta(formData: FormData) {
   const s = (k: string) => String(formData.get(k) ?? '').trim() || null
   const ageStr = String(formData.get('age') ?? '').trim()
@@ -1217,6 +1335,9 @@ export async function crearHemodialisisConsulta(formData: FormData): Promise<{
 }> {
   try {
     const { ctx } = await exigirAccesoConsulta()
+    if (!ctx.esSuperAdmin && ctx.interfaceMode !== 'HEMODIALISIS') {
+      return { ok: false, error: 'Este expediente pertenece únicamente a la Unidad de Hemodiálisis.' }
+    }
     const residencyId = ctx.residency!.id
 
     const campos = leerCamposHemodialisisConsulta(formData)
@@ -1260,7 +1381,7 @@ export async function crearHemodialisisConsulta(formData: FormData): Promise<{
         patientName: `${campos.firstName} ${campos.lastName}`,
         diagnosisAndTime: campos.diagnosisAndTime,
       },
-      reason: `Expediente de Hemodiálisis ambulatoria creado: ${campos.firstName} ${campos.lastName}`,
+      reason: `Expediente de Hemodiálisis creado: ${campos.firstName} ${campos.lastName}`,
     })
 
     revalidatePath('/dashboard')
@@ -1279,6 +1400,9 @@ export async function actualizarHemodialisisConsulta(formData: FormData): Promis
 }> {
   try {
     const { ctx } = await exigirAccesoConsulta()
+    if (!ctx.esSuperAdmin && ctx.interfaceMode !== 'HEMODIALISIS') {
+      return { ok: false, error: 'Este expediente pertenece únicamente a la Unidad de Hemodiálisis.' }
+    }
     const residencyId = ctx.residency!.id
     const id = String(formData.get('id') ?? '').trim()
     if (!id) return { ok: false, error: 'Expediente no especificado.' }
@@ -1349,6 +1473,9 @@ export async function archivarReactivarHemodialisisConsulta(formData: FormData):
 }> {
   try {
     const { ctx } = await exigirAccesoConsulta()
+    if (!ctx.esSuperAdmin && ctx.interfaceMode !== 'HEMODIALISIS') {
+      return { ok: false, error: 'Este expediente pertenece únicamente a la Unidad de Hemodiálisis.' }
+    }
     const residencyId = ctx.residency!.id
     const id = String(formData.get('id') ?? '').trim()
     const isActive = String(formData.get('isActive') ?? 'false') === 'true'
